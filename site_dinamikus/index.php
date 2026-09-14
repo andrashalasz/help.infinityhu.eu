@@ -49,6 +49,10 @@ $UI = [
         'linkcopied' => 'Hivatkozás a vágólapra másolva', 'close' => 'Bezárás',
         'zoomin' => 'Nagyítás', 'zoomout' => 'Kicsinyítés', 'fit' => 'Eredeti méret',
         'fallback' => 'Ez a fejezet még nem érhető el ezen a nyelven — a magyar változat látható.',
+        'news' => 'Mi újság', 'newsslug' => 'mi-ujsag',
+        'newslead' => 'A legutóbb megjelent és frissített fejezetek.',
+        'nonews' => 'Az elmúlt időszakban nem volt változás.',
+        'isnew' => 'új', 'isupd' => 'frissítve', 'allchapters' => 'Összes fejezet',
     ],
     'en' => [
         'title' => 'Infinity Help', 'search' => 'Search the help…', 'onpage' => 'On this page',
@@ -64,6 +68,10 @@ $UI = [
         'linkcopied' => 'Link copied to clipboard', 'close' => 'Close',
         'zoomin' => 'Zoom in', 'zoomout' => 'Zoom out', 'fit' => 'Actual size',
         'fallback' => 'This chapter is not available in this language yet — showing the Hungarian version.',
+        'news' => "What's new", 'newsslug' => 'whats-new',
+        'newslead' => 'Recently added and updated chapters.',
+        'nonews' => 'No changes in the recent period.',
+        'isnew' => 'new', 'isupd' => 'updated', 'allchapters' => 'All chapters',
     ],
     'de' => [
         'title' => 'Infinity Hilfe', 'search' => 'Hilfe durchsuchen…', 'onpage' => 'Auf dieser Seite',
@@ -79,6 +87,10 @@ $UI = [
         'linkcopied' => 'Link in die Zwischenablage kopiert', 'close' => 'Schließen',
         'zoomin' => 'Vergrößern', 'zoomout' => 'Verkleinern', 'fit' => 'Originalgröße',
         'fallback' => 'Dieses Kapitel ist in dieser Sprache noch nicht verfügbar — es wird die ungarische Fassung gezeigt.',
+        'news' => 'Neuigkeiten', 'newsslug' => 'neuigkeiten',
+        'newslead' => 'Zuletzt veröffentlichte und aktualisierte Kapitel.',
+        'nonews' => 'Im letzten Zeitraum gab es keine Änderungen.',
+        'isnew' => 'neu', 'isupd' => 'aktualisiert', 'allchapters' => 'Alle Kapitel',
     ],
 ];
 
@@ -138,6 +150,22 @@ function searchArticles(PDO $pdo, string $lang, string $q): array
     return $st->fetchAll();
 }
 
+/**
+ * Az ujdonsagok (frissen kozzetett vagy modositott fejezetek) az adott nyelven.
+ * A help_publish() allitja be a highlight_until datumot; ami lejart, az kiesik.
+ */
+function getWhatsNew(PDO $pdo, string $lang): array
+{
+    try {
+        $st = $pdo->prepare('SELECT * FROM help_whatsnew WHERE lang = ?
+                          ORDER BY updated_at DESC, chapter_no LIMIT 50');
+        $st->execute([$lang]);
+        return $st->fetchAll();
+    } catch (Throwable $e) {
+        return [];   // ha a 006 migracio meg nem futott le, a sugo ettol meg mukodjon
+    }
+}
+
 /** Az adott cikk elozo/kovetkezo szomszedja a teljes, modulokon atnyulo sorrendben. */
 function neighbours(array $modules, string $slug): array
 {
@@ -182,9 +210,16 @@ $isEmbed = ($parts[1] ?? '') === 'embed';
 $slug    = $isEmbed ? ($parts[2] ?? null) : ($parts[1] ?? null);
 $modules = getModules($pdo, $lang);
 
+$fresh    = getWhatsNew($pdo, $lang);
+$freshSet = [];
+foreach ($fresh as $f) { $freshSet[$f['slug']] = $f; }
+
+$NEWS_SLUGS = ['mi-ujsag', 'whats-new', 'neuigkeiten'];
+$isNews = $slug !== null && in_array($slug, $NEWS_SLUGS, true);
+
 $article  = null;
 $fallback = false;
-if ($slug !== null && $slug !== '') {
+if ($slug !== null && $slug !== '' && !$isNews) {
     $article = getArticle($pdo, $slug, $lang);
     if ($article === null && $lang !== 'hu') {
         // ha az adott nyelven meg nincs kesz a forditas, mutassuk a magyart
@@ -277,7 +312,7 @@ if ($isEmbed) {
 }
 
 // ============================================================ TELJES OLDAL
-if ($slug !== null && $slug !== '' && $article === null) {
+if ($slug !== null && $slug !== '' && $article === null && !$isNews) {
     http_response_code(404);
 }
 [$prev, $next] = $article ? neighbours($modules, $article['slug']) : [null, null];
@@ -330,6 +365,11 @@ $totalArticles = array_sum(array_map(static fn($m) => count($m['articles']), $mo
          href="/<?= h($L) ?>/<?= $article ? h($article['slug']) : '' ?>"><?= strtoupper($L) ?></a>
     <?php endforeach; ?>
   </nav>
+
+  <a class="sbtn<?= $isNews ? ' on' : '' ?>" href="/<?= h($lang) ?>/<?= h($u['newsslug']) ?>" title="<?= h($u['news']) ?>">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10v12H4z"/><path d="M14 9h4a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1"/><path d="M7 9h4M7 12h4M7 15h3"/></svg>
+    <?php if ($fresh): ?><span class="count"><?= count($fresh) > 99 ? '99+' : count($fresh) ?></span><?php endif; ?>
+  </a>
 
   <button class="sbtn" id="theme-toggle" title="<?= h($u['theme']) ?>" aria-label="<?= h($u['theme']) ?>"></button>
 
@@ -398,7 +438,9 @@ $totalArticles = array_sum(array_map(static fn($m) => count($m['articles']), $mo
           <div class="nav__list">
             <?php foreach ($m['articles'] as $a): ?>
               <a class="nav__a<?= $article && $a['slug'] === $article['slug'] ? ' on' : '' ?>"
-                 href="/<?= h($lang) ?>/<?= h($a['slug']) ?>"><em><?= h($a['chapter_no']) ?></em><?= h($a['title']) ?></a>
+                 href="/<?= h($lang) ?>/<?= h($a['slug']) ?>"><em><?= h($a['chapter_no']) ?></em><?= h($a['title']) ?><?php
+                 if (isset($freshSet[$a['slug']])): ?><span class="fresh" title="<?=
+                     h($freshSet[$a['slug']]['change_flag'] === 'new' ? $u['isnew'] : $u['isupd']) ?>"></span><?php endif; ?></a>
             <?php endforeach; ?>
           </div>
         </div>
@@ -408,12 +450,50 @@ $totalArticles = array_sum(array_map(static fn($m) => count($m['articles']), $mo
 
   <!-- tartalom -->
   <main>
-    <?php if ($article === null && ($slug === null || $slug === '')): ?>
+    <?php if ($isNews): ?>
+      <!-- ---------------- Mi újság ---------------- -->
+      <section class="hero" style="padding:24px 30px">
+        <h1><?= h($u['news']) ?></h1>
+        <p><?= h($u['newslead']) ?></p>
+      </section>
+      <?php if (!$fresh): ?>
+        <div class="card"><p class="muted"><?= h($u['nonews']) ?></p>
+          <p><a href="/<?= h($lang) ?>/"><?= h($u['allchapters']) ?> →</a></p></div>
+      <?php else: ?>
+        <?php foreach ($fresh as $f): ?>
+          <a class="news-item" href="/<?= h($lang) ?>/<?= h($f['slug']) ?>">
+            <div class="news-item__h">
+              <span class="chip chip--fresh"><?= h($f['change_flag'] === 'new' ? $u['isnew'] : $u['isupd']) ?></span>
+              <span class="news-item__t"><?= h(trim($f['chapter_no'] . ' ' . $f['title'])) ?></span>
+              <span style="flex:1"></span>
+              <span class="news-date"><?= h((string)$f['updated_at']) ?></span>
+            </div>
+            <div class="news-item__m"><?= h(trim(($f['module_no'] ?? '') . ' ' . ($f['module_title'] ?? ''))) ?></div>
+            <?php if (!empty($f['summary'])): ?>
+              <div class="news-item__s"><?= h((string)$f['summary']) ?></div>
+            <?php endif; ?>
+          </a>
+        <?php endforeach; ?>
+      <?php endif; ?>
+
+    <?php elseif ($article === null && ($slug === null || $slug === '')): ?>
       <!-- ---------------- kezdőlap ---------------- -->
       <section class="hero">
         <h1><?= h($siteTitle) ?></h1>
         <p><?= h($u['hero']) ?></p>
       </section>
+      <?php if ($fresh): ?>
+        <a class="news-item" href="/<?= h($lang) ?>/<?= h($u['newsslug']) ?>" style="margin-bottom:18px">
+          <div class="news-item__h">
+            <span class="chip chip--fresh"><?= count($fresh) ?></span>
+            <span class="news-item__t"><?= h($u['news']) ?></span>
+            <span style="flex:1"></span>
+            <span class="news-date"><?= h((string)$fresh[0]['updated_at']) ?></span>
+          </div>
+          <div class="news-item__s"><?= h($u['newslead']) ?></div>
+        </a>
+      <?php endif; ?>
+
       <div class="tiles">
         <?php foreach ($modules as $m): if (!$m['articles']) { continue; } ?>
           <a class="tile" href="/<?= h($lang) ?>/<?= h($m['articles'][0]['slug']) ?>">
@@ -447,8 +527,10 @@ $totalArticles = array_sum(array_map(static fn($m) => count($m['articles']), $mo
         <div class="meta">
           <span class="chip"><?= h($u['updated']) ?> <?= h((string)$article['updated_at']) ?></span>
           <span class="chip"><?= h((string)$article['doc_version']) ?></span>
-          <?php if ($article['change_flag'] === 'new'): ?><span class="chip chip--new">új</span>
-          <?php elseif ($article['change_flag'] === 'mod'): ?><span class="chip chip--mod">módosult</span><?php endif; ?>
+          <?php if (isset($freshSet[$article['slug']])): ?>
+            <span class="chip chip--fresh"><?= h($article['change_flag'] === 'new' ? $u['isnew'] : $u['isupd']) ?></span>
+          <?php elseif ($article['change_flag'] === 'new'): ?><span class="chip chip--new"><?= h($u['isnew']) ?></span>
+          <?php elseif ($article['change_flag'] === 'mod'): ?><span class="chip chip--mod"><?= h($u['isupd']) ?></span><?php endif; ?>
           <?php if ((int)$article['img_count'] > 0): ?>
             <span class="chip"><?= (int)$article['img_count'] ?> <?= h($u['image']) ?></span>
           <?php endif; ?>

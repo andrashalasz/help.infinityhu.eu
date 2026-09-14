@@ -165,3 +165,112 @@ final class Translator
         return (string)$body;
     }
 }
+
+/**
+ * Egy forditas eltarolasa a celnyelvi cikk vazlatakent.
+ * Ha meg nincs celnyelvi valtozat, letrehozza (ugyanazzal a slug-gal).
+ *
+ * @return int a celnyelvi cikk azonositoja
+ */
+function translate_store(
+    PDO $db, int $srcId, string $to, string $html, string $title,
+    string $how, ?int $userId, bool $publish = false
+): int {
+    $st = $db->prepare('SELECT * FROM help_article WHERE id = ?');
+    $st->execute([$srcId]);
+    $src = $st->fetch();
+    if (!$src) {
+        throw new RuntimeException('Nincs ilyen forrásfejezet: ' . $srcId);
+    }
+
+    $t = $db->prepare('SELECT id FROM help_article WHERE slug = ? AND lang = ?');
+    $t->execute([$src['slug'], $to]);
+    $targetId = (int)($t->fetchColumn() ?: 0);
+
+    if ($targetId === 0) {
+        // celnyelvi modul: ugyanaz a chapter_no; ha nincs, atmasoljuk
+        $mst = $db->prepare('SELECT m2.id FROM help_module m1 JOIN help_module m2
+                                ON m2.chapter_no = m1.chapter_no AND m2.lang = ?
+                              WHERE m1.id = ?');
+        $mst->execute([$to, $src['module_id']]);
+        $moduleId = (int)($mst->fetchColumn() ?: 0);
+        if ($moduleId === 0) {
+            $mi = $db->prepare('INSERT INTO help_module (chapter_no, slug, title, lang, sort_order)
+                                SELECT chapter_no, slug, title, ?, sort_order FROM help_module WHERE id = ?
+                                RETURNING id');
+            $mi->execute([$to, $src['module_id']]);
+            $moduleId = (int)$mi->fetchColumn();
+        }
+        $ai = $db->prepare('INSERT INTO help_article
+                (module_id, chapter_no, slug, title, lang, body_html, plain_text, doc_version,
+                 updated_at, content_hash, sort_order, is_published, draft_html, draft_title,
+                 draft_by, draft_at, source)
+                VALUES (?,?,?,?,?,\'\',\'\',?, CURRENT_DATE, md5(?), ?, false, ?, ?, ?, now(), \'editor\')
+                RETURNING id');
+        $ai->execute([
+            $moduleId, $src['chapter_no'], $src['slug'], $title !== '' ? $title : $src['title'], $to,
+            $src['doc_version'], $src['slug'] . $to, (int)$src['sort_order'],
+            $html, $title !== '' ? $title : null, $userId,
+        ]);
+        $targetId = (int)$ai->fetchColumn();
+    } else {
+        $db->prepare('UPDATE help_article SET draft_html = ?, draft_title = ?, draft_by = ?, draft_at = now() WHERE id = ?')
+           ->execute([$html, $title !== '' ? $title : null, $userId, $targetId]);
+    }
+
+    $db->prepare('UPDATE help_article SET translated_from_hash = ?, translated_by = ?, translated_at = now() WHERE id = ?')
+       ->execute([$src['content_hash'], mb_substr($how, 0, 16), $targetId]);
+
+    if ($publish) {
+        $db->prepare('SELECT help_publish(?, ?, ?, ?, NULL, true)')
+           ->execute([$targetId, $userId, null, 'mod']);
+        $b = $db->prepare('SELECT body_html FROM help_article WHERE id = ?');
+        $b->execute([$targetId]);
+        sections_rebuild($db, $targetId, (string)$b->fetchColumn());
+    }
+
+    return $targetId;
+}
+
+/** Be van-e kapcsolva az automatikus forditas, es van-e mivel forditani? */
+function mt_auto_on(PDO $db, array $cfg): bool
+{
+    try {
+        $v = (string)$db->query("SELECT value FROM help_setting WHERE key = 'mt_auto'")->fetchColumn();
+    } catch (Throwable $e) {
+        return false;
+    }
+    return $v === '1' && Translator::fromConfig($cfg, $db)->isConfigured();
+}
+
+/**
+ * Egy frissen importalt/letrehozott MAGYAR fejezet automatikus leforditasa
+ * a tobbi nyelvre. Csak vazlatot keszit - kozzetenni ember dont.
+ *
+ * @return array{done: list<string>, failed: array<string,string>}
+ */
+function mt_auto_translate(PDO $db, array $cfg, int $srcId, ?int $userId, array $targets = ['en', 'de']): array
+{
+    $done = []; $failed = [];
+    $tr = Translator::fromConfig($cfg, $db);
+
+    $st = $db->prepare("SELECT lang, title, body_html FROM help_article WHERE id = ?");
+    $st->execute([$srcId]);
+    $src = $st->fetch();
+    if (!$src || $src['lang'] !== 'hu') { return ['done' => [], 'failed' => []]; }
+
+    foreach ($targets as $to) {
+        try {
+            $html  = $tr->translateHtml((string)$src['body_html'], 'hu', $to);
+            $title = trim(help_plain($tr->translateHtml(
+                '<p>' . htmlspecialchars((string)$src['title'], ENT_QUOTES, 'UTF-8') . '</p>', 'hu', $to)));
+            $clean = help_clean_html($html);
+            [$clean] = help_anchorize($clean);
+            translate_store($db, $srcId, $to, $clean, $title, $tr->provider, $userId, false);
+            $done[] = $to;
+        } catch (Throwable $e) {
+            $failed[$to] = $e->getMessage();
+        }
+    }
+    return ['done' => $done, 'failed' => $failed];
+}

@@ -52,6 +52,8 @@ fejezetfa, kártyás tartalom, jobb oldalt oldalon belüli tartalomjegyzék.
 | **Sötét mód** | világos / sötét / rendszer szerinti; a fejléc holdgombjával vagy `D` billentyűvel |
 | **Keresés** | `Ctrl+K` vagy `/`, ékezet-független, nyilakkal járható, kiemelt találatokkal |
 | **Navigáció** | modulonként nyitható-zárható fa, szűrőmezővel; az állapot megmarad |
+| **Mi újság** | a fejlécben jelvény mutatja, hány fejezet új vagy frissült; a fejezetfában zöld pont, a fejezet fejlécében „új” / „frissítve” címke, és külön **Mi újság** lap az összes friss változással |
+| **Videó** | a fejezetekbe videó is kerülhet, a böngésző saját lejátszójával (tekerhető, teljes képernyős) |
 | **Egyéb** | olvasási csík, aktív szakasz követése, címsor-horgonyok másolása, előző/következő fejezet, nyomtatási nézet, mobilnézet |
 
 Útvonalak:
@@ -62,6 +64,7 @@ fejezetfa, kártyás tartalom, jobb oldalt oldalon belüli tartalomjegyzék.
 | `/hu/` | kezdőlap, modul-csempékkel |
 | `/hu/5-4-kintlevoseg-kezeles` | konkrét fejezet |
 | `/hu/embed/5-4-kintlevoseg-kezeles` | beágyazható (iframe) változat |
+| `/hu/mi-ujsag` · `/en/whats-new` · `/de/neuigkeiten` | Mi újság — a friss változások |
 | `/search?lang=hu&q=szamla` | JSON keresés |
 
 Az admin felületre **szándékosan nem vezet link a súgóból** — a `/admin.php` címet
@@ -85,9 +88,14 @@ Bal oldalt a teljes fejezetlista nyelvenként, szűrővel. Jobb oldalt a szerkes
   és **HTML forrás nézet** — a kettő között bármikor lehet váltani. `Ctrl+S` ment.
 - **Vázlat → közzététel**: amit mentesz, az *vázlat*, a nyilvános oldalon még a régi látszik.
   A közzététel élesíti, és eltesz egy visszaállítható verziót.
-- **Fejezet ki-/bekapcsolása** egyetlen gombbal: ha egy fejezet még nincs kész, kapcsold ki —
-  eltűnik a nyilvános oldalról, de a tartalma és a vázlata megmarad. A bal oldali listában
-  szürke pont jelzi a kikapcsolt, sárga a vázlattal rendelkező fejezeteket.
+- **Ki-/bekapcsolás nyelvenként**: a fejezet fölött külön kártya mutatja a magyar, angol és német
+  változatot, mindegyiket külön lehet láthatóvá tenni vagy elrejteni — és egy gombbal mind a hármat
+  egyszerre. Ha egy fejezet még nincs kész egy nyelven, csak azt a nyelvet kapcsold ki; a tartalom
+  és a vázlat megmarad. **Alapból minden be van kapcsolva.** A bal oldali listában szürke pont jelzi
+  a kikapcsolt, sárga a vázlattal rendelkező fejezeteket.
+- **Kép és videó feltöltése közvetlenül a szerkesztőből**: a **Kép** / **Videó** gomb, a fájl
+  ráhúzása a szövegre, vagy vágólapról beillesztett képernyőkép — mind azonnal feltölt és beszúr.
+  Nem kell előre a Képek fülre menni.
 - **Adatok**: fejezetszám, cím, URL-azonosító, modul, sorrend, jogosultság.
 - **Korábbi változatok**: minden közzététel előtti állapot megmarad, egy kattintással visszatölthető vázlatként.
 - Új fejezet létrehozása, fejezet törlése.
@@ -111,6 +119,8 @@ Feltöltesz egy **.docx**-et, és a rendszer:
 
 Az átvett tartalom **vázlat** lesz — közzétenni külön kell (vagy egy pipával rögtön az átvételkor).
 Az új fejezetek kikapcsolt állapotban jönnek létre, amíg közzé nem teszed őket.
+Ha a **Beállítások** fülön be van kapcsolva az automatikus fordítás, a frissen átvett magyar
+fejezetekből rögtön elkészül az angol és német vázlat is.
 Nem használ külső könyvtárat, csak a PHP `zip` és `dom` kiterjesztését.
 
 ### Fordítás
@@ -124,12 +134,49 @@ Beállítani a **Beállítások** fülön vagy környezeti változóval lehet
 (`HELP_MT_PROVIDER`, `HELP_MT_ENDPOINT`, `HELP_MT_KEY`). **Szolgáltató nélkül is használható**
 a fül, csak a nyersfordítás gomb marad inaktív.
 
+**Fizetős kulcs nélkül is megoldható.** A csomagban van egy saját, helyben futó fordító:
+
+```bash
+docker compose --profile mt up -d      # LibreTranslate, hu/en/de modellekkel
+```
+
+Utána a **Beállítások** fülön: Szolgáltató = *LibreTranslate*, Végpont = `http://libretranslate:5000`.
+Az első indulás pár perc (letölti a nyelvi modelleket, ~1–2 GB), utána minden helyben fut,
+nem megy ki adat a hálózatra. Ez nem indul el a szokásos `docker compose up`-pal.
+
+**Automatikus fordítás**: a Beállítások fülön bekapcsolható, hogy minden új vagy Word-ből
+importált magyar fejezetből rögtön készüljön angol és német **vázlat**. A gépi fordítás mindig
+csak vázlatot készít — közzétenni ember dönt. A Fordítás fülön az `EN + DE egyben` gombbal
+egy fejezetre kézzel is elindítható.
+
 ### Képernyők
 Útvonal → fejezet hozzárendelés: ez mondja meg, az Infinity melyik képernyőjén a `?` gomb
 melyik fejezetet nyissa meg.
 
-### Képek
-A `media/` mappa tartalma, feltöltéssel. A fájlnév itt is a tartalom hash-e.
+### Képek, videók
+A fájltár áttekintése, tömeges feltöltés, szűrés kép/videó szerint, törlés (csak olyan fájl
+törölhető, amire egyetlen fejezet sem hivatkozik). **Szerkesztés közben nem kell ide jönni** —
+a szerkesztőből közvetlenül tölthetsz fel. A fájlnév a tartalom hash-e, ezért ugyanaz a fájl
+csak egyszer kerül a szerverre.
+
+| | formátumok | méret |
+|---|---|---|
+| kép | PNG, JPG, GIF, WebP, SVG | max 25 MB |
+| videó | MP4 (H.264), WebM, MOV | max 400 MB |
+
+A videókat a böngésző saját lejátszója játssza le, tekeréssel (a szerver `Range` kéréseket is
+kiszolgál). A Word-exportba a videó nem kerül bele — ott hivatkozás marad a helyén.
+
+### Export
+A teljes használati útmutató letölthető **bármelyik nyelven**, **tartalomjegyzékkel**:
+
+- **Word (.docx)** — címlap, valódi Word-tartalomjegyzék (`TOC` mező, a Word felajánlja a
+  frissítését, vagy `F9`), modulonként új oldal, beágyazott képek, táblázatok, Tipp/Figyelem dobozok.
+- **Nyomtatható HTML** — ebből a böngésző *Nyomtatás → Mentés PDF-ként* funkciójával lesz PDF,
+  külön eszköz nélkül.
+
+Egy pipával a még nem közzétett (kikapcsolt) fejezetek is belevehetők — belső átnézésre hasznos.
+Az export **mindig a friss adatbázis-tartalomból** dolgozik, nem egy korábbi pillanatképből.
 
 ### Felhasználók
 Létrehozás, szerepkör, aktiválás/inaktiválás, jelszó beállítása. Új felhasználónak és
@@ -183,6 +230,7 @@ A fájlok ábécé-sorrendben futnak le (így teszi a postgres image is):
 | `03_changelog_migracio.sql` | kiadás-kezelés: `help_release`, bővített `help_publish()`, `help_news` nézet |
 | `04_erp_norm_fix.sql` | **javítás** — lásd lent |
 | `05_admin_felulet.sql` | az admin felület táblái (`help_user`, `help_setting`, `help_import`, `help_audit`), a fordítási állapot mezői, és **két hibajavítás** — lásd lent |
+| `06_video_export_ujdonsag.sql` | videó a képek mellé (`help_media.kind`), újdonság-kiemelés (`help_article.highlight_until`, `help_whatsnew` nézet), automatikus fordítás kapcsolója |
 | `99_docker_roles.sql` | a `help_ro` (olvasó) és `help_rw` (író) szerepkör, fejlesztői jelszóval |
 
 Az első három fájl az eredeti csomag `01_infinity_fo_rendszerbe/sql/` mappájából származik,
@@ -238,6 +286,7 @@ psql -d help_infinityhu -f db/02_szerkeszto_migracio.sql
 psql -d help_infinityhu -f db/03_changelog_migracio.sql
 psql -d help_infinityhu -f db/04_erp_norm_fix.sql
 psql -d help_infinityhu -f db/05_admin_felulet.sql
+psql -d help_infinityhu -f db/06_video_export_ujdonsag.sql
 
 # a szerepkoroket SAJAT jelszoval hozd letre, ne a 99-es fajllal:
 psql -d help_infinityhu -c "CREATE ROLE help_ro LOGIN PASSWORD '...';"
@@ -328,10 +377,27 @@ Az alábbiakat ténylegesen lefuttatva ellenőriztük a Docker környezetben, ne
 - **Word import**: valódi .docx-ből 2 fejezet (1 meglévő + 1 új) és 1 kép kibontva,
   a meglévőhöz szó szintű diff (19,7% egyezés), átvétel után vázlat, illetve új,
   kikapcsolt fejezet jött létre
-- mind a kilenc fül hibamentesen renderel (a PHP naplóban nincs warning)
+- mind a tíz fül hibamentesen renderel (a PHP naplóban nincs warning)
+- **kép és videó feltöltése a szerkesztőből**: PNG feltöltve és beszúrva, MP4 felismerve
+  (`video/mp4`), `vid_<hash>.mp4` néven eltárolva; nem támogatott fájltípus elutasítva
+- a videó kiszolgálása `Content-Type: video/mp4` fejléccel és `Range` kérésekkel (HTTP 206),
+  tehát a lejátszóban tekerhető
+- **újdonság-kiemelés**: közzététel után a fejezet 30 napig „frissítve" jelölést kap, megjelenik
+  a Mi újság lapon az összefoglalóval, a fejlécben a számláló 1-re vált, a fejezetfában zöld pont
+
+**Export — valódi dokumentumon ellenőrizve**
+- a teljes magyar útmutató Word-exportja: **17 MB**, 1,7 másodperc alatt
+- benne **109 fejezet** (Heading2), 17 modul (Heading1), 199 szakasz (Heading3),
+  **276 kép beágyazva**, 64 táblázat, valódi `TOC` mező
+- a dokumentumot a **macOS saját Word-olvasója (textutil) hiba nélkül megnyitotta** és
+  171 KB szöveget olvasott ki belőle — címlap, tartalomjegyzék, címsorok, táblázatok,
+  Tipp/Figyelem dobozok, számozott listák mind a helyükön
+- az angol nyomtatható HTML-export 109 fejezettel, kattintható tartalomjegyzékkel
 
 **Amit nem tudtunk itt ellenőrizni**
 - a gépi fordítás valódi szolgáltatóval (DeepL/LibreTranslate/Google kulcs nélkül) — a
   kódút és a hibakezelés megvan, de éles hívás nem futott
+- valódi, kódolt videó lejátszása: a feltöltési út (felismerés, tárolás, beszúrás, kiszolgálás
+  `Range`-dzsel) ellenőrizve, de kódolt MP4 nem volt kéznél a gépen
 - az Infinity-n belüli Yii2 modul (`/help/admin`, Word/PDF export, RBAC) — az az eredeti
   csomag 1. részében van, és nem tárgya ennek a repónak

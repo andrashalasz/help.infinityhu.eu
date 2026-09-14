@@ -11,7 +11,8 @@ const ADMIN_TABS = [
     'import'    => 'Word import',
     'translate' => 'Fordítás',
     'screens'   => 'Képernyők',
-    'media'     => 'Képek',
+    'media'     => 'Képek, videók',
+    'export'    => 'Export',
     'users'     => 'Felhasználók',
     'settings'  => 'Beállítások',
 ];

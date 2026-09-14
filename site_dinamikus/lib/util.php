@@ -93,7 +93,10 @@ function help_clean_html(string $html): string
         'table' => ['class'], 'thead' => [], 'tbody' => [], 'tfoot' => [],
         'tr' => ['class'], 'th' => ['class','colspan','rowspan','scope'], 'td' => ['class','colspan','rowspan'],
         'a' => ['href','title','target','rel'],
-        'img' => ['src','alt','title','width','height','class'],
+        'img' => ['src','alt','title','width','height','class','loading'],
+        'video' => ['src','controls','preload','poster','width','height','class','muted','loop','playsinline'],
+        'source' => ['src','type'],
+        'track' => ['src','kind','srclang','label','default'],
         'figure' => ['class'], 'figcaption' => ['class'],
         'div' => ['class','id'], 'span' => ['class'],
         'section' => ['class','id'],
@@ -252,7 +255,8 @@ function help_logo(int $size = 30, string $idSuffix = ''): string
         }
     }
     if ($file !== '') {
-        return '<img class="logo-img" src="' . h($file) . '" alt="Infinity" width="' . $size . '" height="' . $size . '">';
+        // a magassagot adjuk meg, a szelesseg a kep aranyabol jon - igy nem torzul
+        return '<img class="logo-img" src="' . h($file) . '" alt="Infinity" height="' . $size . '" decoding="async">';
     }
 
     $h  = (int)round($size * 0.5);

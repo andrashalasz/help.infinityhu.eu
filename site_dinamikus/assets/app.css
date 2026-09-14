@@ -513,3 +513,41 @@ a:hover { text-decoration: underline; }
 .body table.erp-table tr.header td { background: var(--surface-3); font-weight: 700; }
 .body table.erp-table tr.odd  td { background: var(--surface); }
 .body table.erp-table tr.even td { background: var(--surface-2); }
+
+/* ---------- 15. videó a fejezetekben ---------- */
+.body figure.vid { margin: 0 0 20px; }
+.body video {
+  max-width: 100%; width: 100%; display: block;
+  border: 1px solid var(--line); border-radius: var(--r);
+  background: #000; box-shadow: var(--shadow-1);
+}
+.body figure.vid figcaption { margin-top: 6px; font-size: calc(12.2px * var(--fs)); color: var(--ink-3); }
+
+/* ---------- 16. újdonság-kiemelés ---------- */
+.chip--fresh {
+  background: var(--ok); color: #fff; border-color: transparent;
+  letter-spacing: .4px; text-transform: uppercase; font-size: calc(10.6px * var(--fs));
+}
+.nav__a .fresh {
+  display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--ok); margin-left: 5px; vertical-align: middle;
+}
+.sbtn .count {
+  position: absolute; top: 3px; right: 2px; min-width: 15px; height: 15px; padding: 0 3px;
+  border-radius: 100px; background: var(--ok); color: #fff;
+  font-size: 10px; font-weight: 800; line-height: 15px; text-align: center;
+}
+.sbtn { position: relative; }
+
+/* Mi újság lap */
+.news-item {
+  display: block; padding: 14px 18px; margin-bottom: 10px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg);
+  box-shadow: var(--shadow-1); color: var(--ink);
+}
+.news-item:hover { border-color: var(--brand); text-decoration: none; box-shadow: var(--shadow-2); }
+.news-item__h { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; margin-bottom: 4px; }
+.news-item__t { font-size: calc(15.5px * var(--fs)); font-weight: 700; }
+.news-item__m { font-size: calc(12.2px * var(--fs)); color: var(--ink-3); }
+.news-item__s { font-size: calc(13.4px * var(--fs)); color: var(--ink-2); margin-top: 4px; }
+.news-date { font-size: calc(11.6px * var(--fs)); color: var(--ink-3); font-variant-numeric: tabular-nums; }

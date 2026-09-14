@@ -14,12 +14,14 @@ RUN set -eux; \
     rm -rf /var/lib/apt/lists/*; \
     a2enmod rewrite headers
 
-# A Word-fajlok nagyok lehetnek (kepekkel egyutt 50-100 MB is)
+# A Word-fajlok nagyok lehetnek (a valodi utmutato kepekkel egyutt 27 MB),
+# az oktatovideok pedig meg nagyobbak - ezert bo limitek.
 RUN { \
-      echo 'upload_max_filesize = 128M'; \
-      echo 'post_max_size = 128M'; \
-      echo 'memory_limit = 512M'; \
-      echo 'max_execution_time = 300'; \
+      echo 'upload_max_filesize = 512M'; \
+      echo 'post_max_size = 512M'; \
+      echo 'memory_limit = 1024M'; \
+      echo 'max_execution_time = 600'; \
+      echo 'max_file_uploads = 60'; \
       echo 'expose_php = Off'; \
     } > /usr/local/etc/php/conf.d/help.ini
 

@@ -156,18 +156,94 @@
       });
     }
 
-    var imgBtn = $('.ed-toolbar [data-act="image"]');
-    if (imgBtn) {
-      imgBtn.addEventListener('click', function () {
-        var name = window.prompt('Kép fájlneve a /media mappából (pl. img_7a90df0c0c19.png):', 'img_');
-        if (!name) { return; }
-        name = name.replace(/^\/?media\//, '').trim();
-        if (!/^[A-Za-z0-9._-]+\.(png|jpe?g|gif|webp)$/i.test(name)) { toast('Érvénytelen fájlnév.', 'err'); return; }
-        area.focus();
-        document.execCommand('insertHTML', false, '<p><img src="/media/' + name + '" class="shot" alt=""></p>');
-        syncToSource();
-      });
+    // ---------- kep / video feltoltes kozvetlenul a szerkesztobol ----------
+    function csrfOf() {
+      var i = (form && form.querySelector('[name=csrf]')) || document.querySelector('[name=csrf]');
+      return i ? i.value : '';
     }
+
+    function insertAtCursor(html) {
+      area.focus();
+      document.execCommand('insertHTML', false, html);
+      syncToSource();
+      var st = $('#ed-state');
+      if (st) { st.dataset.dirty = '1'; st.textContent = 'Nem mentett változások — Ctrl+S vagy „Vázlat mentése”.'; }
+    }
+
+    function uploadFile(file) {
+      if (!file) { return Promise.resolve(); }
+      var fd = new FormData();
+      fd.append('a', 'media.inline');
+      fd.append('fmt', 'json');
+      fd.append('csrf', csrfOf());
+      fd.append('file', file);
+
+      var mark = 'up-' + Math.random().toString(36).slice(2);
+      insertAtCursor('<p id="' + mark + '" class="uploading">Feltöltés: ' +
+        file.name.replace(/[<>&]/g, '') + ' …</p>');
+
+      return fetch('admin.php', { method: 'POST', body: fd })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          var ph = document.getElementById(mark);
+          if (!d.ok) { throw new Error(d.error || 'Ismeretlen hiba'); }
+          if (ph) {
+            ph.outerHTML = d.html;
+          } else {
+            insertAtCursor(d.html);
+          }
+          syncToSource();
+          toast(d.existed ? 'Ez a fájl már fent volt, újra felhasználtam.' : 'Feltöltve: ' + d.name);
+        })
+        .catch(function (e) {
+          var ph = document.getElementById(mark);
+          if (ph) { ph.remove(); }
+          syncToSource();
+          toast('Nem sikerült: ' + e.message, 'err');
+        });
+    }
+
+    function pickAndUpload(accept) {
+      var inp = document.createElement('input');
+      inp.type = 'file';
+      inp.accept = accept;
+      inp.multiple = true;
+      inp.style.display = 'none';
+      document.body.appendChild(inp);
+      inp.addEventListener('change', function () {
+        var files = Array.prototype.slice.call(inp.files || []);
+        files.reduce(function (chain, f) {
+          return chain.then(function () { return uploadFile(f); });
+        }, Promise.resolve()).then(function () { inp.remove(); });
+      });
+      inp.click();
+    }
+
+    var upImg = $('.ed-toolbar [data-act="upload-image"]');
+    if (upImg) { upImg.addEventListener('click', function () { pickAndUpload('image/*'); }); }
+    var upVid = $('.ed-toolbar [data-act="upload-video"]');
+    if (upVid) { upVid.addEventListener('click', function () { pickAndUpload('video/mp4,video/webm,video/quicktime'); }); }
+
+    // fogd-és-vidd a szerkesztore
+    ['dragenter', 'dragover'].forEach(function (ev) {
+      area.addEventListener(ev, function (e) {
+        if (!e.dataTransfer || Array.prototype.indexOf.call(e.dataTransfer.types || [], 'Files') < 0) { return; }
+        e.preventDefault();
+        area.classList.add('ed--drop');
+      });
+    });
+    ['dragleave', 'dragend'].forEach(function (ev) {
+      area.addEventListener(ev, function () { area.classList.remove('ed--drop'); });
+    });
+    area.addEventListener('drop', function (e) {
+      var files = e.dataTransfer && e.dataTransfer.files;
+      if (!files || !files.length) { return; }
+      e.preventDefault();
+      area.classList.remove('ed--drop');
+      Array.prototype.slice.call(files).reduce(function (chain, f) {
+        return chain.then(function () { return uploadFile(f); });
+      }, Promise.resolve());
+    });
 
     [['callout-tip', 'tip', 'Tipp'], ['callout-warn', 'warn', 'Figyelem']].forEach(function (c) {
       var b = $('.ed-toolbar [data-act="' + c[0] + '"]');
@@ -191,6 +267,17 @@
 
     // csak sima szöveg (illetve tiszta HTML) kerüljön be beillesztéskor
     area.addEventListener('paste', function (e) {
+      // kep a vagolapon (pl. kepernyokep) -> feltoltjuk
+      var items = e.clipboardData && e.clipboardData.items;
+      if (items) {
+        for (var i = 0; i < items.length; i++) {
+          if (items[i].kind === 'file' && /^image\//.test(items[i].type)) {
+            e.preventDefault();
+            uploadFile(items[i].getAsFile());
+            return;
+          }
+        }
+      }
       var html = e.clipboardData && e.clipboardData.getData('text/html');
       if (!html) { return; }
       e.preventDefault();

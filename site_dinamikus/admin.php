@@ -23,6 +23,8 @@ require __DIR__ . '/lib/auth.php';
 require __DIR__ . '/lib/diff.php';
 require __DIR__ . '/lib/docx.php';
 require __DIR__ . '/lib/mt.php';
+require __DIR__ . '/lib/media.php';
+require __DIR__ . '/lib/docx_export.php';
 require __DIR__ . '/lib/admin_layout.php';
 require __DIR__ . '/lib/admin_actions.php';
 require __DIR__ . '/lib/admin_pages.php';
@@ -141,6 +143,9 @@ switch ($page) {
         break;
     case 'users':
         page_users($db, $counts);
+        break;
+    case 'export':
+        page_export($db, $cfg, $lang, $counts);
         break;
     case 'settings':
         page_settings($db, $cfg, $counts);

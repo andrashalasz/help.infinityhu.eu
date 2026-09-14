@@ -158,6 +158,22 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             back(['p' => 'articles', 'id' => $id]);
         }
 
+        // Egy fejezet OSSZES nyelvi valtozatanak egyszerre valo ki-/bekapcsolasa.
+        case 'article.toggle-all': {
+            $id = (int)post('id');
+            $st = $db->prepare('SELECT slug FROM help_article WHERE id = ?');
+            $st->execute([$id]);
+            $slug = (string)$st->fetchColumn();
+            $on   = post('on') === '1';
+            $n = $db->prepare('UPDATE help_article SET is_published = ? WHERE slug = ?');
+            $n->execute([$on ? 'true' : 'false', $slug]);
+            audit_me($db, 'article.toggle-all', 'slug:' . $slug, $on ? 'be' : 'ki');
+            flash('ok', $on
+                ? 'A fejezet <b>mindhárom nyelven</b> közzétéve.'
+                : 'A fejezet <b>mindhárom nyelven</b> kikapcsolva.');
+            back(['p' => 'articles', 'id' => $id]);
+        }
+
         case 'article.meta': {
             $id = (int)post('id');
             $slug = post('slug');
@@ -468,10 +484,27 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             }
 
             $db->prepare('UPDATE help_import SET status = ? WHERE id = ?')->execute(['applied', $importId]);
+
+            // Automatikus forditas: ha be van kapcsolva es van beallitva gepi fordito,
+            // a frissen atvett MAGYAR fejezetekbol rogton keszul EN/DE vazlat is.
+            $autoOk = 0; $autoFail = 0;
+            if ($lang === 'hu' && mt_auto_on($db, $cfg)) {
+                foreach ($items as $it) {
+                    $aid = (int)($it['article_id'] ?: 0);
+                    if ($aid === 0) { continue; }
+                    $r = mt_auto_translate($db, $cfg, $aid, auth_user()['id']);
+                    $autoOk += count($r['done']);
+                    $autoFail += count($r['failed']);
+                }
+            }
             audit_me($db, 'import.apply', 'import:' . $importId, "{$created} új, {$updated} frissített, {$published} közzétett");
 
             $msg = "Kész: <b>{$created}</b> új fejezet, <b>{$updated}</b> frissített vázlat";
             $msg .= $publish ? ", <b>{$published}</b> közzétéve." : '. A vázlatokat a Fejezetek fülön nézheted át és teheted közzé.';
+            if ($autoOk || $autoFail) {
+                $msg .= " Gépi fordítás: <b>{$autoOk}</b> nyelvi változat elkészült"
+                      . ($autoFail ? ", {$autoFail} nem sikerült." : '.');
+            }
             flash($errors ? 'warn' : 'ok', $msg);
             foreach (array_slice($errors, 0, 5) as $e) { flash('err', h($e)); }
             back(['p' => 'import', 'import' => $importId]);
@@ -517,61 +550,9 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             $title = post('title');
             $publishNow = isset($_POST['publish_now']);
 
-            $st = $db->prepare('SELECT * FROM help_article WHERE id = ?');
-            $st->execute([$srcId]);
-            $src = $st->fetch();
-            if (!$src) {
-                flash('err', 'Nincs ilyen forrásfejezet.');
-                back(['p' => 'translate']);
-            }
-
             $db->beginTransaction();
             try {
-                $t = $db->prepare('SELECT id FROM help_article WHERE slug = ? AND lang = ?');
-                $t->execute([$src['slug'], $to]);
-                $targetId = (int)($t->fetchColumn() ?: 0);
-
-                if ($targetId === 0) {
-                    // a celnyelvi modul megkeresese (ugyanaz a chapter_no)
-                    $mst = $db->prepare('SELECT m2.id FROM help_module m1 JOIN help_module m2
-                                            ON m2.chapter_no = m1.chapter_no AND m2.lang = ?
-                                          WHERE m1.id = ?');
-                    $mst->execute([$to, $src['module_id']]);
-                    $moduleId = (int)($mst->fetchColumn() ?: 0);
-                    if ($moduleId === 0) {
-                        $mi = $db->prepare('INSERT INTO help_module (chapter_no, slug, title, lang, sort_order)
-                                            SELECT chapter_no, slug, title, ?, sort_order FROM help_module WHERE id = ?
-                                            RETURNING id');
-                        $mi->execute([$to, $src['module_id']]);
-                        $moduleId = (int)$mi->fetchColumn();
-                    }
-                    $ai = $db->prepare('INSERT INTO help_article
-                            (module_id, chapter_no, slug, title, lang, body_html, plain_text, doc_version,
-                             updated_at, content_hash, sort_order, is_published, draft_html, draft_title,
-                             draft_by, draft_at, source)
-                            VALUES (?,?,?,?,?,\'\',\'\',?, CURRENT_DATE, md5(?), ?, false, ?, ?, ?, now(), \'editor\')
-                            RETURNING id');
-                    $ai->execute([
-                        $moduleId, $src['chapter_no'], $src['slug'], $title !== '' ? $title : $src['title'], $to,
-                        $src['doc_version'], $src['slug'] . $to, (int)$src['sort_order'],
-                        $html, $title !== '' ? $title : null, auth_user()['id'],
-                    ]);
-                    $targetId = (int)$ai->fetchColumn();
-                } else {
-                    $db->prepare('UPDATE help_article SET draft_html = ?, draft_title = ?, draft_by = ?, draft_at = now() WHERE id = ?')
-                       ->execute([$html, $title !== '' ? $title : null, auth_user()['id'], $targetId]);
-                }
-
-                $db->prepare('UPDATE help_article SET translated_from_hash = ?, translated_by = ?, translated_at = now() WHERE id = ?')
-                   ->execute([$src['content_hash'], mb_substr($how, 0, 16), $targetId]);
-
-                if ($publishNow) {
-                    $db->prepare('SELECT help_publish(?, ?, ?, ?, NULL, true)')
-                       ->execute([$targetId, auth_user()['id'], null, 'mod']);
-                    $b = $db->prepare('SELECT body_html FROM help_article WHERE id = ?');
-                    $b->execute([$targetId]);
-                    sections_rebuild($db, $targetId, (string)$b->fetchColumn());
-                }
+                translate_store($db, $srcId, $to, $html, $title, $how, auth_user()['id'], $publishNow);
                 $db->commit();
             } catch (Throwable $e) {
                 if ($db->inTransaction()) { $db->rollBack(); }
@@ -579,9 +560,26 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                 back(['p' => 'translate', 'src' => $srcId, 'to' => $to]);
             }
 
-            audit_me($db, 'translate.save', 'article:' . $srcId, $src['lang'] . '->' . $to . ($publishNow ? ' + közzététel' : ''));
+            audit_me($db, 'translate.save', 'article:' . $srcId, 'hu->' . $to . ($publishNow ? ' + közzététel' : ''));
             flash('ok', $publishNow ? 'A fordítás mentve és közzétéve.' : 'A fordítás vázlatként mentve.');
             back(['p' => 'translate', 'src' => $srcId, 'to' => $to]);
+        }
+
+        // Egy magyar fejezet automatikus leforditasa a tobbi nyelvre, kezzel inditva.
+        case 'translate.auto': {
+            $srcId = (int)post('src_id');
+            $r = mt_auto_translate($db, $cfg, $srcId, auth_user()['id']);
+            if ($r['done']) {
+                flash('ok', 'Gépi fordítás kész: <b>' . implode(', ', array_map('strtoupper', $r['done']))
+                    . '</b> — vázlatként mentve, nézd át és tedd közzé.');
+            }
+            foreach ($r['failed'] as $lang => $err) {
+                flash('err', strtoupper($lang) . ': ' . h($err));
+            }
+            if (!$r['done'] && !$r['failed']) {
+                flash('warn', 'Nem történt fordítás — csak magyar forrásfejezetet tudok fordítani.');
+            }
+            back(['p' => 'translate', 'src' => $srcId]);
         }
 
         // ================================================== képernyő-hozzárendelés
@@ -619,40 +617,69 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             back(['p' => 'screens']);
         }
 
-        // ================================================== képek
+        // ================================================== képek és videók
         case 'media.upload': {
-            $files = $_FILES['images'] ?? null;
+            $files = $_FILES['files'] ?? ($_FILES['images'] ?? null);
             if (!is_array($files) || !isset($files['tmp_name'])) {
-                flash('err', 'Nem választottál képet.');
+                flash('err', 'Nem választottál fájlt.');
                 back(['p' => 'media']);
             }
-            $names = (array)$files['name'];
-            $ok = 0; $skipped = 0;
-            foreach (array_keys($names) as $i) {
-                if ((int)$files['error'][$i] !== UPLOAD_ERR_OK) { $skipped++; continue; }
-                $tmp = (string)$files['tmp_name'][$i];
-                $info = @getimagesize($tmp);
-                if ($info === false) { $skipped++; continue; }
-                $mime = (string)$info['mime'];
-                $ext = match ($mime) {
-                    'image/png' => 'png', 'image/jpeg' => 'jpg', 'image/gif' => 'gif', 'image/webp' => 'webp',
-                    default => null,
-                };
-                if ($ext === null) { $skipped++; continue; }
-
-                $bytes = (string)file_get_contents($tmp);
-                $sha = hash('sha256', $bytes);
-                $name = 'img_' . substr($sha, 0, 12) . '.' . $ext;
-                $target = rtrim($cfg['media_dir'], '/') . '/' . $name;
-                if (!is_file($target) && @file_put_contents($target, $bytes) === false) { $skipped++; continue; }
-
-                $db->prepare('INSERT INTO help_media (filename, sha256, mime, bytes, width, height, uploaded_by)
-                              VALUES (?,?,?,?,?,?,?) ON CONFLICT (sha256) DO NOTHING')
-                   ->execute([$name, $sha, $mime, strlen($bytes), (int)$info[0], (int)$info[1], auth_user()['id']]);
-                $ok++;
+            $ok = 0; $skipped = 0; $problems = [];
+            foreach (array_keys((array)$files['name']) as $i) {
+                if ((int)$files['error'][$i] !== UPLOAD_ERR_OK) {
+                    $skipped++;
+                    $problems[] = $files['name'][$i] . ': ' . media_upload_error((int)$files['error'][$i]);
+                    continue;
+                }
+                $r = media_store($db, $cfg, (string)$files['tmp_name'][$i], (string)$files['name'][$i], auth_user()['id']);
+                if ($r['ok']) { $ok++; } else { $skipped++; $problems[] = $files['name'][$i] . ': ' . $r['error']; }
             }
-            audit_me($db, 'media.upload', null, "{$ok} kép");
-            flash($ok ? 'ok' : 'err', "Feltöltve: {$ok} kép." . ($skipped ? " Kihagyva: {$skipped} (nem támogatott formátum vagy hiba)." : ''));
+            audit_me($db, 'media.upload', null, "{$ok} fajl");
+            flash($ok ? 'ok' : 'err', "Feltöltve: <b>{$ok}</b> fájl." . ($skipped ? " Kihagyva: {$skipped}." : ''));
+            foreach (array_slice($problems, 0, 4) as $pr) { flash('warn', h($pr)); }
+            back(['p' => 'media']);
+        }
+
+        // A szerkesztobol jovo kozvetlen feltoltes (kep vagy video), JSON valasszal.
+        // Ez az, amit a "Kép" / "Videó" gomb es a fogd-és-vidd hasznal - nem kell
+        // elore feltolteni a Kepek fulon, majd fajlnevet beirni.
+        case 'media.inline': {
+            $f = $_FILES['file'] ?? null;
+            if (!is_array($f)) { help_json(['ok' => false, 'error' => 'Nem érkezett fájl.'], 400); }
+            if ((int)$f['error'] !== UPLOAD_ERR_OK) {
+                help_json(['ok' => false, 'error' => media_upload_error((int)$f['error'])], 400);
+            }
+            $r = media_store($db, $cfg, (string)$f['tmp_name'], (string)$f['name'], auth_user()['id']);
+            if (!$r['ok']) { help_json(['ok' => false, 'error' => $r['error']], 400); }
+
+            audit_me($db, 'media.inline', $r['filename'], $r['kind']);
+            help_json([
+                'ok'      => true,
+                'url'     => $r['url'],
+                'kind'    => $r['kind'],
+                'html'    => media_snippet($r, ''),
+                'existed' => $r['existed'],
+                'name'    => $r['filename'],
+            ]);
+        }
+
+        case 'media.delete': {
+            $name = post('filename');
+            if (!preg_match('/^(img|vid)_[0-9a-f]{12}\.[a-z0-9]{2,5}$/', $name)) {
+                flash('err', 'Érvénytelen fájlnév.');
+                back(['p' => 'media']);
+            }
+            $used = $db->prepare("SELECT count(*) FROM help_article
+                                   WHERE body_html LIKE ? OR coalesce(draft_html, '') LIKE ?");
+            $used->execute(['%' . $name . '%', '%' . $name . '%']);
+            if ((int)$used->fetchColumn() > 0) {
+                flash('err', 'Ezt a fájlt még használja legalább egy fejezet, ezért nem töröltem.');
+                back(['p' => 'media']);
+            }
+            @unlink(media_dir($cfg) . '/' . $name);
+            $db->prepare('DELETE FROM help_media WHERE filename = ?')->execute([$name]);
+            audit_me($db, 'media.delete', $name);
+            flash('ok', 'A fájl törölve.');
             back(['p' => 'media']);
         }
 
@@ -723,10 +750,52 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             back(['p' => 'users']);
         }
 
+        // ================================================== export
+        case 'export.docx': {
+            $lang = array_key_exists(post('lang'), ADMIN_LANGS) ? post('lang') : 'hu';
+            $version = (string)$db->query("SELECT coalesce(max(doc_version), '') FROM help_article")->fetchColumn();
+            try {
+                $exp = new DocxExport($cfg['media_dir']);
+                $r = $exp->build($db, $lang, [
+                    'company'        => admin_setting($db, 'export_company', 'Infinity ERP'),
+                    'version'        => $version,
+                    'only_published' => !isset($_POST['include_hidden']),
+                ]);
+            } catch (Throwable $e) {
+                flash('err', 'Az export nem sikerült: ' . h($e->getMessage()));
+                back(['p' => 'export']);
+            }
+            audit_me($db, 'export.docx', $lang, $r['chapters'] . ' fejezet, ' . $r['images'] . ' kép');
+
+            header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+            header('Content-Disposition: attachment; filename="' . $r['filename'] . '"');
+            header('Content-Length: ' . (string)filesize($r['path']));
+            header('X-Accel-Buffering: no');
+            readfile($r['path']);
+            @unlink($r['path']);
+            exit;
+        }
+
+        // Nyomtatasra kesz egyoldalas HTML - innen a bongeszo "Nyomtatas -> PDF"
+        // funkciojaval keszul a PDF, kulon eszkoz nelkul.
+        case 'export.html': {
+            $lang = array_key_exists(post('lang'), ADMIN_LANGS) ? post('lang') : 'hu';
+            $html = export_print_html($db, $cfg, $lang, !isset($_POST['include_hidden']));
+            audit_me($db, 'export.html', $lang);
+            header('Content-Type: text/html; charset=utf-8');
+            header('Content-Disposition: inline; filename="infinity-' . $lang . '.html"');
+            echo $html;
+            exit;
+        }
+
         // ================================================== beállítások
         case 'setting.save': {
             if (!auth_is('admin')) { flash('err', 'Ehhez adminisztrátori jog kell.'); back(['p' => 'settings']); }
-            $keys = ['site_title_hu', 'site_title_en', 'site_title_de', 'mt_provider', 'mt_endpoint', 'mt_key'];
+            $keys = ['site_title_hu', 'site_title_en', 'site_title_de',
+                     'mt_provider', 'mt_endpoint', 'mt_key', 'mt_auto',
+                     'highlight_days', 'export_company', 'export_footer'];
+            // a kipipalatlan jelolonegyzet nem kerul be a POST-ba
+            if (isset($_POST['mt_provider'])) { $_POST['mt_auto'] = isset($_POST['mt_auto']) ? '1' : '0'; }
             $st = $db->prepare('INSERT INTO help_setting (key, value, updated_by, updated_at) VALUES (?,?,?,now())
                                 ON CONFLICT (key) DO UPDATE SET value = excluded.value, updated_by = excluded.updated_by, updated_at = now()');
             foreach ($keys as $k) {

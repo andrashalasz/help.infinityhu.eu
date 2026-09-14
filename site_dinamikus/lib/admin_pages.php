@@ -372,6 +372,59 @@ function page_articles(PDO $db, string $lang, int $id, array $counts): void
         <div class="msg msg--info">Ez a fejezet <b>nincs közzétéve</b>, a nyilvános oldalon nem jelenik meg.</div>
       <?php endif; ?>
 
+      <?php
+      // a fejezet osszes nyelvi valtozata (ugyanaz a slug), hogy nyelvenkent
+      // lehessen ki-/bekapcsolni
+      $sib = $db->prepare('SELECT id, lang, is_published, draft_html IS NOT NULL AS has_draft
+                             FROM help_article WHERE slug = ? ORDER BY lang');
+      $sib->execute([$article['slug']]);
+      $siblings = [];
+      foreach ($sib->fetchAll() as $r) { $siblings[$r['lang']] = $r; }
+      $onCount = count(array_filter($siblings, static fn($r) => $r['is_published']));
+      ?>
+      <div class="panel" style="margin-bottom:14px">
+        <div class="panel__h">
+          <h2 style="font-size:calc(12.4px * var(--fs));text-transform:uppercase;letter-spacing:.6px;color:var(--ink-3)">
+            Nyelvenkénti megjelenés</h2>
+          <span class="sp"></span>
+          <form method="post" action="<?= h(admin_url()) ?>" style="display:inline">
+            <?= csrf_input() ?>
+            <input type="hidden" name="a" value="article.toggle-all">
+            <input type="hidden" name="id" value="<?= (int)$article['id'] ?>">
+            <input type="hidden" name="on" value="<?= $onCount === count($siblings) ? '0' : '1' ?>">
+            <button class="btn btn--sm" type="submit">
+              <?= $onCount === count($siblings) ? 'Mindegyik kikapcsolása' : 'Mindegyik bekapcsolása' ?>
+            </button>
+          </form>
+        </div>
+        <div class="panel__b" style="display:flex;gap:10px;flex-wrap:wrap">
+          <?php foreach (ADMIN_LANGS as $code => $label):
+              $r = $siblings[$code] ?? null; ?>
+            <div class="langcard<?= $r && $r['is_published'] ? ' on' : '' ?>">
+              <div class="langcard__t"><?= h($label) ?> <span class="mono muted"><?= h($code) ?></span></div>
+              <?php if (!$r): ?>
+                <div class="muted" style="font-size:calc(12px * var(--fs))">nincs ilyen nyelvű változat</div>
+                <a class="btn btn--sm" href="<?= h(admin_url(['p' => 'translate', 'to' => $code === 'hu' ? 'en' : $code,
+                     'src' => $article['lang'] === 'hu' ? $article['id'] : 0])) ?>">Fordítás →</a>
+              <?php else: ?>
+                <form method="post" action="<?= h(admin_url()) ?>">
+                  <?= csrf_input() ?>
+                  <input type="hidden" name="a" value="article.toggle">
+                  <input type="hidden" name="id" value="<?= (int)$r['id'] ?>">
+                  <button class="btn btn--sm <?= $r['is_published'] ? 'btn--ok' : 'btn--danger' ?>" type="submit">
+                    <?= $r['is_published'] ? '● Látszik' : '○ Kikapcsolva' ?>
+                  </button>
+                </form>
+                <?php if ($r['has_draft']): ?><span class="badge badge--warn">vázlat</span><?php endif; ?>
+                <?php if ((int)$r['id'] !== (int)$article['id']): ?>
+                  <a class="btn btn--sm btn--ghost" href="<?= h(admin_url(['p' => 'articles', 'lang' => $code, 'id' => $r['id']])) ?>">Megnyitás</a>
+                <?php endif; ?>
+              <?php endif; ?>
+            </div>
+          <?php endforeach; ?>
+        </div>
+      </div>
+
       <!-- fejezet adatai -->
       <div class="panel" style="margin-bottom:14px">
         <div class="panel__h">
@@ -455,7 +508,8 @@ function page_articles(PDO $db, string $lang, int $id, array $counts): void
             <button type="button" data-cmd="insertOrderedList" title="Számozott lista">1. lista</button>
             <span class="divider"></span>
             <button type="button" data-act="link" title="Hivatkozás">🔗</button>
-            <button type="button" data-act="image" title="Kép beszúrása a Képek közül">🖼</button>
+            <button type="button" data-act="upload-image" title="Kép feltöltése és beszúrása">🖼 Kép</button>
+            <button type="button" data-act="upload-video" title="Videó feltöltése és beszúrása">🎬 Videó</button>
             <button type="button" data-act="callout-tip" title="Tipp doboz">Tipp</button>
             <button type="button" data-act="callout-warn" title="Figyelmeztetés doboz">Figyelem</button>
             <span class="divider"></span>
@@ -465,6 +519,12 @@ function page_articles(PDO $db, string $lang, int $id, array $counts): void
           </div>
           <div class="ed-area body" id="ed-area" contenteditable="true" spellcheck="true"><?= fix_img_url($body) ?></div>
           <textarea class="ta ed-src" id="ed-src" name="body"></textarea>
+        </div>
+
+        <div class="hint" style="margin-top:6px">
+          Képet és videót a <b>Kép</b> / <b>Videó</b> gombbal tölthetsz fel — vagy egyszerűen
+          <b>húzd rá a fájlt a szövegre</b>, illetve illeszd be vágólapról. A feltöltés azonnal
+          megtörténik, nem kell előre a Képek fülre menni.
         </div>
 
         <div class="savebar">

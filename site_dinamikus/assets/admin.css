@@ -271,3 +271,32 @@ p.lead { margin: 0 0 18px; color: var(--ink-3); font-size: calc(13.4px * var(--f
 .empty { padding: 40px 20px; text-align: center; color: var(--ink-3); font-size: calc(13.4px * var(--fs)); }
 .mono { font-family: var(--mono); font-size: calc(12.3px * var(--fs)); }
 .muted { color: var(--ink-3); }
+
+/* ---------- nyelvenkénti megjelenés kártyái ---------- */
+.langcard {
+  flex: 1 1 200px; min-width: 180px;
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--r);
+  background: var(--surface-2);
+}
+.langcard.on { border-color: color-mix(in srgb, var(--ok) 45%, var(--line)); background: var(--ok-soft); }
+.langcard__t { flex: 1 1 100%; font-size: calc(12.6px * var(--fs)); font-weight: 700; }
+
+/* ---------- média-rács: videó is ---------- */
+.mcard { position: relative; }
+.mcard video { width: 100%; height: 110px; object-fit: cover; display: block; background: #000; }
+.mcard__tag {
+  position: absolute; top: 6px; left: 6px; padding: 1px 7px; border-radius: 100px;
+  background: rgba(8, 12, 18, .72); color: #fff; font-size: 10.5px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .5px;
+}
+
+/* ---------- szerkesztő: feltöltés ---------- */
+.ed-area.ed--drop { box-shadow: inset 0 0 0 2px var(--brand); background: var(--brand-soft); }
+.ed-area .uploading {
+  padding: 8px 12px; border: 1px dashed var(--brand); border-radius: var(--r);
+  background: var(--brand-soft); color: var(--brand-strong);
+  font-size: calc(13px * var(--fs)); font-style: italic;
+}
+.ed-area video { max-width: 100%; border-radius: var(--r); border: 1px solid var(--line); background: #000; }
+.ed-area figure.vid { margin: 0 0 16px; }

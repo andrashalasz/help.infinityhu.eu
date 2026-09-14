@@ -56,5 +56,31 @@ services:
     ports:
       - "${WEB_PORT:-8080}:80"
 
+  # ------------------------------------------------------------------
+  # Opcionalis: sajat, helyben futo gepi fordito (LibreTranslate).
+  # Nem indul el magatol - igy a szokasos "docker compose up" gyors marad.
+  #
+  #   docker compose --profile mt up -d
+  #
+  # Elso indulaskor letolti a hu/en/de nyelvi modelleket (par perc, ~1-2 GB).
+  # Utana az admin Beallitasok fulen:
+  #     Szolgaltato = LibreTranslate,  Vegpont = http://libretranslate:5000
+  # (vagy .env-ben: HELP_MT_PROVIDER=libre, HELP_MT_ENDPOINT=http://libretranslate:5000)
+  #
+  # Igy nem kell fizetos API-kulcs a gepi forditashoz.
+  libretranslate:
+    image: libretranslate/libretranslate:latest
+    container_name: help_mt
+    profiles: ["mt"]
+    restart: unless-stopped
+    environment:
+      LT_LOAD_ONLY: "hu,en,de"
+      LT_DISABLE_WEB_UI: "false"
+    volumes:
+      - help_mt_models:/home/libretranslate/.local/share/argos-translate
+    ports:
+      - "${MT_PORT:-5050}:5000"
+
 volumes:
   help_pgdata:
+  help_mt_models:
