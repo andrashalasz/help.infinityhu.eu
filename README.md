@@ -28,8 +28,9 @@ Az első indításkor a PostgreSQL automatikusan lefuttatja a [`db/`](db/) alatt
 (327 cikk = 109 fejezet × 3 nyelv, 663 szakasz, 51 modul-sor). Ez kb. 20–30 másodperc;
 addig a webes felület még `503`-at adhat.
 
-**Az első belépés után a rendszer kötelezően jelszócserét kér** — a `12345678` csak
-kezdőjelszó. Ha elrontanád: 5 sikertelen próbálkozás után a fiók 10 percre zárolódik.
+A jelszócsere **nem kötelező**: belépés után a rendszer egyszer emlékeztet rá, cserélni pedig a
+**Beállítások → Saját jelszó** résznél lehet, amikor jónak látod. Ha elrontanád a belépést:
+5 sikertelen próbálkozás után a fiók 10 percre zárolódik.
 
 ```bash
 docker compose down          # csak leállít
@@ -96,8 +97,17 @@ Bal oldalt a teljes fejezetlista nyelvenként, szűrővel. Jobb oldalt a szerkes
 - **Kép és videó feltöltése közvetlenül a szerkesztőből**: a **Kép** / **Videó** gomb, a fájl
   ráhúzása a szövegre, vagy vágólapról beillesztett képernyőkép — mind azonnal feltölt és beszúr.
   Nem kell előre a Képek fülre menni.
+- **Tömeges műveletek**: a ☑ gombbal több fejezet jelölhető ki (Shift-kattintással tartomány,
+  a modul fejlécével az egész csoport), majd egyszerre kapcsolható be/ki, tehető közzé,
+  helyezhető át másik modulba vagy törölhető.
+- **Sorrend húzással**: az ↕ gombbal megjelenik a ⠿ fogantyú, és a fejezetek húzással
+  átrendezhetők — másik modul alá is. A mentés automatikus.
 - **Adatok**: fejezetszám, cím, URL-azonosító, modul, sorrend, jogosultság.
 - **Korábbi változatok**: minden közzététel előtti állapot megmarad, egy kattintással visszatölthető vázlatként.
+- **Visszavonás**: a közzététel után megjelenő „↩ Közzététel visszavonása" gombbal a nyilvános
+  oldal azonnal visszaáll az előző változatra — a visszavont szöveg vázlatként megmarad.
+  A törölt fejezet a **Kukába** kerül, onnan teljes tartalmával (szakaszok, verziótörténet,
+  képernyő-hozzárendelések) visszaállítható.
 - Új fejezet létrehozása, fejezet törlése.
 
 A beküldött HTML fehérlistás tisztításon megy át (`<script>`, `on*` eseménykezelő,
@@ -105,7 +115,21 @@ A beküldött HTML fehérlistás tisztításon megy át (`<script>`, `on*` esem�
 amiből az olvasói oldal tartalomjegyzéke épül.
 
 ### Modulok
-A felső szint: szám, név, URL-azonosító, sorrend — nyelvenként. Üres modul törölhető.
+A felső szint: szám, név, URL-azonosító, sorrend — nyelvenként. A sorrend a ⠿ fogantyúval
+húzva is átrendezhető. Üres modul törölhető (a Kukába kerül).
+
+### Billentyűzet
+| | |
+|---|---|
+| `Ctrl+K` | **Parancspaletta**: fejezetek és fülek egyben, nyilakkal járható |
+| `/` | a bal oldali fejezetszűrő |
+| `↑` `↓` | lépkedés a fejezetlistán, `Enter` megnyitás |
+| `Ctrl+S` | vázlat mentése a szerkesztőben |
+| `A` `M` `I` `T` `K` `E` `U` `B` `D` | ugrás a fülekre (Fejezetek, Modulok, Import, Fordítás, Képek, Export, Felhasználók, Beállítások, Áttekintés) |
+| `?` | a billentyűparancsok listája |
+| `Esc` | ablak bezárása |
+
+A táblázatok telefonon **kártyákká alakulnak**, minden mező a saját címkéjével.
 
 ### Word import
 Feltöltesz egy **.docx**-et, és a rendszer:
@@ -186,8 +210,12 @@ Az export **mindig a friss adatbázis-tartalomból** dolgozik, nem egy korábbi 
 Létrehozás, szerepkör, aktiválás/inaktiválás, jelszó beállítása. Új felhasználónak és
 jelszó-visszaállítás után az első belépéskor kötelező jelszót cserélnie.
 
+### Kuka
+A törölt fejezetek és modulok teljes tartalma. Visszaállítás egy kattintással; véglegesen csak
+innen törlődnek. A tömeges áthelyezés visszavonása is itt található.
+
 ### Beállítások
-Oldalcímek nyelvenként, gépi fordító, és a **kiadások** kezelése: a közzétételkor megadott
+Saját jelszó cseréje, oldalcímek nyelvenként, gépi fordító, és a **kiadások** kezelése: a közzétételkor megadott
 összefoglalók a nyitott kiadásba gyűlnek, a lezárás ad nekik dátumot és verziószámot.
 
 ---
@@ -235,6 +263,7 @@ A fájlok ábécé-sorrendben futnak le (így teszi a postgres image is):
 | `04_erp_norm_fix.sql` | **javítás** — lásd lent |
 | `05_admin_felulet.sql` | az admin felület táblái (`help_user`, `help_setting`, `help_import`, `help_audit`), a fordítási állapot mezői, és **két hibajavítás** — lásd lent |
 | `06_video_export_ujdonsag.sql` | videó a képek mellé (`help_media.kind`), újdonság-kiemelés (`help_article.highlight_until`, `help_whatsnew` nézet), automatikus fordítás kapcsolója |
+| `07_visszavonas.sql` | Kuka (`help_trash`) a visszaállítható törléshez, `help_unpublish()` a közzététel visszavonásához |
 | `99_docker_roles.sql` | a `help_ro` (olvasó) és `help_rw` (író) szerepkör, fejlesztői jelszóval |
 
 Az első három fájl az eredeti csomag `01_infinity_fo_rendszerbe/sql/` mappájából származik,
@@ -291,6 +320,7 @@ psql -d help_infinityhu -f db/03_changelog_migracio.sql
 psql -d help_infinityhu -f db/04_erp_norm_fix.sql
 psql -d help_infinityhu -f db/05_admin_felulet.sql
 psql -d help_infinityhu -f db/06_video_export_ujdonsag.sql
+psql -d help_infinityhu -f db/07_visszavonas.sql
 
 # a szerepkoroket SAJAT jelszoval hozd letre, ne a 99-es fajllal:
 psql -d help_infinityhu -c "CREATE ROLE help_ro LOGIN PASSWORD '...';"
@@ -385,7 +415,15 @@ Az alábbiakat ténylegesen lefuttatva ellenőriztük a Docker környezetben, ne
   párosult. A képeket felismerte, és mivel tartalom-hash a fájlnév, **egyet sem duplikált**.
   Az egyetlen „új” találat a Word-ben lévő **üres `5.1 Beállítások` címsor** — a dokumentumban
   nincs alatta szöveg, ezért a korábbi konverzió kihagyta; az import viszont jelzi, hogy döntsön róla ember.
-- mind a tíz fül hibamentesen renderel (a PHP naplóban nincs warning)
+- mind a tizenegy fül hibamentesen renderel (a PHP naplóban nincs warning)
+- **tömeges műveletek**: 2 fejezet egyszerre kikapcsolva → a nyilvános oldal 404-et ad,
+  visszakapcsolva 200-at; áthelyezés másik modulba és annak visszavonása is ellenőrizve
+- **sorrend húzással**: 6 fejezet átrendezve, a `sort_order` újraszámozva; modulok ugyanígy
+- **közzététel visszavonása**: a nyilvános oldalon azonnal visszaállt az előző szöveg,
+  a szakaszok újraépültek, a változásnapló-bejegyzés eltűnt, a visszavont szöveg vázlatként megmaradt
+- **Kuka**: törölt fejezet visszaállítva a szakaszaival együtt
+- **parancspaletta**: `Ctrl+K`, „penz" keresésre 5 találat, első a „5 Pénzügy"
+- **mobil nézet** (375 px): a táblázatok kártyákká alakulnak, minden mező a saját címkéjével
 - **kép és videó feltöltése a szerkesztőből**: PNG feltöltve és beszúrva, MP4 felismerve
   (`video/mp4`), `vid_<hash>.mp4` néven eltárolva; nem támogatott fájltípus elutasítva
 - a videó kiszolgálása `Content-Type: video/mp4` fejléccel és `Range` kérésekkel (HTTP 206),

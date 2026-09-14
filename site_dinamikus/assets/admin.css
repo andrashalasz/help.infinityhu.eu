@@ -300,3 +300,140 @@ p.lead { margin: 0 0 18px; color: var(--ink-3); font-size: calc(13.4px * var(--f
 }
 .ed-area video { max-width: 100%; border-radius: var(--r); border: 1px solid var(--line); background: #000; }
 .ed-area figure.vid { margin: 0 0 16px; }
+
+/* ============================================================
+   Tömeges kijelölés, húzásos sorrend, parancspaletta, mobil táblák
+   ============================================================ */
+
+/* ---------- fejezetlista sorai ---------- */
+.picker__row { display: flex; align-items: center; gap: 2px; }
+.picker__row .picker__a { flex: 1; min-width: 0; }
+.picker__chk, .picker__mchk { display: none; flex: none; padding: 0 4px; }
+.picker__chk input, .picker__mchk input { width: 15px; height: 15px; accent-color: var(--brand); cursor: pointer; }
+.picker__grip {
+  display: none; flex: none; width: 18px; cursor: grab;
+  color: var(--ink-3); font-size: 13px; line-height: 1; text-align: center; user-select: none;
+}
+.picker__grip:active { cursor: grabbing; }
+
+.picker--select .picker__chk, .picker--select .picker__mchk { display: flex; }
+.picker--sort .picker__grip { display: block; }
+.picker__m { display: flex; align-items: center; gap: 4px; }
+
+.picker__row.dragging { opacity: .45; }
+.picker__row.drop-before { box-shadow: inset 0 2px 0 var(--brand); }
+.picker__row.drop-after  { box-shadow: inset 0 -2px 0 var(--brand); }
+
+.picker__hint {
+  padding: 8px 12px; margin: 0 10px 6px; border-radius: var(--r);
+  background: var(--info-soft); color: var(--brand-strong);
+  font-size: calc(11.8px * var(--fs)); line-height: 1.45;
+}
+
+/* ---------- tömeges műveletek sávja ---------- */
+.bulkbar {
+  position: sticky; bottom: 0; z-index: 12;
+  padding: 10px 12px; border-top: 1px solid var(--line);
+  background: var(--surface); box-shadow: 0 -4px 12px rgba(16, 24, 40, .08);
+  border-radius: 0 0 var(--r-lg) var(--r-lg);
+}
+.bulkbar__n { font-size: calc(12.4px * var(--fs)); color: var(--ink-2); margin-bottom: 8px; }
+.bulkbar__n b { color: var(--brand); font-size: calc(14px * var(--fs)); }
+.bulkbar__b { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.bulkbar .sel { padding: 5px 8px; font-size: calc(12.2px * var(--fs)); }
+
+/* ---------- húzható táblasorok ---------- */
+.tbl--sortable td.grip { width: 34px; padding-right: 0; }
+.tbl--sortable tr.dragging { opacity: .45; }
+.tbl--sortable tr.drop-before td { box-shadow: inset 0 2px 0 var(--brand); }
+.tbl--sortable tr.drop-after  td { box-shadow: inset 0 -2px 0 var(--brand); }
+.tbl--sortable .picker__grip { display: block; }
+
+/* ---------- visszavonás gomb az üzenetekben ---------- */
+.undo-form { display: inline-block; margin-left: 8px; vertical-align: middle; }
+.msg .undo-form .btn { background: var(--surface); }
+
+/* ---------- parancspaletta ---------- */
+.palette {
+  position: fixed; inset: 0; z-index: 200; display: none;
+  background: rgba(8, 12, 18, .45); backdrop-filter: blur(2px);
+  padding: 12vh 16px 16px;
+}
+.palette.on { display: block; }
+.palette__box {
+  max-width: 620px; margin: 0 auto; background: var(--surface);
+  border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow-3);
+  overflow: hidden;
+}
+.palette__in {
+  width: 100%; padding: 15px 18px; font: inherit; font-size: calc(15px * var(--fs));
+  border: 0; border-bottom: 1px solid var(--line-soft);
+  background: var(--surface); color: var(--ink);
+}
+.palette__in:focus { outline: none; }
+.palette__list { max-height: 52vh; overflow-y: auto; }
+.palette__g {
+  padding: 9px 18px 4px; font-size: calc(10.6px * var(--fs)); font-weight: 800;
+  text-transform: uppercase; letter-spacing: .7px; color: var(--ink-3);
+}
+.palette__i {
+  display: block; padding: 8px 18px; color: var(--ink); border-left: 2px solid transparent;
+}
+.palette__i:hover, .palette__i.sel {
+  background: var(--brand-soft); border-left-color: var(--brand); text-decoration: none;
+}
+.palette__i b { display: block; font-size: calc(13.6px * var(--fs)); font-weight: 600; }
+.palette__i span { display: block; font-size: calc(11.8px * var(--fs)); color: var(--ink-3); margin-top: 1px; }
+.palette__empty { padding: 26px 18px; text-align: center; color: var(--ink-3); font-size: calc(13px * var(--fs)); }
+.palette__foot {
+  padding: 8px 18px; border-top: 1px solid var(--line-soft); background: var(--surface-2);
+  font-size: calc(11.4px * var(--fs)); color: var(--ink-3);
+}
+.palette__foot kbd, .kbdbox kbd {
+  font-family: var(--mono); font-size: calc(10.6px * var(--fs)); padding: 1px 5px; margin: 0 1px;
+  background: var(--surface); border: 1px solid var(--line); border-bottom-width: 2px;
+  border-radius: 3px; color: var(--ink-2);
+}
+.kbdbox { display: grid; grid-template-columns: auto 1fr; gap: 7px 14px; font-size: calc(13px * var(--fs)); }
+
+/* ---------- mobil: a táblázatok kártyákká bomlanak ---------- */
+@media (max-width: 760px) {
+  .page { padding: 12px; }
+  .tabs { padding: 0 8px; }
+  .ashell__user span:last-child { display: none; }
+
+  .tbl thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .tbl, .tbl tbody, .tbl tr, .tbl td { display: block; width: 100%; }
+  .tbl tr {
+    border: 1px solid var(--line); border-radius: var(--r);
+    margin: 0 12px 10px; padding: 6px 0; background: var(--surface);
+  }
+  .tbl tbody tr:hover td { background: transparent; }
+  .tbl td {
+    border: 0; padding: 5px 12px;
+    display: grid; grid-template-columns: minmax(90px, 38%) 1fr; gap: 10px; align-items: center;
+  }
+  .tbl td::before {
+    content: attr(data-label);
+    font-size: calc(11px * var(--fs)); font-weight: 700; text-transform: uppercase;
+    letter-spacing: .5px; color: var(--ink-3);
+  }
+  .tbl td[data-label=""]::before, .tbl td:not([data-label])::before { content: ""; }
+  .tbl td[data-label=""], .tbl td:not([data-label]) { grid-template-columns: 1fr; }
+  .tbl .num { text-align: left; }
+  .tbl td.grip { display: none; }
+
+  .panel__h { padding: 11px 12px; }
+  .panel__b { padding: 12px; }
+  .row > * { flex: 1 1 100%; }
+  .picker { max-height: none; }
+  .bulkbar { position: static; }
+  .tr-grid { grid-template-columns: minmax(0, 1fr); }
+  .palette { padding: 6vh 10px 10px; }
+}
+
+.sbtn__kbd {
+  margin-left: 6px; padding: 1px 5px; border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, .24); font-size: 10.5px; color: var(--shell-muted);
+}
+@media (max-width: 900px) { .sbtn__kbd { display: none; } }

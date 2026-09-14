@@ -64,7 +64,7 @@ function auth_can(string $area): bool
     if ($u === null) { return false; }
     if ($u['role'] === 'admin') { return true; }
     if ($u['role'] === 'editor') {
-        return in_array($area, ['dashboard', 'articles', 'modules', 'import', 'translate', 'screens', 'media', 'export'], true);
+        return in_array($area, ['dashboard', 'articles', 'modules', 'import', 'translate', 'screens', 'media', 'export', 'trash'], true);
     }
     if ($u['role'] === 'translator') {
         return in_array($area, ['dashboard', 'translate', 'export'], true);

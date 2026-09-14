@@ -25,6 +25,7 @@ require __DIR__ . '/lib/docx.php';
 require __DIR__ . '/lib/mt.php';
 require __DIR__ . '/lib/media.php';
 require __DIR__ . '/lib/docx_export.php';
+require __DIR__ . '/lib/trash.php';
 require __DIR__ . '/lib/admin_layout.php';
 require __DIR__ . '/lib/admin_actions.php';
 require __DIR__ . '/lib/admin_pages.php';
@@ -75,15 +76,24 @@ if ($action !== '') {
     exit;
 }
 
+// ------------------------------------------------------------ parancspaletta keresője
+if (($_GET['a'] ?? '') === 'palette') {
+    if (auth_user() === null) { help_json(['items' => []], 401); }
+    help_json(['items' => palette_items($db, (string)($_GET['q'] ?? ''))]);
+}
+
 // ------------------------------------------------------------ megjelenítés
 $user = auth_user();
 if ($user === null) {
     page_login();
     exit;
 }
-if ($user['must_change'] && ($_GET['p'] ?? '') !== 'chpw') {
-    header('Location: ' . admin_url(['p' => 'chpw']), true, 303);
-    exit;
+// A jelszocsere NEM kotelezo belepeskor - a Beallitasok / Sajat fiok lapon
+// barmikor elvegezheto. Ha meg a kezdojelszo van ervenyben, csak emlekeztetunk ra.
+if ($user['must_change'] && ($_GET['p'] ?? '') === '') {
+    flash('warn', 'Még a kezdeti jelszó van érvényben. '
+        . 'Ha szeretnéd lecserélni: <a href="' . h(admin_url(['p' => 'settings'])) . '#jelszo">Beállítások → Jelszó</a>.');
+    $_SESSION['user']['must_change'] = false;   // egyszer szoljunk, ne minden betoltesnel
 }
 
 $page = (string)($_GET['p'] ?? 'dashboard');
@@ -146,6 +156,9 @@ switch ($page) {
         break;
     case 'export':
         page_export($db, $cfg, $lang, $counts);
+        break;
+    case 'trash':
+        page_trash($db, $counts);
         break;
     case 'settings':
         page_settings($db, $cfg, $counts);

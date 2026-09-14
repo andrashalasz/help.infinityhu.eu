@@ -2,7 +2,8 @@
 -- Infinity Sugo - 005 migracio: admin felulet
 --
 -- Amit hozzatesz:
---   * help_user            - bejelentkezes (admin / 12345678, elso belepeskor kotelezo jelszocsere)
+--   * help_user            - bejelentkezes (admin / 12345678; a jelszocsere nem kotelezo,
+--                          a Beallitasok fulon barmikor elvegezheto)
 --   * help_setting         - futasideju beallitasok (oldalcim, gepi fordito, ...)
 --   * help_import          - Word (.docx) importok naploja
 --   * help_import_item     - az importbol szarmazo fejezetek, osszehasonlitasra varva
@@ -31,9 +32,11 @@ CREATE TABLE IF NOT EXISTS help_user (
 );
 
 COMMENT ON COLUMN help_user.must_change_pw IS
-  'true = a kovetkezo belepes utan a rendszer kotelezoen jelszocseret ker.';
+  'true = meg a kezdo/visszaallitott jelszo van ervenyben; belepes utan egyszer emlekeztet ra a rendszer.';
 
--- Kezdo admin: admin / 12345678 - az elso belepesnel KOTELEZO megvaltoztatni.
+-- Kezdo admin: admin / 12345678.
+-- A jelszocsere NEM kotelezo a belepeskor: a Beallitasok fulon barmikor
+-- elvegezheto. Belepes utan egyszer emlekeztet ra a rendszer.
 -- A hash bcrypt (PHP password_hash, PASSWORD_BCRYPT, cost 10).
 INSERT INTO help_user (username, password_hash, display_name, role, must_change_pw)
   SELECT 'admin',

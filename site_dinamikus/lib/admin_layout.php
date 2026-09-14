@@ -14,6 +14,7 @@ const ADMIN_TABS = [
     'media'     => 'Képek, videók',
     'export'    => 'Export',
     'users'     => 'Felhasználók',
+    'trash'     => 'Kuka',
     'settings'  => 'Beállítások',
 ];
 
@@ -72,6 +73,12 @@ function admin_head(string $title, string $page = '', array $counts = []): void
   <span class="ashell__tag">admin</span>
   <span class="ashell__spacer"></span>
 
+  <button class="sbtn" id="palette-open" title="Ugrás / keresés (Ctrl+K)">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+    <span class="sbtn__kbd">Ctrl K</span>
+  </button>
+  <button class="sbtn" id="keys-open" title="Billentyűparancsok (?)">?</button>
+
   <a class="sbtn" href="/hu/" target="_blank" rel="noopener" title="A súgó megnyitása új lapon">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6M10 14 21 3"/></svg>
   </a>
@@ -102,7 +109,33 @@ function admin_head(string $title, string $page = '', array $counts = []): void
 
 function admin_foot(): void
 {
-    ?>
+    if (auth_user() !== null): ?>
+<div class="modal" id="modal-keys">
+  <div class="modal__box" style="max-width:480px">
+    <div class="modal__h">Billentyűparancsok</div>
+    <div class="modal__b">
+      <div class="kbdbox">
+        <kbd>Ctrl</kbd><span>Ugrás / keresés — fejezetek és fülek egyben</span>
+        <kbd>/</kbd><span>A bal oldali fejezetszűrő</span>
+        <kbd>↑</kbd><span>Lépkedés a fejezetlistán</span>
+        <kbd>Enter</kbd><span>A kijelölt elem megnyitása</span>
+        <kbd>Ctrl</kbd><span>Vázlat mentése a szerkesztőben</span>
+        <kbd>A</kbd><span>Fejezetek</span>
+        <kbd>M</kbd><span>Modulok</span>
+        <kbd>I</kbd><span>Word import</span>
+        <kbd>T</kbd><span>Fordítás</span>
+        <kbd>K</kbd><span>Képek, videók</span>
+        <kbd>E</kbd><span>Export</span>
+        <kbd>U</kbd><span>Felhasználók</span>
+        <kbd>B</kbd><span>Beállítások</span>
+        <kbd>D</kbd><span>Áttekintés</span>
+        <kbd>Esc</kbd><span>Ablak bezárása</span>
+      </div>
+    </div>
+    <div class="modal__f"><button class="btn btn--p" type="button" data-close>Rendben</button></div>
+  </div>
+</div>
+<?php endif; ?>
 <script src="/assets/admin.js" defer></script>
 </body>
 </html>

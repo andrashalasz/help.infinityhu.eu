@@ -181,12 +181,12 @@ function page_import(PDO $db, array $cfg, string $lang, int $importId, array $co
         <tbody>
         <?php foreach ($recent as $r): $s = json_decode((string)$r['stats'], true) ?: []; ?>
           <tr>
-            <td><a href="<?= h(admin_url(['p' => 'import', 'import' => $r['id']])) ?>"><?= h($r['filename']) ?></a></td>
-            <td><span class="badge"><?= h($r['lang']) ?></span></td>
-            <td class="muted"><?= (int)($s['chapters'] ?? 0) ?> fejezet · <?= (int)($s['images'] ?? 0) ?> kép</td>
-            <td><span class="badge <?= $r['status'] === 'applied' ? 'badge--ok' : '' ?>"><?= h($r['status']) ?></span></td>
-            <td class="nowrap muted"><?= h(substr((string)$r['uploaded_at'], 0, 16)) ?></td>
-            <td class="muted"><?= h((string)$r['display_name']) ?></td>
+            <td data-label="Fájl"><a href="<?= h(admin_url(['p' => 'import', 'import' => $r['id']])) ?>"><?= h($r['filename']) ?></a></td>
+            <td data-label="Nyelv"><span class="badge"><?= h($r['lang']) ?></span></td>
+            <td class="muted" data-label="Tartalom"><?= (int)($s['chapters'] ?? 0) ?> fejezet · <?= (int)($s['images'] ?? 0) ?> kép</td>
+            <td data-label="Állapot"><span class="badge <?= $r['status'] === 'applied' ? 'badge--ok' : '' ?>"><?= h($r['status']) ?></span></td>
+            <td class="nowrap muted" data-label="Mikor"><?= h(substr((string)$r['uploaded_at'], 0, 16)) ?></td>
+            <td class="muted" data-label="Ki"><?= h((string)$r['display_name']) ?></td>
           </tr>
         <?php endforeach; ?>
         </tbody>
@@ -436,11 +436,11 @@ function page_screens(PDO $db, array $counts): void
           <tbody>
           <?php foreach ($rows as $r): ?>
             <tr>
-              <td class="mono"><?= h($r['route']) ?></td>
+              <td class="mono" data-label="Útvonal"><?= h($r['route']) ?></td>
               <td><a href="<?= h(admin_url(['p' => 'articles', 'lang' => $r['lang'], 'id' => $r['article_id']])) ?>">
                 <?= h($r['chapter_no'] . ' ' . $r['title']) ?></a></td>
-              <td class="mono muted"><?= h((string)$r['anchor']) ?></td>
-              <td><?= $r['is_verified'] ? '<span class="badge badge--ok">igen</span>' : '<span class="badge">nem</span>' ?></td>
+              <td class="mono muted" data-label="Horgony"><?= h((string)$r['anchor']) ?></td>
+              <td data-label="Ellenőrzött"><?= $r['is_verified'] ? '<span class="badge badge--ok">igen</span>' : '<span class="badge">nem</span>' ?></td>
               <td class="nowrap">
                 <form method="post" action="<?= h(admin_url()) ?>" onsubmit="return confirm('Törlöd ezt a hozzárendelést?')">
                   <?= csrf_input() ?>
@@ -619,9 +619,9 @@ function page_export(PDO $db, array $cfg, string $lang, array $counts): void
             $s = $stat[$code] ?? ['published' => 0, 'hidden' => 0, 'images' => 0]; ?>
           <tr>
             <td><b><?= h($label) ?></b> <span class="badge"><?= h($code) ?></span></td>
-            <td class="num"><?= (int)$s['published'] ?></td>
-            <td class="num"><?= (int)$s['hidden'] ? '<span class="badge badge--warn">' . (int)$s['hidden'] . '</span>' : '0' ?></td>
-            <td class="num"><?= (int)$s['images'] ?></td>
+            <td class="num" data-label="Közzétett"><?= (int)$s['published'] ?></td>
+            <td class="num" data-label="Kikapcsolt"><?= (int)$s['hidden'] ? '<span class="badge badge--warn">' . (int)$s['hidden'] . '</span>' : '0' ?></td>
+            <td class="num" data-label="Kép"><?= (int)$s['images'] ?></td>
             <td class="nowrap">
               <form method="post" action="<?= h(admin_url()) ?>" style="display:inline">
                 <?= csrf_input() ?>
@@ -692,7 +692,8 @@ function page_users(PDO $db, array $counts): void
   <h1 class="pt">Felhasználók</h1>
   <p class="lead">
     Szerepkörök: <b>admin</b> — mindent; <b>editor</b> — fejezetek, modulok, import, fordítás, képernyők, képek;
-    <b>translator</b> — csak a Fordítás fül. Új felhasználó az első belépéskor kötelezően jelszót cserél.
+    <b>translator</b> — csak a Fordítás fül. A jelszó cseréje nem kötelező; a Beállítások fülön
+    bármikor elvégezhető.
   </p>
   <?= flash_render() ?>
 
@@ -723,30 +724,33 @@ function page_users(PDO $db, array $counts): void
   <div class="panel">
     <div class="panel__h"><h2>Meglévő felhasználók</h2><span class="sp"></span><span class="badge"><?= count($users) ?></span></div>
     <div class="panel__b panel__b--flush">
+      <?php foreach ($users as $us): ?>
+        <form method="post" action="<?= h(admin_url()) ?>" id="uf<?= (int)$us['id'] ?>">
+          <input type="hidden" name="csrf" value="<?= h(csrf_token()) ?>">
+          <input type="hidden" name="a" value="user.save">
+          <input type="hidden" name="id" value="<?= (int)$us['id'] ?>">
+        </form>
+      <?php endforeach; ?>
       <table class="tbl">
         <thead><tr><th>Felhasználónév</th><th>Név</th><th>E-mail</th><th>Szerepkör</th><th>Aktív</th><th>Utolsó belépés</th><th></th></tr></thead>
         <tbody>
         <?php foreach ($users as $us): ?>
           <tr>
-            <td><b><?= h($us['username']) ?></b>
+            <td data-label="Felhasználónév"><b><?= h($us['username']) ?></b>
               <?php if ($us['must_change_pw']): ?><br><span class="badge badge--warn">jelszócsere vár</span><?php endif; ?>
               <?php if ($us['locked_until'] !== null && strtotime((string)$us['locked_until']) > time()): ?>
                 <br><span class="badge badge--err">zárolva</span><?php endif; ?>
             </td>
-            <form method="post" action="<?= h(admin_url()) ?>" id="uf<?= (int)$us['id'] ?>"></form>
-            <td><input class="inp" form="uf<?= (int)$us['id'] ?>" name="display_name" value="<?= h($us['display_name']) ?>"></td>
-            <td><input class="inp" form="uf<?= (int)$us['id'] ?>" name="email" value="<?= h((string)$us['email']) ?>"></td>
-            <td><select class="sel" form="uf<?= (int)$us['id'] ?>" name="role">
+            <td data-label="Név"><input class="inp" form="uf<?= (int)$us['id'] ?>" name="display_name" value="<?= h($us['display_name']) ?>"></td>
+            <td data-label="E-mail"><input class="inp" form="uf<?= (int)$us['id'] ?>" name="email" value="<?= h((string)$us['email']) ?>"></td>
+            <td data-label="Szerepkör"><select class="sel" form="uf<?= (int)$us['id'] ?>" name="role">
                 <?php foreach (HELP_ROLES as $r): ?>
                   <option value="<?= h($r) ?>" <?= $r === $us['role'] ? 'selected' : '' ?>><?= h($r) ?></option>
                 <?php endforeach; ?>
               </select></td>
-            <td><label class="check"><input form="uf<?= (int)$us['id'] ?>" type="checkbox" name="is_active" <?= $us['is_active'] ? 'checked' : '' ?>></label></td>
-            <td class="nowrap muted"><?= h(substr((string)($us['last_login_at'] ?? '—'), 0, 16)) ?></td>
-            <td class="nowrap">
-              <input type="hidden" form="uf<?= (int)$us['id'] ?>" name="csrf" value="<?= h(csrf_token()) ?>">
-              <input type="hidden" form="uf<?= (int)$us['id'] ?>" name="a" value="user.save">
-              <input type="hidden" form="uf<?= (int)$us['id'] ?>" name="id" value="<?= (int)$us['id'] ?>">
+            <td data-label="Aktív"><label class="check"><input form="uf<?= (int)$us['id'] ?>" type="checkbox" name="is_active" <?= $us['is_active'] ? 'checked' : '' ?>></label></td>
+            <td class="nowrap muted" data-label="Utolsó belépés"><?= h(substr((string)($us['last_login_at'] ?? '—'), 0, 16)) ?></td>
+            <td class="nowrap" data-label="">
               <button class="btn btn--sm btn--p" form="uf<?= (int)$us['id'] ?>" type="submit">Mentés</button>
               <button class="btn btn--sm" type="button" data-modal="pw<?= (int)$us['id'] ?>">Jelszó</button>
               <?php if ((int)$us['id'] !== (int)$me['id']): ?>
@@ -820,6 +824,31 @@ function page_settings(PDO $db, array $cfg, array $counts): void
           <?php endforeach; ?>
         </div>
         <button class="btn btn--p" type="submit">Mentés</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-bottom:16px" id="jelszo">
+    <div class="panel__h"><h2>Saját jelszó</h2><span class="sp"></span>
+      <span class="muted"><?= h(auth_user()['username']) ?></span></div>
+    <div class="panel__b">
+      <p class="lead" style="margin-bottom:14px">
+        A jelszó cseréje <b>nem kötelező</b> — akkor változtasd meg, amikor szeretnéd.
+      </p>
+      <form method="post" action="<?= h(admin_url()) ?>" autocomplete="off">
+        <?= csrf_input() ?>
+        <input type="hidden" name="a" value="chpw">
+        <div class="row">
+          <div class="field"><label for="s-cur">Jelenlegi jelszó</label>
+            <input class="inp" id="s-cur" name="current" type="password" autocomplete="current-password" required></div>
+          <div class="field"><label for="s-n1">Új jelszó</label>
+            <input class="inp" id="s-n1" name="new" type="password" autocomplete="new-password" required minlength="8"></div>
+          <div class="field"><label for="s-n2">Még egyszer</label>
+            <input class="inp" id="s-n2" name="new2" type="password" autocomplete="new-password" required minlength="8"></div>
+          <div class="field" style="flex:0 1 auto;align-self:flex-end">
+            <button class="btn btn--p" type="submit">Jelszó mentése</button></div>
+        </div>
+        <div class="hint">Legalább 8 karakter, betű és szám is legyen benne.</div>
       </form>
     </div>
   </div>
@@ -917,4 +946,146 @@ function page_settings(PDO $db, array $cfg, array $counts): void
 </div>
     <?php
     admin_foot();
+}
+
+// ============================================================ KUKA
+function page_trash(PDO $db, array $counts): void
+{
+    $rows = $db->query("
+        SELECT t.*, u.display_name
+          FROM help_trash t LEFT JOIN help_user u ON u.id = t.deleted_by
+      ORDER BY t.restored_at IS NOT NULL, t.deleted_at DESC
+         LIMIT 200")->fetchAll();
+    $open = array_filter($rows, static fn($r) => $r['restored_at'] === null);
+
+    admin_head('Kuka', 'trash', $counts);
+    ?>
+<div class="page" style="max-width:1100px">
+  <h1 class="pt">Kuka</h1>
+  <p class="lead">
+    A törölt fejezetek és modulok <b>nem vesznek el</b>: teljes tartalmukkal ide kerülnek —
+    a szakaszaikkal, a verziótörténetükkel és a képernyő-hozzárendeléseikkel együtt —, és
+    egy kattintással visszaállíthatók. Véglegesen csak innen törlődnek.
+  </p>
+  <?= flash_render() ?>
+
+  <div class="panel">
+    <div class="panel__h"><h2>Törölt elemek</h2><span class="sp"></span>
+      <span class="badge <?= $open ? 'badge--warn' : '' ?>"><?= count($open) ?> visszaállítható</span>
+      <?php if ($open): ?>
+        <form method="post" action="<?= h(admin_url()) ?>"
+              onsubmit="return confirm('Véglegesen törlöd a Kuka teljes tartalmát? Ez nem vonható vissza.')">
+          <?= csrf_input() ?>
+          <input type="hidden" name="a" value="trash.purge">
+          <input type="hidden" name="id" value="0">
+          <button class="btn btn--sm btn--danger" type="submit">Kuka ürítése</button>
+        </form>
+      <?php endif; ?>
+    </div>
+    <div class="panel__b panel__b--flush">
+      <?php if (!$rows): ?>
+        <div class="empty">A Kuka üres.</div>
+      <?php else: ?>
+        <table class="tbl">
+          <thead><tr><th>Mit</th><th>Megnevezés</th><th>Nyelv</th><th>Mikor</th><th>Ki</th><th></th></tr></thead>
+          <tbody>
+          <?php foreach ($rows as $r):
+              $kind = match ($r['kind']) {
+                  'article' => 'fejezet', 'module' => 'modul', 'move' => 'áthelyezés', default => $r['kind'],
+              }; ?>
+            <tr<?= $r['restored_at'] !== null ? ' style="opacity:.55"' : '' ?>>
+              <td data-label="Mit"><span class="badge"><?= h($kind) ?></span></td>
+              <td data-label="Megnevezés"><b><?= h($r['label']) ?></b></td>
+              <td data-label="Nyelv" class="mono"><?= h((string)$r['lang']) ?></td>
+              <td data-label="Mikor" class="nowrap muted"><?= h(substr((string)$r['deleted_at'], 0, 16)) ?></td>
+              <td data-label="Ki" class="muted"><?= h((string)$r['display_name']) ?></td>
+              <td data-label="" class="nowrap">
+                <?php if ($r['restored_at'] !== null): ?>
+                  <span class="badge badge--ok">visszaállítva</span>
+                <?php else: ?>
+                  <form method="post" action="<?= h(admin_url()) ?>" style="display:inline">
+                    <?= csrf_input() ?>
+                    <input type="hidden" name="a" value="trash.restore">
+                    <input type="hidden" name="id" value="<?= (int)$r['id'] ?>">
+                    <button class="btn btn--sm btn--p" type="submit">↩ Visszaállítás</button>
+                  </form>
+                  <form method="post" action="<?= h(admin_url()) ?>" style="display:inline"
+                        onsubmit="return confirm('Véglegesen törlöd? Ez nem vonható vissza.')">
+                    <?= csrf_input() ?>
+                    <input type="hidden" name="a" value="trash.purge">
+                    <input type="hidden" name="id" value="<?= (int)$r['id'] ?>">
+                    <button class="btn btn--sm btn--danger" type="submit">Végleges törlés</button>
+                  </form>
+                <?php endif; ?>
+              </td>
+            </tr>
+          <?php endforeach; ?>
+          </tbody>
+        </table>
+      <?php endif; ?>
+    </div>
+  </div>
+</div>
+    <?php
+    admin_foot();
+}
+
+/**
+ * A parancspaletta (Ctrl+K) talalatai: fulek, muveletek es fejezetek egyben.
+ * @return list<array{group:string,label:string,sub:string,url:string,key:string}>
+ */
+function palette_items(PDO $db, string $q): array
+{
+    $q = trim($q);
+    $out = [];
+
+    // 1. fulek es gyorsmuveletek
+    $nav = [
+        ['Áttekintés',        'dashboard', 'Vázlatok, statisztika, napló'],
+        ['Fejezetek',         'articles',  'Szerkesztés, közzététel, verziók'],
+        ['Modulok',           'modules',   'A súgó felső szintje'],
+        ['Word import',       'import',    '.docx betöltése összehasonlítással'],
+        ['Fordítás',          'translate', 'HU → EN/DE'],
+        ['Képernyők',         'screens',   'Útvonal → fejezet'],
+        ['Képek, videók',     'media',     'Fájltár, feltöltés'],
+        ['Export',            'export',    'Word / PDF letöltés'],
+        ['Felhasználók',      'users',     'Fiókok, szerepkörök'],
+        ['Kuka',              'trash',     'Törölt elemek visszaállítása'],
+        ['Beállítások',       'settings',  'Fordító, kiadás, oldalcímek'],
+        ['Saját fiók',        'account',   'Jelszócsere'],
+    ];
+    foreach ($nav as [$label, $page, $sub]) {
+        if (!auth_can($page) && !in_array($page, ['account'], true)) { continue; }
+        if ($q === '' || mb_stripos(help_norm($label . ' ' . $sub), help_norm($q)) !== false) {
+            $out[] = ['group' => 'Menü', 'label' => $label, 'sub' => $sub,
+                      'url' => admin_url(['p' => $page]), 'key' => 'p-' . $page];
+        }
+    }
+
+    // 2. fejezetek
+    if ($q !== '' && auth_can('articles')) {
+        $st = $db->prepare("
+            SELECT a.id, a.lang, a.chapter_no, a.title, a.is_published,
+                   a.draft_html IS NOT NULL AS has_draft, m.title AS module_title
+              FROM help_article a LEFT JOIN help_module m ON m.id = a.module_id
+             WHERE erp_norm(a.chapter_no || ' ' || a.title) LIKE '%' || erp_norm(?) || '%'
+          ORDER BY (a.lang = 'hu') DESC, a.sort_order
+             LIMIT 25");
+        $st->execute([$q]);
+        foreach ($st->fetchAll() as $r) {
+            $flags = [];
+            if ($r['has_draft'])     { $flags[] = 'vázlat'; }
+            if (!$r['is_published']) { $flags[] = 'kikapcsolva'; }
+            $out[] = [
+                'group' => 'Fejezet',
+                'label' => trim($r['chapter_no'] . ' ' . $r['title']),
+                'sub'   => strtoupper((string)$r['lang']) . ' · ' . (string)$r['module_title']
+                         . ($flags ? ' · ' . implode(', ', $flags) : ''),
+                'url'   => admin_url(['p' => 'articles', 'lang' => $r['lang'], 'id' => $r['id']]),
+                'key'   => 'a-' . $r['id'],
+            ];
+        }
+    }
+
+    return array_slice($out, 0, 40);
 }

@@ -38,7 +38,8 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                 flash('err', h($r['error'] ?? 'Sikertelen bejelentkezés.'));
                 back(['p' => 'login']);
             }
-            back(auth_user()['must_change'] ? ['p' => 'chpw'] : []);
+            // belepes utan egyenesen az Attekintesre - jelszocsere nem kotelezo
+            back();
         }
 
         case 'chpw': {
@@ -54,24 +55,24 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
 
             if (!password_verify($cur, $hash)) {
                 flash('err', 'A jelenlegi jelszó nem stimmel.');
-                back(['p' => 'chpw']);
+                back(['p' => 'settings']);
             }
             if ($new !== $new2) {
                 flash('err', 'A két új jelszó nem egyezik.');
-                back(['p' => 'chpw']);
+                back(['p' => 'settings']);
             }
             if (($problem = auth_password_problem($new, $u['username'])) !== null) {
                 flash('err', h($problem));
-                back(['p' => 'chpw']);
+                back(['p' => 'settings']);
             }
             if (password_verify($new, $hash)) {
                 flash('err', 'Az új jelszó nem lehet ugyanaz, mint a régi.');
-                back(['p' => 'chpw']);
+                back(['p' => 'settings']);
             }
             auth_set_password($db, (int)$u['id'], $new);
             audit_me($db, 'password.change', 'user:' . $u['username']);
             flash('ok', 'A jelszó megváltozott.');
-            back();
+            back(['p' => 'settings']);
         }
 
         // ================================================== fejezetek
@@ -127,7 +128,8 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             audit_me($db, 'article.publish', 'article:' . $id, $summary);
 
             if ($wantsJson) { help_json(['ok' => true]); }
-            flash('ok', 'A fejezet közzétéve — a nyilvános oldalon már ez látszik.');
+            flash('ok', 'A fejezet közzétéve — a nyilvános oldalon már ez látszik. '
+                . undo_button($db, 'article.unpublish', ['id' => $id], 'Közzététel visszavonása'));
             back(['p' => 'articles', 'id' => $id]);
         }
 
@@ -242,15 +244,24 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             back(['p' => 'articles', 'lang' => $lang, 'id' => $newId]);
         }
 
+        // A torles nem semmisit meg semmit: a cikk teljes allapota (szakaszaival es
+        // a hozza tartozo kepernyo-hozzarendelesekkel egyutt) a Kukaba kerul,
+        // ahonnan egy kattintassal visszaallithato.
         case 'article.delete': {
             $id = (int)post('id');
-            $st = $db->prepare('SELECT lang, slug, title FROM help_article WHERE id = ?');
+            $st = $db->prepare('SELECT * FROM help_article WHERE id = ?');
             $st->execute([$id]);
             $a = $st->fetch();
-            $db->prepare('DELETE FROM help_article WHERE id = ?')->execute([$id]);
-            audit_me($db, 'article.delete', 'article:' . $id, $a['title'] ?? null);
-            flash('ok', 'A fejezet törölve.');
-            back(['p' => 'articles', 'lang' => $a['lang'] ?? 'hu']);
+            if (!$a) {
+                flash('err', 'Nincs ilyen fejezet.');
+                back(['p' => 'articles']);
+            }
+            $trashId = trash_article($db, $a, auth_user()['id']);
+            audit_me($db, 'article.delete', 'article:' . $id, $a['title']);
+
+            flash('ok', 'A fejezet a <b>Kukába</b> került: ' . h($a['chapter_no'] . ' ' . $a['title'])
+                . '. ' . undo_button($db, 'trash.restore', ['id' => $trashId], 'Visszaállítom'));
+            back(['p' => 'articles', 'lang' => $a['lang']]);
         }
 
         case 'article.restore': {
@@ -268,6 +279,193 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             audit_me($db, 'article.restore', 'article:' . $id, 'rev ' . $rev);
             flash('ok', "A(z) {$rev}. változat betöltve vázlatként. Nézd át, és tedd közzé, ha jó.");
             back(['p' => 'articles', 'id' => $id]);
+        }
+
+        // ---------- a legutobbi kozzetetel visszavonasa ----------
+        case 'article.unpublish': {
+            $id = (int)post('id');
+            $st = $db->prepare('SELECT help_unpublish(?, ?)');
+            $st->execute([$id, auth_user()['id']]);
+            $ok = $st->fetchColumn();
+
+            if (!$ok) {
+                flash('warn', 'Ezen a fejezeten még nem volt közzététel, nincs mit visszavonni.');
+                back(['p' => 'articles', 'id' => $id]);
+            }
+            $b = $db->prepare('SELECT body_html FROM help_article WHERE id = ?');
+            $b->execute([$id]);
+            sections_rebuild($db, $id, (string)$b->fetchColumn());
+
+            audit_me($db, 'article.unpublish', 'article:' . $id);
+            flash('ok', 'A közzététel <b>visszavonva</b> — a nyilvános oldalon ismét az előző '
+                . 'változat látszik. A visszavont szöveg vázlatként megmaradt, nem veszett el.');
+            back(['p' => 'articles', 'id' => $id]);
+        }
+
+        // ---------- tomeges muveletek a fejezetlistan ----------
+        case 'articles.bulk': {
+            $ids = array_values(array_unique(array_filter(array_map('intval', (array)($_POST['ids'] ?? [])))));
+            $op   = post('op');
+            $lang = array_key_exists(post('lang'), ADMIN_LANGS) ? post('lang') : 'hu';
+
+            if (!$ids) {
+                flash('warn', 'Nem jelöltél ki egyetlen fejezetet sem.');
+                back(['p' => 'articles', 'lang' => $lang]);
+            }
+            $in = implode(',', array_fill(0, count($ids), '?'));
+            $n = 0;
+
+            switch ($op) {
+                case 'publish-on':
+                case 'publish-off': {
+                    $on = $op === 'publish-on';
+                    $st = $db->prepare("UPDATE help_article SET is_published = ? WHERE id IN ($in)");
+                    $st->execute([$on ? 'true' : 'false', ...$ids]);
+                    $n = $st->rowCount();
+                    audit_me($db, 'articles.bulk', $op, (string)$n);
+                    flash('ok', "<b>{$n} fejezet</b> " . ($on ? 'bekapcsolva' : 'kikapcsolva') . '. '
+                        . undo_button($db, 'articles.bulk', ['op' => $on ? 'publish-off' : 'publish-on',
+                                                             'lang' => $lang, 'ids' => $ids], 'Visszavonom'));
+                    break;
+                }
+
+                case 'publish-drafts': {
+                    $st = $db->prepare("SELECT id FROM help_article WHERE id IN ($in) AND draft_html IS NOT NULL");
+                    $st->execute($ids);
+                    $summary = post('summary');
+                    foreach ($st->fetchAll() as $r) {
+                        try {
+                            $db->beginTransaction();
+                            $db->prepare('SELECT help_publish(?, ?, ?, ?, NULL, ?)')
+                               ->execute([$r['id'], auth_user()['id'], $summary !== '' ? $summary : null,
+                                          'mod', isset($_POST['minor']) ? 'true' : 'false']);
+                            $b = $db->prepare('SELECT body_html FROM help_article WHERE id = ?');
+                            $b->execute([$r['id']]);
+                            sections_rebuild($db, (int)$r['id'], (string)$b->fetchColumn());
+                            $db->commit();
+                            $n++;
+                        } catch (Throwable $e) {
+                            if ($db->inTransaction()) { $db->rollBack(); }
+                        }
+                    }
+                    audit_me($db, 'articles.bulk', 'publish-drafts', (string)$n);
+                    flash('ok', "<b>{$n} fejezet</b> közzétéve.");
+                    break;
+                }
+
+                case 'move': {
+                    $moduleId = (int)post('module_id');
+                    if ($moduleId === 0) {
+                        flash('err', 'Válaszd ki, melyik modulba kerüljenek.');
+                        back(['p' => 'articles', 'lang' => $lang]);
+                    }
+                    // az eredeti modulok feljegyzese, hogy a visszavonas is mukodjon
+                    $old = $db->prepare("SELECT id, module_id FROM help_article WHERE id IN ($in)");
+                    $old->execute($ids);
+                    $before = $old->fetchAll();
+
+                    $st = $db->prepare("UPDATE help_article SET module_id = ? WHERE id IN ($in)");
+                    $st->execute([$moduleId, ...$ids]);
+                    $n = $st->rowCount();
+
+                    $tid = trash_put($db, 'move', 'Áthelyezés visszavonása', $lang,
+                                     ['articles' => $before], auth_user()['id']);
+                    audit_me($db, 'articles.bulk', 'move', "{$n} -> module {$moduleId}");
+                    flash('ok', "<b>{$n} fejezet</b> áthelyezve. "
+                        . undo_button($db, 'trash.restore', ['id' => $tid], 'Visszavonom'));
+                    break;
+                }
+
+                case 'delete': {
+                    $st = $db->prepare("SELECT * FROM help_article WHERE id IN ($in)");
+                    $st->execute($ids);
+                    $tids = [];
+                    foreach ($st->fetchAll() as $a) {
+                        $tids[] = trash_article($db, $a, auth_user()['id']);
+                        $n++;
+                    }
+                    audit_me($db, 'articles.bulk', 'delete', (string)$n);
+                    flash('ok', "<b>{$n} fejezet</b> a Kukába került. "
+                        . undo_button($db, 'trash.restore-many', ['ids' => $tids], 'Mindet visszaállítom'));
+                    break;
+                }
+
+                default:
+                    flash('err', 'Ismeretlen művelet.');
+            }
+            back(['p' => 'articles', 'lang' => $lang]);
+        }
+
+        // ---------- sorrend huzassal ----------
+        case 'articles.reorder': {
+            $ids = array_values(array_filter(array_map('intval', (array)($_POST['order'] ?? []))));
+            $moduleId = (int)post('module_id');
+            if (!$ids) { help_json(['ok' => false, 'error' => 'Üres sorrend.'], 400); }
+
+            $db->beginTransaction();
+            try {
+                $st = $db->prepare('UPDATE help_article SET sort_order = ?'
+                    . ($moduleId > 0 ? ', module_id = ?' : '') . ' WHERE id = ?');
+                foreach ($ids as $i => $id) {
+                    $st->execute($moduleId > 0 ? [($i + 1) * 10, $moduleId, $id] : [($i + 1) * 10, $id]);
+                }
+                $db->commit();
+            } catch (Throwable $e) {
+                if ($db->inTransaction()) { $db->rollBack(); }
+                help_json(['ok' => false, 'error' => $e->getMessage()], 500);
+            }
+            audit_me($db, 'articles.reorder', $moduleId > 0 ? 'module:' . $moduleId : null, count($ids) . ' elem');
+            help_json(['ok' => true, 'count' => count($ids)]);
+        }
+
+        case 'modules.reorder': {
+            $ids = array_values(array_filter(array_map('intval', (array)($_POST['order'] ?? []))));
+            if (!$ids) { help_json(['ok' => false, 'error' => 'Üres sorrend.'], 400); }
+            $db->beginTransaction();
+            try {
+                $st = $db->prepare('UPDATE help_module SET sort_order = ? WHERE id = ?');
+                foreach ($ids as $i => $id) { $st->execute([($i + 1) * 10, $id]); }
+                $db->commit();
+            } catch (Throwable $e) {
+                if ($db->inTransaction()) { $db->rollBack(); }
+                help_json(['ok' => false, 'error' => $e->getMessage()], 500);
+            }
+            audit_me($db, 'modules.reorder', null, count($ids) . ' elem');
+            help_json(['ok' => true, 'count' => count($ids)]);
+        }
+
+        // ---------- kuka ----------
+        case 'trash.restore':
+        case 'trash.restore-many': {
+            $ids = $action === 'trash.restore'
+                ? [(int)post('id')]
+                : array_values(array_filter(array_map('intval', (array)($_POST['ids'] ?? []))));
+            $ok = 0; $err = [];
+            foreach ($ids as $tid) {
+                try {
+                    trash_restore($db, $tid);
+                    $ok++;
+                } catch (Throwable $e) {
+                    $err[] = $e->getMessage();
+                }
+            }
+            audit_me($db, 'trash.restore', null, (string)$ok);
+            if ($ok) { flash('ok', "<b>{$ok} elem</b> visszaállítva."); }
+            foreach (array_slice($err, 0, 3) as $e) { flash('err', h($e)); }
+            back(['p' => (string)($_POST['back'] ?? 'trash')]);
+        }
+
+        case 'trash.purge': {
+            $id = (int)post('id');
+            if ($id > 0) {
+                $db->prepare('DELETE FROM help_trash WHERE id = ?')->execute([$id]);
+                flash('ok', 'Véglegesen törölve.');
+            } else {
+                $n = $db->exec('DELETE FROM help_trash WHERE restored_at IS NULL');
+                flash('ok', "A Kuka kiürítve ({$n} elem).");
+            }
+            audit_me($db, 'trash.purge', $id > 0 ? 'trash:' . $id : 'all');
+            back(['p' => 'trash']);
         }
 
         // ================================================== modulok
@@ -307,9 +505,15 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                 flash('err', 'Ez a modul még tartalmaz fejezeteket – előbb helyezd át vagy töröld őket.');
                 back(['p' => 'modules', 'lang' => $lang]);
             }
-            $db->prepare('DELETE FROM help_module WHERE id = ?')->execute([$id]);
-            audit_me($db, 'module.delete', 'module:' . $id);
-            flash('ok', 'Modul törölve.');
+            $m = $db->prepare('SELECT * FROM help_module WHERE id = ?');
+            $m->execute([$id]);
+            $row = $m->fetch();
+            if (!$row) { flash('err', 'Nincs ilyen modul.'); back(['p' => 'modules', 'lang' => $lang]); }
+
+            $tid = trash_module($db, $row, auth_user()['id']);
+            audit_me($db, 'module.delete', 'module:' . $id, $row['title']);
+            flash('ok', 'A modul a <b>Kukába</b> került. '
+                . undo_button($db, 'trash.restore', ['id' => $tid, 'back' => 'modules'], 'Visszaállítom'));
             back(['p' => 'modules', 'lang' => $lang]);
         }
 

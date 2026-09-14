@@ -77,9 +77,8 @@ function page_chpw(bool $forced): void
 <div class="page" style="max-width:560px">
   <h1 class="pt">Jelszócsere</h1>
   <p class="lead">
-    <?= $forced
-        ? 'Az első belépés után kötelező új jelszót választani. A kezdeti jelszó (12345678) bárki számára ismert lehet — cseréld le most.'
-        : 'Adj meg egy új jelszót ehhez a fiókhoz.' ?>
+    Adj meg egy új jelszót ehhez a fiókhoz. Ez nem kötelező — a
+    <a href="<?= h(admin_url(['p' => 'settings'])) ?>#jelszo">Beállítások</a> fülön is bármikor elvégezhető.
   </p>
   <?= flash_render() ?>
   <div class="panel"><div class="panel__b">
@@ -101,7 +100,7 @@ function page_chpw(bool $forced): void
       </div>
       <div class="btnbar">
         <button class="btn btn--p" type="submit">Jelszó mentése</button>
-        <?php if (!$forced): ?><a class="btn btn--ghost" href="<?= h(admin_url()) ?>">Mégsem</a><?php endif; ?>
+        <a class="btn btn--ghost" href="<?= h(admin_url()) ?>">Mégsem</a>
       </div>
     </form>
   </div></div>
@@ -229,9 +228,9 @@ function page_dashboard(PDO $db, array $cfg, array $counts): void
             <table class="tbl">
               <?php foreach ($drafts as $d): ?>
                 <tr>
-                  <td class="nowrap muted mono"><?= h($d['lang']) ?> · <?= h($d['chapter_no']) ?></td>
-                  <td><a href="<?= h(admin_url(['p' => 'articles', 'lang' => $d['lang'], 'id' => $d['id']])) ?>"><?= h($d['title']) ?></a></td>
-                  <td class="nowrap muted"><?= h(substr((string)$d['draft_at'], 0, 16)) ?> · <?= h((string)$d['display_name']) ?></td>
+                  <td class="nowrap muted mono" data-label="Fejezet"><?= h($d['lang']) ?> · <?= h($d['chapter_no']) ?></td>
+                  <td data-label="Cím"><a href="<?= h(admin_url(['p' => 'articles', 'lang' => $d['lang'], 'id' => $d['id']])) ?>"><?= h($d['title']) ?></a></td>
+                  <td class="nowrap muted" data-label="Mentve"><?= h(substr((string)$d['draft_at'], 0, 16)) ?> · <?= h((string)$d['display_name']) ?></td>
                 </tr>
               <?php endforeach; ?>
             </table>
@@ -248,10 +247,10 @@ function page_dashboard(PDO $db, array $cfg, array $counts): void
             <table class="tbl">
               <?php foreach ($imports as $i): $s = json_decode((string)$i['stats'], true) ?: []; ?>
                 <tr>
-                  <td><a href="<?= h(admin_url(['p' => 'import', 'import' => $i['id']])) ?>"><?= h($i['filename']) ?></a></td>
-                  <td class="nowrap muted"><?= (int)($s['chapters'] ?? 0) ?> fejezet · <?= (int)($s['images'] ?? 0) ?> kép</td>
-                  <td class="nowrap"><span class="badge <?= $i['status'] === 'applied' ? 'badge--ok' : '' ?>"><?= h($i['status']) ?></span></td>
-                  <td class="nowrap muted"><?= h(substr((string)$i['uploaded_at'], 0, 16)) ?></td>
+                  <td data-label="Fájl"><a href="<?= h(admin_url(['p' => 'import', 'import' => $i['id']])) ?>"><?= h($i['filename']) ?></a></td>
+                  <td class="nowrap muted" data-label="Tartalom"><?= (int)($s['chapters'] ?? 0) ?> fejezet · <?= (int)($s['images'] ?? 0) ?> kép</td>
+                  <td class="nowrap" data-label="Állapot"><span class="badge <?= $i['status'] === 'applied' ? 'badge--ok' : '' ?>"><?= h($i['status']) ?></span></td>
+                  <td class="nowrap muted" data-label="Mikor"><?= h(substr((string)$i['uploaded_at'], 0, 16)) ?></td>
                 </tr>
               <?php endforeach; ?>
             </table>
@@ -280,9 +279,9 @@ function page_dashboard(PDO $db, array $cfg, array $counts): void
           <table class="tbl">
             <?php foreach ($audit as $a): ?>
               <tr>
-                <td class="nowrap muted" style="width:104px"><?= h(substr((string)$a['created_at'], 5, 11)) ?></td>
-                <td class="mono nowrap"><?= h($a['action']) ?></td>
-                <td class="muted"><?= h((string)$a['username']) ?></td>
+                <td class="nowrap muted" style="width:104px" data-label="Mikor"><?= h(substr((string)$a['created_at'], 5, 11)) ?></td>
+                <td class="mono nowrap" data-label="Művelet"><?= h($a['action']) ?></td>
+                <td class="muted" data-label="Ki"><?= h((string)$a['username']) ?></td>
               </tr>
             <?php endforeach; ?>
           </table>
@@ -326,26 +325,65 @@ function page_articles(PDO $db, string $lang, int $id, array $counts): void
 <div class="page page--split">
 
   <!-- bal: fejezetválasztó -->
-  <div class="panel picker">
+  <div class="panel picker" id="picker">
     <div class="picker__f">
-      <input class="inp" id="pick-filter" placeholder="Szűrés…" autocomplete="off">
+      <input class="inp" id="pick-filter" placeholder="Szűrés…  (Ctrl+K a kereséshez)" autocomplete="off">
+      <button class="btn btn--sm" type="button" id="pick-select" title="Több fejezet kijelölése">☑</button>
+      <button class="btn btn--sm" type="button" id="pick-sort" title="Sorrend átrendezése húzással">↕</button>
       <button class="btn btn--p btn--sm" type="button" data-modal="new-article" title="Új fejezet">+</button>
     </div>
     <div style="padding:8px 10px 0"><?= lang_switch('articles', $lang) ?></div>
+
+    <div class="picker__hint" id="pick-hint" hidden></div>
+
     <div class="picker__l" id="pick-list">
       <?php foreach ($tree as $m): ?>
-        <div class="picker__m"><?= h($m['chapter_no']) ?> <?= h($m['title']) ?></div>
+        <div class="picker__m" data-module="<?= (int)$m['id'] ?>">
+          <label class="picker__mchk"><input type="checkbox" class="pick-mod-all" tabindex="-1"></label>
+          <?= h($m['chapter_no']) ?> <?= h($m['title']) ?>
+        </div>
+        <div class="picker__group" data-module="<?= (int)$m['id'] ?>">
         <?php foreach ($m['articles'] as $a): ?>
-          <a class="picker__a<?= $article && (int)$a['id'] === (int)$article['id'] ? ' on' : '' ?>"
-             href="<?= h(admin_url(['p' => 'articles', 'lang' => $lang, 'id' => $a['id']])) ?>">
-            <em><?= h($a['chapter_no']) ?></em><span><?= h($a['title']) ?></span>
-            <?php if (!$a['is_published']): ?><span class="dot dot--hidden" title="Kikapcsolva – nem látszik a nyilvános oldalon"></span><?php endif; ?>
-            <?php if ($a['has_draft']): ?><span class="dot dot--draft" title="Van közzétételre váró vázlat"></span><?php endif; ?>
-          </a>
+          <div class="picker__row" data-id="<?= (int)$a['id'] ?>">
+            <label class="picker__chk"><input type="checkbox" class="pick-one" value="<?= (int)$a['id'] ?>" tabindex="-1"></label>
+            <span class="picker__grip" title="Húzd a sorrend átrendezéséhez" aria-hidden="true">⠿</span>
+            <a class="picker__a<?= $article && (int)$a['id'] === (int)$article['id'] ? ' on' : '' ?>"
+               href="<?= h(admin_url(['p' => 'articles', 'lang' => $lang, 'id' => $a['id']])) ?>">
+              <em><?= h($a['chapter_no']) ?></em><span><?= h($a['title']) ?></span>
+              <?php if (!$a['is_published']): ?><span class="dot dot--hidden" title="Kikapcsolva – nem látszik a nyilvános oldalon"></span><?php endif; ?>
+              <?php if ($a['has_draft']): ?><span class="dot dot--draft" title="Van közzétételre váró vázlat"></span><?php endif; ?>
+            </a>
+          </div>
         <?php endforeach; ?>
+        </div>
       <?php endforeach; ?>
       <?php if (!$tree): ?><div class="empty">Ezen a nyelven még nincs modul.</div><?php endif; ?>
     </div>
+
+    <!-- tömeges műveletek sávja -->
+    <form class="bulkbar" id="bulkbar" method="post" action="<?= h(admin_url()) ?>" hidden>
+      <?= csrf_input() ?>
+      <input type="hidden" name="a" value="articles.bulk">
+      <input type="hidden" name="lang" value="<?= h($lang) ?>">
+      <input type="hidden" name="op" id="bulk-op" value="">
+      <div class="bulkbar__n"><b id="bulk-count">0</b> kijelölve</div>
+      <div class="bulkbar__b">
+        <button class="btn btn--sm btn--ok" type="submit" data-op="publish-on" title="Megjelenik a nyilvános oldalon">● Bekapcsol</button>
+        <button class="btn btn--sm btn--danger" type="submit" data-op="publish-off" title="Eltűnik a nyilvános oldalról">○ Kikapcsol</button>
+        <button class="btn btn--sm" type="submit" data-op="publish-drafts" title="A kijelöltek vázlatainak közzététele">Vázlatok közzététele</button>
+        <select class="sel" name="module_id" id="bulk-module" style="width:auto;min-width:140px">
+          <option value="">Áthelyezés ide…</option>
+          <?php foreach ($modules as $m): ?>
+            <option value="<?= (int)$m['id'] ?>"><?= h($m['chapter_no'] . ' ' . $m['title']) ?></option>
+          <?php endforeach; ?>
+        </select>
+        <button class="btn btn--sm" type="submit" data-op="move">Áthelyez</button>
+        <span style="flex:1"></span>
+        <button class="btn btn--sm btn--danger" type="submit" data-op="delete"
+                data-confirm="A kijelölt fejezetek a Kukába kerülnek, ahonnan visszaállíthatók. Folytatod?">Törlés</button>
+        <button class="btn btn--sm btn--ghost" type="button" id="bulk-cancel">Mégsem</button>
+      </div>
+    </form>
   </div>
 
   <!-- jobb: szerkesztő -->
@@ -559,12 +597,12 @@ function page_articles(PDO $db, string $lang, int $id, array $counts): void
               <tbody>
               <?php foreach ($revisions as $r): ?>
                 <tr>
-                  <td class="num"><?= (int)$r['rev_no'] ?></td>
-                  <td><?= h($r['title']) ?></td>
-                  <td class="muted"><?= h((string)$r['note']) ?></td>
-                  <td class="nowrap muted"><?= h(substr((string)$r['created_at'], 0, 16)) ?></td>
-                  <td class="muted"><?= h((string)$r['display_name']) ?></td>
-                  <td class="nowrap">
+                  <td class="num" data-label="#"><?= (int)$r['rev_no'] ?></td>
+                  <td data-label="Cím"><?= h($r['title']) ?></td>
+                  <td class="muted" data-label="Összefoglaló"><?= h((string)$r['note']) ?></td>
+                  <td class="nowrap muted" data-label="Mikor"><?= h(substr((string)$r['created_at'], 0, 16)) ?></td>
+                  <td class="muted" data-label="Ki"><?= h((string)$r['display_name']) ?></td>
+                  <td class="nowrap" data-label="">
                     <form method="post" action="<?= h(admin_url()) ?>" onsubmit="return confirm('Betöltöd ezt a változatot vázlatként? A jelenlegi vázlat felülíródik.')">
                       <?= csrf_input() ?>
                       <input type="hidden" name="a" value="article.restore">
@@ -698,22 +736,29 @@ function page_modules(PDO $db, string $lang, array $counts): void
     <div class="panel__h"><h2><?= h(ADMIN_LANGS[$lang]) ?> modulok</h2><span class="sp"></span>
       <button class="btn btn--p btn--sm" type="button" data-modal="new-module">+ Új modul</button></div>
     <div class="panel__b panel__b--flush">
-      <table class="tbl">
-        <thead><tr><th style="width:90px">Sorrend</th><th style="width:90px">Szám</th><th>Név</th><th>URL-azonosító</th><th class="num">Fejezet</th><th></th></tr></thead>
-        <tbody>
+      <div class="hint" style="padding:10px 16px 0">
+        A sorrendet a sor eleji <b>⠿</b> fogantyúval húzva is átrendezheted — a mentés automatikus.
+      </div>
+      <?php foreach ($modules as $m): ?>
+        <form method="post" action="<?= h(admin_url()) ?>" id="mf<?= (int)$m['id'] ?>">
+          <input type="hidden" name="csrf" value="<?= h(csrf_token()) ?>">
+          <input type="hidden" name="a" value="module.save">
+          <input type="hidden" name="id" value="<?= (int)$m['id'] ?>">
+          <input type="hidden" name="lang" value="<?= h($lang) ?>">
+        </form>
+      <?php endforeach; ?>
+      <table class="tbl tbl--sortable" data-sort-action="modules.reorder">
+        <thead><tr><th style="width:34px"></th><th style="width:90px">Sorrend</th><th style="width:90px">Szám</th><th>Név</th><th>URL-azonosító</th><th class="num">Fejezet</th><th></th></tr></thead>
+        <tbody id="mod-sort">
         <?php foreach ($modules as $m): ?>
-          <tr>
-            <form method="post" action="<?= h(admin_url()) ?>" id="mf<?= (int)$m['id'] ?>"></form>
-            <td><input class="inp" form="mf<?= (int)$m['id'] ?>" name="sort_order" type="number" value="<?= (int)$m['sort_order'] ?>" style="width:74px"></td>
-            <td><input class="inp" form="mf<?= (int)$m['id'] ?>" name="chapter_no" value="<?= h($m['chapter_no']) ?>" style="width:74px"></td>
-            <td><input class="inp" form="mf<?= (int)$m['id'] ?>" name="title" value="<?= h($m['title']) ?>"></td>
-            <td><input class="inp mono" form="mf<?= (int)$m['id'] ?>" name="slug" value="<?= h($m['slug']) ?>"></td>
-            <td class="num"><?= (int)$m['n'] ?></td>
-            <td class="nowrap">
-              <input type="hidden" form="mf<?= (int)$m['id'] ?>" name="csrf" value="<?= h(csrf_token()) ?>">
-              <input type="hidden" form="mf<?= (int)$m['id'] ?>" name="a" value="module.save">
-              <input type="hidden" form="mf<?= (int)$m['id'] ?>" name="id" value="<?= (int)$m['id'] ?>">
-              <input type="hidden" form="mf<?= (int)$m['id'] ?>" name="lang" value="<?= h($lang) ?>">
+          <tr data-id="<?= (int)$m['id'] ?>">
+            <td class="grip" data-label=""><span class="picker__grip" title="Húzd az átrendezéshez">⠿</span></td>
+            <td data-label="Sorrend"><input class="inp" form="mf<?= (int)$m['id'] ?>" name="sort_order" type="number" value="<?= (int)$m['sort_order'] ?>" style="width:74px"></td>
+            <td data-label="Szám"><input class="inp" form="mf<?= (int)$m['id'] ?>" name="chapter_no" value="<?= h($m['chapter_no']) ?>" style="width:74px"></td>
+            <td data-label="Név"><input class="inp" form="mf<?= (int)$m['id'] ?>" name="title" value="<?= h($m['title']) ?>"></td>
+            <td data-label="URL-azonosító"><input class="inp mono" form="mf<?= (int)$m['id'] ?>" name="slug" value="<?= h($m['slug']) ?>"></td>
+            <td class="num" data-label="Fejezet"><?= (int)$m['n'] ?></td>
+            <td class="nowrap" data-label="">
               <button class="btn btn--sm btn--p" form="mf<?= (int)$m['id'] ?>" type="submit">Mentés</button>
               <?php if ((int)$m['n'] === 0): ?>
                 <form method="post" action="<?= h(admin_url()) ?>" style="display:inline"
