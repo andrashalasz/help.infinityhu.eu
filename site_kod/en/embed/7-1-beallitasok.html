@@ -1,0 +1,136 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Settings</title><style>*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,-apple-system,'Segoe UI',sans-serif;background:#fff;color:#333B4D;
+font-size:14px;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:#1B3A6B}
+.bar{position:sticky;top:0;display:flex;align-items:center;gap:10px;padding:10px 16px;
+background:#FAFAF9;border-bottom:1px solid #E8E7E3;font-size:12px}
+.bar b{font-size:13px;color:#1E293B;font-weight:600;flex:1;min-width:0;overflow:hidden;
+text-overflow:ellipsis;white-space:nowrap}
+.bar a{color:#6B7280;text-decoration:none;white-space:nowrap;display:flex;align-items:center;gap:4px}
+.bar a:hover{color:#1B3A6B}
+.bar svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.pad{padding:18px 20px 30px}
+h1{font-size:19px;font-weight:700;color:#1E293B;margin:0 0 12px}
+h2{font-size:16px;font-weight:600;color:#1E293B;margin:22px 0 8px;scroll-margin-top:50px}
+h3{font-size:14.5px;font-weight:600;color:#1E293B;margin:18px 0 6px;scroll-margin-top:50px}
+h2 .hno,h3 .hno{color:#9CA3AF;font-weight:500;margin-right:6px}
+p{margin:0 0 11px}
+ul,ol{margin:0 0 11px;padding-left:20px}
+li{margin-bottom:4px}
+img{max-width:100%;height:auto;border:1px solid #E8E7E3;border-radius:5px;margin:5px 0}
+.call{background:#FAFAF9;border:1px solid #E8E7E3;border-left:3px solid #1B3A6B;border-radius:0 6px 6px 0;
+padding:11px 14px;margin:14px 0;font-size:13px}
+.call.warn{background:#FFFDF5;border-color:#F3E7C4;border-left-color:#F59E0B}
+.call strong{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;
+color:#6B7280;margin-bottom:3px}
+table{width:100%;border-collapse:collapse;margin:13px 0;font-size:12.5px}
+th{background:#FAFAF9;text-align:left;padding:7px 10px;font-size:10px;text-transform:uppercase;
+letter-spacing:.04em;color:#6B7280;border-bottom:1px solid #E8E7E3}
+td{padding:7px 10px;border-bottom:1px solid #F1F0EE;vertical-align:top}
+figcaption{font-size:11px;color:#9CA3AF;margin-top:4px}
+.foot{padding:14px 20px;border-top:1px solid #F1F0EE;font-size:11px;color:#9CA3AF}
+</style></head><body><div class="bar"><b>7.1 Settings</b><a href="https://help.infinityhu.eu/en/7-1-beallitasok.html" target="_blank" rel="noopener">Full page<svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></a></div><div class="pad"><p>The approval process is closely related to filing. Activities that may require approval:</p>
+<ul>
+<li><p>Payment batch — the authorised user is notified in the information bar about the invoices to be certified, which can be opened, approved or rejected directly from there</p></li>
+<li><p>Accountability of an incoming invoice — after the payment approval, the accounting and VAT dates appear; once these are filled in, the invoice can be handed over for accounting</p></li>
+<li><p>Approval of quotations — every quotation, or only quotations above a certain value limit, can be sent for approval</p></li>
+<li><p>Approval of orders — likewise for all orders or only those above the value limit</p></li>
+<li><p>Approval of an outgoing invoice — after closing, but before the document is produced</p></li>
+<li><p>Approval of a cash payment</p></li>
+</ul><h2 id="7-1-1-dokumentumtipusok"><span class="hno">7.1.1</span>Document types</h2><p>By creating filing types you can set up document groups that match your business processes. Data to be entered:</p>
+<ul>
+<li><p>Code: short identifier, 3 characters, mandatory</p></li>
+<li><p>Name: free text, mandatory</p></li>
+<li><p>Serial number pattern: can be given per filing type (not mandatory)</p></li>
+<li><p>Site: if given, filing is only possible at that site (not mandatory)</p></li>
+<li><p>Type: invoice or document type (mandatory)</p></li>
+<li><p>Expiring document: if yes, entering the expiry date is mandatory when uploading the document</p></li>
+<li><p>Directory: the directory the filed documents are placed in</p></li>
+<li><p>Status: active or inactive (mandatory)</p></li>
+</ul><h2 id="7-1-2-lejaro-dokumentum-tipus"><span class="hno">7.1.2</span>Expiring document type</h2><p>Documents with an expiry date (for example certificates, permits, attestations) can be recorded in the system. When creating the document type, it has to be specified whether documents of that type expire.</p>
+<p><strong>Automatic notification system:</strong></p>
+<div class="tblwrap"><table class="erp-table">
+<tbody>
+<tr class="odd">
+<td><strong>90 days before</strong></td>
+<td>First notification to the person responsible</td>
+</tr>
+<tr class="even">
+<td><strong>60 days before</strong></td>
+<td>Reminder to the person responsible + notification to the supervisor</td>
+</tr>
+<tr class="odd">
+<td><strong>30 days before</strong></td>
+<td>Urgent warning to both parties</td>
+</tr>
+<tr class="even">
+<td><strong>14 days before</strong></td>
+<td>Critical warning</td>
+</tr>
+<tr class="odd">
+<td><strong>On the day of expiry</strong></td>
+<td>Expired status + immediate notification</td>
+</tr>
+<tr class="even">
+<td><strong>Weekly after expiry</strong></td>
+<td>Recurring reminder until renewal</td>
+</tr>
+</tbody>
+</table></div>
+<p>Notification channels: e-mail notification, dashboard widget.</p>
+<ul>
+<li><p>Dashboard of the person responsible: it arrives in the My tasks widget and can be found in the My documents list, sorted by expiry date</p></li>
+<li><p>Supervisor dashboard: a consolidated overview of the documents of the organisational unit, with the list of expiring documents by priority</p></li>
+</ul><h2 id="7-1-3-jovahagyasi-protokoll"><span class="hno">7.1.3</span>Approval protocol</h2><p>Used to control the approval processes. Fields to be entered:</p>
+<ul>
+<li><p>Code: 3 characters, mandatory</p></li>
+<li><p>Name: free text, mandatory</p></li>
+<li><p>Minimum value: below which approval is not required (numeric, not mandatory)</p></li>
+<li><p>Currency: the currency of the amount (default: HUF)</p></li>
+<li><p>Site: if given, it is only valid at that site (not mandatory)</p></li>
+<li><p>Approver: a user selectable from the partner list (mandatory)</p></li>
+<li><p>+ Approver: further approvers can be added (unlimited number, not mandatory)</p></li>
+<li><p>Score: a score has to be given for every approver — the document can only be considered approved once 10 approval points have been collected (values between 1 and 10)</p></li>
+<li><p>Status: active or inactive (mandatory)</p></li>
+</ul>
+<p><img src="https://help.infinityhu.eu/media/img_5bcdd23e6c15.png" class="shot" loading="lazy"/></p>
+<p><img src="https://help.infinityhu.eu/media/img_7e18eb2c6956.png" class="shot" loading="lazy"/></p><h2 id="7-1-4-engedelyezesre-varo-dokumentumok-informacios-sav"><span class="hno">7.1.4</span>Documents awaiting approval – information bar</h2><p>The approving user finds the documents awaiting approval in their information bar. If several users have to approve and the current one has already approved, their item turns green. To withdraw the approval, click the item again and reject it.</p>
+<p><img src="https://help.infinityhu.eu/media/img_9dbd40aeadbc.png" class="shot" loading="lazy"/></p>
+<p>From the list you can reach the document to be approved with a single click. The list contains all the necessary information, including the number of approval points received so far. In the approval window you can send a message to the issuer of the document or to the other approver. With the Approve field you approve the document (as many points are recorded as the approval protocol prescribes). In the case of rejection, minus points are assigned.</p>
+<div class="call warn"><strong>Caution</strong>
+<p>If a document under approval is modified, all approval points are deleted and the approval process starts again.</p></div>
+<p><img src="https://help.infinityhu.eu/media/img_8213301b9847.png" class="shot" loading="lazy"/></p><h2 id="7-1-5-iktatokonyv"><span class="hno">7.1.5</span>Filing register</h2><p>When creating the digital filing register, enter the name of the register and the prefix and suffix of its serial number. In the register list, add the user who has permission to use it. The system automatically creates a filing register in which it places the documents.</p>
+<p><strong>The filing process:</strong></p>
+<ol start="3" type="1">
+<li><p>The user uploads the document into the Filing widget under the Document upload tab on the home page.</p></li>
+</ol>
+
+<p><img src="https://help.infinityhu.eu/media/img_6aaecb09dd2b.png" class="shot" loading="lazy"/></p>
+<ol start="4" type="1">
+<li><p>The documents are placed in a list, which the authorised user sees on the home page under the My tasks tab.</p></li>
+</ol>
+
+<p><img src="https://help.infinityhu.eu/media/img_590b0bbe4b72.png" class="shot" loading="lazy"/></p>
+<ol start="5" type="1">
+<li><p>The user categorises the documents one by one, marks the partner or employee (not mandatory), places the document in the filing register, then presses the filing button.</p></li>
+</ol>
+
+<p><img src="https://help.infinityhu.eu/media/img_fd1a6948ed24.png" class="shot" loading="lazy"/></p>
+<ol start="6" type="1">
+<li><p>The document receives a filing number and a time stamp; the name of the filing user is also stored.</p></li>
+</ol>
+<ol start="7" type="1">
+<li><p>The user assigns the document to a division or to one or more users.</p></li>
+</ol>
+<ol start="8" type="1">
+<li><p>The designated user processes the document by clicking the process button.</p></li>
+</ol>
+
+<p><img src="https://help.infinityhu.eu/media/img_e82bd171d410.png" class="shot" loading="lazy"/></p>
+<p><strong>Types of the filed document:</strong></p>
+<ul>
+<li><p>Invoice: clicking the filing button opens the invoice entry page, the document is attached automatically and the partner is already selected</p></li>
+<li><p>Employee document: the employee document screen opens, where the division and the employees have to be selected</p></li>
+<li><p>General document: the basic upload screen appears, where the document is archived for the given partner</p></li>
+</ul></div><div class="foot">Updated 2026.08.26 · v2026.08.26</div></body></html>

@@ -1,0 +1,376 @@
+<!DOCTYPE html><html lang="hu"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Árucikkek</title><style>*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,-apple-system,'Segoe UI',sans-serif;background:#fff;color:#333B4D;
+font-size:14px;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:#1B3A6B}
+.bar{position:sticky;top:0;display:flex;align-items:center;gap:10px;padding:10px 16px;
+background:#FAFAF9;border-bottom:1px solid #E8E7E3;font-size:12px}
+.bar b{font-size:13px;color:#1E293B;font-weight:600;flex:1;min-width:0;overflow:hidden;
+text-overflow:ellipsis;white-space:nowrap}
+.bar a{color:#6B7280;text-decoration:none;white-space:nowrap;display:flex;align-items:center;gap:4px}
+.bar a:hover{color:#1B3A6B}
+.bar svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.pad{padding:18px 20px 30px}
+h1{font-size:19px;font-weight:700;color:#1E293B;margin:0 0 12px}
+h2{font-size:16px;font-weight:600;color:#1E293B;margin:22px 0 8px;scroll-margin-top:50px}
+h3{font-size:14.5px;font-weight:600;color:#1E293B;margin:18px 0 6px;scroll-margin-top:50px}
+h2 .hno,h3 .hno{color:#9CA3AF;font-weight:500;margin-right:6px}
+p{margin:0 0 11px}
+ul,ol{margin:0 0 11px;padding-left:20px}
+li{margin-bottom:4px}
+img{max-width:100%;height:auto;border:1px solid #E8E7E3;border-radius:5px;margin:5px 0}
+.call{background:#FAFAF9;border:1px solid #E8E7E3;border-left:3px solid #1B3A6B;border-radius:0 6px 6px 0;
+padding:11px 14px;margin:14px 0;font-size:13px}
+.call.warn{background:#FFFDF5;border-color:#F3E7C4;border-left-color:#F59E0B}
+.call strong{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;
+color:#6B7280;margin-bottom:3px}
+table{width:100%;border-collapse:collapse;margin:13px 0;font-size:12.5px}
+th{background:#FAFAF9;text-align:left;padding:7px 10px;font-size:10px;text-transform:uppercase;
+letter-spacing:.04em;color:#6B7280;border-bottom:1px solid #E8E7E3}
+td{padding:7px 10px;border-bottom:1px solid #F1F0EE;vertical-align:top}
+figcaption{font-size:11px;color:#9CA3AF;margin-top:4px}
+.foot{padding:14px 20px;border-top:1px solid #F1F0EE;font-size:11px;color:#9CA3AF}
+</style></head><body><div class="bar"><b>6.2 Árucikkek</b><a href="https://help.infinityhu.eu/hu/6-2-arucikkek.html" target="_blank" rel="noopener">Teljes oldal<svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></a></div><div class="pad"><h2 id="6-2-1-uj-arucikk"><span class="hno">6.2.1</span>Új árucikk</h2><p><strong>Alapadatok</strong></p>
+<p>Új cikket kétféleképpen hozhatunk létre Infinityben: tömeges
+betöltéssel vagy kézi bevitellel. Egyedi cikk létrehozásához menjünk a
+Készletek → Árucikkek → Árucikk lista menüpontra és kattintsunk a
+Létrehozás gombra.</p><h2 id="6-2-2-arucikk-lista"><span class="hno">6.2.2</span>Árucikk lista</h2><p>A lista fejlécében találjuk a keresőt, a típus szerinti szűrőket és a
+műveleti gombokat. A lista soronként mutatja a cikk azonosítóját,
+megnevezését, típusát, listaárát, készletét és a műveleteket.</p>
+<p><img src="https://help.infinityhu.eu/media/img_c89b0f08378c.png" class="shot" loading="lazy"/></p>
+<p><em><strong>Szűrők és keresés</strong></em></p>
+<p>A típus pill szűrők (Árucikk, Szolgáltatás, Alapanyag stb.) azonnal
+szűkítik a listát – csak a ténylegesen létező típusok jelennek meg.</p>
+<p>A keresőmező szóköz = ÉS, vessző = VAGY logikával, ékezet-független
+kereséssel működik.</p>
+<p>Az Export gomb a szűrt listát CSV fájlba menti.</p>
+<p><em><strong>Műveleti gombok (soronként)</strong></em></p>
+<ul>
+<li><p>🗑 Törlés – az árucikk inaktívvá tétele (nem törli
+fizikailag).</p></li>
+<li><p>👁 Gyors nézet – felugró kártyában mutatja az árucikk legfontosabb
+adatait (ár, készlet, EAN, gyártó, ÁFA). Innen megnyitható a teljes
+adatlap.</p></li>
+<li><p>✏ Szerkesztés – megnyitja az árucikk részletes adatlapját
+szerkesztő módban.</p></li>
+<li><p>📋 Másolás – másolatot hoz létre "-MÁSOLAT" cikkszám utótaggal,
+Inaktív státusszal; a másolat a lista tetejére kerül.</p></li>
+</ul><h2 id="6-2-3-uj-arucikk-letrehozasa-alapadatok-ful"><span class="hno">6.2.3</span>Új árucikk létrehozása – Alapadatok fül</h2><p>A + Létrehozás gombra kattintva egy modal ablak nyílik meg. Az
+Alapadatok fülön adjuk meg a cikk törzsadatait.</p>
+<p><img src="https://help.infinityhu.eu/media/img_a0ea03300c0b.png" class="shot" loading="lazy"/></p>
+<div class="tblwrap"><table class="erp-table">
+
+<thead>
+<tr class="header">
+<th><strong>Mező</strong></th>
+<th><strong>Leírása</strong></th>
+<th><strong>Értéke</strong></th>
+<th><strong>Kötelezőség</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Cikkszám</td>
+<td>Egyedi azonosító</td>
+<td>Szabadon írható</td>
+<td>Kötelező</td>
+</tr>
+<tr class="even">
+<td>EAN kód</td>
+<td>Vonalkód azonosító</td>
+<td>Numerikus mező</td>
+<td>Nem kötelező</td>
+</tr>
+<tr class="odd">
+<td>Név</td>
+<td>Cikk megnevezése</td>
+<td>Szabadon írható</td>
+<td>Kötelező</td>
+</tr>
+<tr class="even">
+<td>Típus</td>
+<td>Árucikk, Szolgáltatás, Alapanyag, Gyártandó termék, Csomag</td>
+<td>Legördülő listából</td>
+<td>Kötelező</td>
+</tr>
+<tr class="odd">
+<td>ÁFA kulcs</td>
+<td>Az alkalmazandó ÁFA mértéke</td>
+<td>Legördülő listából</td>
+<td>Kötelező</td>
+</tr>
+<tr class="even">
+<td>Mennyiségi egység</td>
+<td>pl. db, kg, m, óra</td>
+<td>Szabadon írható</td>
+<td>Kötelező</td>
+</tr>
+<tr class="odd">
+<td>Másodlagos menny. egység</td>
+<td>Alternatív mértékegység</td>
+<td>Szabadon írható</td>
+<td>Nem kötelező</td>
+</tr>
+<tr class="even">
+<td>Garancialevél</td>
+<td>Garancia típusa</td>
+<td>Legördülő listából</td>
+<td>Nem kötelező</td>
+</tr>
+<tr class="odd">
+<td>Engedélyek</td>
+<td>Termékértékesítési engedély</td>
+<td>Legördülő listából</td>
+<td>Nem kötelező</td>
+</tr>
+<tr class="even">
+<td>Gyártó</td>
+<td>A termék gyártója</td>
+<td>Legördülő listából</td>
+<td>Nem kötelező</td>
+</tr>
+<tr class="odd">
+<td>Garancia (hónap)</td>
+<td>Jótállás időtartama hónapban</td>
+<td>Numerikus mező</td>
+<td>Nem kötelező</td>
+</tr>
+<tr class="even">
+<td>Szállító</td>
+<td>Fő szállító partner</td>
+<td>Legördülő, írható</td>
+<td>Nem kötelező</td>
+</tr>
+<tr class="odd">
+<td>Sorozatszám nyilvántartás</td>
+<td>Egyedi azonosítóval követett cikk</td>
+<td>Pipálós mező</td>
+<td>Kötelező (ha releváns)</td>
+</tr>
+<tr class="even">
+<td>Státusz</td>
+<td>Felhelyezhető-e bizonylatokra</td>
+<td>Aktív vagy Inaktív</td>
+<td>Kötelező</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p><em>ℹ A Típus kiválasztásakor a form dinamikusan frissül –
+Szolgáltatás esetén a raktárkészlet-kezeléshez kapcsolódó mezők
+(polcszám, minimumkészlet, darabos kiszerelés stb.) elrejtésre
+kerülnek.</em></p>
+</blockquote>
+<p><strong>Speciális jelölők (checkboxok)</strong></p>
+<ul>
+<li><p>Közvetített szolgáltatás – a cikk más fél által nyújtott
+szolgáltatás közvetítése.</p></li>
+<li><p>Szállítási költség tétel – a cikk szállítási díjként kerül a
+számlára.</p></li>
+<li><p>Megrendelésre értékesítés – a cikk nem raktárból, hanem
+rendelésre szállítandó.</p></li>
+<li><p>Darabos kiszerelés – a cikk darabos csomagolásban
+értékesíthető.</p></li>
+<li><p>Sorszámnyilvántartás – bekapcsolva a cikkhez minden mozgásnál
+egyedi sorozatszámot kell megadni.</p></li>
+</ul>
+<p><strong>Tagek</strong></p>
+<p>Az Alapadatok fülön tageket rendelhetünk a cikkhez. A tagek szabad
+szavas jelölők (pl. Akciós, Új termék, Szezonális). Bevitel: Enter vagy
+vessző után rögzül; a rendszer előre definiált javaslatokat is
+felkínál.</p>
+<p><strong>Többnyelvű megnevezés és leírás</strong></p>
+<p>A Név mező felett nyelv pill tabok találhatók (Alap + hozzáadott
+nyelvek + Nyelv hozzáadása). Az Alap tabon a rendszer alapnyelvén adjuk
+meg a nevet; a többi tabon az adott nyelv fordítása rögzíthető. Ugyanígy
+működik az Egyéb fülön a Leírás mező is.</p><h2 id="6-2-4-arucikk-adatlap"><span class="hno">6.2.4</span>Árucikk adatlap</h2><p>Az árucikk megnyitásakor a kéthasábos nézet jelenik meg: bal oldalon
+az adatlap fejléce és a kapcsolódó adatok, jobb oldalon a fülekre
+bontott tartalom.</p>
+<p><img src="https://help.infinityhu.eu/media/img_b21ae0f93ca9.png" class="shot" loading="lazy"/></p>
+<p><strong>Fejléc</strong></p>
+<ul>
+<li><p>Típus háttérszínű fejléc, benne a cikk monogram-avatarjával,
+nevével, azonosítójával és cikkszámával.</p></li>
+<li><p>Típus Badge mutatja a cikk típusát.</p></li>
+<li><p>Kattintható Aktív/Inaktív státusz pill – kattintásra vált a két
+állapot között.</p></li>
+<li><p>Speciális jelölők (pl. Közvetített / Előleg) / -vel elválasztva
+jelennek meg.</p></li>
+</ul>
+<p><strong>Olvasó mód – fülek</strong></p>
+<ul>
+<li><p>Adatlap – alapadatok, tagek, egyedi mezők értékei.</p></li>
+<li><p>Pénzügyi adatok – árazási adatok, ÁFA, speciális jelölők.
+(Kapcsolódó adatok kártyára kattintva is elérhető.)</p></li>
+<li><p>Raktár – polcszám, minimumkészlet, készletkezelési beállítások.
+(Kapcsolódó adatok kártyára kattintva is elérhető.)</p></li>
+<li><p>Méret &amp; Súly – méretek (X/Y/Z) és nettó/bruttó súly.</p></li>
+<li><p>Egyéb – SZJ/VTSZ kód, YouTube link, leírás, fordítások.</p></li>
+<li><p>Egyedi mezők – az adminon konfigurált egyedi mezők
+értékei.</p></li>
+<li><p>Képek – a cikkhez feltöltött képek (drag &amp; drop is
+támogatott).</p></li>
+<li><p>Árak – eladási ártípusok listája, érvényességi
+dátumokkal.</p></li>
+<li><p>Azonosítók – idegen cikkszámok (alul) és EAN vonalkódok
+(felül).</p></li>
+<li><p>Áfa besorolás – ÁFA kulcsok és érvényességi időszakok, SZJ
+kód.</p></li>
+<li><p>Kategóriák – termékfakategóriák hozzárendelése.</p></li>
+<li><p>Sorozatszámok – csak sorszámnyilvántartásos cikkeknél jelenik
+meg; listázza a készleten lévő sorozatszámokat.</p></li>
+</ul>
+<p><strong>Kapcsolódó adatok (bal oldali kártyák)</strong></p>
+<p>A bal oldali kapcsolódó adatok szekció három kattintható kártyát
+tartalmaz. Mindegyikre kattintva kék fejlécű popup modal nyílik:</p>
+<ul>
+<li><p>Pénzügyi adatok – az árucikk árazási és pénzügyi adatai.</p></li>
+<li><p>Készlet – az aktuális raktárkészlet telephelyenként bontva; a 👁
+gombbal raktármozgások jeleníthetők meg.</p></li>
+<li><p>Kapcsolódó dok. – a termékhez csatolt bizonylatok és
+dokumentumok; a 👁 gombbal előnézet és részletek jeleníthetők
+meg.</p></li>
+</ul>
+<p><strong>Változástörténet</strong></p>
+<p>Az Összes › linkre kattintva popup modal nyílik, amelyen az árucikk
+változásainak idővonala látható (esemény neve, részlet, dátum,
+felhasználó).</p>
+<p><strong>Sidebar gombok</strong></p>
+<ul>
+<li><p>✏ Szerkesztés – szerkesztő módra vált, az Adatlap fülre
+ugrik.</p></li>
+<li><p>🖨 Etikett – etikett nyomtatás modal: ártípus és pénznem választó,
+előnézet, Nyomtatás gomb.</p></li>
+</ul>
+<blockquote>
+<p><em>ℹ Szerkesztés módban az Etikett gomb helyett piros Mégsem gomb
+jelenik meg, amellyel a szerkesztés elvethető.</em></p>
+</blockquote><h2 id="6-2-5-szerkeszto-mod"><span class="hno">6.2.5</span>Szerkesztő mód</h2><p>A ✏ Szerkesztés gombra kattintva az Adatlap fül szerkeszthetővé
+válik, és a felső tab sorba becsúsznak a szerkesztő fülek.</p>
+<p><strong>Tab sor szerkesztés módban</strong></p>
+<p>Adatlap · Pénzügyi adatok · Raktár · Méret &amp; Súly · Egyéb ·
+Egyedi mezők · Képek · Árak · Azonosítók · Áfa besorolás ·
+Kategóriák</p>
+<blockquote>
+<p><em>⚠ Szolgáltatás típusnál a Raktár és Méret &amp; Súly fülek nem
+jelennek meg.</em></p>
+</blockquote>
+<p><strong>Típusváltás hatása szerkesztés közben</strong></p>
+<p>Ha szerkesztés közben megváltoztatjuk a Típus mezőt, a megjelenő
+fülek és mezők azonnal, dinamikusan frissülnek – Szolgáltatásra váltva
+eltűnnek a raktárkészlet-specifikus fülek és mezők.</p>
+<p><strong>Mentés</strong></p>
+<p>A sidebar bal oldali zöld 💾 Mentés gombjával véglegesíthetjük a
+módosításokat.</p><h2 id="6-2-6-egyedi-mezok-kezelese"><span class="hno">6.2.6</span>Egyedi mezők kezelése</h2><p>Az Árucikk lista fejlécében lévő ⚙ Egyedi mezők gombra kattintva
+érhető el az egyedi mezők admin felülete.</p>
+<p><img src="https://help.infinityhu.eu/media/img_a3642a6cd0d8.png" class="shot" loading="lazy"/></p>
+<p><strong>Mező definíció</strong></p>
+<ul>
+<li><p>Mező neve – szabadon megadható (pl. Szín, Anyag, CE
+tanúsítvány).</p></li>
+<li><p>Típus – Szöveg / Szám / Igen-Nem / Dátum / Lista.</p></li>
+<li><p>Megjelenik ezeknél – Minden árucikknél / adott Típus / adott
+Kategória.</p></li>
+<li><p>Kötelező – ha be van jelölve, az árucikk mentésekor kötelező
+kitölteni.</p></li>
+</ul>
+<blockquote>
+<p><em>ℹ Az itt definiált mezők automatikusan elérhetők az import column
+mapper-ben (GET /api/import/fields?type=product endpoint).</em></p>
+</blockquote><h2 id="6-2-7-vonalkod-nyomtatas"><span class="hno">6.2.7</span>Vonalkód nyomtatás</h2><p>Az árucikk adatlapjáról (vagy a listából az ✏ gombbal megnyitva)
+elérhető az Etikett modal, ahol az ártípus és pénznem megadása után
+előnézet látható és a Nyomtatás gombbal a vonalkód kinyomtatható.</p>
+<p>Az Infinityben kétféle vonalkód használható:</p>
+<ul>
+<li><p>Normál, egyáras vonalkód.</p></li>
+<li><p>Kedvezményes vonalkód – áthúzva az eredeti ár, mellette a
+kedvezményes ár.</p></li>
+</ul>
+<p>A telephely vonalkód típusát a telephely beállításánál adhatjuk
+meg.</p><h2 id="6-2-8-arucikk-masolasa"><span class="hno">6.2.8</span>Árucikk másolása</h2><p>A lista műveletek sorában a 📋 Másolás gombra kattintva a rendszer
+másolatot hoz létre az árucikkből:</p>
+<ul>
+<li><p>Cikkszám: eredeti cikkszám + "-MÁSOLAT" utótag.</p></li>
+<li><p>Státusz: Inaktív (nem kerül automatikusan
+értékesítésre).</p></li>
+<li><p>Minden egyéb adat (árak, képek, azonosítók stb.)
+öröklődik.</p></li>
+<li><p>A másolat a lista tetejére kerül.</p></li>
+</ul><h2 id="6-2-9-termek-variansok"><span class="hno">6.2.9</span>Termék variánsok</h2><p>Ha sok lényegében azonos cikkel rendelkezünk – amelyek csak egy-egy
+tulajdonságban térnek el – termékvariánsok létrehozásával csökkenthetjük
+a cikktörzs méretét. A varinánsok a főtermék alá rendelődnek.</p>
+<p>A termék variánsok egyedi, konfigurálható cikkszámot kapnak: a
+főtermék cikkszámát kiegészíti a termékvariáns kód. Minden variáns
+örökli a főtermék adatait, de eltérő ára is lehet.</p>
+<p><strong>Bevételezés variansoknál:</strong></p>
+<ul>
+<li><p>Főcikk bevételezésekor: az összes hozzárendelt variáns egyszerre
+bevételezhető, azonos beszerzési áron, variansonkénti
+mennyiséggel</p></li>
+<li><p>Variáns szintű bevételezésnél: egyedileg adjuk meg a mennyiséget
+és a beszerzési árat</p></li>
+</ul>
+<p>Értékesíteni csak a termék variánsokat lehet, a főcikket nem.
+Leltározáskor a főterméket leltározhatjuk, vagy variansonként is
+elvégezhetjük külön.</p>
+<p>Elsőként határozzuk meg a megkülönböztető tulajdonságokat (pl. szín,
+méret) termék jellemzőkként:</p>
+<p><img src="https://help.infinityhu.eu/media/img_83f4b604564f.png" class="shot" loading="lazy"/></p>
+<p>Ezután hozzuk létre az egyes termék variánsokat. Pl. különböző színű
+termékekhez: felvesszük az összes lehetséges színt jellemzőként,
+létrehozzuk a főterméket, majd a rendszer variánsonként generálja az új
+cikkszámot.</p>
+<p><img src="https://help.infinityhu.eu/media/img_8b6d216939bd.png" class="shot" loading="lazy"/></p>
+<p><img src="https://help.infinityhu.eu/media/img_bf744c13fc2f.png" class="shot" loading="lazy"/></p>
+<p><img src="https://help.infinityhu.eu/media/img_7f43ba1ceaed.png" class="shot" loading="lazy"/></p>
+<p>Mind a termékjellemzők, mind a termék variánsok tetszőlegesen
+bővíthetők. A bevételezéskor az alábbi lehetőségek közül
+választhatunk:</p>
+<ul>
+<li><p>A főcikket vételezzük be (azonos ár, variánsonkénti
+mennyiség)</p></li>
+<li><p>A variánsokat vételezzük be egyenként (egyedi ár és mennyiség
+variánsonként)</p></li>
+</ul>
+<div class="call tip"><strong>Megjegyzés</strong>
+<p>Értékesíteni csak a termék variánsokat lehet, a főcikket
+nem.</p></div><h2 id="6-2-10-arucikk-tortenet"><span class="hno">6.2.10</span>Árucikk történet</h2><p>Sorozatszám kezelt árucikkek esetén a sorozatszám megadásával,
+egyébként a cikkszám megadásával listázhatjuk az árucikkhez kapcsolódó
+mozgásokat.</p>
+<p><img src="https://help.infinityhu.eu/media/img_9026ef8e64fd.png" class="shot" loading="lazy"/></p><h2 id="6-2-11-tomeges-arazas"><span class="hno">6.2.11</span>Tömeges árazás</h2><p>Ha egyszerre több termék árát kívánjuk változtatni, a Tömeges árazás
+menüpont nyújt segítséget. A menüpont megnyitásakor az összes árucikk
+listázódik – szűrhetjük őket, vagy manuálisan jelöljük ki a
+módosítandókat.</p>
+<p><img src="https://help.infinityhu.eu/media/img_ab8169be069f.png" class="shot" loading="lazy"/></p>
+<p>A Kiválasztás gombra kattintva megjelenik az ármodosítási felület,
+ahol gyorsan adhatjuk meg az új árakat.</p>
+<p><img src="https://help.infinityhu.eu/media/img_808e77febe75.png" class="shot" loading="lazy"/></p>
+<p>Ha véletlenül olyan cikket választottunk ki, amelynek mégsem
+módosítjuk az árát, a sor eleji narancssárga kukával törölhetjük a
+listából. Ha a cikkhez minimális vagy maximális árat adtunk meg, azok
+segítségként megjelennek.</p>
+<p>Ha egyszerre több ártípust szeretnénk módosítani (pl. forintos és
+eurós listaár), adjunk hozzá Új ártípust – a rendszer mindkettőt
+egyszerre változtatja. Mentéssel véglegesíthetjük az ármódosítást.</p><h2 id="6-2-12-tomeges-arazas-fajlbol"><span class="hno">6.2.12</span>Tömeges árazás fájlból</h2><p>Nagy tömegű ármódosítás esetén Excel-alapú betöltés is
+lehetséges.</p>
+<p><img src="https://help.infinityhu.eu/media/img_28610147260d.png" class="shot" loading="lazy"/></p>
+<p>A mintafájl letöltése után adjuk meg a cikkszámot és az új árat. A
+jobb oldalon lévő Árazás ablakban adjuk meg a devizanemet, az ártípust
+és az érvényességi dátumot.</p>
+<p>A feltöltés gombra kattintva ideiglenesen tölthetjük fel az árakat
+(ez még nem írja felül a meglévőket). Ha elégedtek vagyunk az
+eredménnyel, kattintsunk az Összes változás mentése gombra.</p><h2 id="6-2-13-arlista-keszites"><span class="hno">6.2.13</span>Árlista készítés</h2><p>A meglévő termékekből árlistát készíthetünk partnereink számára.
+Válasszuk ki a termékeket, adjuk a listához a Kiválasztás gombbal, majd
+exportáljuk a kívánt devizanemben és ártípusban.</p>
+<p><img src="https://help.infinityhu.eu/media/img_9cee8f937555.png" class="shot" loading="lazy"/></p><h2 id="6-2-14-termekertekesites-engedelyek"><span class="hno">6.2.14</span>Termékértékesítés engedélyek</h2><p>Speciális engedélyeket hozhatunk létre, amelyek alapján csak
+engedéllyel rendelkező partnernek adhatjuk el az adott terméket (pl.
+permetszer értékesítés mezőgazdaságban).</p>
+<p>A folyamat: 1. Hozzuk létre az engedélyt:</p>
+<p><img src="https://help.infinityhu.eu/media/img_4d08e44cfa1b.png" class="shot" loading="lazy"/></p>
+<p>2. Állítsuk be az engedélyt a terméknél:</p>
+<p><img src="https://help.infinityhu.eu/media/img_304b3ca64b2e.png" class="shot" loading="lazy"/></p>
+<p>3. A partnerlistában válasszuk ki a partnert (csak vevő típusúaknál
+érhető el), kattintsunk a szemgombra, majd a lap alján a
+Termékértékesítés engedélyek fülön adjuk hozzá a szükséges
+engedélyt.</p>
+<p><img src="https://help.infinityhu.eu/media/img_f86109095cbe.png" class="shot" loading="lazy"/></p></div><div class="foot">Frissítve 2026.08.26 · v2026.08.26</div></body></html>

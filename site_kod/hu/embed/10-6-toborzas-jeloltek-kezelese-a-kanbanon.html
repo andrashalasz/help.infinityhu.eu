@@ -1,0 +1,459 @@
+<!DOCTYPE html><html lang="hu"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Toborzás – jelöltek kezelése a Kanbanon</title><style>*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,-apple-system,'Segoe UI',sans-serif;background:#fff;color:#333B4D;
+font-size:14px;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:#1B3A6B}
+.bar{position:sticky;top:0;display:flex;align-items:center;gap:10px;padding:10px 16px;
+background:#FAFAF9;border-bottom:1px solid #E8E7E3;font-size:12px}
+.bar b{font-size:13px;color:#1E293B;font-weight:600;flex:1;min-width:0;overflow:hidden;
+text-overflow:ellipsis;white-space:nowrap}
+.bar a{color:#6B7280;text-decoration:none;white-space:nowrap;display:flex;align-items:center;gap:4px}
+.bar a:hover{color:#1B3A6B}
+.bar svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.pad{padding:18px 20px 30px}
+h1{font-size:19px;font-weight:700;color:#1E293B;margin:0 0 12px}
+h2{font-size:16px;font-weight:600;color:#1E293B;margin:22px 0 8px;scroll-margin-top:50px}
+h3{font-size:14.5px;font-weight:600;color:#1E293B;margin:18px 0 6px;scroll-margin-top:50px}
+h2 .hno,h3 .hno{color:#9CA3AF;font-weight:500;margin-right:6px}
+p{margin:0 0 11px}
+ul,ol{margin:0 0 11px;padding-left:20px}
+li{margin-bottom:4px}
+img{max-width:100%;height:auto;border:1px solid #E8E7E3;border-radius:5px;margin:5px 0}
+.call{background:#FAFAF9;border:1px solid #E8E7E3;border-left:3px solid #1B3A6B;border-radius:0 6px 6px 0;
+padding:11px 14px;margin:14px 0;font-size:13px}
+.call.warn{background:#FFFDF5;border-color:#F3E7C4;border-left-color:#F59E0B}
+.call strong{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;
+color:#6B7280;margin-bottom:3px}
+table{width:100%;border-collapse:collapse;margin:13px 0;font-size:12.5px}
+th{background:#FAFAF9;text-align:left;padding:7px 10px;font-size:10px;text-transform:uppercase;
+letter-spacing:.04em;color:#6B7280;border-bottom:1px solid #E8E7E3}
+td{padding:7px 10px;border-bottom:1px solid #F1F0EE;vertical-align:top}
+figcaption{font-size:11px;color:#9CA3AF;margin-top:4px}
+.foot{padding:14px 20px;border-top:1px solid #F1F0EE;font-size:11px;color:#9CA3AF}
+</style></head><body><div class="bar"><b>10.6 Toborzás – jelöltek kezelése a Kanbanon</b><a href="https://help.infinityhu.eu/hu/10-6-toborzas-jeloltek-kezelese-a-kanbanon.html" target="_blank" rel="noopener">Teljes oldal<svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></a></div><div class="pad"><p>Menü: HR → Toborzás</p>
+<p>A Toborzás modulban a jelöltek lista nézetben jelennek meg. A Kanban
+nézet segít átlátni, hol tart a kiválasztás.</p>
+<p><img src="https://help.infinityhu.eu/media/img_7a445e6de42f.png" class="shot" loading="lazy"/></p><h2 id="10-6-1-uj-jelolt-rogzitese"><span class="hno">10.6.1</span>Új jelölt rögzítése</h2><p>Új jelöltet a HR → Toborzás menüben a "Létrehozás" gombbal
+rögzíthetsz. Mentés után a jelölt automatikusan a "Beérkezett" státuszba
+kerül.</p>
+<p><img src="https://help.infinityhu.eu/media/img_855e0edb890a.png" class="shot" loading="lazy"/></p>
+<ol type="1">
+<li><p>Kattints: Új jelölt.</p></li>
+<li><p>Válaszd ki a pozíciót (csak Nyitott/Folyamatban státuszú pozíció
+választható).</p></li>
+<li><p>Add meg a jelölt nevét és legalább egy elérhetőséget (email vagy
+telefon).</p></li>
+<li><p>Állítsd be a forrást és a státuszt.</p></li>
+<li><p>Tölts fel CV-t (PDF, max 10MB), ha rendelkezésre áll.</p></li>
+<li><p>Töltsd ki a jelentkezés részleteit és a speciális adatokat, ha
+szükséges.</p></li>
+<li><p>Mentés.</p>
+<p><strong>Alapadatok</strong></p></li>
+</ol>
+<div class="tblwrap"><table class="erp-table">
+
+<thead>
+<tr class="header">
+<th><strong>Mező</strong></th>
+<th><strong>Típus</strong></th>
+<th><strong>Kötelező?</strong></th>
+<th><strong>Magyarázat / tippek</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Pozíció</td>
+<td>Dropdown</td>
+<td>Igen</td>
+<td>A jelölt mindig pozícióhoz kötött. Csak Nyitott vagy Folyamatban
+státuszú pozíció választható.</td>
+</tr>
+<tr class="even">
+<td>Jelölt neve</td>
+<td>Szöveg</td>
+<td>Igen</td>
+<td>A jelölt azonosító adata; a listákban és a Kanbanen ez jelenik
+meg.</td>
+</tr>
+<tr class="odd">
+<td>E-mail</td>
+<td>Email</td>
+<td>Nem</td>
+<td>Duplikáció-figyelmeztetés email alapján történik.</td>
+</tr>
+<tr class="even">
+<td>Telefon</td>
+<td>Szöveg</td>
+<td>Nem</td>
+<td>Alternatív elérhetőség.</td>
+</tr>
+<tr class="odd">
+<td>Forrás</td>
+<td>Dropdown</td>
+<td>Igen</td>
+<td>Honnan érkezett a jelölt. Riportokhoz és csatorna-hatékonyság
+méréséhez szükséges. Beállítások → Onboarding beállítások → Forrás
+törzsadatból töltődik.</td>
+</tr>
+<tr class="even">
+<td>Státusz</td>
+<td>Dropdown</td>
+<td>Igen</td>
+<td>A jelölt aktuális pipeline-lépése. Beállítások → Onboarding
+beállítások → Jelölt státusz törzsadatból töltődik.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Kapcsolódó adatok</strong></p>
+<div class="tblwrap"><table class="erp-table">
+
+<thead>
+<tr class="header">
+<th><strong>Mező</strong></th>
+<th><strong>Típus</strong></th>
+<th><strong>Kötelező?</strong></th>
+<th><strong>Magyarázat / tippek</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>CV / fájl feltöltés</td>
+<td>Fájl</td>
+<td>Nem</td>
+<td>Csak PDF fájl fogadott el, max 10MB. Drag &amp; drop vagy Browse
+gombbal tölthető fel.</td>
+</tr>
+<tr class="even">
+<td>LinkedIn</td>
+<td>URL</td>
+<td>Nem</td>
+<td>A jelölt LinkedIn profilának linkje.</td>
+</tr>
+<tr class="odd">
+<td>Facebook</td>
+<td>URL</td>
+<td>Nem</td>
+<td>A jelölt Facebook profiljának linkje.</td>
+</tr>
+<tr class="even">
+<td>Instagram</td>
+<td>URL</td>
+<td>Nem</td>
+<td>A jelölt Instagram profiljának linkje.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Jelentkezés részletei</strong></p>
+<div class="tblwrap"><table class="erp-table">
+
+<thead>
+<tr class="header">
+<th><strong>Mező</strong></th>
+<th><strong>Típus</strong></th>
+<th><strong>Kötelező?</strong></th>
+<th><strong>Magyarázat / tippek</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Szenioritás</td>
+<td>Dropdown</td>
+<td>Nem</td>
+<td>A jelölt által igényelt vagy megítélt szint (pl. Junior, Medior,
+Senior).</td>
+</tr>
+<tr class="even">
+<td>Bérigény min</td>
+<td>Szám</td>
+<td>Nem</td>
+<td>A jelölt által megjelölt minimális bérigény.</td>
+</tr>
+<tr class="odd">
+<td>Bérigény max</td>
+<td>Szám</td>
+<td>Nem</td>
+<td>A jelölt által megjelölt maximális bérigény.</td>
+</tr>
+<tr class="even">
+<td>Pénznem</td>
+<td>Dropdown</td>
+<td>Nem</td>
+<td>A bérigényhez tartozó pénznem (pl. HUF, EUR).</td>
+</tr>
+<tr class="odd">
+<td>Elérhetőség / kezdés dátuma</td>
+<td>Dátum</td>
+<td>Nem</td>
+<td>Mikor tudna legkorábban kezdeni a jelölt.</td>
+</tr>
+<tr class="even">
+<td>Megjegyzés belső használatra</td>
+<td>Hosszú szöveg</td>
+<td>Nem</td>
+<td>Csak HR és vezető látja; tárgyalási szempontok, benyomások.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Speciális adatok</strong></p>
+<div class="tblwrap"><table class="erp-table">
+
+<thead>
+<tr class="header">
+<th><strong>Mező</strong></th>
+<th><strong>Típus</strong></th>
+<th><strong>Kötelező?</strong></th>
+<th><strong>Magyarázat / tippek</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Tech Stack</td>
+<td>Multiselect</td>
+<td>Nem</td>
+<td>A jelölt által ismert technológiák. IT toborzásnál különösen hasznos
+szűrési és összehasonlítási dimenzió.</td>
+</tr>
+<tr class="even">
+<td>Angol szint</td>
+<td>Dropdown</td>
+<td>Nem</td>
+<td>A jelölt angol nyelvtudásának szintje (pl. A1–C2 vagy
+alapfok/középfok/felsőfok).</td>
+</tr>
+<tr class="odd">
+<td>Távmunka preferencia</td>
+<td>Checkbox</td>
+<td>Nem</td>
+<td>Jelzi, hogy a jelölt preferál-e távmunkát.</td>
+</tr>
+<tr class="even">
+<td>Tesztfeladat státusz</td>
+<td>Dropdown</td>
+<td>Nem</td>
+<td>A jelöltnek kiadott tesztfeladat aktuális állapota (pl. Kiadva,
+Beérkezett, Értékelve).</td>
+</tr>
+</tbody>
+</table></div><h2 id="10-6-2-jelolt-statusz-mozgatasa-a-kanbanon"><span class="hno">10.6.2</span>Jelölt státusz mozgatása a Kanbanon</h2><p>A Kanbanon a jelölteket drag &amp; drop módszerrel tudod mozgatni.
+Minden mozgatás státusztörténetbe kerül, így visszakereshető, mikor
+melyik lépésben állt a jelölt.</p>
+<ol type="1">
+<li><p>Nyisd meg a megfelelő pozíciót szűrővel (ha több pozíció
+fut).</p></li>
+<li><p>Fogd meg a jelölt kártyát és húzd a következő oszlopba (pl.
+Beérkezett → Előszűrt).</p></li>
+<li><p>Ha a rendszer megjegyzést kér (pl. elutasítás), add meg az
+okot.</p></li>
+<li><p>Ellenőrizd a jelölt kártyán a badge-eket (pl. "Interjú
+kitűzve").</p></li>
+</ol><h2 id="10-6-3-interjuk-rogzitese-es-lezarasa"><span class="hno">10.6.3</span>Interjúk rögzítése és lezárása</h2><p>Interjút a jelölt adatlapján tudsz hozzáadni. Az interjú rögzítésekor
+időpontot, típust (lásd: 3.6.4 Interjú típus) és résztvevőket adsz
+meg.</p>
+<ol type="1">
+<li><p>Nyisd meg a jelöltet (kártyára kattintás).</p></li>
+<li><p>Menj az "Interjúk" szekcióra és kattints: Interjú
+ütemezése.</p></li>
+<li><p>Válaszd ki a típust (HR/Tech/Final), állíts időpontot és
+résztvevőket.</p></li>
+<li><p>Mentés után az interjú státusza Ütemezett.</p></li>
+<li><p>Interjú után nyisd meg az interjút és állítsd DONE-ra, majd add
+meg az értékelést.</p></li>
+</ol>
+<div class="tblwrap"><table class="erp-table">
+
+<thead>
+<tr class="header">
+<th><strong>Mező</strong></th>
+<th><strong>Típus</strong></th>
+<th><strong>Kötelező?</strong></th>
+<th><strong>Magyarázat / tippek</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Interjú típusa</td>
+<td>Enum</td>
+<td>Igen</td>
+<td>HR/Tech/Final; riportokhoz is hasznos.</td>
+</tr>
+<tr class="even">
+<td>Időpont</td>
+<td>Dátum+idő</td>
+<td>Igen</td>
+<td>Naptár nézet és emlékeztetők alapja.</td>
+</tr>
+<tr class="odd">
+<td>Meeting link / helyszín</td>
+<td>Szöveg/URL</td>
+<td>Nem</td>
+<td>Online link vagy irodai helyszín.</td>
+</tr>
+<tr class="even">
+<td>Résztvevők</td>
+<td>User lista</td>
+<td>Igen</td>
+<td>Ki interjúztat; terhelés látszik.</td>
+</tr>
+<tr class="odd">
+<td>Megjegyzések</td>
+<td>Szöveg</td>
+<td>Nem</td>
+<td>Interjúval kapcsolatos megjegyzések</td>
+</tr>
+</tbody>
+</table></div><h2 id="10-6-4-ajanlat-keszitese-es-kovetese"><span class="hno">10.6.4</span>Ajánlat készítése és követése</h2><p>Amikor a kiválasztás sikeres, ajánlatot hozol létre. Az ajánlat külön
+rekord, mert így nyomon követhető (kiküldés, elfogadás, lejárat), és
+később riportolható.</p>
+<ol type="1">
+<li><p>Jelölt adatlap → Ajánlat szekció → Ajánlat létrehozása.</p></li>
+<li><p>A pozíció automatikusan kitöltődik a jelölt
+adatlapjából.</p></li>
+<li><p>Add meg a nyitás dátumát és a munkaviszony típusát.</p></li>
+<li><p>Töltsd ki a kompenzációs adatokat (alapfizetés, pénznem, fizetési
+időszak).</p></li>
+<li><p>Jelöld be az adott juttatásokat (Laptop, Telefon, HO keret, Céges
+autó, Egyéb).</p></li>
+<li><p>Szükség esetén add meg az érvényességi dátumot és a belső
+megjegyzést.</p></li>
+<li><p>Csatolj PDF dokumentumot, ha szükséges.</p></li>
+<li><p>Mentés – az ajánlat Tervezet státuszban kerül rögzítésre.</p>
+<p><strong>Alapadatok</strong></p></li>
+</ol>
+<div class="tblwrap"><table class="erp-table">
+
+<thead>
+<tr class="header">
+<th><strong>Mező</strong></th>
+<th><strong>Típus</strong></th>
+<th><strong>Kötelező?</strong></th>
+<th><strong>Magyarázat / tippek</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Pozíció</td>
+<td>Szöveg (csak olvasható)</td>
+<td>–</td>
+<td>Automatikusan töltődik a jelölt adatlapjából; nem
+szerkeszthető.</td>
+</tr>
+<tr class="even">
+<td>Nyitás dátuma</td>
+<td>Dátum</td>
+<td>Igen</td>
+<td>Az ajánlat elkészítésének dátuma.</td>
+</tr>
+<tr class="odd">
+<td>Munkaviszony</td>
+<td>Dropdown</td>
+<td>Igen</td>
+<td>A foglalkoztatás típusa (pl. Teljes munkaidő, Részmunkaidő).
+Beállítások → Munkakör és foglalkoztatás → Foglalkoztatás típusa
+törzsadatból töltődik.</td>
+</tr>
+<tr class="even">
+<td>Státusz</td>
+<td>Jelzőcímke</td>
+<td>–</td>
+<td>Új ajánlatnál automatikusan Tervezet. Mentés után manuálisan
+léptethető tovább.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Adminisztratív adatok</strong></p>
+<div class="tblwrap"><table class="erp-table">
+
+<thead>
+<tr class="header">
+<th><strong>Mező</strong></th>
+<th><strong>Típus</strong></th>
+<th><strong>Kötelező?</strong></th>
+<th><strong>Magyarázat / tippek</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Érvényességi dátum</td>
+<td>Dátum</td>
+<td>Nem</td>
+<td>Meddig érvényes az ajánlat. Lejárat figyeléshez; a rendszer
+riasztást adhat.</td>
+</tr>
+<tr class="even">
+<td>Megjegyzés belső használatra</td>
+<td>Hosszú szöveg</td>
+<td>Nem</td>
+<td>Csak HR és vezető látja; tárgyalási szempontok, belső
+kontextus.</td>
+</tr>
+<tr class="odd">
+<td>Csatolmány (csak PDF)</td>
+<td>Fájl</td>
+<td>Nem</td>
+<td>Az ajánlólevél vagy szerződéstervezet csatolására szolgál.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Kompenzáció</strong></p>
+<div class="tblwrap"><table class="erp-table">
+
+<thead>
+<tr class="header">
+<th><strong>Mező</strong></th>
+<th><strong>Típus</strong></th>
+<th><strong>Kötelező?</strong></th>
+<th><strong>Magyarázat / tippek</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Alapfizetés</td>
+<td>Szám</td>
+<td>Nem</td>
+<td>A jelöltnek ajánlott bruttó alapbér. Jogosultságfüggő mező – csak
+HR/Finance láthatja.</td>
+</tr>
+<tr class="even">
+<td>Pénznem</td>
+<td>Dropdown</td>
+<td>Igen</td>
+<td>Az alapfizetés pénzneme (pl. HUF, EUR).</td>
+</tr>
+<tr class="odd">
+<td>Fizetési időszak</td>
+<td>Dropdown</td>
+<td>Igen</td>
+<td>Az alapfizetés gyakorisága (pl. Havi, Éves).</td>
+</tr>
+<tr class="even">
+<td>Bónusz</td>
+<td>Szám</td>
+<td>Nem</td>
+<td>Teljesítményalapú vagy egyéb bónusz összege.</td>
+</tr>
+<tr class="odd">
+<td>Juttatások</td>
+<td>Checkbox lista</td>
+<td>Nem</td>
+<td>Több elem is választható: Laptop / Telefon / HO keret / Céges autó /
+Egyéb.</td>
+</tr>
+</tbody>
+</table></div><h2 id="10-6-5-felvetel-mikor-es-hogyan"><span class="hno">10.6.5</span>Felvétel – mikor és hogyan</h2><p>Az ajánlat elfogadása még nem felvétel. A felvétel egy HR jóváhagyási
+lépés, ami létrehozza a dolgozót a rendszerben, frissíti a pozíció
+headcountot, és elindítja az onboardingot.</p>
+<ol type="1">
+<li><p><img src="https://help.infinityhu.eu/media/img_787ab7c9e5ff.png" class="shot" loading="lazy"/>Jelölt státusz: Ajánlat
+elfogadva</p></li>
+<li><p>Kattints a kanban listán a jelölt adatlapján:</p></li>
+<li><p>A rendszer kiküldi a munkavállalói adatlapot</p></li>
+<li><p>A munkavállaló kitölti, feltölti a szükséges dokumentumokat és
+elmenti, ilyenkor ‘partnerként’ jön létre az Infinityben.</p></li>
+<li><p>Ellenőrizd/egészítsd ki a belépési adatokat (start date, vezető,
+szerződéstípus, bér stb.).</p></li>
+<li><p>Felvétel véglegesítése, át kell fordítani a partner
+munkavállalóvá és hozzá kell rendelni egy On-boarding sablont,ha
+szükséges, amit a beállításoknál létrehoztunk.</p></li>
+<li><p>Ellenőrizd: dolgozó megjelent a Munkavállalók között, onboarding
+elindult.</p></li>
+</ol></div><div class="foot">Frissítve 2026.08.26 · v2026.08.26</div></body></html>

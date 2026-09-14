@@ -1,0 +1,82 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Purchase orders</title><style>*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,-apple-system,'Segoe UI',sans-serif;background:#fff;color:#333B4D;
+font-size:14px;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:#1B3A6B}
+.bar{position:sticky;top:0;display:flex;align-items:center;gap:10px;padding:10px 16px;
+background:#FAFAF9;border-bottom:1px solid #E8E7E3;font-size:12px}
+.bar b{font-size:13px;color:#1E293B;font-weight:600;flex:1;min-width:0;overflow:hidden;
+text-overflow:ellipsis;white-space:nowrap}
+.bar a{color:#6B7280;text-decoration:none;white-space:nowrap;display:flex;align-items:center;gap:4px}
+.bar a:hover{color:#1B3A6B}
+.bar svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.pad{padding:18px 20px 30px}
+h1{font-size:19px;font-weight:700;color:#1E293B;margin:0 0 12px}
+h2{font-size:16px;font-weight:600;color:#1E293B;margin:22px 0 8px;scroll-margin-top:50px}
+h3{font-size:14.5px;font-weight:600;color:#1E293B;margin:18px 0 6px;scroll-margin-top:50px}
+h2 .hno,h3 .hno{color:#9CA3AF;font-weight:500;margin-right:6px}
+p{margin:0 0 11px}
+ul,ol{margin:0 0 11px;padding-left:20px}
+li{margin-bottom:4px}
+img{max-width:100%;height:auto;border:1px solid #E8E7E3;border-radius:5px;margin:5px 0}
+.call{background:#FAFAF9;border:1px solid #E8E7E3;border-left:3px solid #1B3A6B;border-radius:0 6px 6px 0;
+padding:11px 14px;margin:14px 0;font-size:13px}
+.call.warn{background:#FFFDF5;border-color:#F3E7C4;border-left-color:#F59E0B}
+.call strong{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;
+color:#6B7280;margin-bottom:3px}
+table{width:100%;border-collapse:collapse;margin:13px 0;font-size:12.5px}
+th{background:#FAFAF9;text-align:left;padding:7px 10px;font-size:10px;text-transform:uppercase;
+letter-spacing:.04em;color:#6B7280;border-bottom:1px solid #E8E7E3}
+td{padding:7px 10px;border-bottom:1px solid #F1F0EE;vertical-align:top}
+figcaption{font-size:11px;color:#9CA3AF;margin-top:4px}
+.foot{padding:14px 20px;border-top:1px solid #F1F0EE;font-size:11px;color:#9CA3AF}
+</style></head><body><div class="bar"><b>9.3 Purchase orders</b><a href="https://help.infinityhu.eu/en/9-3-szallitoi-megrendelesek.html" target="_blank" rel="noopener">Full page<svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></a></div><div class="pad"><p>The purchase order module is available in the Orders → Purchase orders menu.</p><h2 id="9-3-1-szallitoi-megrendeles-letrehozasa-a-vevoi-megrendelesbol"><span class="hno">9.3.1</span>Creating a purchase order from the customer order</h2><p>This is the most common case — in the event of a shortage, it can be started from the customer order:</p>
+<ul>
+<li><p>Open the customer order in view mode.</p></li>
+<li><p>Click the + Create purchase order button (at the bottom).</p></li>
+<li><p>The Products awaiting procurement pop-up window appears (with a red header).</p></li>
+<li><p>Check the quantities and the suppliers.</p></li>
+<li><p>Click the + Create purchase order button (blue, at the top).</p></li>
+</ul><h2 id="9-3-2-visszaigazolas-rogzitese"><span class="hno">9.3.2</span>Recording a confirmation</h2><p>When the supplier has confirmed the order (quantity and deadline), it has to be recorded as follows:</p>
+<ul>
+<li><p>Open the purchase order.</p></li>
+<li><p>At the items, click the pencil icon on the left of the row — the “Edit procurement item” page opens.</p></li>
+<li><p>At the top of the page you can see the name of the product, its item number and the current In stock and Reserved values.</p></li>
+<li><p>Scroll down to the Confirmations section.</p></li>
+<li><p>Enter the Confirmed quantity (primary) value and the Confirmed date.</p></li>
+<li><p>Click the + Add button.</p></li>
+<li><p>Save the item with the Save button.</p></li>
+</ul>
+<blockquote>
+<p><strong>ℹ</strong> Several confirmation lines can be added to one item if the supplier confirms in parts — a separate date and quantity can be given for each line.</p>
+<p><strong>✓</strong> After the confirmation has been recorded, the red 0 / 259.00 value at the item turns green: 259.00 / 259.00 ✓</p>
+<p><strong>⚠</strong> When the Finalise button is clicked, a confirmation window appears: “Are you sure you want to finalise? After this operation, items can no longer be added or deleted.” The operation cannot be undone.</p>
+</blockquote><h2 id="9-3-3-veglegesites-es-raktari-bevet"><span class="hno">9.3.3</span>Finalisation and goods receipt</h2><p>Once every item has been confirmed and the shipment has arrived:</p>
+<ul>
+<li><p>Click the Finalise button — confirm in the pop-up window.</p></li>
+<li><p>The status of the purchase order changes to Confirmed.</p></li>
+<li><p>To start the goods receipt, click the Closing method button (bottom left).</p></li>
+</ul><h2 id="9-3-4-lezaras-modja-ket-opcio"><span class="hno">9.3.4</span>Closing method — two options</h2><div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Option</strong></th>
+<th><strong>When</strong></th>
+<th><strong>Effect</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Closing with approval</td>
+<td>If Check required = Yes</td>
+<td>The approver also has to accept it</td>
+</tr>
+<tr class="even">
+<td>Closing immediately</td>
+<td>If Check required = No (default)</td>
+<td>Creates the warehouse movement immediately, stock increases</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p><strong>✓</strong> After closing, press the Reserve button on the customer order — the items previously marked Awaiting procurement now move to Reserved: Final status.</p>
+</blockquote></div><div class="foot">Updated 2026.08.26 · v2026.08.26</div></body></html>

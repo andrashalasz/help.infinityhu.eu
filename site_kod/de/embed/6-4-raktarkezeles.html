@@ -1,0 +1,84 @@
+<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Lagerverwaltung</title><style>*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,-apple-system,'Segoe UI',sans-serif;background:#fff;color:#333B4D;
+font-size:14px;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:#1B3A6B}
+.bar{position:sticky;top:0;display:flex;align-items:center;gap:10px;padding:10px 16px;
+background:#FAFAF9;border-bottom:1px solid #E8E7E3;font-size:12px}
+.bar b{font-size:13px;color:#1E293B;font-weight:600;flex:1;min-width:0;overflow:hidden;
+text-overflow:ellipsis;white-space:nowrap}
+.bar a{color:#6B7280;text-decoration:none;white-space:nowrap;display:flex;align-items:center;gap:4px}
+.bar a:hover{color:#1B3A6B}
+.bar svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.pad{padding:18px 20px 30px}
+h1{font-size:19px;font-weight:700;color:#1E293B;margin:0 0 12px}
+h2{font-size:16px;font-weight:600;color:#1E293B;margin:22px 0 8px;scroll-margin-top:50px}
+h3{font-size:14.5px;font-weight:600;color:#1E293B;margin:18px 0 6px;scroll-margin-top:50px}
+h2 .hno,h3 .hno{color:#9CA3AF;font-weight:500;margin-right:6px}
+p{margin:0 0 11px}
+ul,ol{margin:0 0 11px;padding-left:20px}
+li{margin-bottom:4px}
+img{max-width:100%;height:auto;border:1px solid #E8E7E3;border-radius:5px;margin:5px 0}
+.call{background:#FAFAF9;border:1px solid #E8E7E3;border-left:3px solid #1B3A6B;border-radius:0 6px 6px 0;
+padding:11px 14px;margin:14px 0;font-size:13px}
+.call.warn{background:#FFFDF5;border-color:#F3E7C4;border-left-color:#F59E0B}
+.call strong{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;
+color:#6B7280;margin-bottom:3px}
+table{width:100%;border-collapse:collapse;margin:13px 0;font-size:12.5px}
+th{background:#FAFAF9;text-align:left;padding:7px 10px;font-size:10px;text-transform:uppercase;
+letter-spacing:.04em;color:#6B7280;border-bottom:1px solid #E8E7E3}
+td{padding:7px 10px;border-bottom:1px solid #F1F0EE;vertical-align:top}
+figcaption{font-size:11px;color:#9CA3AF;margin-top:4px}
+.foot{padding:14px 20px;border-top:1px solid #F1F0EE;font-size:11px;color:#9CA3AF}
+</style></head><body><div class="bar"><b>6.4 Lagerverwaltung</b><a href="https://help.infinityhu.eu/de/6-4-raktarkezeles.html" target="_blank" rel="noopener">Volle Seite<svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></a></div><div class="pad"><h2 id="6-4-1-raktari-bevet"><span class="hno">6.4.1</span>Wareneingang</h2><p>In Infinity kann Ware auf zwei Wege eingebucht werden: einzeln anhand eines Lieferscheins oder in großen Mengen.</p>
+<p><strong>Ware einzeln anhand eines Lieferscheins einbuchen</strong></p>
+<p>Wählen Sie den Lieferanten und den Lagerort aus, an dem Sie die Ware einbuchen möchten. Die Nummer des Referenzbelegs (Nummer des Lieferscheins oder der Eingangsrechnung) ist verpflichtend anzugeben. Erfassen Sie nach dem Ausfüllen der Stammdaten die einzubuchenden Artikel.</p>
+<div class="call tip"><strong>Hinweis</strong>
+<p>In diesem Menüpunkt können nur zuvor angelegte Artikel eingebucht werden.</p></div>
+<p>Enthält der Lieferschein den Preis, geben Sie ihn an oder übernehmen Sie den vom System vorgeschlagenen letzten Einkaufspreis. Ist der Preis nicht bekannt, kann er auch nach der Umwandlung des Wareneingangs in eine Lieferantenrechnung angegeben werden.</p>
+<p>Verfügt der einbuchende Benutzer nur über Erfassungsrechte, kann er den Beleg zur Genehmigung senden. Der Beleg verbleibt im Status wartet auf Genehmigung, bis ein Benutzer mit entsprechender Berechtigung ihn genehmigt.</p>
+<p><img src="https://help.infinityhu.eu/media/img_93121fe5c8c6.png" class="shot" loading="lazy"/></p>
+<p><img src="https://help.infinityhu.eu/media/img_ec7f5f7cca2c.png" class="shot" loading="lazy"/></p>
+<p>Ein so erstellter, aber nicht abgeschlossener Wareneingang ist noch änderbar (in der Liste der Lagerbewegungen: Status In Bearbeitung). Mit der Schaltfläche Abschließen buchen Sie ihn endgültig — die Ware gelangt dann in das Lager. Zu einem abgeschlossenen Wareneingang können Sie einen Barcode drucken, den Beleg ansehen und ausdrucken, ihn stornieren und daraus eine Lieferantenrechnung erstellen.</p><h3 id="6-4-1-1-termekvariansok-bevetelezese"><span class="hno">6.4.1.1</span>Wareneingang von Artikelvarianten</h3><p>Zwei Methoden sind möglich:</p>
+<ul>
+<li><p>Wir geben im Wareneingang den Hauptartikel an — dann können alle Varianten gemeinsam zum gleichen Preis mit einer Menge je Variante eingebucht werden</p></li>
+<li><p>Wir beginnen den Wareneingang direkt mit den Varianten — dann können je Variante ein individueller Einkaufspreis und eine individuelle Menge angegeben werden</p></li>
+</ul><h2 id="6-4-2-raktari-kivet"><span class="hno">6.4.2</span>Warenausgang</h2><p>Das Ausbuchen von Ware aus einem Lagerort, wodurch sich der Bestand des Artikels verringert. Typische Ausgänge: Ausgang aufgrund eines Verkaufsbelegs, Ausgang aufgrund einer Inventurdifferenz, Verschrottung, Kommissionsverkauf (zum Lieferanten verbrachte Ware).</p>
+<p>Warenausgänge werden aus dem Menü Lagerverwaltung gestartet. Wählen Sie den Partner und den Lagerort aus. Die Waren übernehmen Sie über die Schaltfläche Artikelsuche in den Ausgang. Nach dem Abschluss können Sie den Lieferschein drucken.</p>
+<p><img src="https://help.infinityhu.eu/media/img_9452a62b905e.png" class="shot" loading="lazy"/></p>
+<p><img src="https://help.infinityhu.eu/media/img_7fe697e0ebe4.png" class="shot" loading="lazy"/></p><h2 id="6-4-3-raktarmozgasok-szallitoi-szamla-letrehozasa-raktari-bevetbol"><span class="hno">6.4.3</span>Lagerbewegungen – Lieferantenrechnung aus einem Wareneingang erstellen</h2><p>Die Fakturierung der Wareneingänge ist über das Menü Lagerhaltung → Lagerverwaltung → Lagerbewegungen erreichbar. Markieren Sie die in eine Rechnung umzuwandelnden Eingänge und erstellen Sie über die Schaltfläche Fakturierung die Lieferantenrechnung. Die umgewandelte, aber noch nicht endgültig gebuchte Rechnung finden Sie im Menü Finanzen → Rechnungsliste.</p>
+<p>Wareneingänge können auch gesammelt fakturiert werden, und aus mehreren Lieferscheinen kann eine Lieferantenrechnung erstellt werden: markieren Sie die zum selben Lieferanten gehörenden Eingänge und wandeln Sie sie über die Schaltfläche Fakturierung um. Im Bemerkungsfeld der Lieferantenrechnung erscheinen die Nummern aller Lagerbewegungen.</p><h2 id="6-4-4-raktarak-kozotti-mozgatas"><span class="hno">6.4.4</span>Umlagerung zwischen Lagern</h2><p>Für die Umlagerung von Bestand zwischen Lagern wählen Sie zuerst das Quelllager, dann das Ziellager. Wählen Sie aus den Artikeln mit aktuellem Bestand im Quelllager die umzulagernden Posten aus. Mit der Schaltfläche Abschließen buchen Sie die Transaktion endgültig.</p>
+<p>Auch eine genehmigungspflichtige Umlagerung ist möglich: die Ware verlässt beim Speichern das Quelllager, das System führt sie jedoch als Bestand in Transit, bis sie im Ziellager eingebucht wird.</p><h2 id="6-4-5-selejtezes"><span class="hno">6.4.5</span>Verschrottung</h2><p>Dient dem Ausbuchen abgenutzter oder beschädigter Ware aus dem Bestand. Der Grund der Verschrottung ist verpflichtend anzugeben (er erscheint auch im Verschrottungsprotokoll). Schließen Sie nach der Auswahl der Positionen den Beleg ab — die verschrotteten Waren werden mit der Bewegung Schrottausgang aus dem Bestand ausgebucht.</p>
+<p><img src="https://help.infinityhu.eu/media/img_420eede958b8.png" class="shot" loading="lazy"/></p><h2 id="6-4-6-leltarozas"><span class="hno">6.4.6</span>Inventur</h2><p>Geben Sie als ersten Schritt das zu inventarisierende Lager an oder laden Sie die Inventurdatei hoch (das Muster ist über die Inventuroberfläche herunterladbar).</p>
+<p><img src="https://help.infinityhu.eu/media/img_b69914c11198.png" class="shot" loading="lazy"/></p>
+<p>Nach der Auswahl des Lagers listet Infinity die dort vorhandenen Bestände auf. Inventarisieren Sie nur einige Artikel, markieren Sie diese manuell; bei einem ganzen Lager klicken Sie auf das Kennzeichen Alle auswählen.</p>
+<p><img src="https://help.infinityhu.eu/media/img_18454e896051.png" class="shot" loading="lazy"/></p>
+<p>Klicken Sie nach der Auswahl der Artikel auf die Schaltfläche Auswählen:</p>
+<p><img src="https://help.infinityhu.eu/media/img_d42b1b278d8b.png" class="shot" loading="lazy"/></p>
+<p>Nach der Auswahl der zu inventarisierenden Artikel besteht die Möglichkeit, die Lagerbewegungen zu sperren. Klicken Sie auf die Schaltfläche Lock warehouse und geben Sie den Beginn der Sperre an.</p>
+<div class="call warn"><strong>Achtung</strong>
+<p>Während der Sperre sind aus diesem Lager kein Verkauf, kein Warenausgang, kein Wareneingang und keine Umlagerung möglich. Versucht es jemand, hält das System mit einer Warnmeldung an.</p></div>
+<p>Tragen Sie die physisch gezählten Mengen in die Inventurliste ein. Artikel können Sie im Feld Artikelsuche suchen. Die Spalte Differenz zeigt die Abweichung zwischen den in Infinity geführten und den tatsächlich gezählten Mengen.</p>
+<p>Finden Sie einen Artikel, der nicht im System enthalten ist, können Sie ihn im Feld Artikel hinzufügen suchen und der Liste hinzufügen (nur ein zuvor erfasster Artikel kann hinzugefügt werden).</p>
+<p>Wenn alle Artikel gezählt und erfasst sind, klicken Sie auf die Schaltfläche Inventur abschließen. Das System listet dann die Posten mit Abweichung gesondert auf. Über die Schaltfläche Inventurbericht drucken erhalten Sie den Bericht als PDF.</p>
+<p><img src="https://help.infinityhu.eu/media/img_5f9c94bf486e.png" class="shot" loading="lazy"/></p>
+<p>Zum Ausbuchen einer Abweichung: im Menü Lagerhaltung → Lagerverwaltung → Inventuren begegnen Ihnen Inventuren in drei Statuswerten:</p>
+<div class="tblwrap"><table class="erp-table">
+<tbody>
+<tr class="odd">
+<td><strong>Gestartet</strong></td>
+<td>Eine begonnene, aber noch nicht abgeschlossene Inventurliste</td>
+</tr>
+<tr class="even">
+<td><strong>Abgeschlossen</strong></td>
+<td>Eine abgeschlossene Inventur</td>
+</tr>
+<tr class="odd">
+<td><strong>Ausgebucht</strong></td>
+<td>Eine abgeschlossene Inventur mit ausgebuchten Inventurdifferenzen</td>
+</tr>
+</tbody>
+</table></div>
+<p>Mit einer Inventur im Status Abgeschlossen können Sie zwei Dinge tun: die Ergebnisse akzeptieren und die Schaltfläche Abweichung ausbuchen drücken, oder über die Schaltfläche Wiedereröffnen neu zählen lassen. Nach der Wiedereröffnung sind die zuvor erfassten Mengen bereits enthalten; es müssen nur die neu gezählten Stückzahlen erfasst werden.</p><h2 id="6-4-7-keszlet-bevetelezes"><span class="hno">6.4.7</span>Bestandseinbuchung</h2><p>In diesem Menüpunkt können Sie den importierten Bestand einbuchen, prüfen, korrigieren und genehmigen.</p>
+<p><img src="https://help.infinityhu.eu/media/img_34eddd93bca0.png" class="shot" loading="lazy"/></p><h2 id="6-4-8-keszlet-bevetelezes-fuggo-tetelek"><span class="hno">6.4.8</span>Offene Posten der Bestandseinbuchung</h2><p>Gelangen die Artikel nur mit Genehmigung in den Bestand, können Sie sie hier genehmigen und endgültig buchen. Nach der Genehmigung gelangen die Artikel in den Bestand und sind verkäuflich.</p><h2 id="6-4-9-keszletmozgasok"><span class="hno">6.4.9</span>Bestandsbewegungen</h2><p><img src="https://help.infinityhu.eu/media/img_18e683ca6e5c.png" class="shot" loading="lazy"/></p>
+<p>Die Bestände im System können umgebucht werden (z. B. von Kommissionsbestand in eigenen Bestand). Wählen Sie Lager und Bestand aus, erfassen Sie die Positionen und geben Sie den Zielbestand und die Menge an. Nach dem Speichern ist die Transaktion endgültig.</p></div><div class="foot">Aktualisiert 2026.08.26 · v2026.08.26</div></body></html>

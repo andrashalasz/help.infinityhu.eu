@@ -1,0 +1,83 @@
+<!DOCTYPE html><html lang="hu"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Bankkártya terminálok</title><style>*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,-apple-system,'Segoe UI',sans-serif;background:#fff;color:#333B4D;
+font-size:14px;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:#1B3A6B}
+.bar{position:sticky;top:0;display:flex;align-items:center;gap:10px;padding:10px 16px;
+background:#FAFAF9;border-bottom:1px solid #E8E7E3;font-size:12px}
+.bar b{font-size:13px;color:#1E293B;font-weight:600;flex:1;min-width:0;overflow:hidden;
+text-overflow:ellipsis;white-space:nowrap}
+.bar a{color:#6B7280;text-decoration:none;white-space:nowrap;display:flex;align-items:center;gap:4px}
+.bar a:hover{color:#1B3A6B}
+.bar svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.pad{padding:18px 20px 30px}
+h1{font-size:19px;font-weight:700;color:#1E293B;margin:0 0 12px}
+h2{font-size:16px;font-weight:600;color:#1E293B;margin:22px 0 8px;scroll-margin-top:50px}
+h3{font-size:14.5px;font-weight:600;color:#1E293B;margin:18px 0 6px;scroll-margin-top:50px}
+h2 .hno,h3 .hno{color:#9CA3AF;font-weight:500;margin-right:6px}
+p{margin:0 0 11px}
+ul,ol{margin:0 0 11px;padding-left:20px}
+li{margin-bottom:4px}
+img{max-width:100%;height:auto;border:1px solid #E8E7E3;border-radius:5px;margin:5px 0}
+.call{background:#FAFAF9;border:1px solid #E8E7E3;border-left:3px solid #1B3A6B;border-radius:0 6px 6px 0;
+padding:11px 14px;margin:14px 0;font-size:13px}
+.call.warn{background:#FFFDF5;border-color:#F3E7C4;border-left-color:#F59E0B}
+.call strong{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;
+color:#6B7280;margin-bottom:3px}
+table{width:100%;border-collapse:collapse;margin:13px 0;font-size:12.5px}
+th{background:#FAFAF9;text-align:left;padding:7px 10px;font-size:10px;text-transform:uppercase;
+letter-spacing:.04em;color:#6B7280;border-bottom:1px solid #E8E7E3}
+td{padding:7px 10px;border-bottom:1px solid #F1F0EE;vertical-align:top}
+figcaption{font-size:11px;color:#9CA3AF;margin-top:4px}
+.foot{padding:14px 20px;border-top:1px solid #F1F0EE;font-size:11px;color:#9CA3AF}
+</style></head><body><div class="bar"><b>5.2 Bankkártya terminálok</b><a href="https://help.infinityhu.eu/hu/5-2-bankkartya-terminalok.html" target="_blank" rel="noopener">Teljes oldal<svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></a></div><div class="pad"><p>Új kártyaolvasó létrehozása a bankkártyás fizetéshez szükséges.
+Elérhető: Pénzügy → Beállítások → Bankkártya terminálok.</p>
+<ul>
+<li><p>A típus mindig „fizikai" legyen</p></li>
+<li><p>A telephely, amelyen a pénztár üzemel, listából
+kiválasztható</p></li>
+<li><p>Sorszám minta és jutalék százalék: fix értékek, a példában
+megadottak szerint</p></li>
+<li><p>Követelhető partner: az a bank, ahová/ahonnan a kártyás
+tranzakciók érkeznek</p></li>
+<li><p>Állapota mindig „engedélyezett" legyen</p></li>
+</ul>
+<p>A megadott értékeket a Mentés gombbal véglegesíthetjük.</p>
+<p><img src="https://help.infinityhu.eu/media/img_d376a215728b.png" class="shot" loading="lazy"/></p><h2 id="5-2-1-folyoszamla-lista"><span class="hno">5.2.1</span>Folyószámla lista</h2><p>Az ügyviteli események által létrehozott analitikus bizonylatok
+alkotóelemeit itt rögzítjük. Definiáljuk többek között a számlás
+értékesítés, a szállítói számlakiállítás és a pénzügyi tranzakciók
+bizonylatait. A bizonylatok beállítása admin feladat, általában a
+rendszer indulása előtt történik.</p><h2 id="5-2-2-elfogadott-utalvanyok"><span class="hno">5.2.2</span>Elfogadott utalványok</h2><p>Elsősorban kiskereskedelmi értékesítésnél az elfogadott utalványok
+kezelésére szolgál. Rögzíthetjük mind az idegen, mind a saját
+kibocsátású utalványokat, majd a forgalmak utalványtípusonként
+lekérdezhetők.</p><h2 id="5-2-3-szamla-es-nyugtatombok"><span class="hno">5.2.3</span>Számla- és nyugtatömbök</h2><p>A kimenő számlák bizonylatolásához sorszámot és számlaképet hozhatunk
+létre. A nyugtákhoz is rendelhetünk sorszámot a könnyebb követhetőség
+érdekében.</p>
+<p>Külön sorszámot és számlaképet rendelhetünk a proforma számla, előleg
+számla és díjbekérő mellé is. A számlatömb típusa lehet: vevői/szállítói
+számla, vevői/szállítói díjbekérő, nyugta, kamatlevél, proforma számla,
+részszámla, zárószámla.</p>
+<p>Az eredetnél: belső esetén mi határozzuk meg a sorszám felépítését
+(sorszám minta mezőben); külső esetén a program automatikusan generálja.
+A telephelynél adjuk meg, melyik telephelyen kívánjuk használni.</p>
+<p><img src="https://help.infinityhu.eu/media/img_0aa3281ef42c.png" class="shot" loading="lazy"/></p>
+<p>Minta nyugtatömb beállítás:</p>
+<p><img src="https://help.infinityhu.eu/media/img_31ef8fcae6f5.png" class="shot" loading="lazy"/></p>
+<p>Minta vevői számlatömb beállítás:</p>
+<p><img src="https://help.infinityhu.eu/media/img_0dbfd7711238.png" class="shot" loading="lazy"/></p>
+<p>Minta szállítói számlatömb beállítás:</p>
+<p><img src="https://help.infinityhu.eu/media/img_06012299448f.png" class="shot" loading="lazy"/></p><h2 id="5-2-4-koltsegkategoriak"><span class="hno">5.2.4</span>Költségkategóriák</h2><p>A vevői és szállítói számla rögzítésének kötelező eleme a
+költségkategória. Ez az automata kontírozás szabályok egyik fontos
+alapeleme: szállítói számla rögzítésekor a rendszer a kostégkategória
+alapján automatikusan kontírozhat.</p><h2 id="5-2-5-sconto"><span class="hno">5.2.5</span>Scontó</h2><p>A scontó érvényesítéséhez először létre kell hoznunk a scontó
+szabályokat, majd ezeket partnerhez kell rendelnünk.</p>
+<p>Scontót mind vevői, mind szállítói számla esetén elszámolhatunk, de
+csak olyan partnernél, akinek az adatlapjához korábban scontó szabályt
+rendeltünk.</p>
+<p>Elsőként adjuk meg a viszonyítási dátumot – ettől számítjuk a scontó
+határidőket. A százalék és napok megadása után lehetőség van a scontót
+munkaszámhoz rendelni. Egy partnerhez több szabály is megadható, több
+kiválasztása esetén meg kell adni az alapértelmezettet.</p><h2 id="5-2-6-fizetesi-modok"><span class="hno">5.2.6</span>Fizetési módok</h2><p>Itt definiálhatjuk a rendszerben használt fizetési módokat.</p>
+<p><img src="https://help.infinityhu.eu/media/img_26d28226cc8b.png" class="shot" loading="lazy"/></p><h2 id="5-2-7-koltseghelyek"><span class="hno">5.2.7</span>Költséghelyek</h2><p>A rendszer lehetőséget ad költséghelyek rögzítésére, amelyek további
+dimenziókra bontják a főkönyvi számokat és mélyebb költségelemzést
+tesznek lehetővé.</p></div><div class="foot">Frissítve 2026.08.26 · v2026.08.26</div></body></html>

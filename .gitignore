@@ -1,0 +1,6 @@
+.env
+.DS_Store
+site/
+*.log
+helyi_teszt/app/
+helyi_teszt/yii2/

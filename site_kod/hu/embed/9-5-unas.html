@@ -1,0 +1,137 @@
+<!DOCTYPE html><html lang="hu"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>UNAS</title><style>*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,-apple-system,'Segoe UI',sans-serif;background:#fff;color:#333B4D;
+font-size:14px;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:#1B3A6B}
+.bar{position:sticky;top:0;display:flex;align-items:center;gap:10px;padding:10px 16px;
+background:#FAFAF9;border-bottom:1px solid #E8E7E3;font-size:12px}
+.bar b{font-size:13px;color:#1E293B;font-weight:600;flex:1;min-width:0;overflow:hidden;
+text-overflow:ellipsis;white-space:nowrap}
+.bar a{color:#6B7280;text-decoration:none;white-space:nowrap;display:flex;align-items:center;gap:4px}
+.bar a:hover{color:#1B3A6B}
+.bar svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.pad{padding:18px 20px 30px}
+h1{font-size:19px;font-weight:700;color:#1E293B;margin:0 0 12px}
+h2{font-size:16px;font-weight:600;color:#1E293B;margin:22px 0 8px;scroll-margin-top:50px}
+h3{font-size:14.5px;font-weight:600;color:#1E293B;margin:18px 0 6px;scroll-margin-top:50px}
+h2 .hno,h3 .hno{color:#9CA3AF;font-weight:500;margin-right:6px}
+p{margin:0 0 11px}
+ul,ol{margin:0 0 11px;padding-left:20px}
+li{margin-bottom:4px}
+img{max-width:100%;height:auto;border:1px solid #E8E7E3;border-radius:5px;margin:5px 0}
+.call{background:#FAFAF9;border:1px solid #E8E7E3;border-left:3px solid #1B3A6B;border-radius:0 6px 6px 0;
+padding:11px 14px;margin:14px 0;font-size:13px}
+.call.warn{background:#FFFDF5;border-color:#F3E7C4;border-left-color:#F59E0B}
+.call strong{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;
+color:#6B7280;margin-bottom:3px}
+table{width:100%;border-collapse:collapse;margin:13px 0;font-size:12.5px}
+th{background:#FAFAF9;text-align:left;padding:7px 10px;font-size:10px;text-transform:uppercase;
+letter-spacing:.04em;color:#6B7280;border-bottom:1px solid #E8E7E3}
+td{padding:7px 10px;border-bottom:1px solid #F1F0EE;vertical-align:top}
+figcaption{font-size:11px;color:#9CA3AF;margin-top:4px}
+.foot{padding:14px 20px;border-top:1px solid #F1F0EE;font-size:11px;color:#9CA3AF}
+</style></head><body><div class="bar"><b>9.5 UNAS</b><a href="https://help.infinityhu.eu/hu/9-5-unas.html" target="_blank" rel="noopener">Teljes oldal<svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></a></div><div class="pad"><p>UNAS webshopok kezelésére szolgáló felület, ahol megadhatjuk, mely
+webáruházakkal dolgozunk, mely raktárakat használjuk, és mely termékeket
+értékesítjük. Elérhető funkciók:</p>
+<ul>
+<li><p>Korlátlan számú webshop párhuzamos kezelése</p></li>
+<li><p>Árucikkek feltöltése</p></li>
+<li><p>Készletváltozás azonnali, automatikus frissítése</p></li>
+<li><p>Elektronikus számlázás egy gombnyomással, vagy
+automatikusan</p></li>
+<li><p>Készpénzes, bankkártyás megrendeléshez tartozó számlák azonnali
+kiegyenlítése</p></li>
+</ul><h2 id="9-5-1-unas-api-kulcsok"><span class="hno">9.5.1</span>UNAS API kulcsok</h2><p>Új hozzáadásával vehetünk fel új webáruházat (megnevezés, leírás, API
+kulcs szükséges). Csak az aktív státuszban lévő API kulcsok
+szinkronizálódnak.</p>
+<p><strong>UNAS futás feltételei:</strong></p>
+<ul>
+<li><p>Létezzen számlát kiállító vállalat</p></li>
+<li><p>A számlakiállító telephelyei közt legalább egy Főtelephelynek
+kell lennie</p></li>
+<li><p>A Főtelephelynek legyen normál vevői számlatömbje</p></li>
+<li><p>Legyen legalább egy aktív API kulcs</p></li>
+<li><p>A háttérfolyamatok legyenek megfelelően beállítva</p></li>
+</ul>
+<p><img src="https://help.infinityhu.eu/media/img_1f14c46719de.png" class="shot" loading="lazy"/></p><h2 id="9-5-2-unas-rendelesi-naplo"><span class="hno">9.5.2</span>UNAS rendelési napló</h2><p>A Letöltő folyamat futtatása gombra kattintva a számlázható státuszú
+megrendelések letöltődnek a webáruházból. A rendszer megrendelés
+azonosító alapján ellenőrzi, hogy ami már kiszámlázásra került, azt ne
+töltse le újra.</p>
+<p>Megrendelés szinkronizáció alkalmával az alábbi adatok generálódnak
+le: Partnerek, Címek, Elérhetőségek, Termékek, Áfa kulcsok, Pénzügyi
+tranzakciók, Értékesítések, Számlák.</p>
+<p>Ha a megrendelés log futás állapota nem Teljesített, hanem Sikertelen
+vagy Várakozó, nyissuk meg a logot a hibaüzenetért. Hiba esetén
+kattintsunk az UNAS API kulcsok felületen a kulcs melletti letöltés
+gombra – ez az összes le nem töltött megrendelést azonnal letölti.</p><h2 id="9-5-3-partner-szinkronizalas"><span class="hno">9.5.3</span>Partner szinkronizálás</h2><p>Partnerek csak a megrendelés generálásakor kerülnek letöltésre. Új
+partner létrehozása e-mail cím ellenőrzés alapján történik. Ha az e-mail
+már szerepel a rendszerben, csak a számlázási és cím adatok frissülnek
+(a korábban kiállított számlákat ez nem érinti).</p>
+<p>Adószámmal rendelkező partner esetén az adószámot változatlan
+formátumban veszi át a rendszer (az ellenőrzést számla kiállításakor
+végzi). Ha hibás az adószám, a megrendelés letöltésekor nyitott
+értékesítés jön létre, és a számla megnyitásakor hibaüzenet jelzi a
+problémát.</p><h2 id="9-5-4-arucikk-szinkronizacio-objektum-kapcsolatok"><span class="hno">9.5.4</span>Árucikk szinkronizáció – objektum kapcsolatok</h2><p><strong>Szinkronizáció alapfeltételei:</strong></p>
+<ul>
+<li><p>A háttérfolyamat aktív legyen</p></li>
+<li><p>A terméknek legyen cikkszáma, neve, kategóriája, eladási ára és
+termékképe</p></li>
+<li><p>A fentiek közül valaminek módosulnia kell (a szinkronizáció
+változás hatására indul el)</p></li>
+</ul>
+<p>A cikktörzsből az UNAS objektum kapcsolatok → Árucikk felületen
+határozhatjuk meg, mi kerüljön ki a webshopba. A bal és jobb oldali
+oszlop összekapcsolható; az API kulccsal összekapcsolt cikkek jelennek
+meg az adott weboldalon. Egy árucikk több API kulcshoz is
+kapcsolható.</p>
+<p>A Kapcsolat hozzáadása gombbal véglegesíthetjük, az Eltávolítás
+gombbal megszüntethetjük a kapcsolatot. Az Utoljára frissítve mező
+mutatja az utolsó szinkronizálás dátumát.</p>
+<p>Első alkalommal vagy kampányszerű frissítéskor használhatjuk az
+Összes szinkronizálása gombot (módosítás nélkül is elvégzi a
+szinkronizációt).</p>
+<p><img src="https://help.infinityhu.eu/media/img_8029223ae742.png" class="shot" loading="lazy"/></p>
+<div class="tblwrap"><table class="erp-table">
+
+<thead>
+<tr class="header">
+<th><p><strong>⚠ Figyelem</strong></p>
+<p>Az információs sávban folyamatosan ellenőrizhető, hogy melyik
+árucikknek jár le a listaára 5 napon belül. Lejáró árakat módosítani
+vagy meghosszabbítani kell, mert a UNAS hibásnak kezeli az ár nélküli
+cikkeket.</p></th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table></div>
+<p>A termékképek szinkronizálása is megtörténik, de UNAS csak akkor
+veszi át a képet, ha a weboldalon még nincs kép feltöltve a cikkhez.</p><h2 id="9-5-5-kategoria-szinkronizacio"><span class="hno">9.5.5</span>Kategória szinkronizáció</h2><p>Árucikk menedzseléskor az árucikkhez kapcsolt kategóriák
+legenerálódnak a webshopban is (teljes elérési úttal). Ez a menüpont
+kizárólag az árucikkhez nem kapcsolt kategóriák szinkronizációjára
+szolgál.</p><h2 id="9-5-6-raktar-szinkronizacio"><span class="hno">9.5.6</span>Raktár szinkronizáció</h2><p>Itt adjuk meg, hogy melyik raktár készletét használja a webshop.
+Készlet szinkronizáció csak a már létrehozott cikkek esetén fut le.</p>
+<div class="tblwrap"><table class="erp-table">
+
+<thead>
+<tr class="header">
+<th><p><strong>ℹ Megjegyzés</strong></p>
+<p>A raktárnak és a cikknek is összekapcsoltnak kell lennie az aktív API
+kulccsal. Alap esetben a szinkronizáció csak készletmozgás hatására
+indul el; a Teljes szinkron gombbal raktármozgás nélkül is frissíthető a
+készlet.</p></th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table></div><h2 id="9-5-7-unas-szinkronizacios-naplo"><span class="hno">9.5.7</span>UNAS szinkronizációs napló</h2><p><img src="https://help.infinityhu.eu/media/img_59273e076060.png" class="shot" loading="lazy"/></p>
+<p>A szinkronizációs háttéreljárás futásának ellenőrzésére szolgál. Hiba
+esetén itt tekinthetjük meg, hogy mely árucikkek, raktárak esetén nem
+futott le a szinkronizáció és mi az oka. Javítást követően a
+háttérfolyamat újra automatikusan lefut.</p><h2 id="9-5-8-unas-szamlak-kiegyenlitese"><span class="hno">9.5.8</span>UNAS számlák kiegyenlítése</h2><p>Mind a készpénzes, mind a bankkártyás számlák esetén lehetőség van
+automata kiegyenlítésre (a számla kiállításakor elkészül a kiegyenlítés
+bizonylata is, és a számla egyenlege nulla lesz).</p>
+<p>Készpénzes számlánál csak egy beállítás szükséges. Bankkártyás
+számláknál a rendszer csak akkor egyenlít ki automatikusan, ha az UNAS
+weboldalától megkapja a „Sikeresen lezárult fizetési státuszt" és az
+összeg megegyezik a megrendelés összegével.</p></div><div class="foot">Frissítve 2026.08.26 · v2026.08.26</div></body></html>

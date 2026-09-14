@@ -1,0 +1,91 @@
+<!DOCTYPE html><html lang="hu"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Onboarding – beléptetés feladatokkal</title><style>*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,-apple-system,'Segoe UI',sans-serif;background:#fff;color:#333B4D;
+font-size:14px;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:#1B3A6B}
+.bar{position:sticky;top:0;display:flex;align-items:center;gap:10px;padding:10px 16px;
+background:#FAFAF9;border-bottom:1px solid #E8E7E3;font-size:12px}
+.bar b{font-size:13px;color:#1E293B;font-weight:600;flex:1;min-width:0;overflow:hidden;
+text-overflow:ellipsis;white-space:nowrap}
+.bar a{color:#6B7280;text-decoration:none;white-space:nowrap;display:flex;align-items:center;gap:4px}
+.bar a:hover{color:#1B3A6B}
+.bar svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.pad{padding:18px 20px 30px}
+h1{font-size:19px;font-weight:700;color:#1E293B;margin:0 0 12px}
+h2{font-size:16px;font-weight:600;color:#1E293B;margin:22px 0 8px;scroll-margin-top:50px}
+h3{font-size:14.5px;font-weight:600;color:#1E293B;margin:18px 0 6px;scroll-margin-top:50px}
+h2 .hno,h3 .hno{color:#9CA3AF;font-weight:500;margin-right:6px}
+p{margin:0 0 11px}
+ul,ol{margin:0 0 11px;padding-left:20px}
+li{margin-bottom:4px}
+img{max-width:100%;height:auto;border:1px solid #E8E7E3;border-radius:5px;margin:5px 0}
+.call{background:#FAFAF9;border:1px solid #E8E7E3;border-left:3px solid #1B3A6B;border-radius:0 6px 6px 0;
+padding:11px 14px;margin:14px 0;font-size:13px}
+.call.warn{background:#FFFDF5;border-color:#F3E7C4;border-left-color:#F59E0B}
+.call strong{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;
+color:#6B7280;margin-bottom:3px}
+table{width:100%;border-collapse:collapse;margin:13px 0;font-size:12.5px}
+th{background:#FAFAF9;text-align:left;padding:7px 10px;font-size:10px;text-transform:uppercase;
+letter-spacing:.04em;color:#6B7280;border-bottom:1px solid #E8E7E3}
+td{padding:7px 10px;border-bottom:1px solid #F1F0EE;vertical-align:top}
+figcaption{font-size:11px;color:#9CA3AF;margin-top:4px}
+.foot{padding:14px 20px;border-top:1px solid #F1F0EE;font-size:11px;color:#9CA3AF}
+</style></head><body><div class="bar"><b>10.7 Onboarding – beléptetés feladatokkal</b><a href="https://help.infinityhu.eu/hu/10-7-onboarding-beleptetes-feladatokkal.html" target="_blank" rel="noopener">Teljes oldal<svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></a></div><div class="pad"><p>Az onboarding célja, hogy az új belépő az első naptól kezdve
+munkaképes legyen. A rendszer sablon alapján feladatokat generál, és
+követi azok teljesülését (HR/IT/Vezető/Dolgozó).</p><h2 id="10-7-1-onboarding-indulasa-felvetel-utan"><span class="hno">10.7.1</span>Onboarding indulása felvétel után</h2><p>Felvétel véglegesítésekor amikor átfordítottuk a jelöltet
+munkavállalóvá a rendszer automatikusan létrehoz egy onboarding
+példányt, és a kiválasztott sablon alapján feladatokat generál. A
+feladatok határideje a belépési dátumhoz képest számolódik (pl. -5
+nap).</p><h2 id="10-7-2-onboarding-lista-nezet"><span class="hno">10.7.2</span>Onboarding lista nézet</h2><p>A lista nézetben látod az összes futó onboardingot, előrehaladás
+százalékkal. Szűrhetsz belépési dátumra, osztályra, vezetőre, státuszra.
+A piros jelzés késést jelent (határidő lejárt, feladat nincs kész).<img
+src="https://help.infinityhu.eu/media/img_8dec2d959df9.png" /></p><h2 id="10-7-3-onboarding-reszletezo-feladatok-kezelese"><span class="hno">10.7.3</span>Onboarding részletező – feladatok kezelése</h2><ol type="1">
+<li><p>Nyisd meg az onboarding rekordot a listából.</p></li>
+<li><p>Nézd meg a legközelebbi fázist (pl. Day 1).</p></li>
+<li><p>Kattints egy feladatra: állítsd IN_PROGRESS vagy DONE
+állapotra.</p></li>
+<li><p>Ha elakadás van, állítsd BLOCKED-re és írj megjegyzést.</p></li>
+<li><p>Késő feladat esetén jelezd a felelősnek (a rendszer is küldhet
+emlékeztetőt).</p>
+<p><img src="https://help.infinityhu.eu/media/img_4bd66d2e9d90.png" class="shot" loading="lazy"/></p></li>
+</ol>
+<div class="tblwrap"><table class="erp-table">
+
+<thead>
+<tr class="header">
+<th><strong>Mező</strong></th>
+<th><strong>Típus</strong></th>
+<th><strong>Kötelező?</strong></th>
+<th><strong>Magyarázat / tippek</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Feladat státusz</td>
+<td>Enum</td>
+<td>Igen</td>
+<td>Folyamatban/Elvégezve/Késésben</td>
+</tr>
+<tr class="even">
+<td>Megjegyzés</td>
+<td>Szöveg</td>
+<td>Nem</td>
+<td>Miért csúszik; segít a későbbi tanulságokban.</td>
+</tr>
+<tr class="odd">
+<td>Felelős</td>
+<td>Szerep/User</td>
+<td>Igen</td>
+<td>HR/IT/Vezető/Dolgozó; szerkesztése jogosultságfüggő.</td>
+</tr>
+<tr class="even">
+<td>Határidő</td>
+<td>Dátum</td>
+<td>Igen</td>
+<td>Késés jelzés alapja.</td>
+</tr>
+</tbody>
+</table></div><h2 id="10-7-4-probaido-es-ertekeles"><span class="hno">10.7.4</span>Próbaidő és értékelés</h2><p>Ha a dolgozó próbaidőn van, a rendszer a próbaidő végéhez közeledve
+automatikus értékelési feladatot hoz létre a vezetőnek. Ezt érdemes
+időben lezárni, mert a HR Dashboard külön riasztást ad a közelgő
+határidőre.</p></div><div class="foot">Frissítve 2026.08.26 · v2026.08.26</div></body></html>

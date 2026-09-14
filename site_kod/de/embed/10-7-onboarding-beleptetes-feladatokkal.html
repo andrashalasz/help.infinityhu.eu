@@ -1,0 +1,76 @@
+<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Onboarding – mit Aufgabenlisten</title><style>*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,-apple-system,'Segoe UI',sans-serif;background:#fff;color:#333B4D;
+font-size:14px;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:#1B3A6B}
+.bar{position:sticky;top:0;display:flex;align-items:center;gap:10px;padding:10px 16px;
+background:#FAFAF9;border-bottom:1px solid #E8E7E3;font-size:12px}
+.bar b{font-size:13px;color:#1E293B;font-weight:600;flex:1;min-width:0;overflow:hidden;
+text-overflow:ellipsis;white-space:nowrap}
+.bar a{color:#6B7280;text-decoration:none;white-space:nowrap;display:flex;align-items:center;gap:4px}
+.bar a:hover{color:#1B3A6B}
+.bar svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.pad{padding:18px 20px 30px}
+h1{font-size:19px;font-weight:700;color:#1E293B;margin:0 0 12px}
+h2{font-size:16px;font-weight:600;color:#1E293B;margin:22px 0 8px;scroll-margin-top:50px}
+h3{font-size:14.5px;font-weight:600;color:#1E293B;margin:18px 0 6px;scroll-margin-top:50px}
+h2 .hno,h3 .hno{color:#9CA3AF;font-weight:500;margin-right:6px}
+p{margin:0 0 11px}
+ul,ol{margin:0 0 11px;padding-left:20px}
+li{margin-bottom:4px}
+img{max-width:100%;height:auto;border:1px solid #E8E7E3;border-radius:5px;margin:5px 0}
+.call{background:#FAFAF9;border:1px solid #E8E7E3;border-left:3px solid #1B3A6B;border-radius:0 6px 6px 0;
+padding:11px 14px;margin:14px 0;font-size:13px}
+.call.warn{background:#FFFDF5;border-color:#F3E7C4;border-left-color:#F59E0B}
+.call strong{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;
+color:#6B7280;margin-bottom:3px}
+table{width:100%;border-collapse:collapse;margin:13px 0;font-size:12.5px}
+th{background:#FAFAF9;text-align:left;padding:7px 10px;font-size:10px;text-transform:uppercase;
+letter-spacing:.04em;color:#6B7280;border-bottom:1px solid #E8E7E3}
+td{padding:7px 10px;border-bottom:1px solid #F1F0EE;vertical-align:top}
+figcaption{font-size:11px;color:#9CA3AF;margin-top:4px}
+.foot{padding:14px 20px;border-top:1px solid #F1F0EE;font-size:11px;color:#9CA3AF}
+</style></head><body><div class="bar"><b>10.7 Onboarding – mit Aufgabenlisten</b><a href="https://help.infinityhu.eu/de/10-7-onboarding-beleptetes-feladatokkal.html" target="_blank" rel="noopener">Volle Seite<svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></a></div><div class="pad"><p>Ziel des Onboardings ist, dass der neue Mitarbeiter vom ersten Tag an arbeitsfähig ist. Das System erzeugt anhand einer Vorlage Aufgaben und verfolgt deren Erfüllung (HR/IT/Führungskraft/Mitarbeiter).</p><h2 id="10-7-1-onboarding-indulasa-felvetel-utan"><span class="hno">10.7.1</span>Start des Onboardings nach der Einstellung</h2><p>Bei der endgültigen Einstellung — wenn wir den Kandidaten in einen Mitarbeiter umgewandelt haben — erstellt das System automatisch eine Onboarding-Instanz und erzeugt anhand der gewählten Vorlage Aufgaben. Die Frist der Aufgaben wird relativ zum Eintrittsdatum berechnet (z. B. −5 Tage).</p><h2 id="10-7-2-onboarding-lista-nezet"><span class="hno">10.7.2</span>Onboarding-Listenansicht</h2><p>In der Listenansicht sehen Sie alle laufenden Onboardings mit Fortschrittsangabe in Prozent. Sie können nach Eintrittsdatum, Abteilung, Führungskraft und Status filtern. Die rote Anzeige bedeutet eine Verzögerung (Frist abgelaufen, Aufgabe nicht erledigt).<img src="https://help.infinityhu.eu/media/img_8dec2d959df9.png" /></p><h2 id="10-7-3-onboarding-reszletezo-feladatok-kezelese"><span class="hno">10.7.3</span>Onboarding-Detailansicht – Aufgaben verwalten</h2><ol type="1">
+<li><p>Öffnen Sie den Onboarding-Datensatz aus der Liste.</p></li>
+<li><p>Sehen Sie sich die nächste Phase an (z. B. Day 1).</p></li>
+<li><p>Klicken Sie auf eine Aufgabe: setzen Sie sie auf IN_PROGRESS oder DONE.</p></li>
+<li><p>Gibt es eine Blockade, setzen Sie sie auf BLOCKED und schreiben Sie eine Bemerkung.</p></li>
+<li><p>Bei einer verspäteten Aufgabe informieren Sie den Verantwortlichen (das System kann ebenfalls eine Erinnerung senden).</p>
+<p><img src="https://help.infinityhu.eu/media/img_4bd66d2e9d90.png" class="shot" loading="lazy"/></p></li>
+</ol>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Feld</strong></th>
+<th><strong>Typ</strong></th>
+<th><strong>Pflicht?</strong></th>
+<th><strong>Erläuterung / Tipps</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Aufgabenstatus</td>
+<td>Enum</td>
+<td>Ja</td>
+<td>In Bearbeitung / Erledigt / Verspätet</td>
+</tr>
+<tr class="even">
+<td>Bemerkung</td>
+<td>Text</td>
+<td>Nein</td>
+<td>Warum es sich verzögert; hilft bei späteren Erkenntnissen.</td>
+</tr>
+<tr class="odd">
+<td>Verantwortlicher</td>
+<td>Rolle/Benutzer</td>
+<td>Ja</td>
+<td>HR/IT/Führungskraft/Mitarbeiter; die Bearbeitung hängt von den Berechtigungen ab.</td>
+</tr>
+<tr class="even">
+<td>Frist</td>
+<td>Datum</td>
+<td>Ja</td>
+<td>Grundlage der Verzögerungsanzeige.</td>
+</tr>
+</tbody>
+</table></div><h2 id="10-7-4-probaido-es-ertekeles"><span class="hno">10.7.4</span>Probezeit und Bewertung</h2><p>Befindet sich der Mitarbeiter in der Probezeit, erzeugt das System gegen Ende der Probezeit automatisch eine Bewertungsaufgabe für die Führungskraft. Diese sollte rechtzeitig abgeschlossen werden, da das HR-Dashboard eine gesonderte Warnung zur nahenden Frist ausgibt.</p></div><div class="foot">Aktualisiert 2026.08.26 · v2026.08.26</div></body></html>

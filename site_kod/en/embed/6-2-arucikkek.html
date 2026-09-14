@@ -1,0 +1,266 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Products</title><style>*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,-apple-system,'Segoe UI',sans-serif;background:#fff;color:#333B4D;
+font-size:14px;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:#1B3A6B}
+.bar{position:sticky;top:0;display:flex;align-items:center;gap:10px;padding:10px 16px;
+background:#FAFAF9;border-bottom:1px solid #E8E7E3;font-size:12px}
+.bar b{font-size:13px;color:#1E293B;font-weight:600;flex:1;min-width:0;overflow:hidden;
+text-overflow:ellipsis;white-space:nowrap}
+.bar a{color:#6B7280;text-decoration:none;white-space:nowrap;display:flex;align-items:center;gap:4px}
+.bar a:hover{color:#1B3A6B}
+.bar svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.pad{padding:18px 20px 30px}
+h1{font-size:19px;font-weight:700;color:#1E293B;margin:0 0 12px}
+h2{font-size:16px;font-weight:600;color:#1E293B;margin:22px 0 8px;scroll-margin-top:50px}
+h3{font-size:14.5px;font-weight:600;color:#1E293B;margin:18px 0 6px;scroll-margin-top:50px}
+h2 .hno,h3 .hno{color:#9CA3AF;font-weight:500;margin-right:6px}
+p{margin:0 0 11px}
+ul,ol{margin:0 0 11px;padding-left:20px}
+li{margin-bottom:4px}
+img{max-width:100%;height:auto;border:1px solid #E8E7E3;border-radius:5px;margin:5px 0}
+.call{background:#FAFAF9;border:1px solid #E8E7E3;border-left:3px solid #1B3A6B;border-radius:0 6px 6px 0;
+padding:11px 14px;margin:14px 0;font-size:13px}
+.call.warn{background:#FFFDF5;border-color:#F3E7C4;border-left-color:#F59E0B}
+.call strong{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;
+color:#6B7280;margin-bottom:3px}
+table{width:100%;border-collapse:collapse;margin:13px 0;font-size:12.5px}
+th{background:#FAFAF9;text-align:left;padding:7px 10px;font-size:10px;text-transform:uppercase;
+letter-spacing:.04em;color:#6B7280;border-bottom:1px solid #E8E7E3}
+td{padding:7px 10px;border-bottom:1px solid #F1F0EE;vertical-align:top}
+figcaption{font-size:11px;color:#9CA3AF;margin-top:4px}
+.foot{padding:14px 20px;border-top:1px solid #F1F0EE;font-size:11px;color:#9CA3AF}
+</style></head><body><div class="bar"><b>6.2 Products</b><a href="https://help.infinityhu.eu/en/6-2-arucikkek.html" target="_blank" rel="noopener">Full page<svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></a></div><div class="pad"><h2 id="6-2-1-uj-arucikk"><span class="hno">6.2.1</span>New product</h2><p><strong>Basic data</strong></p>
+<p>A new item can be created in Infinity in two ways: by bulk import or by manual entry. To create an individual item, go to Inventory → Products → Product list and click the Create button.</p><h2 id="6-2-2-arucikk-lista"><span class="hno">6.2.2</span>Product list</h2><p>In the header of the list you find the search field, the filters by type and the action buttons. The list shows, row by row, the identifier, name, type, list price and stock of the item, along with the actions.</p>
+<p><img src="https://help.infinityhu.eu/media/img_c89b0f08378c.png" class="shot" loading="lazy"/></p>
+<p><em><strong>Filters and search</strong></em></p>
+<p>The type pill filters (Product, Service, Raw material and so on) narrow the list immediately — only the types that actually exist appear.</p>
+<p>The search field works with space = AND, comma = OR logic and accent-insensitive searching.</p>
+<p>The Export button saves the filtered list to a CSV file.</p>
+<p><em><strong>Action buttons (per row)</strong></em></p>
+<ul>
+<li><p>🗑 Delete — sets the product to inactive (does not delete it physically).</p></li>
+<li><p>👁 Quick view — shows the most important data of the product (price, stock, EAN, manufacturer, VAT) in a pop-up card. The full record can be opened from here.</p></li>
+<li><p>✏ Edit — opens the detailed record of the product in edit mode.</p></li>
+<li><p>📋 Copy — creates a copy with the item number suffix “-COPY”, in Inactive status; the copy is placed at the top of the list.</p></li>
+</ul><h2 id="6-2-3-uj-arucikk-letrehozasa-alapadatok-ful"><span class="hno">6.2.3</span>Creating a new product – Basic data tab</h2><p>Clicking the + Create button opens a modal window. On the Basic data tab, enter the master data of the item.</p>
+<p><img src="https://help.infinityhu.eu/media/img_a0ea03300c0b.png" class="shot" loading="lazy"/></p>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Field</strong></th>
+<th><strong>Description</strong></th>
+<th><strong>Value</strong></th>
+<th><strong>Mandatory</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Item number</td>
+<td>Unique identifier</td>
+<td>Free text</td>
+<td>Mandatory</td>
+</tr>
+<tr class="even">
+<td>EAN code</td>
+<td>Barcode identifier</td>
+<td>Numeric field</td>
+<td>Not mandatory</td>
+</tr>
+<tr class="odd">
+<td>Name</td>
+<td>Name of the item</td>
+<td>Free text</td>
+<td>Mandatory</td>
+</tr>
+<tr class="even">
+<td>Type</td>
+<td>Product, Service, Raw material, Manufactured product, Package</td>
+<td>From a drop-down list</td>
+<td>Mandatory</td>
+</tr>
+<tr class="odd">
+<td>VAT rate</td>
+<td>The applicable VAT rate</td>
+<td>From a drop-down list</td>
+<td>Mandatory</td>
+</tr>
+<tr class="even">
+<td>Unit of measure</td>
+<td>for example pcs, kg, m, hour</td>
+<td>Free text</td>
+<td>Mandatory</td>
+</tr>
+<tr class="odd">
+<td>Secondary unit of measure</td>
+<td>Alternative unit of measure</td>
+<td>Free text</td>
+<td>Not mandatory</td>
+</tr>
+<tr class="even">
+<td>Warranty certificate</td>
+<td>Type of warranty</td>
+<td>From a drop-down list</td>
+<td>Not mandatory</td>
+</tr>
+<tr class="odd">
+<td>Permits</td>
+<td>Product sales permit</td>
+<td>From a drop-down list</td>
+<td>Not mandatory</td>
+</tr>
+<tr class="even">
+<td>Manufacturer</td>
+<td>The manufacturer of the product</td>
+<td>From a drop-down list</td>
+<td>Not mandatory</td>
+</tr>
+<tr class="odd">
+<td>Warranty (months)</td>
+<td>Duration of the warranty in months</td>
+<td>Numeric field</td>
+<td>Not mandatory</td>
+</tr>
+<tr class="even">
+<td>Supplier</td>
+<td>Main supplier partner</td>
+<td>Drop-down, editable</td>
+<td>Not mandatory</td>
+</tr>
+<tr class="odd">
+<td>Serial number tracking</td>
+<td>Item tracked by a unique identifier</td>
+<td>Check box</td>
+<td>Mandatory (if relevant)</td>
+</tr>
+<tr class="even">
+<td>Status</td>
+<td>Whether it can be placed on documents</td>
+<td>Active or Inactive</td>
+<td>Mandatory</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p><em>ℹ When the Type is selected, the form refreshes dynamically — for Service, the fields related to warehouse stock management (shelf number, minimum stock, unit packaging and so on) are hidden.</em></p>
+</blockquote>
+<p><strong>Special markers (check boxes)</strong></p>
+<ul>
+<li><p>Intermediated service — the item is the intermediation of a service provided by another party.</p></li>
+<li><p>Delivery cost item — the item is placed on the invoice as a delivery charge.</p></li>
+<li><p>Sale to order — the item is not delivered from stock but to order.</p></li>
+<li><p>Unit packaging — the item can be sold in unit packaging.</p></li>
+<li><p>Serial number tracking — when switched on, a unique serial number has to be given for the item at every movement.</p></li>
+</ul>
+<p><strong>Tags</strong></p>
+<p>On the Basic data tab you can assign tags to the item. Tags are free-word markers (for example On sale, New product, Seasonal). Entry: they are recorded after Enter or a comma; the system also offers predefined suggestions.</p>
+<p><strong>Multilingual name and description</strong></p>
+<p>Above the Name field there are language pill tabs (Base + added languages + Add language). On the Base tab, enter the name in the base language of the system; on the other tabs the translation for the given language can be recorded. The Description field on the Other tab works the same way.</p><h2 id="6-2-4-arucikk-adatlap"><span class="hno">6.2.4</span>Product record</h2><p>When the product is opened, a two-column view appears: on the left the header of the record and the related data, on the right the content broken down into tabs.</p>
+<p><img src="https://help.infinityhu.eu/media/img_b21ae0f93ca9.png" class="shot" loading="lazy"/></p>
+<p><strong>Header</strong></p>
+<ul>
+<li><p>A header with the type background colour, containing the monogram avatar, the name, the identifier and the item number of the item.</p></li>
+<li><p>A type badge shows the type of the item.</p></li>
+<li><p>A clickable Active/Inactive status pill — clicking it switches between the two states.</p></li>
+<li><p>Special markers (for example Intermediated / Advance) are displayed separated by /.</p></li>
+</ul>
+<p><strong>Reading mode – tabs</strong></p>
+<ul>
+<li><p>Record — basic data, tags, values of the custom fields.</p></li>
+<li><p>Financial data — pricing data, VAT, special markers. (Also accessible by clicking the related data card.)</p></li>
+<li><p>Warehouse — shelf number, minimum stock, stock management settings. (Also accessible by clicking the related data card.)</p></li>
+<li><p>Size &amp; Weight — dimensions (X/Y/Z) and net/gross weight.</p></li>
+<li><p>Other — service and customs tariff code, YouTube link, description, translations.</p></li>
+<li><p>Custom fields — the values of the custom fields configured in the admin.</p></li>
+<li><p>Images — the images uploaded for the item (drag &amp; drop is also supported).</p></li>
+<li><p>Prices — the list of selling price types, with validity dates.</p></li>
+<li><p>Identifiers — foreign item numbers (below) and EAN barcodes (above).</p></li>
+<li><p>VAT classification — VAT rates and validity periods, service code.</p></li>
+<li><p>Categories — assignment of product tree categories.</p></li>
+<li><p>Serial numbers — appears only for items with serial number tracking; it lists the serial numbers in stock.</p></li>
+</ul>
+<p><strong>Related data (cards on the left)</strong></p>
+<p>The related data section on the left contains three clickable cards. Clicking each of them opens a pop-up modal with a blue header:</p>
+<ul>
+<li><p>Financial data — the pricing and financial data of the product.</p></li>
+<li><p>Stock — the current warehouse stock broken down by site; with the 👁 button the warehouse movements can be displayed.</p></li>
+<li><p>Related documents — the documents attached to the product; with the 👁 button a preview and the details can be displayed.</p></li>
+</ul>
+<p><strong>Change history</strong></p>
+<p>Clicking the All › link opens a pop-up modal showing the timeline of the changes to the product (name of the event, detail, date, user).</p>
+<p><strong>Sidebar buttons</strong></p>
+<ul>
+<li><p>✏ Edit — switches to edit mode and jumps to the Record tab.</p></li>
+<li><p>🖨 Label — label printing modal: price type and currency selector, preview, Print button.</p></li>
+</ul>
+<blockquote>
+<p><em>ℹ In edit mode, instead of the Label button a red Cancel button appears, with which the editing can be discarded.</em></p>
+</blockquote><h2 id="6-2-5-szerkeszto-mod"><span class="hno">6.2.5</span>Edit mode</h2><p>Clicking the ✏ Edit button makes the Record tab editable, and the editor tabs slide into the tab row at the top.</p>
+<p><strong>Tab row in edit mode</strong></p>
+<p>Record · Financial data · Warehouse · Size &amp; Weight · Other · Custom fields · Images · Prices · Identifiers · VAT classification · Categories</p>
+<blockquote>
+<p><em>⚠ For the Service type, the Warehouse and Size &amp; Weight tabs do not appear.</em></p>
+</blockquote>
+<p><strong>Effect of changing the type during editing</strong></p>
+<p>If the Type field is changed during editing, the tabs and fields displayed refresh immediately and dynamically — switching to Service makes the stock-specific tabs and fields disappear.</p>
+<p><strong>Saving</strong></p>
+<p>The modifications can be finalised with the green 💾 Save button on the left of the sidebar.</p><h2 id="6-2-6-egyedi-mezok-kezelese"><span class="hno">6.2.6</span>Managing custom fields</h2><p>The admin screen of the custom fields is reached by clicking the ⚙ Custom fields button in the header of the product list.</p>
+<p><img src="https://help.infinityhu.eu/media/img_a3642a6cd0d8.png" class="shot" loading="lazy"/></p>
+<p><strong>Field definition</strong></p>
+<ul>
+<li><p>Field name — freely definable (for example Colour, Material, CE certificate).</p></li>
+<li><p>Type — Text / Number / Yes-No / Date / List.</p></li>
+<li><p>Appears for — All products / a given Type / a given Category.</p></li>
+<li><p>Mandatory — if ticked, it has to be filled in when the product is saved.</p></li>
+</ul>
+<blockquote>
+<p><em>ℹ The fields defined here are automatically available in the import column mapper (GET /api/import/fields?type=product endpoint).</em></p>
+</blockquote><h2 id="6-2-7-vonalkod-nyomtatas"><span class="hno">6.2.7</span>Barcode printing</h2><p>The Label modal is accessible from the product record (or by opening it from the list with the ✏ button); after entering the price type and the currency, a preview is shown and the barcode can be printed with the Print button.</p>
+<p>Two kinds of barcode can be used in Infinity:</p>
+<ul>
+<li><p>Normal, single-price barcode.</p></li>
+<li><p>Discount barcode — the original price crossed out, with the discounted price next to it.</p></li>
+</ul>
+<p>The barcode type of the site can be specified in the site settings.</p><h2 id="6-2-8-arucikk-masolasa"><span class="hno">6.2.8</span>Copying a product</h2><p>Clicking the 📋 Copy button in the actions row of the list makes the system create a copy of the product:</p>
+<ul>
+<li><p>Item number: the original item number + the suffix “-COPY”.</p></li>
+<li><p>Status: Inactive (it does not go on sale automatically).</p></li>
+<li><p>All other data (prices, images, identifiers and so on) are inherited.</p></li>
+<li><p>The copy is placed at the top of the list.</p></li>
+</ul><h2 id="6-2-9-termek-variansok"><span class="hno">6.2.9</span>Product variants</h2><p>If you have many essentially identical items — differing only in one property — the size of the product master data can be reduced by creating product variants. The variants are subordinated to the main product.</p>
+<p>Product variants receive a unique, configurable item number: the item number of the main product is supplemented with the variant code. Every variant inherits the data of the main product, but it can also have a different price.</p>
+<p><strong>Goods receipt with variants:</strong></p>
+<ul>
+<li><p>When receiving the main item: all assigned variants can be received at once, at the same purchase price, with a quantity per variant</p></li>
+<li><p>With variant-level receipt: the quantity and the purchase price are given individually</p></li>
+</ul>
+<p>Only the product variants can be sold, not the main item. At stocktaking you can take stock of the main product, or you can do it separately per variant.</p>
+<p>First define the distinguishing properties (for example colour, size) as product attributes:</p>
+<p><img src="https://help.infinityhu.eu/media/img_83f4b604564f.png" class="shot" loading="lazy"/></p>
+<p>Then create the individual product variants. For example for products in different colours: add every possible colour as an attribute, create the main product, and the system then generates the new item number per variant.</p>
+<p><img src="https://help.infinityhu.eu/media/img_8b6d216939bd.png" class="shot" loading="lazy"/></p>
+<p><img src="https://help.infinityhu.eu/media/img_bf744c13fc2f.png" class="shot" loading="lazy"/></p>
+<p><img src="https://help.infinityhu.eu/media/img_7f43ba1ceaed.png" class="shot" loading="lazy"/></p>
+<p>Both the product attributes and the product variants can be extended at will. At goods receipt you can choose from the following options:</p>
+<ul>
+<li><p>Receive the main item (same price, quantity per variant)</p></li>
+<li><p>Receive the variants one by one (individual price and quantity per variant)</p></li>
+</ul>
+<div class="call tip"><strong>Note</strong>
+<p>Only the product variants can be sold, not the main item.</p></div><h2 id="6-2-10-arucikk-tortenet"><span class="hno">6.2.10</span>Product history</h2><p>For products with serial number management, the movements related to the product can be listed by entering the serial number; otherwise by entering the item number.</p>
+<p><img src="https://help.infinityhu.eu/media/img_9026ef8e64fd.png" class="shot" loading="lazy"/></p><h2 id="6-2-11-tomeges-arazas"><span class="hno">6.2.11</span>Bulk pricing</h2><p>If you want to change the price of several products at once, the Bulk pricing menu helps. When the menu is opened, every product is listed — you can filter them, or select the ones to be modified manually.</p>
+<p><img src="https://help.infinityhu.eu/media/img_ab8169be069f.png" class="shot" loading="lazy"/></p>
+<p>Clicking the Select button displays the price modification screen, where the new prices can be entered quickly.</p>
+<p><img src="https://help.infinityhu.eu/media/img_808e77febe75.png" class="shot" loading="lazy"/></p>
+<p>If you have selected an item whose price you do not want to change after all, you can remove it from the list with the orange bin at the beginning of the row. If a minimum or maximum price has been given for the item, these are displayed as guidance.</p>
+<p>If you want to modify several price types at once (for example the forint and euro list price), add a New price type — the system changes both at the same time. The price modification is finalised by saving.</p><h2 id="6-2-12-tomeges-arazas-fajlbol"><span class="hno">6.2.12</span>Bulk pricing from a file</h2><p>For price changes in large volumes, an Excel-based import is also possible.</p>
+<p><img src="https://help.infinityhu.eu/media/img_28610147260d.png" class="shot" loading="lazy"/></p>
+<p>After downloading the sample file, enter the item number and the new price. In the Pricing window on the right, specify the currency, the price type and the validity date.</p>
+<p>Clicking the upload button loads the prices temporarily (this does not overwrite the existing ones yet). If you are satisfied with the result, click the Save all changes button.</p><h2 id="6-2-13-arlista-keszites"><span class="hno">6.2.13</span>Creating a price list</h2><p>You can create a price list from the existing products for your partners. Select the products, add them to the list with the Select button, then export them in the required currency and price type.</p>
+<p><img src="https://help.infinityhu.eu/media/img_9cee8f937555.png" class="shot" loading="lazy"/></p><h2 id="6-2-14-termekertekesites-engedelyek"><span class="hno">6.2.14</span>Product sales permits</h2><p>Special permits can be created, on the basis of which the given product may only be sold to a partner holding a permit (for example the sale of pesticides in agriculture).</p>
+<p>The process: 1. Create the permit:</p>
+<p><img src="https://help.infinityhu.eu/media/img_4d08e44cfa1b.png" class="shot" loading="lazy"/></p>
+<p>2. Set the permit on the product:</p>
+<p><img src="https://help.infinityhu.eu/media/img_304b3ca64b2e.png" class="shot" loading="lazy"/></p>
+<p>3. In the partner list, select the partner (available only for customer type partners), click the eye button, then add the required permit on the Product sales permits tab at the bottom of the page.</p>
+<p><img src="https://help.infinityhu.eu/media/img_f86109095cbe.png" class="shot" loading="lazy"/></p></div><div class="foot">Updated 2026.08.26 · v2026.08.26</div></body></html>

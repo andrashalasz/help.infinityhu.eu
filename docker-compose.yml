@@ -1,0 +1,52 @@
+# Infinity Sugo - help.infinityhu.eu helyi/Docker kornyezet
+#
+#   docker compose up -d --build
+#   -> http://localhost:8080/
+#
+# Az adatbazis elso indulaskor automatikusan felepul a db/*.sql fajlokbol
+# (sema + 109 fejezet x 3 nyelv + szerkeszto- es changelog-migracio).
+
+services:
+  db:
+    image: postgres:16
+    container_name: help_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-help_infinityhu}
+      POSTGRES_USER: ${POSTGRES_USER:-help}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-help}
+      # a postgres image-ben nincs hu_HU locale; UTF8 + C.UTF-8 bven eleg,
+      # a kereses ugyis az erp_norm()/unaccent fuggvenyen keresztul megy
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C.UTF-8"
+    volumes:
+      - help_pgdata:/var/lib/postgresql/data
+      # a postgres image abc-sorrendben futtatja le ezeket az ELSO indulaskor
+      - ./db:/docker-entrypoint-initdb.d:ro
+    ports:
+      # 5433 a hoston, hogy ne utkozzon egy esetleg mar futo helyi PostgreSQL-lel
+      - "${DB_PORT:-5433}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-help} -d ${POSTGRES_DB:-help_infinityhu}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  web:
+    build: ./docker/php
+    container_name: help_web
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      HELP_DB_DSN:  "pgsql:host=db;port=5432;dbname=${POSTGRES_DB:-help_infinityhu}"
+      HELP_DB_USER: "${HELP_DB_USER:-help_ro}"
+      HELP_DB_PASS: "${HELP_DB_PASS:-help_ro}"
+    volumes:
+      - ./site_dinamikus:/var/www/html:ro
+      - ./media:/srv/media:ro
+    ports:
+      - "${WEB_PORT:-8080}:80"
+
+volumes:
+  help_pgdata:

@@ -1,0 +1,45 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Settings</title><style>*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,-apple-system,'Segoe UI',sans-serif;background:#fff;color:#333B4D;
+font-size:14px;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:#1B3A6B}
+.bar{position:sticky;top:0;display:flex;align-items:center;gap:10px;padding:10px 16px;
+background:#FAFAF9;border-bottom:1px solid #E8E7E3;font-size:12px}
+.bar b{font-size:13px;color:#1E293B;font-weight:600;flex:1;min-width:0;overflow:hidden;
+text-overflow:ellipsis;white-space:nowrap}
+.bar a{color:#6B7280;text-decoration:none;white-space:nowrap;display:flex;align-items:center;gap:4px}
+.bar a:hover{color:#1B3A6B}
+.bar svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.pad{padding:18px 20px 30px}
+h1{font-size:19px;font-weight:700;color:#1E293B;margin:0 0 12px}
+h2{font-size:16px;font-weight:600;color:#1E293B;margin:22px 0 8px;scroll-margin-top:50px}
+h3{font-size:14.5px;font-weight:600;color:#1E293B;margin:18px 0 6px;scroll-margin-top:50px}
+h2 .hno,h3 .hno{color:#9CA3AF;font-weight:500;margin-right:6px}
+p{margin:0 0 11px}
+ul,ol{margin:0 0 11px;padding-left:20px}
+li{margin-bottom:4px}
+img{max-width:100%;height:auto;border:1px solid #E8E7E3;border-radius:5px;margin:5px 0}
+.call{background:#FAFAF9;border:1px solid #E8E7E3;border-left:3px solid #1B3A6B;border-radius:0 6px 6px 0;
+padding:11px 14px;margin:14px 0;font-size:13px}
+.call.warn{background:#FFFDF5;border-color:#F3E7C4;border-left-color:#F59E0B}
+.call strong{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;
+color:#6B7280;margin-bottom:3px}
+table{width:100%;border-collapse:collapse;margin:13px 0;font-size:12.5px}
+th{background:#FAFAF9;text-align:left;padding:7px 10px;font-size:10px;text-transform:uppercase;
+letter-spacing:.04em;color:#6B7280;border-bottom:1px solid #E8E7E3}
+td{padding:7px 10px;border-bottom:1px solid #F1F0EE;vertical-align:top}
+figcaption{font-size:11px;color:#9CA3AF;margin-top:4px}
+.foot{padding:14px 20px;border-top:1px solid #F1F0EE;font-size:11px;color:#9CA3AF}
+</style></head><body><div class="bar"><b>6.1 Settings</b><a href="https://help.infinityhu.eu/en/6-1-beallitasok.html" target="_blank" rel="noopener">Full page<svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></a></div><div class="pad"><h2 id="6-1-1-gyartok"><span class="hno">6.1.1</span>Manufacturers</h2><p>The master data of the manufacturers used for the recorded products. With the help of manufacturers you can group your items, speed up searching and separate the brands. One manufacturer can be given for each item.</p><h2 id="6-1-2-termekkategoria-lista"><span class="hno">6.1.2</span>Product category list</h2><p>A tree-structured, hierarchical marker for grouping the products. An unlimited number of product categories can be assigned to an item, so items can be grouped according to several aspects.</p>
+<p><img src="https://help.infinityhu.eu/media/img_2c8e2849d9cc.png" class="shot" loading="lazy"/></p>
+<p>The existing structure can be listed under Inventory → Settings → Product category list. New categories can be added and existing ones modified here as well.</p>
+<p><img src="https://help.infinityhu.eu/media/img_70dfda41bd7b.png" class="shot" loading="lazy"/></p><h2 id="6-1-3-keszletlista"><span class="hno">6.1.3</span>Stock list</h2><p>Stock is a category serving to separate the goods stored in the warehouses. You can distinguish own, consignment, externally stored, taken-in-for-service and used stock. When creating a product, the stock type always has to be specified.</p><h2 id="6-1-4-raktar-lista"><span class="hno">6.1.4</span>Warehouse list</h2><p>Used to create and maintain warehouses — the number of warehouses can be extended without limit. Every warehouse has to be assigned to a site, and it has to be set whether selling from it is permitted and whether it is a returns warehouse. Its status can be Active or Inactive.</p>
+<p><img src="https://help.infinityhu.eu/media/img_79c1ec8e51be.png" class="shot" loading="lazy"/></p><h2 id="6-1-5-artipus-lista"><span class="hno">6.1.5</span>Price type list</h2><p><img src="https://help.infinityhu.eu/media/img_278afd2c929f.png" class="shot" loading="lazy"/></p>
+<p>The place for defining the selling price types. For sales the system uses the list price types, for procurement the purchase types. To assign an individual price list to a partner, enter a price type on the partner record (Partners → Partner list → Modify).</p>
+<p>Using the price type on a product: Inventory → Product → Product list, the appropriate product → Prices worksheet → Add new.</p>
+<p><img src="https://help.infinityhu.eu/media/img_42ceef95bebe.png" class="shot" loading="lazy"/></p>
+<p>Margin = net selling price − net purchase price; mark-up = (margin / net purchase price) × 100.</p>
+<p>To change a price, either open the existing price type for editing and simply overwrite it, or give the old price an end date and add a new price type (in that case a trace of the price change remains).</p><h2 id="6-1-6-dinamikus-arazas"><span class="hno">6.1.6</span>Dynamic pricing</h2><h2 id="6-1-7-becsult-szallitasi-hataridok"><span class="hno">6.1.7</span>Estimated delivery deadlines</h2><p>Delivery deadlines can be recorded here. The user can select these in the modules (for example in the Service module) when arranging delivery.</p><h2 id="6-1-8-kornyezetvedelmi-termekdijak"><span class="hno">6.1.8</span>Environmental product fees</h2><p>Companies that manufacture or distribute products containing packaging materials that decompose slowly are obliged to pay the environmental product fee. In the system the KT, CsK and HKT numbers, the price of the packaging material and the text to be printed on the invoice can be recorded.</p>
+<p><img src="https://help.infinityhu.eu/media/img_767420e77a30.png" class="shot" loading="lazy"/></p>
+<div class="call tip"><strong>Note</strong>
+<p>The size and weight parameters of the products have to be filled in, because the system calculates from these. When selling, the product fee obligation has to be indicated on the invoice.</p></div><h2 id="6-1-9-polcszam"><span class="hno">6.1.9</span>Shelf number</h2><p>Products can be recorded against a shelf number, and the shelf number can be assigned to a partner. For this, record your shelf number structure in this menu.</p></div><div class="foot">Updated 2026.08.26 · v2026.08.26</div></body></html>

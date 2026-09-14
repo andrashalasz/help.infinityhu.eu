@@ -1,0 +1,104 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Termination / offboarding</title><style>*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,-apple-system,'Segoe UI',sans-serif;background:#fff;color:#333B4D;
+font-size:14px;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:#1B3A6B}
+.bar{position:sticky;top:0;display:flex;align-items:center;gap:10px;padding:10px 16px;
+background:#FAFAF9;border-bottom:1px solid #E8E7E3;font-size:12px}
+.bar b{font-size:13px;color:#1E293B;font-weight:600;flex:1;min-width:0;overflow:hidden;
+text-overflow:ellipsis;white-space:nowrap}
+.bar a{color:#6B7280;text-decoration:none;white-space:nowrap;display:flex;align-items:center;gap:4px}
+.bar a:hover{color:#1B3A6B}
+.bar svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.pad{padding:18px 20px 30px}
+h1{font-size:19px;font-weight:700;color:#1E293B;margin:0 0 12px}
+h2{font-size:16px;font-weight:600;color:#1E293B;margin:22px 0 8px;scroll-margin-top:50px}
+h3{font-size:14.5px;font-weight:600;color:#1E293B;margin:18px 0 6px;scroll-margin-top:50px}
+h2 .hno,h3 .hno{color:#9CA3AF;font-weight:500;margin-right:6px}
+p{margin:0 0 11px}
+ul,ol{margin:0 0 11px;padding-left:20px}
+li{margin-bottom:4px}
+img{max-width:100%;height:auto;border:1px solid #E8E7E3;border-radius:5px;margin:5px 0}
+.call{background:#FAFAF9;border:1px solid #E8E7E3;border-left:3px solid #1B3A6B;border-radius:0 6px 6px 0;
+padding:11px 14px;margin:14px 0;font-size:13px}
+.call.warn{background:#FFFDF5;border-color:#F3E7C4;border-left-color:#F59E0B}
+.call strong{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;
+color:#6B7280;margin-bottom:3px}
+table{width:100%;border-collapse:collapse;margin:13px 0;font-size:12.5px}
+th{background:#FAFAF9;text-align:left;padding:7px 10px;font-size:10px;text-transform:uppercase;
+letter-spacing:.04em;color:#6B7280;border-bottom:1px solid #E8E7E3}
+td{padding:7px 10px;border-bottom:1px solid #F1F0EE;vertical-align:top}
+figcaption{font-size:11px;color:#9CA3AF;margin-top:4px}
+.foot{padding:14px 20px;border-top:1px solid #F1F0EE;font-size:11px;color:#9CA3AF}
+</style></head><body><div class="bar"><b>10.13 Termination / offboarding</b><a href="https://help.infinityhu.eu/en/10-13-kilepes-termination-offboarding.html" target="_blank" rel="noopener">Full page<svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></a></div><div class="pad"><p>Termination is the controlled closing of the employment relationship. The system does not delete data: it archives the employee, closes the employment relationship and (optionally) starts the IT offboarding tasks.</p><h2 id="10-13-1-kileptetes-inditasa"><span class="hno">10.13.1</span>Starting the termination</h2><p>You start the termination on the employee's record with the “Terminate” button. The button is typically only active for HR_ADMIN.</p>
+<ol type="1">
+<li><p>Open the employee's record.</p></li>
+<li><p>Click: Terminate.</p></li>
+<li><p>Fill in the dates (last working day, date of termination).</p></li>
+<li><p>Select the reason for the termination.</p></li>
+<li><p>Set whether IT offboarding should start and whether assets have to be returned.</p></li>
+<li><p>Finalise.</p></li>
+</ol>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Field</strong></th>
+<th><strong>Type</strong></th>
+<th><strong>Mandatory?</strong></th>
+<th><strong>Explanation / tips</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Last working day</td>
+<td>Date</td>
+<td>Yes</td>
+<td>Until when they actually work.</td>
+</tr>
+<tr class="even">
+<td>Date of termination</td>
+<td>Date</td>
+<td>Yes</td>
+<td>The end of the employment relationship; end_date in the system.</td>
+</tr>
+<tr class="odd">
+<td>Reason for termination</td>
+<td>Enum</td>
+<td>Yes</td>
+<td>Resignation / mutual agreement / dismissal / probation unsuccessful / expiry / other.</td>
+</tr>
+<tr class="even">
+<td>Comment</td>
+<td>Long text</td>
+<td>Conditional</td>
+<td>Mandatory if the reason is “other” or of a disciplinary nature.</td>
+</tr>
+<tr class="odd">
+<td>Rehire eligible</td>
+<td>Yes/no</td>
+<td>No</td>
+<td>Whether they can be re-employed later; useful for reports.</td>
+</tr>
+<tr class="even">
+<td>IT offboarding</td>
+<td>Check box</td>
+<td>No</td>
+<td>If switched on, IT tasks are generated.</td>
+</tr>
+<tr class="odd">
+<td>Assets</td>
+<td>List</td>
+<td>No</td>
+<td>Laptop/phone/card; it helps with the handover.</td>
+</tr>
+<tr class="even">
+<td>Documents</td>
+<td>File</td>
+<td>No</td>
+<td>Attaching the notice or the agreement.</td>
+</tr>
+</tbody>
+</table></div><h2 id="10-13-2-mi-tortenik-veglegesites-utan"><span class="hno">10.13.2</span>What happens after finalisation?</h2><p>The system sets the status of the employee to TERMINATED, fills in the end_date field, and the employee is removed from the active list. The employee's data remain available in the Archive (Terminated) list. If IT offboarding is active, the related tasks and integration triggers are started as well.</p>
+<blockquote>
+<p><strong>IMPORTANT! After the termination we do not delete the employee record. This is necessary for the reports and the audit.</strong></p>
+</blockquote></div><div class="foot">Updated 2026.08.26 · v2026.08.26</div></body></html>

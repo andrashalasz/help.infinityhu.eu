@@ -1,0 +1,54 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Card payment terminals</title><style>*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,-apple-system,'Segoe UI',sans-serif;background:#fff;color:#333B4D;
+font-size:14px;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:#1B3A6B}
+.bar{position:sticky;top:0;display:flex;align-items:center;gap:10px;padding:10px 16px;
+background:#FAFAF9;border-bottom:1px solid #E8E7E3;font-size:12px}
+.bar b{font-size:13px;color:#1E293B;font-weight:600;flex:1;min-width:0;overflow:hidden;
+text-overflow:ellipsis;white-space:nowrap}
+.bar a{color:#6B7280;text-decoration:none;white-space:nowrap;display:flex;align-items:center;gap:4px}
+.bar a:hover{color:#1B3A6B}
+.bar svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.pad{padding:18px 20px 30px}
+h1{font-size:19px;font-weight:700;color:#1E293B;margin:0 0 12px}
+h2{font-size:16px;font-weight:600;color:#1E293B;margin:22px 0 8px;scroll-margin-top:50px}
+h3{font-size:14.5px;font-weight:600;color:#1E293B;margin:18px 0 6px;scroll-margin-top:50px}
+h2 .hno,h3 .hno{color:#9CA3AF;font-weight:500;margin-right:6px}
+p{margin:0 0 11px}
+ul,ol{margin:0 0 11px;padding-left:20px}
+li{margin-bottom:4px}
+img{max-width:100%;height:auto;border:1px solid #E8E7E3;border-radius:5px;margin:5px 0}
+.call{background:#FAFAF9;border:1px solid #E8E7E3;border-left:3px solid #1B3A6B;border-radius:0 6px 6px 0;
+padding:11px 14px;margin:14px 0;font-size:13px}
+.call.warn{background:#FFFDF5;border-color:#F3E7C4;border-left-color:#F59E0B}
+.call strong{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;
+color:#6B7280;margin-bottom:3px}
+table{width:100%;border-collapse:collapse;margin:13px 0;font-size:12.5px}
+th{background:#FAFAF9;text-align:left;padding:7px 10px;font-size:10px;text-transform:uppercase;
+letter-spacing:.04em;color:#6B7280;border-bottom:1px solid #E8E7E3}
+td{padding:7px 10px;border-bottom:1px solid #F1F0EE;vertical-align:top}
+figcaption{font-size:11px;color:#9CA3AF;margin-top:4px}
+.foot{padding:14px 20px;border-top:1px solid #F1F0EE;font-size:11px;color:#9CA3AF}
+</style></head><body><div class="bar"><b>5.2 Card payment terminals</b><a href="https://help.infinityhu.eu/en/5-2-bankkartya-terminalok.html" target="_blank" rel="noopener">Full page<svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></a></div><div class="pad"><p>Creating a new card reader is required for card payments. Available at: Finance → Settings → Card payment terminals.</p>
+<ul>
+<li><p>The type must always be “physical”</p></li>
+<li><p>The site where the cash desk operates can be selected from a list</p></li>
+<li><p>Serial number pattern and commission percentage: fixed values, as given in the example</p></li>
+<li><p>Claimable partner: the bank to or from which the card transactions arrive</p></li>
+<li><p>Its status must always be “enabled”</p></li>
+</ul>
+<p>The values entered can be finalised with the Save button.</p>
+<p><img src="https://help.infinityhu.eu/media/img_d376a215728b.png" class="shot" loading="lazy"/></p><h2 id="5-2-1-folyoszamla-lista"><span class="hno">5.2.1</span>Current account list</h2><p>Here you record the building blocks of the analytical documents created by business events. Among others, you define the documents for invoice-based sales, supplier invoice issuing and financial transactions. Setting up the documents is an admin task, usually done before the system goes live.</p><h2 id="5-2-2-elfogadott-utalvanyok"><span class="hno">5.2.2</span>Accepted vouchers</h2><p>Used primarily in retail sales to manage accepted vouchers. Both third-party and own-issued vouchers can be recorded, and the turnover can then be queried by voucher type.</p><h2 id="5-2-3-szamla-es-nyugtatombok"><span class="hno">5.2.3</span>Invoice and receipt blocks</h2><p>For documenting outgoing invoices you can create a serial number and an invoice layout. A serial number can also be assigned to receipts for easier tracking.</p>
+<p>A separate serial number and layout can be assigned to the proforma invoice, the advance invoice and the advance payment request as well. The type of the invoice block can be: customer/supplier invoice, customer/supplier advance payment request, receipt, interest letter, proforma invoice, partial invoice, final invoice.</p>
+<p>For the origin: with internal, you define the structure of the serial number (in the serial number pattern field); with external, the program generates it automatically. Under site, specify at which site you want to use it.</p>
+<p><img src="https://help.infinityhu.eu/media/img_0aa3281ef42c.png" class="shot" loading="lazy"/></p>
+<p>Sample receipt block setting:</p>
+<p><img src="https://help.infinityhu.eu/media/img_31ef8fcae6f5.png" class="shot" loading="lazy"/></p>
+<p>Sample customer invoice block setting:</p>
+<p><img src="https://help.infinityhu.eu/media/img_0dbfd7711238.png" class="shot" loading="lazy"/></p>
+<p>Sample supplier invoice block setting:</p>
+<p><img src="https://help.infinityhu.eu/media/img_06012299448f.png" class="shot" loading="lazy"/></p><h2 id="5-2-4-koltsegkategoriak"><span class="hno">5.2.4</span>Cost categories</h2><p>The cost category is a mandatory element when recording customer and supplier invoices. It is one of the important building blocks of the automatic posting rules: when a supplier invoice is recorded, the system can post it automatically based on the cost category.</p><h2 id="5-2-5-sconto"><span class="hno">5.2.5</span>Cash discount (sconto)</h2><p>To apply a cash discount, you first have to create the discount rules and then assign them to a partner.</p>
+<p>A cash discount can be accounted for on both customer and supplier invoices, but only for a partner whose record has previously been assigned a discount rule.</p>
+<p>First specify the reference date — the discount deadlines are calculated from this. After entering the percentage and the number of days, the discount can be assigned to a job number. Several rules can be defined for one partner; if you select more than one, the default has to be specified.</p><h2 id="5-2-6-fizetesi-modok"><span class="hno">5.2.6</span>Payment methods</h2><p>Here you can define the payment methods used in the system.</p>
+<p><img src="https://help.infinityhu.eu/media/img_26d28226cc8b.png" class="shot" loading="lazy"/></p><h2 id="5-2-7-koltseghelyek"><span class="hno">5.2.7</span>Cost centres</h2><p>The system allows cost centres to be recorded, which break the general ledger accounts down into further dimensions and enable deeper cost analysis.</p></div><div class="foot">Updated 2026.08.26 · v2026.08.26</div></body></html>

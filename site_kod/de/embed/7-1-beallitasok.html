@@ -1,0 +1,136 @@
+<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Einstellungen</title><style>*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,-apple-system,'Segoe UI',sans-serif;background:#fff;color:#333B4D;
+font-size:14px;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:#1B3A6B}
+.bar{position:sticky;top:0;display:flex;align-items:center;gap:10px;padding:10px 16px;
+background:#FAFAF9;border-bottom:1px solid #E8E7E3;font-size:12px}
+.bar b{font-size:13px;color:#1E293B;font-weight:600;flex:1;min-width:0;overflow:hidden;
+text-overflow:ellipsis;white-space:nowrap}
+.bar a{color:#6B7280;text-decoration:none;white-space:nowrap;display:flex;align-items:center;gap:4px}
+.bar a:hover{color:#1B3A6B}
+.bar svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.pad{padding:18px 20px 30px}
+h1{font-size:19px;font-weight:700;color:#1E293B;margin:0 0 12px}
+h2{font-size:16px;font-weight:600;color:#1E293B;margin:22px 0 8px;scroll-margin-top:50px}
+h3{font-size:14.5px;font-weight:600;color:#1E293B;margin:18px 0 6px;scroll-margin-top:50px}
+h2 .hno,h3 .hno{color:#9CA3AF;font-weight:500;margin-right:6px}
+p{margin:0 0 11px}
+ul,ol{margin:0 0 11px;padding-left:20px}
+li{margin-bottom:4px}
+img{max-width:100%;height:auto;border:1px solid #E8E7E3;border-radius:5px;margin:5px 0}
+.call{background:#FAFAF9;border:1px solid #E8E7E3;border-left:3px solid #1B3A6B;border-radius:0 6px 6px 0;
+padding:11px 14px;margin:14px 0;font-size:13px}
+.call.warn{background:#FFFDF5;border-color:#F3E7C4;border-left-color:#F59E0B}
+.call strong{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;
+color:#6B7280;margin-bottom:3px}
+table{width:100%;border-collapse:collapse;margin:13px 0;font-size:12.5px}
+th{background:#FAFAF9;text-align:left;padding:7px 10px;font-size:10px;text-transform:uppercase;
+letter-spacing:.04em;color:#6B7280;border-bottom:1px solid #E8E7E3}
+td{padding:7px 10px;border-bottom:1px solid #F1F0EE;vertical-align:top}
+figcaption{font-size:11px;color:#9CA3AF;margin-top:4px}
+.foot{padding:14px 20px;border-top:1px solid #F1F0EE;font-size:11px;color:#9CA3AF}
+</style></head><body><div class="bar"><b>7.1 Einstellungen</b><a href="https://help.infinityhu.eu/de/7-1-beallitasok.html" target="_blank" rel="noopener">Volle Seite<svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></a></div><div class="pad"><p>Eng mit der Ablage verbunden ist der Genehmigungsprozess. Genehmigungspflichtige Tätigkeiten können sein:</p>
+<ul>
+<li><p>Überweisungspaket — der berechtigte Benutzer wird in der Informationsleiste über die zu bestätigenden Rechnungen informiert, die er von dort direkt öffnen, genehmigen oder ablehnen kann</p></li>
+<li><p>Buchungsfähigkeit einer Eingangsrechnung — nach der Zahlungsfreigabe erscheinen die Buchungs- und Umsatzsteuerdaten; nach deren Ausfüllen kann die Rechnung an die Buchhaltung übergeben werden</p></li>
+<li><p>Genehmigung von Angeboten — es können alle Angebote oder nur Angebote über einer bestimmten Wertgrenze zur Genehmigung vorgelegt werden</p></li>
+<li><p>Genehmigung von Aufträgen — ebenso für alle oder nur für Aufträge über der Wertgrenze</p></li>
+<li><p>Genehmigung einer Ausgangsrechnung — nach dem Abschluss, aber vor der Belegerstellung</p></li>
+<li><p>Genehmigung einer Barauszahlung</p></li>
+</ul><h2 id="7-1-1-dokumentumtipusok"><span class="hno">7.1.1</span>Dokumentarten</h2><p>Durch das Anlegen von Ablagearten erstellen Sie Dokumentgruppen, die zu Ihren Geschäftsprozessen passen. Anzugebende Daten:</p>
+<ul>
+<li><p>Code: kurze Kennung, 3 Zeichen, Pflichtfeld</p></li>
+<li><p>Bezeichnung: frei wählbar, Pflichtfeld</p></li>
+<li><p>Nummernmuster: je Ablageart angebbar (kein Pflichtfeld)</p></li>
+<li><p>Standort: bei Angabe ist die Ablage nur an diesem Standort möglich (kein Pflichtfeld)</p></li>
+<li><p>Typ: Rechnungs- oder Dokumentart (Pflichtfeld)</p></li>
+<li><p>Ablaufendes Dokument: bei Ja ist beim Hochladen des Dokuments die Angabe des Ablaufdatums verpflichtend</p></li>
+<li><p>Verzeichnis: das Verzeichnis, in das die abgelegten Dokumente gelangen</p></li>
+<li><p>Status: aktiv oder inaktiv (Pflichtfeld)</p></li>
+</ul><h2 id="7-1-2-lejaro-dokumentum-tipus"><span class="hno">7.1.2</span>Ablaufende Dokumentart</h2><p>Im System können Dokumente mit Ablaufdatum erfasst werden (z. B. Ausweise, Genehmigungen, Zertifikate). Beim Anlegen der Dokumentart ist anzugeben, ob Dokumente dieser Art ablaufen.</p>
+<p><strong>Automatisches Benachrichtigungssystem:</strong></p>
+<div class="tblwrap"><table class="erp-table">
+<tbody>
+<tr class="odd">
+<td><strong>90 Tage vorher</strong></td>
+<td>Erste Benachrichtigung an den Zuständigen</td>
+</tr>
+<tr class="even">
+<td><strong>60 Tage vorher</strong></td>
+<td>Erinnerung an den Zuständigen + Benachrichtigung des Supervisors</td>
+</tr>
+<tr class="odd">
+<td><strong>30 Tage vorher</strong></td>
+<td>Dringende Warnung an beide Seiten</td>
+</tr>
+<tr class="even">
+<td><strong>14 Tage vorher</strong></td>
+<td>Kritische Warnung</td>
+</tr>
+<tr class="odd">
+<td><strong>Am Tag des Ablaufs</strong></td>
+<td>Status abgelaufen + sofortige Benachrichtigung</td>
+</tr>
+<tr class="even">
+<td><strong>Nach Ablauf wöchentlich</strong></td>
+<td>Wiederkehrende Erinnerung bis zur Erneuerung</td>
+</tr>
+</tbody>
+</table></div>
+<p>Benachrichtigungskanäle: E-Mail-Benachrichtigung, Dashboard-Widget.</p>
+<ul>
+<li><p>Dashboard des Zuständigen: die Benachrichtigung erscheint im Widget Meine Aufgaben und ist in der Liste Meine Dokumente nach Ablaufdatum sortiert zu finden</p></li>
+<li><p>Supervisor-Dashboard: zusammenfassender Überblick über die Dokumente der Organisationseinheit, Liste der ablaufenden Dokumente nach Priorität</p></li>
+</ul><h2 id="7-1-3-jovahagyasi-protokoll"><span class="hno">7.1.3</span>Genehmigungsprotokoll</h2><p>Dient der Steuerung der Genehmigungsprozesse. Anzugebende Felder:</p>
+<ul>
+<li><p>Code: 3 Zeichen, Pflichtfeld</p></li>
+<li><p>Bezeichnung: frei wählbar, Pflichtfeld</p></li>
+<li><p>Mindestwert: unterhalb dessen keine Genehmigung erforderlich ist (numerisch, kein Pflichtfeld)</p></li>
+<li><p>Währung: die Währung des Betrags (Standard: HUF)</p></li>
+<li><p>Standort: bei Angabe nur an diesem Standort gültig (kein Pflichtfeld)</p></li>
+<li><p>Genehmiger: ein aus der Partnerliste auswählbarer Benutzer (Pflichtfeld)</p></li>
+<li><p>+ Genehmiger: weitere Genehmiger können hinzugefügt werden (unbegrenzt, kein Pflichtfeld)</p></li>
+<li><p>Punktzahl: für jeden Genehmiger ist eine Punktzahl anzugeben — der Beleg gilt erst dann als genehmigt, wenn 10 Genehmigungspunkte erreicht sind (Werte zwischen 1 und 10)</p></li>
+<li><p>Status: aktiv oder inaktiv (Pflichtfeld)</p></li>
+</ul>
+<p><img src="https://help.infinityhu.eu/media/img_5bcdd23e6c15.png" class="shot" loading="lazy"/></p>
+<p><img src="https://help.infinityhu.eu/media/img_7e18eb2c6956.png" class="shot" loading="lazy"/></p><h2 id="7-1-4-engedelyezesre-varo-dokumentumok-informacios-sav"><span class="hno">7.1.4</span>Dokumente in Genehmigung – Informationsleiste</h2><p>Der genehmigende Benutzer findet die zu genehmigenden Dokumente in seiner Informationsleiste. Müssen mehrere Benutzer genehmigen und hat der aktuelle bereits genehmigt, wird seine Position grün. Um die Genehmigung zurückzunehmen, klicken Sie erneut auf die Position und lehnen Sie sie ab.</p>
+<p><img src="https://help.infinityhu.eu/media/img_9dbd40aeadbc.png" class="shot" loading="lazy"/></p>
+<p>Aus der Liste gelangen Sie mit einem Klick zum zu genehmigenden Dokument. Die Liste enthält alle erforderlichen Informationen, einschließlich der bisher erhaltenen Genehmigungspunkte. Im Genehmigungsfenster können Sie dem Aussteller des Dokuments oder dem anderen Genehmiger eine Nachricht senden. Mit dem Feld Genehmigen bestätigen Sie das Dokument (es werden so viele Punkte gebucht, wie im Genehmigungsprotokoll festgelegt). Bei Ablehnung werden Minuspunkte zugeordnet.</p>
+<div class="call warn"><strong>Achtung</strong>
+<p>Wird ein in Genehmigung befindliches Dokument geändert, werden alle Genehmigungspunkte gelöscht und der Genehmigungsprozess beginnt von vorn.</p></div>
+<p><img src="https://help.infinityhu.eu/media/img_8213301b9847.png" class="shot" loading="lazy"/></p><h2 id="7-1-5-iktatokonyv"><span class="hno">7.1.5</span>Ablageregister</h2><p>Geben Sie beim Anlegen des digitalen Ablageregisters den Namen des Registers sowie Prä- und Suffix seiner Nummer an. Fügen Sie in der Registerliste den Benutzer hinzu, der dazu berechtigt ist. Das System erstellt automatisch ein Ablageregister, in das es die Dokumente einstellt.</p>
+<p><strong>Ablauf der Ablage:</strong></p>
+<ol start="3" type="1">
+<li><p>Der Benutzer lädt das Dokument auf der Startseite unter der Registerkarte Dokument-Upload in das Widget Ablage hoch.</p></li>
+</ol>
+
+<p><img src="https://help.infinityhu.eu/media/img_6aaecb09dd2b.png" class="shot" loading="lazy"/></p>
+<ol start="4" type="1">
+<li><p>Die Dokumente gelangen in eine Liste, die der berechtigte Benutzer auf der Startseite unter der Registerkarte Meine Aufgaben sieht.</p></li>
+</ol>
+
+<p><img src="https://help.infinityhu.eu/media/img_590b0bbe4b72.png" class="shot" loading="lazy"/></p>
+<ol start="5" type="1">
+<li><p>Der Benutzer kategorisiert die Dokumente einzeln, kennzeichnet den Partner oder Mitarbeiter (kein Pflichtfeld), stellt das Dokument in das Ablageregister ein und klickt anschließend auf die Schaltfläche Ablegen.</p></li>
+</ol>
+
+<p><img src="https://help.infinityhu.eu/media/img_fd1a6948ed24.png" class="shot" loading="lazy"/></p>
+<ol start="6" type="1">
+<li><p>Das Dokument erhält eine Ablagenummer und einen Zeitstempel; auch der Name des ablegenden Benutzers wird gespeichert.</p></li>
+</ol>
+<ol start="7" type="1">
+<li><p>Der Benutzer weist das Dokument einer Division oder einem bzw. mehreren Benutzern zu.</p></li>
+</ol>
+<ol start="8" type="1">
+<li><p>Der zugewiesene Benutzer bearbeitet das Dokument über die Schaltfläche Bearbeiten.</p></li>
+</ol>
+
+<p><img src="https://help.infinityhu.eu/media/img_e82bd171d410.png" class="shot" loading="lazy"/></p>
+<p><strong>Arten des abgelegten Dokuments:</strong></p>
+<ul>
+<li><p>Rechnung: über die Schaltfläche Ablegen öffnet sich die Seite zur Rechnungserfassung, das Dokument wird automatisch als Anhang übernommen und der Partner ist bereits ausgewählt</p></li>
+<li><p>Mitarbeiterdokument: die Oberfläche für Mitarbeiterdokumente öffnet sich, Division und Mitarbeiter sind auszuwählen</p></li>
+<li><p>Allgemeines Dokument: die einfache Upload-Oberfläche erscheint, auf der das Dokument dem jeweiligen Partner zugeordnet archiviert wird</p></li>
+</ul></div><div class="foot">Aktualisiert 2026.08.26 · v2026.08.26</div></body></html>

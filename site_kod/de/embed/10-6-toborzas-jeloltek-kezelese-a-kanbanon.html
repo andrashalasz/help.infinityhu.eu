@@ -1,0 +1,402 @@
+<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Recruiting – Kandidaten im Kanban verwalten</title><style>*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,-apple-system,'Segoe UI',sans-serif;background:#fff;color:#333B4D;
+font-size:14px;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:#1B3A6B}
+.bar{position:sticky;top:0;display:flex;align-items:center;gap:10px;padding:10px 16px;
+background:#FAFAF9;border-bottom:1px solid #E8E7E3;font-size:12px}
+.bar b{font-size:13px;color:#1E293B;font-weight:600;flex:1;min-width:0;overflow:hidden;
+text-overflow:ellipsis;white-space:nowrap}
+.bar a{color:#6B7280;text-decoration:none;white-space:nowrap;display:flex;align-items:center;gap:4px}
+.bar a:hover{color:#1B3A6B}
+.bar svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.pad{padding:18px 20px 30px}
+h1{font-size:19px;font-weight:700;color:#1E293B;margin:0 0 12px}
+h2{font-size:16px;font-weight:600;color:#1E293B;margin:22px 0 8px;scroll-margin-top:50px}
+h3{font-size:14.5px;font-weight:600;color:#1E293B;margin:18px 0 6px;scroll-margin-top:50px}
+h2 .hno,h3 .hno{color:#9CA3AF;font-weight:500;margin-right:6px}
+p{margin:0 0 11px}
+ul,ol{margin:0 0 11px;padding-left:20px}
+li{margin-bottom:4px}
+img{max-width:100%;height:auto;border:1px solid #E8E7E3;border-radius:5px;margin:5px 0}
+.call{background:#FAFAF9;border:1px solid #E8E7E3;border-left:3px solid #1B3A6B;border-radius:0 6px 6px 0;
+padding:11px 14px;margin:14px 0;font-size:13px}
+.call.warn{background:#FFFDF5;border-color:#F3E7C4;border-left-color:#F59E0B}
+.call strong{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;
+color:#6B7280;margin-bottom:3px}
+table{width:100%;border-collapse:collapse;margin:13px 0;font-size:12.5px}
+th{background:#FAFAF9;text-align:left;padding:7px 10px;font-size:10px;text-transform:uppercase;
+letter-spacing:.04em;color:#6B7280;border-bottom:1px solid #E8E7E3}
+td{padding:7px 10px;border-bottom:1px solid #F1F0EE;vertical-align:top}
+figcaption{font-size:11px;color:#9CA3AF;margin-top:4px}
+.foot{padding:14px 20px;border-top:1px solid #F1F0EE;font-size:11px;color:#9CA3AF}
+</style></head><body><div class="bar"><b>10.6 Recruiting – Kandidaten im Kanban verwalten</b><a href="https://help.infinityhu.eu/de/10-6-toborzas-jeloltek-kezelese-a-kanbanon.html" target="_blank" rel="noopener">Volle Seite<svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></a></div><div class="pad"><p>Menü: HR → Recruiting</p>
+<p>Im Modul Recruiting erscheinen die Kandidaten in einer Listenansicht. Die Kanban-Ansicht hilft dabei, den Stand der Auswahl zu überblicken.</p>
+<p><img src="https://help.infinityhu.eu/media/img_7a445e6de42f.png" class="shot" loading="lazy"/></p><h2 id="10-6-1-uj-jelolt-rogzitese"><span class="hno">10.6.1</span>Neuen Kandidaten erfassen</h2><p>Einen neuen Kandidaten erfassen Sie im Menü HR → Recruiting über die Schaltfläche „Erstellen“. Nach dem Speichern erhält der Kandidat automatisch den Status „Eingegangen“.</p>
+<p><img src="https://help.infinityhu.eu/media/img_855e0edb890a.png" class="shot" loading="lazy"/></p>
+<ol type="1">
+<li><p>Klicken Sie auf: Neuer Kandidat.</p></li>
+<li><p>Wählen Sie die Stelle aus (nur eine Stelle mit dem Status Offen oder In Bearbeitung ist wählbar).</p></li>
+<li><p>Geben Sie den Namen des Kandidaten und mindestens eine Kontaktmöglichkeit an (E-Mail oder Telefon).</p></li>
+<li><p>Stellen Sie Quelle und Status ein.</p></li>
+<li><p>Laden Sie einen Lebenslauf hoch (PDF, max. 10 MB), sofern vorhanden.</p></li>
+<li><p>Füllen Sie bei Bedarf die Bewerbungsdetails und die speziellen Daten aus.</p></li>
+<li><p>Speichern.</p>
+<p><strong>Stammdaten</strong></p></li>
+</ol>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Feld</strong></th>
+<th><strong>Typ</strong></th>
+<th><strong>Pflicht?</strong></th>
+<th><strong>Erläuterung / Tipps</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Stelle</td>
+<td>Auswahlliste</td>
+<td>Ja</td>
+<td>Der Kandidat ist immer an eine Stelle gebunden. Nur eine Stelle mit dem Status Offen oder In Bearbeitung ist wählbar.</td>
+</tr>
+<tr class="even">
+<td>Name des Kandidaten</td>
+<td>Text</td>
+<td>Ja</td>
+<td>Das Identifikationsmerkmal des Kandidaten; er erscheint in den Listen und im Kanban.</td>
+</tr>
+<tr class="odd">
+<td>E-Mail</td>
+<td>E-Mail</td>
+<td>Nein</td>
+<td>Die Duplikatswarnung erfolgt anhand der E-Mail-Adresse.</td>
+</tr>
+<tr class="even">
+<td>Telefon</td>
+<td>Text</td>
+<td>Nein</td>
+<td>Alternative Kontaktmöglichkeit.</td>
+</tr>
+<tr class="odd">
+<td>Quelle</td>
+<td>Auswahlliste</td>
+<td>Ja</td>
+<td>Woher der Kandidat kam. Für Berichte und die Messung der Kanaleffizienz erforderlich. Wird aus den Stammdaten unter Einstellungen → Onboarding-Einstellungen → Quelle geladen.</td>
+</tr>
+<tr class="even">
+<td>Status</td>
+<td>Auswahlliste</td>
+<td>Ja</td>
+<td>Der aktuelle Pipeline-Schritt des Kandidaten. Wird aus den Stammdaten unter Einstellungen → Onboarding-Einstellungen → Kandidatenstatus geladen.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Zugehörige Daten</strong></p>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Feld</strong></th>
+<th><strong>Typ</strong></th>
+<th><strong>Pflicht?</strong></th>
+<th><strong>Erläuterung / Tipps</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Lebenslauf / Datei-Upload</td>
+<td>Datei</td>
+<td>Nein</td>
+<td>Es werden nur PDF-Dateien akzeptiert, max. 10 MB. Upload per Drag &amp; Drop oder über die Schaltfläche Durchsuchen.</td>
+</tr>
+<tr class="even">
+<td>LinkedIn</td>
+<td>URL</td>
+<td>Nein</td>
+<td>Link zum LinkedIn-Profil des Kandidaten.</td>
+</tr>
+<tr class="odd">
+<td>Facebook</td>
+<td>URL</td>
+<td>Nein</td>
+<td>Link zum Facebook-Profil des Kandidaten.</td>
+</tr>
+<tr class="even">
+<td>Instagram</td>
+<td>URL</td>
+<td>Nein</td>
+<td>Link zum Instagram-Profil des Kandidaten.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Bewerbungsdetails</strong></p>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Feld</strong></th>
+<th><strong>Typ</strong></th>
+<th><strong>Pflicht?</strong></th>
+<th><strong>Erläuterung / Tipps</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Senioritätsstufe</td>
+<td>Auswahlliste</td>
+<td>Nein</td>
+<td>Die vom Kandidaten geforderte oder ihm zugeschriebene Stufe (z. B. Junior, Medior, Senior).</td>
+</tr>
+<tr class="even">
+<td>Gehaltsvorstellung min</td>
+<td>Zahl</td>
+<td>Nein</td>
+<td>Die vom Kandidaten angegebene Mindestgehaltsvorstellung.</td>
+</tr>
+<tr class="odd">
+<td>Gehaltsvorstellung max</td>
+<td>Zahl</td>
+<td>Nein</td>
+<td>Die vom Kandidaten angegebene maximale Gehaltsvorstellung.</td>
+</tr>
+<tr class="even">
+<td>Währung</td>
+<td>Auswahlliste</td>
+<td>Nein</td>
+<td>Die Währung der Gehaltsvorstellung (z. B. HUF, EUR).</td>
+</tr>
+<tr class="odd">
+<td>Verfügbarkeit / Startdatum</td>
+<td>Datum</td>
+<td>Nein</td>
+<td>Wann der Kandidat frühestens beginnen könnte.</td>
+</tr>
+<tr class="even">
+<td>Bemerkung für den internen Gebrauch</td>
+<td>Langtext</td>
+<td>Nein</td>
+<td>Nur HR und die Führungskraft sehen sie; Verhandlungsaspekte, Eindrücke.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Spezielle Daten</strong></p>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Feld</strong></th>
+<th><strong>Typ</strong></th>
+<th><strong>Pflicht?</strong></th>
+<th><strong>Erläuterung / Tipps</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Tech Stack</td>
+<td>Mehrfachauswahl</td>
+<td>Nein</td>
+<td>Die vom Kandidaten beherrschten Technologien. Im IT-Recruiting eine besonders nützliche Filter- und Vergleichsdimension.</td>
+</tr>
+<tr class="even">
+<td>Englischniveau</td>
+<td>Auswahlliste</td>
+<td>Nein</td>
+<td>Das Englischniveau des Kandidaten (z. B. A1–C2 oder Grund-/Mittel-/Oberstufe).</td>
+</tr>
+<tr class="odd">
+<td>Präferenz für Remote-Arbeit</td>
+<td>Kontrollkästchen</td>
+<td>Nein</td>
+<td>Kennzeichnet, ob der Kandidat Remote-Arbeit bevorzugt.</td>
+</tr>
+<tr class="even">
+<td>Status der Testaufgabe</td>
+<td>Auswahlliste</td>
+<td>Nein</td>
+<td>Der aktuelle Stand der dem Kandidaten gestellten Testaufgabe (z. B. Ausgegeben, Eingegangen, Bewertet).</td>
+</tr>
+</tbody>
+</table></div><h2 id="10-6-2-jelolt-statusz-mozgatasa-a-kanbanon"><span class="hno">10.6.2</span>Kandidatenstatus im Kanban verschieben</h2><p>Im Kanban können Sie die Kandidaten per Drag &amp; Drop verschieben. Jede Verschiebung wird in der Statushistorie festgehalten, sodass nachvollziehbar bleibt, wann der Kandidat in welchem Schritt stand.</p>
+<ol type="1">
+<li><p>Öffnen Sie die betreffende Stelle mit einem Filter (wenn mehrere Stellen laufen).</p></li>
+<li><p>Fassen Sie die Kandidatenkarte an und ziehen Sie sie in die nächste Spalte (z. B. Eingegangen → Vorausgewählt).</p></li>
+<li><p>Verlangt das System eine Bemerkung (z. B. bei einer Absage), geben Sie den Grund an.</p></li>
+<li><p>Prüfen Sie die Badges auf der Kandidatenkarte (z. B. „Interview angesetzt“).</p></li>
+</ol><h2 id="10-6-3-interjuk-rogzitese-es-lezarasa"><span class="hno">10.6.3</span>Interviews erfassen und abschließen</h2><p>Ein Interview fügen Sie auf dem Datenblatt des Kandidaten hinzu. Bei der Erfassung geben Sie Zeitpunkt, Art (siehe: 3.6.4 Interviewart) und Teilnehmer an.</p>
+<ol type="1">
+<li><p>Öffnen Sie den Kandidaten (Klick auf die Karte).</p></li>
+<li><p>Gehen Sie in den Abschnitt „Interviews“ und klicken Sie auf: Interview ansetzen.</p></li>
+<li><p>Wählen Sie die Art (HR/Tech/Final), legen Sie Zeitpunkt und Teilnehmer fest.</p></li>
+<li><p>Nach dem Speichern hat das Interview den Status Angesetzt.</p></li>
+<li><p>Öffnen Sie das Interview danach, setzen Sie es auf DONE und geben Sie die Bewertung an.</p></li>
+</ol>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Feld</strong></th>
+<th><strong>Typ</strong></th>
+<th><strong>Pflicht?</strong></th>
+<th><strong>Erläuterung / Tipps</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Interviewart</td>
+<td>Enum</td>
+<td>Ja</td>
+<td>HR/Tech/Final; auch für Berichte nützlich.</td>
+</tr>
+<tr class="even">
+<td>Zeitpunkt</td>
+<td>Datum + Uhrzeit</td>
+<td>Ja</td>
+<td>Grundlage der Kalenderansicht und der Erinnerungen.</td>
+</tr>
+<tr class="odd">
+<td>Meeting-Link / Ort</td>
+<td>Text/URL</td>
+<td>Nein</td>
+<td>Online-Link oder Ort im Büro.</td>
+</tr>
+<tr class="even">
+<td>Teilnehmer</td>
+<td>Benutzerliste</td>
+<td>Ja</td>
+<td>Wer das Interview führt; die Auslastung ist sichtbar.</td>
+</tr>
+<tr class="odd">
+<td>Bemerkungen</td>
+<td>Text</td>
+<td>Nein</td>
+<td>Bemerkungen zum Interview</td>
+</tr>
+</tbody>
+</table></div><h2 id="10-6-4-ajanlat-keszitese-es-kovetese"><span class="hno">10.6.4</span>Angebot erstellen und nachverfolgen</h2><p>Ist die Auswahl erfolgreich, erstellen Sie ein Angebot. Das Angebot ist ein eigener Datensatz, denn so lässt es sich nachverfolgen (Versand, Annahme, Ablauf) und später auswerten.</p>
+<ol type="1">
+<li><p>Kandidatendatenblatt → Abschnitt Angebot → Angebot erstellen.</p></li>
+<li><p>Die Stelle wird automatisch aus dem Datenblatt des Kandidaten übernommen.</p></li>
+<li><p>Geben Sie das Eröffnungsdatum und die Art des Arbeitsverhältnisses an.</p></li>
+<li><p>Füllen Sie die Vergütungsdaten aus (Grundgehalt, Währung, Zahlungsperiode).</p></li>
+<li><p>Markieren Sie die gewährten Leistungen (Laptop, Telefon, Homeoffice-Budget, Firmenwagen, Sonstiges).</p></li>
+<li><p>Geben Sie bei Bedarf das Gültigkeitsdatum und die interne Bemerkung an.</p></li>
+<li><p>Hängen Sie bei Bedarf ein PDF-Dokument an.</p></li>
+<li><p>Speichern — das Angebot wird mit dem Status Entwurf erfasst.</p>
+<p><strong>Stammdaten</strong></p></li>
+</ol>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Feld</strong></th>
+<th><strong>Typ</strong></th>
+<th><strong>Pflicht?</strong></th>
+<th><strong>Erläuterung / Tipps</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Stelle</td>
+<td>Text (nur lesbar)</td>
+<td>–</td>
+<td>Wird automatisch aus dem Datenblatt des Kandidaten übernommen; nicht bearbeitbar.</td>
+</tr>
+<tr class="even">
+<td>Eröffnungsdatum</td>
+<td>Datum</td>
+<td>Ja</td>
+<td>Das Datum der Erstellung des Angebots.</td>
+</tr>
+<tr class="odd">
+<td>Arbeitsverhältnis</td>
+<td>Auswahlliste</td>
+<td>Ja</td>
+<td>Die Art der Beschäftigung (z. B. Vollzeit, Teilzeit). Wird aus den Stammdaten unter Einstellungen → Funktion und Beschäftigung → Art der Beschäftigung geladen.</td>
+</tr>
+<tr class="even">
+<td>Status</td>
+<td>Statuskennzeichen</td>
+<td>–</td>
+<td>Bei einem neuen Angebot automatisch Entwurf. Nach dem Speichern manuell weiterschaltbar.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Administrative Daten</strong></p>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Feld</strong></th>
+<th><strong>Typ</strong></th>
+<th><strong>Pflicht?</strong></th>
+<th><strong>Erläuterung / Tipps</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Gültigkeitsdatum</td>
+<td>Datum</td>
+<td>Nein</td>
+<td>Wie lange das Angebot gültig ist. Zur Ablaufüberwachung; das System kann eine Warnung ausgeben.</td>
+</tr>
+<tr class="even">
+<td>Bemerkung für den internen Gebrauch</td>
+<td>Langtext</td>
+<td>Nein</td>
+<td>Nur HR und die Führungskraft sehen sie; Verhandlungsaspekte, interner Kontext.</td>
+</tr>
+<tr class="odd">
+<td>Anhang (nur PDF)</td>
+<td>Datei</td>
+<td>Nein</td>
+<td>Zum Anhängen des Angebotsschreibens oder des Vertragsentwurfs.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Vergütung</strong></p>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Feld</strong></th>
+<th><strong>Typ</strong></th>
+<th><strong>Pflicht?</strong></th>
+<th><strong>Erläuterung / Tipps</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Grundgehalt</td>
+<td>Zahl</td>
+<td>Nein</td>
+<td>Das dem Kandidaten angebotene Bruttogrundgehalt. Berechtigungsabhängiges Feld — nur HR/Finance sehen es.</td>
+</tr>
+<tr class="even">
+<td>Währung</td>
+<td>Auswahlliste</td>
+<td>Ja</td>
+<td>Die Währung des Grundgehalts (z. B. HUF, EUR).</td>
+</tr>
+<tr class="odd">
+<td>Zahlungsperiode</td>
+<td>Auswahlliste</td>
+<td>Ja</td>
+<td>Die Häufigkeit des Grundgehalts (z. B. monatlich, jährlich).</td>
+</tr>
+<tr class="even">
+<td>Bonus</td>
+<td>Zahl</td>
+<td>Nein</td>
+<td>Die Höhe des leistungsabhängigen oder sonstigen Bonus.</td>
+</tr>
+<tr class="odd">
+<td>Leistungen</td>
+<td>Kontrollkästchenliste</td>
+<td>Nein</td>
+<td>Mehrere Elemente wählbar: Laptop / Telefon / Homeoffice-Budget / Firmenwagen / Sonstiges.</td>
+</tr>
+</tbody>
+</table></div><h2 id="10-6-5-felvetel-mikor-es-hogyan"><span class="hno">10.6.5</span>Einstellung – wann und wie</h2><p>Die Annahme des Angebots ist noch keine Einstellung. Die Einstellung ist ein HR-Genehmigungsschritt, der den Mitarbeiter im System anlegt, die Personenzahl der Stelle aktualisiert und das Onboarding startet.</p>
+<ol type="1">
+<li><p><img src="https://help.infinityhu.eu/media/img_787ab7c9e5ff.png" class="shot" loading="lazy"/>Kandidatenstatus: Angebot angenommen</p></li>
+<li><p>Klicken Sie in der Kanban-Liste auf das Datenblatt des Kandidaten:</p></li>
+<li><p>Das System versendet das Mitarbeiterdatenblatt</p></li>
+<li><p>Der Mitarbeiter füllt es aus, lädt die erforderlichen Dokumente hoch und speichert — dabei wird er in Infinity als „Partner“ angelegt.</p></li>
+<li><p>Prüfen und ergänzen Sie die Eintrittsdaten (Startdatum, Führungskraft, Vertragsart, Gehalt usw.).</p></li>
+<li><p>Einstellung endgültig buchen: der Partner ist in einen Mitarbeiter umzuwandeln, und bei Bedarf ist eine in den Einstellungen angelegte Onboarding-Vorlage zuzuordnen.</p></li>
+<li><p>Prüfen Sie: der Mitarbeiter erscheint unter den Mitarbeitern, das Onboarding ist gestartet.</p></li>
+</ol></div><div class="foot">Aktualisiert 2026.08.26 · v2026.08.26</div></body></html>

@@ -1,0 +1,8 @@
+{
+ "_note": "route -> fejezet slug. Az Infinity ? gombja ezt hasznalja.",
+ "invoice/index": "4-1-szamlak",
+ "partner/index": "4-5-partnerek",
+ "product/index": "6-2-arucikkek",
+ "warehouse/movement": "6-4-raktarkezeles",
+ "hr/employee": "10-8-munkavallalok-aktiv-dolgozo-kezeles"
+}

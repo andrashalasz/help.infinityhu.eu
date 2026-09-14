@@ -1,0 +1,23 @@
+<?php
+/** @var yii\web\View $this */
+/** @var string $content */
+use yii\helpers\Html;
+$this->beginPage(); ?>
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8">
+  <?= Html::csrfMetaTags() ?>
+  <title><?= Html::encode($this->title) ?></title>
+  <?php $this->head() ?>
+</head>
+<body>
+<?php $this->beginBody() ?>
+<div style="background:#FFFBEB;border-bottom:1px solid #FDE68A;color:#92400E;font-size:12px;padding:7px 22px;font-family:sans-serif">
+  TESZT LAYOUT — élesben ez az Infinity sajat, mar letezo layoutja lesz, nem ez a fajl.
+</div>
+<?= $content ?>
+<?php $this->endBody() ?>
+</body>
+</html>
+<?php $this->endPage() ?>

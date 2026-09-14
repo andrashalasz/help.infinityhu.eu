@@ -1,0 +1,151 @@
+<!DOCTYPE html><html lang="hu"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Raktárkezelés</title><style>*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,-apple-system,'Segoe UI',sans-serif;background:#fff;color:#333B4D;
+font-size:14px;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:#1B3A6B}
+.bar{position:sticky;top:0;display:flex;align-items:center;gap:10px;padding:10px 16px;
+background:#FAFAF9;border-bottom:1px solid #E8E7E3;font-size:12px}
+.bar b{font-size:13px;color:#1E293B;font-weight:600;flex:1;min-width:0;overflow:hidden;
+text-overflow:ellipsis;white-space:nowrap}
+.bar a{color:#6B7280;text-decoration:none;white-space:nowrap;display:flex;align-items:center;gap:4px}
+.bar a:hover{color:#1B3A6B}
+.bar svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.pad{padding:18px 20px 30px}
+h1{font-size:19px;font-weight:700;color:#1E293B;margin:0 0 12px}
+h2{font-size:16px;font-weight:600;color:#1E293B;margin:22px 0 8px;scroll-margin-top:50px}
+h3{font-size:14.5px;font-weight:600;color:#1E293B;margin:18px 0 6px;scroll-margin-top:50px}
+h2 .hno,h3 .hno{color:#9CA3AF;font-weight:500;margin-right:6px}
+p{margin:0 0 11px}
+ul,ol{margin:0 0 11px;padding-left:20px}
+li{margin-bottom:4px}
+img{max-width:100%;height:auto;border:1px solid #E8E7E3;border-radius:5px;margin:5px 0}
+.call{background:#FAFAF9;border:1px solid #E8E7E3;border-left:3px solid #1B3A6B;border-radius:0 6px 6px 0;
+padding:11px 14px;margin:14px 0;font-size:13px}
+.call.warn{background:#FFFDF5;border-color:#F3E7C4;border-left-color:#F59E0B}
+.call strong{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;
+color:#6B7280;margin-bottom:3px}
+table{width:100%;border-collapse:collapse;margin:13px 0;font-size:12.5px}
+th{background:#FAFAF9;text-align:left;padding:7px 10px;font-size:10px;text-transform:uppercase;
+letter-spacing:.04em;color:#6B7280;border-bottom:1px solid #E8E7E3}
+td{padding:7px 10px;border-bottom:1px solid #F1F0EE;vertical-align:top}
+figcaption{font-size:11px;color:#9CA3AF;margin-top:4px}
+.foot{padding:14px 20px;border-top:1px solid #F1F0EE;font-size:11px;color:#9CA3AF}
+</style></head><body><div class="bar"><b>6.4 Raktárkezelés</b><a href="https://help.infinityhu.eu/hu/6-4-raktarkezeles.html" target="_blank" rel="noopener">Teljes oldal<svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></a></div><div class="pad"><h2 id="6-4-1-raktari-bevet"><span class="hno">6.4.1</span>Raktári bevét</h2><p>Infinityben kétféleképpen vételezhetünk be árut: egyedileg
+szállítólevél alapján, vagy tömegesen.</p>
+<p><strong>Áru bevételezése egyedileg, szállítólevél
+alapján</strong></p>
+<p>Válasszuk ki a szállítót és a raktári helyet, ahová be szeretnénk
+venni az árut. Kötelező megadni a hivatkozott dokumentum számát
+(szállítólevél vagy bejövő számla száma). Az alapadatok kitöltése után
+rögzítsük a bevételezni kívánt cikkeket.</p>
+<div class="call tip"><strong>Megjegyzés</strong>
+<p>Ebben a menüpontban csak már előzetesen létrehozott cikkek
+vételezhetők be!</p></div>
+<p>Ha a szállítólevél tartalmazza az árat, adjuk meg, vagy fogadjuk el a
+rendszer által megajánlott előző beszerzési árat. Ha az ár nem ismert, a
+bevét szállítói számlává való átfordítását követően is megadható.</p>
+<p>Ha a bevételező felhasználónak csak rögzítési joga van, Jóváhagyásra
+küldheti a bizonylatot. A bizonylat jóváhagyásra vár státuszban marad,
+amíg a megfelelő jogosultságú felhasználó jóvá nem hagyja.</p>
+<p><img src="https://help.infinityhu.eu/media/img_93121fe5c8c6.png" class="shot" loading="lazy"/></p>
+<p><img src="https://help.infinityhu.eu/media/img_ec7f5f7cca2c.png" class="shot" loading="lazy"/></p>
+<p>Az így létrehozott, de le nem zárt raktári bevét még módosítható
+(Raktármozgások listában: Feldolgozás alatt státusz). A Lezárás gombbal
+véglegesíthetjük – ekkor az áruk raktárra kerülnek. Lezárt bevéthez
+vonalkódot nyomtathatunk, a bizonylatot megtekinthetjük/kinyomtathatjuk,
+sztornózhatjuk, és szállítói számlát hozhatunk létre belőle.</p><h3 id="6-4-1-1-termekvariansok-bevetelezese"><span class="hno">6.4.1.1</span>Termékvariánsok bevételezése</h3><p>Két módszer lehetséges:</p>
+<ul>
+<li><p>A bevételezésen a főcikket adjuk meg – ekkor az összes variáns
+egyszerre vételezhető be azonos áron, variansonkénti
+mennyiséggel</p></li>
+<li><p>Közvetlenül a variánsokat kezdjük el bevételezni – ekkor egyedi
+beszerzési árat és mennyiséget adhatunk meg variansonként</p></li>
+</ul><h2 id="6-4-2-raktari-kivet"><span class="hno">6.4.2</span>Raktári kivét</h2><p>Raktári helyről való áru kimozgatása, amelynek során csökken az
+árucikk készlete. Jellemző kivétek: értékesítési bizonylat miatti kivét,
+leltár hiány miatti kivét, selejtezés, bizományosi értékesítés
+(szállítóra vitt áru).</p>
+<p>A raktári kivéteket a Raktárkezelés menüből indítjuk. Válasszuk ki a
+partnert és a raktári helyet. Az árukat a Termék keresése gombbal
+helyezzük fel a kivétre. Lezárást követően nyomtathatjuk a
+szállítólevelet.</p>
+<p><img src="https://help.infinityhu.eu/media/img_9452a62b905e.png" class="shot" loading="lazy"/></p>
+<p><img src="https://help.infinityhu.eu/media/img_7fe697e0ebe4.png" class="shot" loading="lazy"/></p><h2 id="6-4-3-raktarmozgasok-szallitoi-szamla-letrehozasa-raktari-bevetbol"><span class="hno">6.4.3</span>Raktármozgások – Szállítói számla létrehozása raktári bevétből</h2><p>A raktári bevétek számlázása a Készlet → Raktárkezelés →
+Raktármozgások menüpontból érhető el. Jelöljük ki a számlává átfordítani
+kívánt bevéteket, majd a Számlázás gombbal készítsük el a szállítói
+számlát. Az átfordított, de még nem véglegesített számla a Pénzügy →
+Számlalista menüpontban található.</p>
+<p>Lehetőség van raktári bevétek tömeges számlázására is, illetve több
+szállítólevélből egy szállítói számlát készíteni: az ugyanazon
+szállítóhoz tartozó bevéteket jelöljük ki, majd a Számlázás gombra
+kattintva átfordítjuk. A szállítói számla megjegyzés mezőjébe az összes
+raktári mozgás száma megjelenik.</p><h2 id="6-4-4-raktarak-kozotti-mozgatas"><span class="hno">6.4.4</span>Raktárak közötti mozgatás</h2><p>Készlet raktárak közötti mozgatásához elsőként válasszuk ki a Forrás
+raktárat, majd a Célraktárat. A forrás raktár aktuális készlettel
+rendelkező árucikkei közül válasszuk ki az átmozgatni kívánt tételeket.
+A Lezárás gombbal véglegesítjük a tranzakciót.</p>
+<p>Lehetőség van engedélyhez kötött átmozgatásra is: a forrás raktárból
+lekerül az áru a mentéssel, de úton lévő készletként tartja nyilván a
+rendszer mindaddig, amíg a célraktárban nem vételezik be.</p><h2 id="6-4-5-selejtezes"><span class="hno">6.4.5</span>Selejtezés</h2><p>Elhasználódott, megrongálódott áruk készletről való kivezetésére
+szolgál. Kötelező megadni a selejtezés okát (ez a selejtezési
+jegyzőkönyvre is felkerül). A tételek kiválasztása után zárjuk le a
+bizonylatot – a selejtezett áruk Selejt kivét mozgással kivezetődnek a
+készletről.</p>
+<p><img src="https://help.infinityhu.eu/media/img_420eede958b8.png" class="shot" loading="lazy"/></p><h2 id="6-4-6-leltarozas"><span class="hno">6.4.6</span>Leltározás</h2><p>Első lépésként adjuk meg a leltározandó raktárat, vagy töltsük fel a
+leltárfájlt (a minta a leltár felületről letölthető).</p>
+<p><img src="https://help.infinityhu.eu/media/img_b69914c11198.png" class="shot" loading="lazy"/></p>
+<p>A raktár kiválasztása után az Infinity fellistázza az azon lévő
+készleteket. Ha csak néhány cikket leltározunk, jelöljük ki manuálisan;
+ha az egész raktárt, kattintsunk az Összes kijelölése jelölőre.</p>
+<p><img src="https://help.infinityhu.eu/media/img_18454e896051.png" class="shot" loading="lazy"/></p>
+<p>A cikkek kijelölése után kattintsunk a Kiválasztás gombra:</p>
+<p><img src="https://help.infinityhu.eu/media/img_d42b1b278d8b.png" class="shot" loading="lazy"/></p>
+<p>A leltározandó cikkek kijelölése után lehetőség van a raktári
+mozgások zárolására. A Lock warehouse gombra kattintva adjuk meg a
+zárolás kezdetét.</p>
+<div class="call warn"><strong>Figyelem</strong>
+<p>Zárolás alatt nem végezhető értékesítés, raktári kivét, bevét,
+raktárak közti mozgás az adott raktárból. Ha valaki megkísérli, a
+rendszer figyelmeztető üzenettel megáll.</p></div>
+<p>A leltárfelvételi ívre vezessük fel a fizikailag megszámolt
+mennyiségeket. Cikkeket a Termék keresés dobozban kereshetünk. A
+Különbség oszlopban látható az Infinity-ben szereplő és a ténylegesen
+számolt mennyiségek eltérése.</p>
+<p>Ha olyan cikket találunk, amely nem szerepel a rendszerben, a Termék
+hozzáadása mezőben kereshetjük meg és adhatjuk a listához (csak
+előzetesen rögzített cikk adható hozzá).</p>
+<p>Ha minden cikket megszámoltunk és rögzítettünk, kattintsunk a Leltár
+lezárása gombra. Ekkor a rendszer külön listázza az eltérést mutató
+tételeket. A Leltárjelentés nyomtatása gombra kattintva PDF-ben kapjuk
+meg a jelentést.</p>
+<p><img src="https://help.infinityhu.eu/media/img_5f9c94bf486e.png" class="shot" loading="lazy"/></p>
+<p>Eltérés kivezetéséhez: Készletezés → Raktárkezelés → Leltárak
+menüpontban háromféle státuszú leltárral találkozhatunk:</p>
+<div class="tblwrap"><table class="erp-table">
+
+<tbody>
+<tr class="odd">
+<td><strong>Elindítva</strong></td>
+<td>Megkezdett, de még le nem zárt leltárív</td>
+</tr>
+<tr class="even">
+<td><strong>Befejezett</strong></td>
+<td>Lezárt leltár</td>
+</tr>
+<tr class="odd">
+<td><strong>Kivezetett</strong></td>
+<td>Lezárt leltár, elvezetett leltáreltérésekkel</td>
+</tr>
+</tbody>
+</table></div>
+<p>Befejezett státuszú leltárral két dolgot tehetünk: elfogadjuk az
+eredményeket és rányomunk az Eltérés kivezetése gombra, vagy
+újraszámoltatjuk az Újranyitás gombbal. Újranyitás után a korábban
+rögzített mennyiségek már benne vannak, csak az újra számolt
+darabszámokat kell rögzíteni.</p><h2 id="6-4-7-keszlet-bevetelezes"><span class="hno">6.4.7</span>Készlet bevételezés</h2><p>Ebben a menüpontban van lehetőség a betöltött készlet bevételezésére,
+ellenőrzésére, korrekciójára és jóváhagyására.</p>
+<p><img src="https://help.infinityhu.eu/media/img_34eddd93bca0.png" class="shot" loading="lazy"/></p><h2 id="6-4-8-keszlet-bevetelezes-fuggo-tetelek"><span class="hno">6.4.8</span>Készlet bevételezés függő tételek</h2><p>Ha a termékek jóváhagyással kerülnek készletre, itt hagyhatjuk
+jóvá/véglegesíthetjük azokat. A jóváhagyás után a termékek készletre
+kerülnek és eladhatóvá válnak.</p><h2 id="6-4-9-keszletmozgasok"><span class="hno">6.4.9</span>Készletmozgások</h2><p><img src="https://help.infinityhu.eu/media/img_18e683ca6e5c.png" class="shot" loading="lazy"/></p>
+<p>A rendszerben lévő készleteket mozgathatjuk (pl. bizományos
+készletből saját készletre). Válasszuk ki a raktárat és a készletet,
+vigyük fel a tételeket, adjuk meg a cél készletet és a mennyiséget.
+Mentés után a tranzakció véglegesedik.</p></div><div class="foot">Frissítve 2026.08.26 · v2026.08.26</div></body></html>

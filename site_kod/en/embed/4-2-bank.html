@@ -1,0 +1,58 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Bank</title><style>*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,-apple-system,'Segoe UI',sans-serif;background:#fff;color:#333B4D;
+font-size:14px;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:#1B3A6B}
+.bar{position:sticky;top:0;display:flex;align-items:center;gap:10px;padding:10px 16px;
+background:#FAFAF9;border-bottom:1px solid #E8E7E3;font-size:12px}
+.bar b{font-size:13px;color:#1E293B;font-weight:600;flex:1;min-width:0;overflow:hidden;
+text-overflow:ellipsis;white-space:nowrap}
+.bar a{color:#6B7280;text-decoration:none;white-space:nowrap;display:flex;align-items:center;gap:4px}
+.bar a:hover{color:#1B3A6B}
+.bar svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.pad{padding:18px 20px 30px}
+h1{font-size:19px;font-weight:700;color:#1E293B;margin:0 0 12px}
+h2{font-size:16px;font-weight:600;color:#1E293B;margin:22px 0 8px;scroll-margin-top:50px}
+h3{font-size:14.5px;font-weight:600;color:#1E293B;margin:18px 0 6px;scroll-margin-top:50px}
+h2 .hno,h3 .hno{color:#9CA3AF;font-weight:500;margin-right:6px}
+p{margin:0 0 11px}
+ul,ol{margin:0 0 11px;padding-left:20px}
+li{margin-bottom:4px}
+img{max-width:100%;height:auto;border:1px solid #E8E7E3;border-radius:5px;margin:5px 0}
+.call{background:#FAFAF9;border:1px solid #E8E7E3;border-left:3px solid #1B3A6B;border-radius:0 6px 6px 0;
+padding:11px 14px;margin:14px 0;font-size:13px}
+.call.warn{background:#FFFDF5;border-color:#F3E7C4;border-left-color:#F59E0B}
+.call strong{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;
+color:#6B7280;margin-bottom:3px}
+table{width:100%;border-collapse:collapse;margin:13px 0;font-size:12.5px}
+th{background:#FAFAF9;text-align:left;padding:7px 10px;font-size:10px;text-transform:uppercase;
+letter-spacing:.04em;color:#6B7280;border-bottom:1px solid #E8E7E3}
+td{padding:7px 10px;border-bottom:1px solid #F1F0EE;vertical-align:top}
+figcaption{font-size:11px;color:#9CA3AF;margin-top:4px}
+.foot{padding:14px 20px;border-top:1px solid #F1F0EE;font-size:11px;color:#9CA3AF}
+</style></head><body><div class="bar"><b>4.2 Bank</b><a href="https://help.infinityhu.eu/en/4-2-bank.html" target="_blank" rel="noopener">Full page<svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></a></div><div class="pad"><p>Under the Bank menu you can record incoming and outgoing transfers, card payments and withdrawals, as well as cash-on-delivery receivables.</p>
+<p><img src="https://help.infinityhu.eu/media/img_16eff06a747a.png" class="shot" loading="lazy"/></p>
+<p>When recording, there are two options: either you link the transaction to an invoice (in which case select the invoice from the list below), or you do not. An example of the latter is recording bank interest.</p>
+<p>As a first step, specify the bank, then the date, currency, amount, comment and the paying partner. With the Copy in button you can copy the invoice numbers of the selected invoices into the Name/Title field. The Close button finalises the transaction.</p>
+<div class="call warn"><strong>Caution</strong>
+<p>A bank payment is only possible in an open bank period. You can check whether the period is open in the Bank statements menu.</p></div>
+<p>If the currency of the invoice differs from the currency of the bank account, select the required currency, the rate type and the exchange rate from the Currency exchange drop-down. If the rate used by the bank differs from the one retrieved by the system, you can also enter it manually.</p><h2 id="4-2-1-bankkivonatok"><span class="hno">4.2.1</span>Bank statements</h2><p>The movements of the bank accounts can be followed in this menu. It collects the transactions belonging to the given bank account and shows the current balance.</p>
+<p>Bank statements also have to be recorded in Infinity so that the balance is visible immediately when listing the bank accounts, and so that you can provide partners with an up-to-date receivables list.</p>
+<p>Recording can be done on two screens:</p>
+<ul>
+<li><p>By settling customer and supplier invoices (Invoice list → select the invoice → Transfer)</p></li>
+<li><p>By recording a new incoming or outgoing transfer</p></li>
+</ul>
+<p><img src="https://help.infinityhu.eu/media/img_c3acfda524d0.png" class="shot" loading="lazy"/><img src="https://help.infinityhu.eu/media/img_9dce8ef0120f.png" />The Bank statements list manager contains the list of statements belonging to the given bank account. A new bank statement can be created with the Edit bank statement action.</p>
+<p>Only one period can be open per bank account. Before opening a new one, the previous one must be closed.</p>
+<p><strong>Data required to open a bank statement:</strong></p>
+<ul>
+<li><p>Selecting the bank account: from the list of bank type documents</p></li>
+<li><p>Opening date: the system suggests the current date (can be changed)</p></li>
+</ul>
+<p><strong>Viewing a bank statement</strong></p>
+<p>Open the bank statement from the Bank statements list manager to view the transactions belonging to it.</p>
+<p>The Close button closes the period. In a closed period, transactions cannot be recorded or modified. A closed period can be reopened if the open period has been closed beforehand.</p><h2 id="4-2-2-atvezetes"><span class="hno">4.2.2</span>Internal transfer</h2><p>In this menu you can move money between the cash desks and bank accounts in the system — even between different currencies, by entering an exchange rate.</p>
+<p><img src="https://help.infinityhu.eu/media/img_311f6ce35503.png" class="shot" loading="lazy"/></p><h2 id="4-2-3-specialis-banki-tranzakciok"><span class="hno">4.2.3</span>Special bank transactions</h2><p>You can create special bank transactions to record future transfers such as taxes or other cash movements without a document.</p>
+<p><img src="https://help.infinityhu.eu/media/img_527dfd2de90f.png" class="shot" loading="lazy"/></p><h2 id="4-2-4-tulfizetes-kiegyenlites"><span class="hno">4.2.4</span>Settling overpayments</h2><p>The system also allows overpayments to be settled in a simplified way.</p>
+<p><img src="https://help.infinityhu.eu/media/img_625923dcc3cd.png" class="shot" loading="lazy"/></p></div><div class="foot">Updated 2026.08.26 · v2026.08.26</div></body></html>

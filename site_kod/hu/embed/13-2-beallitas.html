@@ -1,0 +1,111 @@
+<!DOCTYPE html><html lang="hu"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Beállítás</title><style>*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,-apple-system,'Segoe UI',sans-serif;background:#fff;color:#333B4D;
+font-size:14px;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:#1B3A6B}
+.bar{position:sticky;top:0;display:flex;align-items:center;gap:10px;padding:10px 16px;
+background:#FAFAF9;border-bottom:1px solid #E8E7E3;font-size:12px}
+.bar b{font-size:13px;color:#1E293B;font-weight:600;flex:1;min-width:0;overflow:hidden;
+text-overflow:ellipsis;white-space:nowrap}
+.bar a{color:#6B7280;text-decoration:none;white-space:nowrap;display:flex;align-items:center;gap:4px}
+.bar a:hover{color:#1B3A6B}
+.bar svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.pad{padding:18px 20px 30px}
+h1{font-size:19px;font-weight:700;color:#1E293B;margin:0 0 12px}
+h2{font-size:16px;font-weight:600;color:#1E293B;margin:22px 0 8px;scroll-margin-top:50px}
+h3{font-size:14.5px;font-weight:600;color:#1E293B;margin:18px 0 6px;scroll-margin-top:50px}
+h2 .hno,h3 .hno{color:#9CA3AF;font-weight:500;margin-right:6px}
+p{margin:0 0 11px}
+ul,ol{margin:0 0 11px;padding-left:20px}
+li{margin-bottom:4px}
+img{max-width:100%;height:auto;border:1px solid #E8E7E3;border-radius:5px;margin:5px 0}
+.call{background:#FAFAF9;border:1px solid #E8E7E3;border-left:3px solid #1B3A6B;border-radius:0 6px 6px 0;
+padding:11px 14px;margin:14px 0;font-size:13px}
+.call.warn{background:#FFFDF5;border-color:#F3E7C4;border-left-color:#F59E0B}
+.call strong{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;
+color:#6B7280;margin-bottom:3px}
+table{width:100%;border-collapse:collapse;margin:13px 0;font-size:12.5px}
+th{background:#FAFAF9;text-align:left;padding:7px 10px;font-size:10px;text-transform:uppercase;
+letter-spacing:.04em;color:#6B7280;border-bottom:1px solid #E8E7E3}
+td{padding:7px 10px;border-bottom:1px solid #F1F0EE;vertical-align:top}
+figcaption{font-size:11px;color:#9CA3AF;margin-top:4px}
+.foot{padding:14px 20px;border-top:1px solid #F1F0EE;font-size:11px;color:#9CA3AF}
+</style></head><body><div class="bar"><b>13.2 Beállítás</b><a href="https://help.infinityhu.eu/hu/13-2-beallitas.html" target="_blank" rel="noopener">Teljes oldal<svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></a></div><div class="pad"><h2 id="13-2-1-esemenyek"><span class="hno">13.2.1</span>Események</h2><p><strong>Esemény típus</strong></p>
+<p>Események csoportosítására szolgál. Alapértelmezetten: árajánlat,
+megrendelés, számlázás, szerviz. Új típus lehet pl. megbeszélés,
+ügyfélszolgálat, telefonhívás. Megadandó: megnevezés (kötelező), állapot
+(aktív/inaktív), alapértelmezett időtartam.</p>
+<p><img src="https://help.infinityhu.eu/media/img_445d4928ed00.png" class="shot" loading="lazy"/></p>
+<p><strong>Esemény státusz</strong></p>
+<p>Az egyes események lehetséges státuszait itt definiáljuk.
+Alapértelmezetten: Új (nem lezáró, aktív) és Lezárt (lezáró, aktív). Új
+esemény státusz megadandó adatai:</p>
+<ul>
+<li><p>Megnevezés: pl. kész, folyamatban, sikertelen (kötelező)</p></li>
+<li><p>Lezáró státusz jelölő: ha bejelöljük, az esemény lezáródik és nem
+igényel további törődést</p></li>
+<li><p>Nyitó státusz jelölő: workflow-ba integrált eseményeknél
+használható</p></li>
+<li><p>Szín: az esemény listázásakor ezzel a színnel jelenik
+meg</p></li>
+<li><p>Állapot: aktív vagy inaktív (kötelező)</p></li>
+</ul>
+<p><img src="https://help.infinityhu.eu/media/img_81edd827af41.png" class="shot" loading="lazy"/></p><h2 id="13-2-2-prioritasok"><span class="hno">13.2.2</span>Prioritások</h2><p>CRM esemény létrehozásakor jelezhetjük a prioritást. Alapértelmezett
+prioritás automatikusan kerül minden új eseményre.</p>
+<p><img src="https://help.infinityhu.eu/media/img_bba7f6f39ae6.png" class="shot" loading="lazy"/></p><h2 id="13-2-3-helyisegek"><span class="hno">13.2.3</span>Helyiségek</h2><p>Az esemény szervezéséhez helyiségeket rögzíthetünk.</p>
+<p><img src="https://help.infinityhu.eu/media/img_235f5fe4b72a.png" class="shot" loading="lazy"/></p><h2 id="13-2-4-megkereses-tipusok"><span class="hno">13.2.4</span>Megkeresés típusok</h2><p>Az adatlapon választható megkeresési típusok rögzítésének helye.</p>
+<p><img src="https://help.infinityhu.eu/media/img_f4bd0f410275.png" class="shot" loading="lazy"/></p><h2 id="13-2-5-meghiusulas-oka"><span class="hno">13.2.5</span>Meghiúsulás oka</h2><p>A CRM folyamat sikertelen lezárásakor választható okok rögzítése.</p>
+<p><img src="https://help.infinityhu.eu/media/img_b2d38d0833b6.png" class="shot" loading="lazy"/></p><h2 id="13-2-6-ertesitesek"><span class="hno">13.2.6</span>Értesítések</h2><p><img src="https://help.infinityhu.eu/media/img_d561a5dbc95e.png" class="shot" loading="lazy"/></p>
+<p>Az értesítés automatikusan bejegyzést hoz létre azon CRM projekt
+adatlapján, ahol engedélyezve van. Pl. ha egy esemény rögzítése után 2
+nappal automatikus figyelmeztetést szeretnénk küldeni, kattintsunk az
+Értesítés létrehozása gombra:</p>
+<ul>
+<li><p>Kategória: az Értesítés kategóriák aloldalon előre definiált
+listából</p></li>
+<li><p>Név és szöveg: szabadon megadható, az értesítés tartalmát
+határozza meg</p></li>
+<li><p>Értesítési idő: hány nappal az esemény rögzítése után jelenjen
+meg</p></li>
+</ul>
+<p>Mentés után az értesítést hozzárendelhetjük egy vagy több
+eseménytípushoz. Az adott eseménytípus rögzítésekor a megadott idő
+elteltével automatikusan megjelenik az értesítés.</p>
+<p><img src="https://help.infinityhu.eu/media/img_df9616ead9e9.png" class="shot" loading="lazy"/></p><h2 id="13-2-7-sablonok"><span class="hno">13.2.7</span>Sablonok</h2><p>A Project management típusú projekteknél használjuk. Sablon
+kategóriákba kell sorolni, szabad szöveges mezőt tartalmaznak. Az
+adatlapoknál checklist jellegű információt jelenít meg – pl. egy
+egyszerűsített építkezési sablonnál a lépések logikai sorrendben követik
+egymást.</p>
+<p><img src="https://help.infinityhu.eu/media/img_3ccce1d4a3c0.png" class="shot" loading="lazy"/></p><h2 id="13-2-8-kerdoivek"><span class="hno">13.2.8</span>Kérdőívek</h2><p>A kérdőív funkció a gyorsabb ügyfél-visszacsatolást szolgálja. A
+kérdőívet egy gombnyomással küldhetjük el a CRM adatlapról az érintett
+ügyfeleknek. Új kérdőív létrehozásakor adjunk meg egyedi nevet, típust,
+és állítsuk be, hogy kötelező-e kitölteni.</p>
+<p>A válasz típusok:</p>
+<ul>
+<li><p>Szabad szöveges: saját szavakkal válaszolható</p></li>
+<li><p>Többszörös választás: több opció is kijelölhető</p></li>
+<li><p>Lenyíló: egy előre definiált listából egy opció
+választható</p></li>
+<li><p>Egyszeres választás: csak egy opció jelölhető meg</p></li>
+</ul>
+<p><img src="https://help.infinityhu.eu/media/img_3760ea0a7ff7.png" class="shot" loading="lazy"/></p>
+<p>Kérdőív kiküldése: a főoldalon a Projektek fül alatt nyissuk meg az
+adott projektet, kattintsunk a partner adatlapjára, majd a jobb felső
+sarokban lévő gombra kattintva töltsük ki az e-mail szerkesztő felületet
+és küldjük el a kérdőívvel.</p>
+<p><img src="https://help.infinityhu.eu/media/img_676ee7a4239c.png" class="shot" loading="lazy"/></p>
+<p>A kitöltött kérdőívet az adott projekt alatt lévő kapcsolatra
+kattintva tekinthetjük meg.</p><h2 id="13-2-9-kapcsolat-beallitasok"><span class="hno">13.2.9</span>Kapcsolat beállítások</h2><p>A Lead és a Kapcsolatok űrlap megjelenéséért felelős paraméter
+beállítások. Az itt konfigurálható paraméterekkel testreszabhatók az
+űrlapok és kiegészítő adatok jeleníthetők meg.</p><h2 id="13-2-10-urlap-szerkeszto"><span class="hno">13.2.10</span>Űrlap szerkesztő</h2><p>A Lead és a Kapcsolat felvételi űrlapok megszerkesztése. Az Űrlapokra
+tetszőleges mezőket vihetünk fel és kategorizálhatjuk azokat.</p>
+<p><img src="https://help.infinityhu.eu/media/img_4b6eeec34f86.png" class="shot" loading="lazy"/></p>
+<p><img src="https://help.infinityhu.eu/media/img_2bed9494f08d.png" class="shot" loading="lazy"/></p><h2 id="13-2-11-kapcsolat-csoportok"><span class="hno">13.2.11</span>Kapcsolat csoportok</h2><p>A CRM kapcsolatokat csoportokba sorolhatjuk. A csoport a kapcsolati
+űrlapon választható ki.</p><h2 id="13-2-12-kapcsolat-tipus"><span class="hno">13.2.12</span>Kapcsolat típus</h2><p>A Lead/kapcsolat felvitelnél választható típus megnevezések
+rögzítése. Hasonlóan rögzíthetők a Kapcsolat prioritások, a Forrás
+(honnan jött az adott kapcsolat, pl. kiállítás, reklám) és a Tagek (a
+keresést és riportolást segítő előre definiált jelölők).</p><h2 id="13-2-13-lead-lehetoseg-beallitasok"><span class="hno">13.2.13</span>Lead/Lehetőség beállítások</h2><p>A leadek kategorizálhatók (pl. cold lead, hot lead, marketing
+qualified lead, sales qualified lead) – az értékesítők így tudják, hogy
+melyik érdeklődő melyik szinten áll. A lehetőségek az előrehaladottabb
+szakaszokat jelölik, ahol konkrét tárgyalások folynak; az értékesítési
+pipeline előrehaladása és a lezáráshoz szükséges lépések átláthatók.</p></div><div class="foot">Frissítve 2026.08.26 · v2026.08.26</div></body></html>

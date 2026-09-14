@@ -1,0 +1,543 @@
+<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Einstellungen</title><style>*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,-apple-system,'Segoe UI',sans-serif;background:#fff;color:#333B4D;
+font-size:14px;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:#1B3A6B}
+.bar{position:sticky;top:0;display:flex;align-items:center;gap:10px;padding:10px 16px;
+background:#FAFAF9;border-bottom:1px solid #E8E7E3;font-size:12px}
+.bar b{font-size:13px;color:#1E293B;font-weight:600;flex:1;min-width:0;overflow:hidden;
+text-overflow:ellipsis;white-space:nowrap}
+.bar a{color:#6B7280;text-decoration:none;white-space:nowrap;display:flex;align-items:center;gap:4px}
+.bar a:hover{color:#1B3A6B}
+.bar svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.pad{padding:18px 20px 30px}
+h1{font-size:19px;font-weight:700;color:#1E293B;margin:0 0 12px}
+h2{font-size:16px;font-weight:600;color:#1E293B;margin:22px 0 8px;scroll-margin-top:50px}
+h3{font-size:14.5px;font-weight:600;color:#1E293B;margin:18px 0 6px;scroll-margin-top:50px}
+h2 .hno,h3 .hno{color:#9CA3AF;font-weight:500;margin-right:6px}
+p{margin:0 0 11px}
+ul,ol{margin:0 0 11px;padding-left:20px}
+li{margin-bottom:4px}
+img{max-width:100%;height:auto;border:1px solid #E8E7E3;border-radius:5px;margin:5px 0}
+.call{background:#FAFAF9;border:1px solid #E8E7E3;border-left:3px solid #1B3A6B;border-radius:0 6px 6px 0;
+padding:11px 14px;margin:14px 0;font-size:13px}
+.call.warn{background:#FFFDF5;border-color:#F3E7C4;border-left-color:#F59E0B}
+.call strong{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;
+color:#6B7280;margin-bottom:3px}
+table{width:100%;border-collapse:collapse;margin:13px 0;font-size:12.5px}
+th{background:#FAFAF9;text-align:left;padding:7px 10px;font-size:10px;text-transform:uppercase;
+letter-spacing:.04em;color:#6B7280;border-bottom:1px solid #E8E7E3}
+td{padding:7px 10px;border-bottom:1px solid #F1F0EE;vertical-align:top}
+figcaption{font-size:11px;color:#9CA3AF;margin-top:4px}
+.foot{padding:14px 20px;border-top:1px solid #F1F0EE;font-size:11px;color:#9CA3AF}
+</style></head><body><div class="bar"><b>10.4 Einstellungen</b><a href="https://help.infinityhu.eu/de/10-4-beallitasok.html" target="_blank" rel="noopener">Volle Seite<svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></a></div><div class="pad"><p>Das Menü Einstellungen enthält sämtliche Stammdatenverwaltungen. Die Untermenüs sind in die folgenden Gruppen gegliedert: Organisationsstruktur, Funktion und Beschäftigung, Arbeitszeit und Dienstplan, Vergütung und Leistungen, Kalender und Zeitrechnung, Onboarding-Einstellungen.</p><h2 id="10-4-1-szervezeti-struktura"><span class="hno">10.4.1</span>Organisationsstruktur</h2><p>Menü: Einstellungen → Organisationsstruktur</p><h3 id="10-4-1-1-divizio"><span class="hno">10.4.1.1</span>Division</h3><p>Die Divisionen sind die obersten Einheiten der Organisation. Auf ihrer Grundlage lassen sich Abteilungen, Stellen und Mitarbeiter in den Berichten gruppieren.</p>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Feld</strong></th>
+<th><strong>Typ</strong></th>
+<th><strong>Pflicht?</strong></th>
+<th><strong>Erläuterung / Tipps</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Bezeichnung der Division</td>
+<td>Text</td>
+<td>Ja</td>
+<td>Sie erscheint in den Listen und Berichten.</td>
+</tr>
+<tr class="even">
+<td>Farbe</td>
+<td>Auswahl</td>
+<td>Nein</td>
+<td>Ordnet der Division eine Farbe zu</td>
+</tr>
+<tr class="odd">
+<td>Gruppe</td>
+<td>Auswahlliste</td>
+<td>Nein</td>
+<td>Gehört die Division einer Gruppe an, ist diese hier auszuwählen</td>
+</tr>
+</tbody>
+</table></div><h3 id="10-4-1-2-helyszin"><span class="hno">10.4.1.2</span>Standort</h3><p>Die Standorte dienen der Erfassung der Büros und Betriebsstätten. Sie können Stellen, Mitarbeitern und Dienstplänen zugeordnet werden.</p>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Feld</strong></th>
+<th><strong>Typ</strong></th>
+<th><strong>Pflicht?</strong></th>
+<th><strong>Erläuterung / Tipps</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Bezeichnung des Standorts</td>
+<td>Text</td>
+<td>Ja</td>
+<td>Z. B. Budapest – Hauptbüro, Büro Dubai.</td>
+</tr>
+</tbody>
+</table></div><h2 id="10-4-2-munkakor-es-foglalkoztatas"><span class="hno">10.4.2</span>Funktion und Beschäftigung</h2><p>Menü: Einstellungen → Funktion und Beschäftigung</p><h3 id="10-4-2-1-beosztasok"><span class="hno">10.4.2.1</span>Funktionen</h3><p>Die Funktion ist im System die Art der Tätigkeit. Sie ist erforderlich, damit die Einordnung von Stellen und Mitarbeitern einheitlich ist und wir später in den Berichten vergleichbare Daten erhalten.</p>
+<p><em><strong>Funktion anlegen:</strong></em></p>
+<ol type="1">
+<li><p>Öffnen Sie: Einstellungen → Funktion und Beschäftigung → Funktionen.</p></li>
+<li><p>Klicken Sie auf: Erstellen.</p></li>
+<li><p>Geben Sie die Bezeichnung der Funktion an (z. B. „IT Support“).</p></li>
+<li><p>Wählen Sie eine Farbe für die Funktion</p></li>
+<li><p>Speichern.</p></li>
+</ol>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Feld</strong></th>
+<th><strong>Typ</strong></th>
+<th><strong>Pflicht?</strong></th>
+<th><strong>Erläuterung / Tipps</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Bezeichnung der Funktion</td>
+<td>Text</td>
+<td>Ja</td>
+<td>Sie erscheint in den Listen und Berichten.</td>
+</tr>
+<tr class="even">
+<td>Farbe</td>
+<td>Auswahl</td>
+<td>Nein</td>
+<td>Ordnet der Funktion eine Farbe zu</td>
+</tr>
+</tbody>
+</table></div><h3 id="10-4-2-2-szenioritasi-szint"><span class="hno">10.4.2.2</span>Senioritätsstufe</h3><p>Die Senioritätsstufen (z. B. Junior, Medior, Senior, Lead) halten die Stufen innerhalb der Funktionen fest. Sie sind bei Stellen und im Recruiting als Filterdimension verwendbar.</p>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Feld</strong></th>
+<th><strong>Typ</strong></th>
+<th><strong>Pflicht?</strong></th>
+<th><strong>Erläuterung / Tipps</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Bezeichnung der Stufe</td>
+<td>Text</td>
+<td>Ja</td>
+<td>Z. B. Junior, Medior, Senior, Lead.</td>
+</tr>
+<tr class="even">
+<td>Aktiv</td>
+<td>Schalter</td>
+<td>Nein</td>
+<td></td>
+</tr>
+</tbody>
+</table></div><h3 id="10-4-2-3-foglalkoztatas-tipusa"><span class="hno">10.4.2.3</span>Art der Beschäftigung</h3><p>Die Art der Beschäftigung bestimmt den Charakter des Arbeitsverhältnisses.</p>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Feld</strong></th>
+<th><strong>Typ</strong></th>
+<th><strong>Pflicht?</strong></th>
+<th><strong>Erläuterung / Tipps</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Bezeichnung der Art</td>
+<td>Text</td>
+<td>Ja</td>
+<td>Z. B. Vollzeit, Teilzeit, Werkvertrag.</td>
+</tr>
+<tr class="even">
+<td>Aktiv</td>
+<td>Schalter</td>
+<td>Ja</td>
+<td>Eine inaktive Art erscheint bei einer Neueinstellung nicht.</td>
+</tr>
+</tbody>
+</table></div><h3 id="10-4-2-4-munkavegzes-modja"><span class="hno">10.4.2.4</span>Arbeitsform</h3><p>Die Stammdaten der Arbeitsform: die Stellen und Mitarbeitern zuordenbare Art der Arbeitsausübung</p>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Feld</strong></th>
+<th><strong>Typ</strong></th>
+<th><strong>Pflicht?</strong></th>
+<th><strong>Erläuterung / Tipps</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Bezeichnung der Form</td>
+<td>Text</td>
+<td>Ja</td>
+<td>Z. B. Büro, Hybrid, Remote.</td>
+</tr>
+<tr class="even">
+<td>Aktiv</td>
+<td>Schalter</td>
+<td>Ja</td>
+<td>Eine inaktive Form ist für einen neuen Datensatz nicht wählbar.</td>
+</tr>
+</tbody>
+</table></div><h2 id="10-4-3-munkaido-es-beosztas-beallitasok"><span class="hno">10.4.3</span>Arbeitszeit und Dienstplan (Einstellungen)</h2><p>Menü: Einstellungen → Arbeitszeit und Dienstplan</p><h3 id="10-4-3-1-munkarendek"><span class="hno">10.4.3.1</span>Arbeitszeitmodelle</h3><p>Die Arbeitszeitmodelle sind die Vorlagen der täglichen und wöchentlichen Arbeitszeit (z. B. 8-Stunden-Tag, 12-Stunden-Schicht). Wir ordnen sie den Mitarbeitern und dem Dienstplan zu.</p>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Feld</strong></th>
+<th><strong>Typ</strong></th>
+<th><strong>Pflicht?</strong></th>
+<th><strong>Erläuterung / Tipps</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Bezeichnung des Arbeitszeitmodells</td>
+<td>Text</td>
+<td>Ja</td>
+<td>Z. B. Standard 8 h, 4-Tage-Woche.</td>
+</tr>
+<tr class="even">
+<td>Wochentyp</td>
+<td>Auswahlliste</td>
+<td>Ja</td>
+<td>Für wie viele Wochen das Modell geplant wird</td>
+</tr>
+<tr class="odd">
+<td>Pause während der Arbeit</td>
+<td>Auswahlliste</td>
+<td>Nein</td>
+<td>Ja/Nein, ob es während der Arbeit eine Pause gibt</td>
+</tr>
+<tr class="even">
+<td>Tägliche Arbeitsstunden</td>
+<td>Zahl</td>
+<td>Nein</td>
+<td>Z. B. 8 Stunden.</td>
+</tr>
+<tr class="odd">
+<td>Feiertage außer Acht lassen</td>
+<td>Kontrollkästchen</td>
+<td>Nein</td>
+<td>Ob die Anwesenheitsliste sie außer Acht lässt</td>
+</tr>
+<tr class="even">
+<td>Pflichtfreie Tage außer Acht lassen</td>
+<td>Kontrollkästchen</td>
+<td>Nein</td>
+<td>Ob die Anwesenheitsliste sie außer Acht lässt</td>
+</tr>
+<tr class="odd">
+<td>Verlegte Arbeitstage außer Acht lassen</td>
+<td>Kontrollkästchen</td>
+<td>Nein</td>
+<td>Ob die Anwesenheitsliste sie außer Acht lässt</td>
+</tr>
+<tr class="even">
+<td>Halbe Arbeitstage außer Acht lassen</td>
+<td>Kontrollkästchen</td>
+<td>Nein</td>
+<td>Ob die Anwesenheitsliste sie außer Acht lässt</td>
+</tr>
+</tbody>
+</table></div><h3 id="10-4-3-2-munkaidokeret"><span class="hno">10.4.3.2</span>Arbeitszeitrahmen</h3><p>Der Arbeitszeitrahmen legt fest, wie viele Arbeitsstunden in einem bestimmten Zeitraum zu leisten sind. Bei Teilzeit und flexibler Arbeitszeit ist er besonders wichtig.</p>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Feld</strong></th>
+<th><strong>Typ</strong></th>
+<th><strong>Pflicht?</strong></th>
+<th><strong>Erläuterung / Tipps</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Jahr</td>
+<td>Zahl</td>
+<td>Ja</td>
+<td>Z. B. 2026</td>
+</tr>
+<tr class="even">
+<td>Zu leistende Stunden</td>
+<td>Zahl</td>
+<td>Ja</td>
+<td>Die Vorgabe für den Zeitraum.</td>
+</tr>
+</tbody>
+</table></div><h2 id="10-4-4"><span class="hno">10.4.4</span></h2><h3 id="10-4-4-1-muszakok"><span class="hno">10.4.4.1</span>Schichten</h3><p>Die Schichten halten die konkreten Arbeitszeitfenster fest (z. B. morgens 6:00–14:00, nachmittags 14:00–22:00). Bei der Dienstplanung beziehen wir uns auf sie.</p>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Feld</strong></th>
+<th><strong>Typ</strong></th>
+<th><strong>Pflicht?</strong></th>
+<th><strong>Erläuterung / Tipps</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Bezeichnung der Schicht</td>
+<td>Text</td>
+<td>Ja</td>
+<td>Z. B. Frühschicht, Nachtschicht.</td>
+</tr>
+<tr class="even">
+<td>Prozentsatz</td>
+<td>Zahl</td>
+<td>Ja</td>
+<td>Wie hoch der Lohnzuschlag in Prozent ausfällt</td>
+</tr>
+<tr class="odd">
+<td>Beginnzeit</td>
+<td>Uhrzeit</td>
+<td>Ja</td>
+<td>Z. B. 06:00.</td>
+</tr>
+<tr class="even">
+<td>Endzeit</td>
+<td>Uhrzeit</td>
+<td>Ja</td>
+<td>Z. B. 14:00.</td>
+</tr>
+</tbody>
+</table></div><h2 id="10-4-5-kompenzacio-es-juttatasok"><span class="hno">10.4.5</span>Vergütung und Leistungen</h2><p>Menü: Einstellungen → Vergütung und Leistungen</p><h3 id="10-4-5-1-munkaltatoi-juttatasok"><span class="hno">10.4.5.1</span>Arbeitgeberleistungen</h3><p>In den Stammdaten der Leistungen erfassen Sie alle angebotenen Leistungsarten (z. B. Cafeteria, Krankenversicherung, Firmenwagen). Im Profil des Mitarbeiters ordnen Sie daraus konkrete Leistungen zu.</p>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Feld</strong></th>
+<th><strong>Typ</strong></th>
+<th><strong>Pflicht?</strong></th>
+<th><strong>Erläuterung / Tipps</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Bezeichnung der Leistung</td>
+<td>Text</td>
+<td>Ja</td>
+<td>Z. B. Cafeteria, Krankenversicherung.</td>
+</tr>
+<tr class="even">
+<td>Art</td>
+<td>Auswahl</td>
+<td>Nein</td>
+<td>Steuerfrei / Sachbezug / Sonstiges</td>
+</tr>
+<tr class="odd">
+<td>Wirtschaftsperiode</td>
+<td>Auswahl</td>
+<td>Nein</td>
+<td>Das Jahr, auf das sie sich bezieht, ist auszuwählen</td>
+</tr>
+</tbody>
+</table></div><h3 id="10-4-5-2-berpotlek"><span class="hno">10.4.5.2</span>Lohnzuschlag</h3><p>Die Arten der Lohnzuschläge (z. B. Nachtzuschlag, Schichtzuschlag, Überstundenzuschlag) sind auf Stammdatenebene verwaltbar und lassen sich anschließend mit der Arbeitszeiterfassung verknüpfen.</p>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Feld</strong></th>
+<th><strong>Typ</strong></th>
+<th><strong>Pflicht?</strong></th>
+<th><strong>Erläuterung / Tipps</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Bezeichnung des Zuschlags</td>
+<td>Text</td>
+<td>Ja</td>
+<td>Z. B. Nachtzuschlag, Schichtzuschlag.</td>
+</tr>
+<tr class="even">
+<td>Höhe (%)</td>
+<td>Zahl</td>
+<td>Ja</td>
+<td>Der prozentuale Zuschlag zum Grundlohn.</td>
+</tr>
+<tr class="odd">
+<td>Beginnzeit</td>
+<td>Uhrzeit</td>
+<td>Ja</td>
+<td>Z. B. 06:00.</td>
+</tr>
+<tr class="even">
+<td>Endzeit</td>
+<td>Uhrzeit</td>
+<td>Ja</td>
+<td>Z. B. 14:00.</td>
+</tr>
+<tr class="odd">
+<td>Aktiv</td>
+<td>Schalter</td>
+<td>Ja</td>
+<td>Ein inaktiver Zuschlag geht nicht in die Abrechnung ein.</td>
+</tr>
+</tbody>
+</table></div><h3 id="10-4-5-3-naptar-es-idoszamitas"><span class="hno">10.4.5.3</span>Kalender und Zeitrechnung</h3><p>Menü: Einstellungen → Kalender und Zeitrechnung</p><h3 id="10-4-5-4-athelyezett-munkanapok"><span class="hno">10.4.5.4</span>Verlegte Arbeitstage</h3><p>Die Erfassung der verlegten Arbeitstage ist für die Urlaubs- und Arbeitszeitberechnung erforderlich (z. B. wenn anstelle eines Feiertags ein anderer Tag ein Arbeitstag ist).</p>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Feld</strong></th>
+<th><strong>Typ</strong></th>
+<th><strong>Pflicht?</strong></th>
+<th><strong>Erläuterung / Tipps</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Art</td>
+<td>Enum</td>
+<td>Ja</td>
+<td>Feiertag → Arbeitstag / Arbeitstag → Feiertag.</td>
+</tr>
+<tr class="even">
+<td>Datum</td>
+<td>Datum</td>
+<td>Ja</td>
+<td>Der konkrete Tag.</td>
+</tr>
+<tr class="odd">
+<td>Bemerkung</td>
+<td>Text</td>
+<td>Nein</td>
+<td>Z. B. „Nachholung des Feiertags“.</td>
+</tr>
+</tbody>
+</table></div><h3 id="10-4-5-5-naptipus"><span class="hno">10.4.5.5</span>Tagesart</h3><p>Die Tagesarten halten die verschiedenen Arbeitstagskategorien fest (z. B. Arbeitstag, Feiertag, gesetzlicher Feiertag). Die Arbeitszeitberechnung arbeitet auf dieser Grundlage.</p>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Feld</strong></th>
+<th><strong>Typ</strong></th>
+<th><strong>Pflicht?</strong></th>
+<th><strong>Erläuterung / Tipps</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Art</td>
+<td>Enum</td>
+<td>Ja</td>
+<td>Arbeitstag/Urlaub/Krankheit — die in der Anwesenheitsliste verwendeten Tagesarten</td>
+</tr>
+<tr class="even">
+<td>Bezeichnung der Tagesart</td>
+<td>Text</td>
+<td>Ja</td>
+<td>Z. B. bezahlter Arbeitstag</td>
+</tr>
+</tbody>
+</table></div><h2 id="10-4-6-onboarding-beallitasok"><span class="hno">10.4.6</span>Onboarding-Einstellungen</h2><p>Menü: Einstellungen → Onboarding-Einstellungen</p>
+<p>Dieses Untermenü enthält die konfigurierbaren Elemente des Onboarding- und Recruiting-Prozesses.</p><h3 id="10-4-6-1-munkavallaloi-adatlap-letrehozasa"><span class="hno">10.4.6.1</span>Mitarbeiterdatenblatt erstellen</h3><p>Beim Eintritt eines neuen Mitarbeiters ist auf dieser Oberfläche ein Link zur Datenabfrage zu versenden. Anzugeben sind die E-Mail-Adresse des neuen Mitarbeiters sowie die Sprache der Kommunikation und die Sprache des zu verwendenden Systems.</p>
+<p><img src="https://help.infinityhu.eu/media/img_ff8f93c3c8a7.png" class="shot" loading="lazy"/></p>
+<p>Das System sendet den Link an den Mitarbeiter.</p>
+<p><img src="https://help.infinityhu.eu/media/img_bc7b21211686.png" class="shot" loading="lazy"/></p>
+<p>Ein Klick auf den Link öffnet die Oberfläche zur Datenabfrage.</p>
+<p><img src="https://help.infinityhu.eu/media/img_dd8056fdb29c.png" class="shot" loading="lazy"/></p>
+<p>Der Mitarbeiter füllt die angeforderten Daten aus, hängt seine arbeitsrechtlichen Dokumente an, und der Infinity-Administrator wandelt ihn anhand des ausgefüllten Datenblatts im System in einen Mitarbeiter um.</p>
+<p><img src="https://help.infinityhu.eu/media/img_77aeef5247b7.png" class="shot" loading="lazy"/></p>
+<p><img src="https://help.infinityhu.eu/media/img_8df2166eb120.png" class="shot" loading="lazy"/></p>
+<p>Die Lohnabrechnungsdaten (Gehalt, Arbeitszeitmodell usw.) sind im System zu erfassen; anschließend lassen sich diese Daten per Knopfdruck an die Buchhaltung senden, damit sie den Mitarbeiter bei den Behörden anmeldet.</p>
+<p><img src="https://help.infinityhu.eu/media/img_e4c83e07ca53.png" class="shot" loading="lazy"/></p><h3 id="10-4-6-2-forras"><span class="hno">10.4.6.2</span>Quelle</h3><p>Die Stammdaten der Recruiting-Quelle halten fest, woher die Kandidaten kommen (z. B. LinkedIn, Empfehlung, Website, Jobmesse). In den Berichten dienen sie der Messung der Kanaleffizienz.</p>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Feld</strong></th>
+<th><strong>Typ</strong></th>
+<th><strong>Pflicht?</strong></th>
+<th><strong>Erläuterung / Tipps</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Bezeichnung der Quelle</td>
+<td>Text</td>
+<td>Ja</td>
+<td>Z. B. LinkedIn, Empfehlung, Website.</td>
+</tr>
+<tr class="even">
+<td>Aktiv</td>
+<td>Schalter</td>
+<td>Ja</td>
+<td>Eine inaktive Quelle erscheint im Formular „Neuer Kandidat“ nicht.</td>
+</tr>
+</tbody>
+</table></div><h3 id="10-4-6-3-jelolt-statusz"><span class="hno">10.4.6.3</span>Kandidatenstatus</h3><p>Die Kandidatenstatuswerte bestimmen die Schritte der Recruiting-Pipeline (z. B. Eingegangen, Vorausgewählt, Interview, Angebot, Eingestellt, Abgelehnt). In der Kanban-Ansicht sehen Sie sie als Spalten.</p>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Feld</strong></th>
+<th><strong>Typ</strong></th>
+<th><strong>Pflicht?</strong></th>
+<th><strong>Erläuterung / Tipps</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Bezeichnung des Status</td>
+<td>Text</td>
+<td>Ja</td>
+<td>Z. B. Eingegangen, Vorausgewählt, Eingestellt.</td>
+</tr>
+<tr class="even">
+<td>Aktiv</td>
+<td>Schalter</td>
+<td>Ja</td>
+<td>Ein inaktiver Status erscheint im Kanban nicht.</td>
+</tr>
+</tbody>
+</table></div><h3 id="10-4-6-4-interju-tipus"><span class="hno">10.4.6.4</span>Interviewart</h3><p>Die Interviewarten (z. B. HR-Interview, technisches Interview, Final-Interview) sind als Stammdaten erfassbar. In den Berichten dienen sie der Messung von Interviewauslastung und -effizienz.</p>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Feld</strong></th>
+<th><strong>Typ</strong></th>
+<th><strong>Pflicht?</strong></th>
+<th><strong>Erläuterung / Tipps</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Bezeichnung der Art</td>
+<td>Text</td>
+<td>Ja</td>
+<td>Z. B. HR, Technisch, Final.</td>
+</tr>
+<tr class="even">
+<td>Aktiv</td>
+<td>Schalter</td>
+<td>Ja</td>
+<td>Eine inaktive Art ist für ein neues Interview nicht wählbar.</td>
+</tr>
+</tbody>
+</table></div><h3 id="10-4-6-5-ajanlat-statusza"><span class="hno">10.4.6.5</span>Angebotsstatus</h3><p>Die Angebotsstatuswerte verfolgen den Angebotsprozess: Entwurf, Versandt, Abgelaufen, Angenommen, Abgelehnt</p>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Feld</strong></th>
+<th><strong>Typ</strong></th>
+<th><strong>Pflicht?</strong></th>
+<th><strong>Erläuterung / Tipps</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Bezeichnung des Status</td>
+<td>Text</td>
+<td>Ja</td>
+<td>Z. B. Entwurf, Versandt, Angenommen.</td>
+</tr>
+<tr class="even">
+<td>Aktiv</td>
+<td>Schalter</td>
+<td>Ja</td>
+<td>Eine inaktive Art ist nicht wählbar</td>
+</tr>
+</tbody>
+</table></div><h3 id="10-4-6-6-onboarding-sablonok"><span class="hno">10.4.6.6</span>Onboarding-Vorlagen</h3><p>Mit den Onboarding-Vorlagen legen Sie im Voraus fest, wer beim Eintritt eines neuen Mitarbeiters welche Aufgaben zu erledigen hat. So läuft jeder Eintritt einheitlich und nachprüfbar ab, und kein Schritt bleibt aus (z. B. Vorbereitung des Arbeitsvertrags, Beschaffung der Arbeitsmittel, Vergabe der Zugänge).</p>
+<p>Eine Vorlage besteht aus beliebig vielen Aufgaben, die Sie in Gruppen (z. B. IT, HR, Finanzen) ordnen können. In der Regel ist es sinnvoll, mehrere Vorlagen nach Funktion anzulegen — beispielsweise eine eigene Vorlage für Bürokräfte und eine eigene für IT-Neuzugänge.</p>
+<p><img src="https://help.infinityhu.eu/media/img_d80f4b82efe2.png" class="shot" loading="lazy"/></p>
+<p><em><strong>Aufgaben hinzufügen</strong></em></p>
+<p>Nach dem Öffnen der Vorlage können Sie über die Schaltfläche Neue Aufgabe hinzufügen Aufgaben aufnehmen. Bei einer Aufgabe geben Sie Folgendes an</p>
+<p>Im Feld Gruppe wählen Sie aus, welcher Abteilung oder Gruppe die Aufgabe zufällt. Der Aufgabenname ist die konkrete Aufgabe selbst. Die Art des Verantwortlichen ist keine konkrete Person, sondern eine Rolle (z. B. direkte Führungskraft, IT-Verantwortlicher) — so bleibt die Vorlage wiederverwendbar, und das System ordnet die Aufgabe bei jedem neuen Eintritt der passenden Person zu. Die Art der Frist und die Anzahl der Tage ergeben zusammen die relative Frist (z. B. „5 Tage vor Arbeitsbeginn“), Sie erfassen also kein festes Datum, sondern einen Zeitpunkt relativ zum Arbeitsbeginn. Markieren Sie das Kennzeichen Pflichtaufgabe, kann die Aufgabe beim Eintritt nicht übersprungen werden. Die Erfassung der Aufgabe schließen Sie mit der Schaltfläche Speichern ab.</p></div><div class="foot">Aktualisiert 2026.08.26 · v2026.08.26</div></body></html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html><html lang="hu"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Pozíciók – nyitás, kezelés, lezárás</title><style>*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,-apple-system,'Segoe UI',sans-serif;background:#fff;color:#333B4D;
+font-size:14px;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:#1B3A6B}
+.bar{position:sticky;top:0;display:flex;align-items:center;gap:10px;padding:10px 16px;
+background:#FAFAF9;border-bottom:1px solid #E8E7E3;font-size:12px}
+.bar b{font-size:13px;color:#1E293B;font-weight:600;flex:1;min-width:0;overflow:hidden;
+text-overflow:ellipsis;white-space:nowrap}
+.bar a{color:#6B7280;text-decoration:none;white-space:nowrap;display:flex;align-items:center;gap:4px}
+.bar a:hover{color:#1B3A6B}
+.bar svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.pad{padding:18px 20px 30px}
+h1{font-size:19px;font-weight:700;color:#1E293B;margin:0 0 12px}
+h2{font-size:16px;font-weight:600;color:#1E293B;margin:22px 0 8px;scroll-margin-top:50px}
+h3{font-size:14.5px;font-weight:600;color:#1E293B;margin:18px 0 6px;scroll-margin-top:50px}
+h2 .hno,h3 .hno{color:#9CA3AF;font-weight:500;margin-right:6px}
+p{margin:0 0 11px}
+ul,ol{margin:0 0 11px;padding-left:20px}
+li{margin-bottom:4px}
+img{max-width:100%;height:auto;border:1px solid #E8E7E3;border-radius:5px;margin:5px 0}
+.call{background:#FAFAF9;border:1px solid #E8E7E3;border-left:3px solid #1B3A6B;border-radius:0 6px 6px 0;
+padding:11px 14px;margin:14px 0;font-size:13px}
+.call.warn{background:#FFFDF5;border-color:#F3E7C4;border-left-color:#F59E0B}
+.call strong{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;
+color:#6B7280;margin-bottom:3px}
+table{width:100%;border-collapse:collapse;margin:13px 0;font-size:12.5px}
+th{background:#FAFAF9;text-align:left;padding:7px 10px;font-size:10px;text-transform:uppercase;
+letter-spacing:.04em;color:#6B7280;border-bottom:1px solid #E8E7E3}
+td{padding:7px 10px;border-bottom:1px solid #F1F0EE;vertical-align:top}
+figcaption{font-size:11px;color:#9CA3AF;margin-top:4px}
+.foot{padding:14px 20px;border-top:1px solid #F1F0EE;font-size:11px;color:#9CA3AF}
+</style></head><body><div class="bar"><b>10.5 Pozíciók – nyitás, kezelés, lezárás</b><a href="https://help.infinityhu.eu/hu/10-5-poziciok-nyitas-kezeles-lezaras.html" target="_blank" rel="noopener">Teljes oldal<svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></a></div><div class="pad"><p>Menü: HR → Pozíciók</p>
+<p>A pozíció egy konkrét betöltendő hely. A toborzás mindig pozícióhoz
+kötött, ezért a jelöltet csak meglévő, nyitott pozícióra tudod
+rögzíteni.</p><h2 id="10-5-1-pozicio-letrehozasa"><span class="hno">10.5.1</span>Pozíció létrehozása</h2><ol type="1">
+<li><p>Menü: HR → Pozíciók → Új Pozíció</p></li>
+<li><p>Add meg a pozíció megnevezését és válaszd ki a
+beosztást.</p></li>
+<li><p>Válaszd ki a divíziót, a hiring managert és a
+telephelyet.</p></li>
+<li><p>Állítsd be a munkaviszony típusát, a munkavégzés módját és a
+szenioritást.</p></li>
+<li><p>Add meg a létszámot és a tervezett kezdési dátumot.</p></li>
+<li><p>Szükség esetén töltsd ki a kompenzáció és az egyéb mezőket
+(bérsáv, költséghely, projekt).</p></li>
+<li><p>Mentés – a státusz alapértelmezetten Tervezet; toborzás
+indításához állítsd Nyitottra.</p>
+<p><img src="https://help.infinityhu.eu/media/img_ff33c591e0b0.png" class="shot" loading="lazy"/></p></li>
+</ol>
+<div class="tblwrap"><table class="erp-table">
+
+<thead>
+<tr class="header">
+<th><strong>Mező</strong></th>
+<th><strong>Típus</strong></th>
+<th><strong>Kötelező?</strong></th>
+<th><strong>Magyarázat / tippek</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Pozíció megnevezés</td>
+<td>Szöveg</td>
+<td>Igen</td>
+<td>A pozíció neve; ez jelenik meg a listákban és a toborzásban.</td>
+</tr>
+<tr class="even">
+<td>Beosztás</td>
+<td>Dropdown</td>
+<td>Igen</td>
+<td>A pozíció munkakör-típusa. Beállítások → Munkakör és foglalkoztatás
+→ Beosztások törzsadatból töltődik.</td>
+</tr>
+<tr class="odd">
+<td>Divízió</td>
+<td>Dropdown</td>
+<td>Nem</td>
+<td>Melyik divízióhoz tartozik. Beállítások → Szervezeti struktúra →
+Divízió törzsadatból töltődik.</td>
+</tr>
+<tr class="even">
+<td>Hiring manager</td>
+<td>Dropdown</td>
+<td>Igen</td>
+<td>A pozíció felelős vezetője. Manager nézetben csak a saját pozícióit
+látja.</td>
+</tr>
+<tr class="odd">
+<td>Telephely</td>
+<td>Dropdown</td>
+<td>Nem</td>
+<td>Melyik helyszínre szól. Beállítások → Szervezeti struktúra →
+Helyszín törzsadatból töltődik.</td>
+</tr>
+<tr class="even">
+<td>Létszám</td>
+<td>Szám</td>
+<td>Igen</td>
+<td>Hány főt kell felvenni. Ha betelt, a rendszer figyelmeztet új jelölt
+felvitelekor.</td>
+</tr>
+<tr class="odd">
+<td>Státusz</td>
+<td>Dropdown</td>
+<td>Nem</td>
+<td>Alapértelmezett: Tervezet. Toborzás csak Nyitott vagy Szüneteltetve
+státusznál indítható.</td>
+</tr>
+<tr class="even">
+<td>Munkaviszony</td>
+<td>Dropdown</td>
+<td>Igen</td>
+<td>A foglalkoztatás típusa (pl. Teljes munkaidő, Részmunkaidő,
+Megbízási). Beállítások → Munkakör és foglalkoztatás → Foglalkoztatás
+típusa törzsadatból töltődik.</td>
+</tr>
+<tr class="odd">
+<td>Munkavégzés módja</td>
+<td>Dropdown</td>
+<td>Nem</td>
+<td>Irodai / Hibrid / Távmunka. Beállítások → Munkakör és foglalkoztatás
+→ Munkavégzés módja törzsadatból töltődik.</td>
+</tr>
+<tr class="even">
+<td>Kezdés tervezett dátuma</td>
+<td>Dátum</td>
+<td>Nem</td>
+<td>Mikor kellene betölteni a pozíciót. Segít a toborzás
+prioritizálásában.</td>
+</tr>
+<tr class="odd">
+<td>Szenioritás</td>
+<td>Dropdown</td>
+<td>Nem</td>
+<td>A beosztáshoz rendelt szint (pl. Junior, Medior, Senior).
+Beállítások → Munkakör és foglalkoztatás → Szenioritási szint
+törzsadatból töltődik.</td>
+</tr>
+<tr class="even">
+<td>Bérsáv min / max</td>
+<td>Szám</td>
+<td>Nem</td>
+<td>Tervezett bérsáv. Jogosultságfüggő – csak HR/Finance láthatja.</td>
+</tr>
+<tr class="odd">
+<td>Pénznem</td>
+<td>Dropdown</td>
+<td>Nem</td>
+<td>A bérsávhoz tartozó pénznem (pl. HUF, EUR).</td>
+</tr>
+<tr class="even">
+<td>Költséghely</td>
+<td>Dropdown</td>
+<td>Nem</td>
+<td>Melyik költséghelyhez terhelődik a pozíció. Pénzügyi riportokhoz
+hasznos.</td>
+</tr>
+<tr class="odd">
+<td>Projekt</td>
+<td>Dropdown</td>
+<td>Nem</td>
+<td>Ha a pozíció projekthez kötött, itt rendelhető hozzá.</td>
+</tr>
+<tr class="even">
+<td>Pozíció leírás</td>
+<td>Hosszú szöveg</td>
+<td>Nem</td>
+<td>A szerepkör részletes leírása; belső vagy külső hirdetéshez is
+felhasználható.</td>
+</tr>
+<tr class="odd">
+<td>Követelmények</td>
+<td>Hosszú szöveg</td>
+<td>Nem</td>
+<td>Elvárt végzettség, tapasztalat, készségek.</td>
+</tr>
+<tr class="even">
+<td>Megjegyzés belső használatra</td>
+<td>Hosszú szöveg</td>
+<td>Nem</td>
+<td>Csak HR és vezető látja; tárgyalási szempontok, belső
+kontextus.</td>
+</tr>
+</tbody>
+</table></div><h2 id="10-5-2-pozicio-statuszok-a-gyakorlatban"><span class="hno">10.5.2</span>Pozíció státuszok a gyakorlatban</h2><p><strong>Tervezet:</strong> a pozíció még nem aktív, toborzás nem
+indítható.</p>
+<p><strong>Nyitott:</strong> toborzás engedélyezett, új jelöltek
+felvehetők.</p>
+<p><strong>Folyamatban:</strong> a kiválasztás aktívan zajlik, a pozíció
+még nincs betöltve.</p>
+<p><strong>Betöltött:</strong> a headcount betelt; új jelölt felvitel
+tiltott vagy figyelmeztetéssel jelzett.</p>
+<p><strong>Törölve:</strong> lezárt/törölt pozíció, csak archív
+megtekintés.</p>
+<blockquote>
+<p><strong>Tipp: Ha a headcount betelt, de mégis kell plusz fő, előbb
+növeld a headcountot, csak utána rögzíts új felvételt.</strong></p>
+</blockquote></div><div class="foot">Frissítve 2026.08.26 · v2026.08.26</div></body></html>

@@ -1,0 +1,402 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Recruitment – managing candidates on the Kanban</title><style>*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,-apple-system,'Segoe UI',sans-serif;background:#fff;color:#333B4D;
+font-size:14px;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:#1B3A6B}
+.bar{position:sticky;top:0;display:flex;align-items:center;gap:10px;padding:10px 16px;
+background:#FAFAF9;border-bottom:1px solid #E8E7E3;font-size:12px}
+.bar b{font-size:13px;color:#1E293B;font-weight:600;flex:1;min-width:0;overflow:hidden;
+text-overflow:ellipsis;white-space:nowrap}
+.bar a{color:#6B7280;text-decoration:none;white-space:nowrap;display:flex;align-items:center;gap:4px}
+.bar a:hover{color:#1B3A6B}
+.bar svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.pad{padding:18px 20px 30px}
+h1{font-size:19px;font-weight:700;color:#1E293B;margin:0 0 12px}
+h2{font-size:16px;font-weight:600;color:#1E293B;margin:22px 0 8px;scroll-margin-top:50px}
+h3{font-size:14.5px;font-weight:600;color:#1E293B;margin:18px 0 6px;scroll-margin-top:50px}
+h2 .hno,h3 .hno{color:#9CA3AF;font-weight:500;margin-right:6px}
+p{margin:0 0 11px}
+ul,ol{margin:0 0 11px;padding-left:20px}
+li{margin-bottom:4px}
+img{max-width:100%;height:auto;border:1px solid #E8E7E3;border-radius:5px;margin:5px 0}
+.call{background:#FAFAF9;border:1px solid #E8E7E3;border-left:3px solid #1B3A6B;border-radius:0 6px 6px 0;
+padding:11px 14px;margin:14px 0;font-size:13px}
+.call.warn{background:#FFFDF5;border-color:#F3E7C4;border-left-color:#F59E0B}
+.call strong{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;
+color:#6B7280;margin-bottom:3px}
+table{width:100%;border-collapse:collapse;margin:13px 0;font-size:12.5px}
+th{background:#FAFAF9;text-align:left;padding:7px 10px;font-size:10px;text-transform:uppercase;
+letter-spacing:.04em;color:#6B7280;border-bottom:1px solid #E8E7E3}
+td{padding:7px 10px;border-bottom:1px solid #F1F0EE;vertical-align:top}
+figcaption{font-size:11px;color:#9CA3AF;margin-top:4px}
+.foot{padding:14px 20px;border-top:1px solid #F1F0EE;font-size:11px;color:#9CA3AF}
+</style></head><body><div class="bar"><b>10.6 Recruitment – managing candidates on the Kanban</b><a href="https://help.infinityhu.eu/en/10-6-toborzas-jeloltek-kezelese-a-kanbanon.html" target="_blank" rel="noopener">Full page<svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></a></div><div class="pad"><p>Menu: HR → Recruitment</p>
+<p>In the Recruitment module the candidates appear in a list view. The Kanban view helps you see where the selection stands.</p>
+<p><img src="https://help.infinityhu.eu/media/img_7a445e6de42f.png" class="shot" loading="lazy"/></p><h2 id="10-6-1-uj-jelolt-rogzitese"><span class="hno">10.6.1</span>Recording a new candidate</h2><p>You can record a new candidate in the HR → Recruitment menu with the “Create” button. After saving, the candidate is automatically placed in the “Received” status.</p>
+<p><img src="https://help.infinityhu.eu/media/img_855e0edb890a.png" class="shot" loading="lazy"/></p>
+<ol type="1">
+<li><p>Click: New candidate.</p></li>
+<li><p>Select the position (only a position with the status Open or In progress can be chosen).</p></li>
+<li><p>Enter the candidate's name and at least one contact detail (e-mail or phone).</p></li>
+<li><p>Set the source and the status.</p></li>
+<li><p>Upload a CV (PDF, max. 10 MB) if one is available.</p></li>
+<li><p>Fill in the details of the application and the special data if needed.</p></li>
+<li><p>Save.</p>
+<p><strong>Basic data</strong></p></li>
+</ol>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Field</strong></th>
+<th><strong>Type</strong></th>
+<th><strong>Mandatory?</strong></th>
+<th><strong>Explanation / tips</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Position</td>
+<td>Drop-down</td>
+<td>Yes</td>
+<td>The candidate is always tied to a position. Only a position with the status Open or In progress can be selected.</td>
+</tr>
+<tr class="even">
+<td>Candidate's name</td>
+<td>Text</td>
+<td>Yes</td>
+<td>The identifying data of the candidate; this is what appears in the lists and on the Kanban.</td>
+</tr>
+<tr class="odd">
+<td>E-mail</td>
+<td>E-mail</td>
+<td>No</td>
+<td>The duplicate warning is based on the e-mail address.</td>
+</tr>
+<tr class="even">
+<td>Phone</td>
+<td>Text</td>
+<td>No</td>
+<td>Alternative contact detail.</td>
+</tr>
+<tr class="odd">
+<td>Source</td>
+<td>Drop-down</td>
+<td>Yes</td>
+<td>Where the candidate came from. Needed for reports and for measuring channel efficiency. Loaded from the master data under Settings → Onboarding settings → Source.</td>
+</tr>
+<tr class="even">
+<td>Status</td>
+<td>Drop-down</td>
+<td>Yes</td>
+<td>The current pipeline step of the candidate. Loaded from the master data under Settings → Onboarding settings → Candidate status.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Related data</strong></p>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Field</strong></th>
+<th><strong>Type</strong></th>
+<th><strong>Mandatory?</strong></th>
+<th><strong>Explanation / tips</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>CV / file upload</td>
+<td>File</td>
+<td>No</td>
+<td>Only PDF files are accepted, max. 10 MB. It can be uploaded by drag &amp; drop or with the Browse button.</td>
+</tr>
+<tr class="even">
+<td>LinkedIn</td>
+<td>URL</td>
+<td>No</td>
+<td>The link to the candidate's LinkedIn profile.</td>
+</tr>
+<tr class="odd">
+<td>Facebook</td>
+<td>URL</td>
+<td>No</td>
+<td>The link to the candidate's Facebook profile.</td>
+</tr>
+<tr class="even">
+<td>Instagram</td>
+<td>URL</td>
+<td>No</td>
+<td>The link to the candidate's Instagram profile.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Details of the application</strong></p>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Field</strong></th>
+<th><strong>Type</strong></th>
+<th><strong>Mandatory?</strong></th>
+<th><strong>Explanation / tips</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Seniority</td>
+<td>Drop-down</td>
+<td>No</td>
+<td>The level requested by or attributed to the candidate (for example junior, medior, senior).</td>
+</tr>
+<tr class="even">
+<td>Salary expectation min</td>
+<td>Number</td>
+<td>No</td>
+<td>The minimum salary expectation indicated by the candidate.</td>
+</tr>
+<tr class="odd">
+<td>Salary expectation max</td>
+<td>Number</td>
+<td>No</td>
+<td>The maximum salary expectation indicated by the candidate.</td>
+</tr>
+<tr class="even">
+<td>Currency</td>
+<td>Drop-down</td>
+<td>No</td>
+<td>The currency of the salary expectation (for example HUF, EUR).</td>
+</tr>
+<tr class="odd">
+<td>Availability / starting date</td>
+<td>Date</td>
+<td>No</td>
+<td>The earliest date the candidate could start.</td>
+</tr>
+<tr class="even">
+<td>Comment for internal use</td>
+<td>Long text</td>
+<td>No</td>
+<td>Only HR and the manager see it; negotiation points, impressions.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Special data</strong></p>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Field</strong></th>
+<th><strong>Type</strong></th>
+<th><strong>Mandatory?</strong></th>
+<th><strong>Explanation / tips</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Tech stack</td>
+<td>Multi-select</td>
+<td>No</td>
+<td>The technologies known by the candidate. A particularly useful filtering and comparison dimension in IT recruitment.</td>
+</tr>
+<tr class="even">
+<td>English level</td>
+<td>Drop-down</td>
+<td>No</td>
+<td>The level of the candidate's English (for example A1–C2, or basic/intermediate/advanced).</td>
+</tr>
+<tr class="odd">
+<td>Remote work preference</td>
+<td>Check box</td>
+<td>No</td>
+<td>It indicates whether the candidate prefers remote work.</td>
+</tr>
+<tr class="even">
+<td>Test assignment status</td>
+<td>Drop-down</td>
+<td>No</td>
+<td>The current state of the test assignment given to the candidate (for example issued, received, evaluated).</td>
+</tr>
+</tbody>
+</table></div><h2 id="10-6-2-jelolt-statusz-mozgatasa-a-kanbanon"><span class="hno">10.6.2</span>Moving the candidate&#x27;s status on the Kanban</h2><p>On the Kanban you can move the candidates by drag &amp; drop. Every move is recorded in the status history, so it can be traced back when the candidate stood at which step.</p>
+<ol type="1">
+<li><p>Open the relevant position with a filter (if several positions are running).</p></li>
+<li><p>Grab the candidate card and drag it into the next column (for example Received → Pre-screened).</p></li>
+<li><p>If the system asks for a comment (for example at a rejection), enter the reason.</p></li>
+<li><p>Check the badges on the candidate card (for example “Interview scheduled”).</p></li>
+</ol><h2 id="10-6-3-interjuk-rogzitese-es-lezarasa"><span class="hno">10.6.3</span>Recording and closing interviews</h2><p>You can add an interview on the candidate's record. When recording the interview, you enter the time, the type (see: 3.6.4 Interview type) and the participants.</p>
+<ol type="1">
+<li><p>Open the candidate (click the card).</p></li>
+<li><p>Go to the “Interviews” section and click: Schedule interview.</p></li>
+<li><p>Select the type (HR/tech/final), set the time and the participants.</p></li>
+<li><p>After saving, the status of the interview is Scheduled.</p></li>
+<li><p>After the interview, open it, set it to DONE and enter the evaluation.</p></li>
+</ol>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Field</strong></th>
+<th><strong>Type</strong></th>
+<th><strong>Mandatory?</strong></th>
+<th><strong>Explanation / tips</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Interview type</td>
+<td>Enum</td>
+<td>Yes</td>
+<td>HR/tech/final; useful for reports as well.</td>
+</tr>
+<tr class="even">
+<td>Time</td>
+<td>Date + time</td>
+<td>Yes</td>
+<td>The basis of the calendar view and the reminders.</td>
+</tr>
+<tr class="odd">
+<td>Meeting link / location</td>
+<td>Text/URL</td>
+<td>No</td>
+<td>An online link or an office location.</td>
+</tr>
+<tr class="even">
+<td>Participants</td>
+<td>User list</td>
+<td>Yes</td>
+<td>Who conducts the interview; the load is visible.</td>
+</tr>
+<tr class="odd">
+<td>Comments</td>
+<td>Text</td>
+<td>No</td>
+<td>Comments related to the interview</td>
+</tr>
+</tbody>
+</table></div><h2 id="10-6-4-ajanlat-keszitese-es-kovetese"><span class="hno">10.6.4</span>Creating and tracking an offer</h2><p>When the selection is successful, you create an offer. The offer is a separate record, because this way it can be tracked (sending out, acceptance, expiry) and reported on later.</p>
+<ol type="1">
+<li><p>Candidate record → Offer section → Create offer.</p></li>
+<li><p>The position is filled in automatically from the candidate's record.</p></li>
+<li><p>Enter the opening date and the type of employment.</p></li>
+<li><p>Fill in the compensation data (base salary, currency, pay period).</p></li>
+<li><p>Tick the benefits granted (laptop, phone, home office allowance, company car, other).</p></li>
+<li><p>If needed, enter the validity date and the internal comment.</p></li>
+<li><p>Attach a PDF document if necessary.</p></li>
+<li><p>Save — the offer is recorded with the status Draft.</p>
+<p><strong>Basic data</strong></p></li>
+</ol>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Field</strong></th>
+<th><strong>Type</strong></th>
+<th><strong>Mandatory?</strong></th>
+<th><strong>Explanation / tips</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Position</td>
+<td>Text (read-only)</td>
+<td>–</td>
+<td>Filled in automatically from the candidate's record; it cannot be edited.</td>
+</tr>
+<tr class="even">
+<td>Opening date</td>
+<td>Date</td>
+<td>Yes</td>
+<td>The date the offer was drawn up.</td>
+</tr>
+<tr class="odd">
+<td>Employment</td>
+<td>Drop-down</td>
+<td>Yes</td>
+<td>The type of employment (for example full-time, part-time). Loaded from the master data under Settings → Job and employment → Type of employment.</td>
+</tr>
+<tr class="even">
+<td>Status</td>
+<td>Status label</td>
+<td>–</td>
+<td>For a new offer it is automatically Draft. After saving it can be moved on manually.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Administrative data</strong></p>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Field</strong></th>
+<th><strong>Type</strong></th>
+<th><strong>Mandatory?</strong></th>
+<th><strong>Explanation / tips</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Validity date</td>
+<td>Date</td>
+<td>No</td>
+<td>How long the offer is valid. For monitoring the expiry; the system can give an alert.</td>
+</tr>
+<tr class="even">
+<td>Comment for internal use</td>
+<td>Long text</td>
+<td>No</td>
+<td>Only HR and the manager see it; negotiation points, internal context.</td>
+</tr>
+<tr class="odd">
+<td>Attachment (PDF only)</td>
+<td>File</td>
+<td>No</td>
+<td>For attaching the offer letter or the draft contract.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Compensation</strong></p>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Field</strong></th>
+<th><strong>Type</strong></th>
+<th><strong>Mandatory?</strong></th>
+<th><strong>Explanation / tips</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Base salary</td>
+<td>Number</td>
+<td>No</td>
+<td>The gross base salary offered to the candidate. A permission-dependent field — only HR/Finance can see it.</td>
+</tr>
+<tr class="even">
+<td>Currency</td>
+<td>Drop-down</td>
+<td>Yes</td>
+<td>The currency of the base salary (for example HUF, EUR).</td>
+</tr>
+<tr class="odd">
+<td>Pay period</td>
+<td>Drop-down</td>
+<td>Yes</td>
+<td>The frequency of the base salary (for example monthly, annual).</td>
+</tr>
+<tr class="even">
+<td>Bonus</td>
+<td>Number</td>
+<td>No</td>
+<td>The amount of the performance-based or other bonus.</td>
+</tr>
+<tr class="odd">
+<td>Benefits</td>
+<td>Check box list</td>
+<td>No</td>
+<td>Several items can be selected: laptop / phone / home office allowance / company car / other.</td>
+</tr>
+</tbody>
+</table></div><h2 id="10-6-5-felvetel-mikor-es-hogyan"><span class="hno">10.6.5</span>Hiring – when and how</h2><p>Accepting the offer is not yet hiring. Hiring is an HR approval step that creates the employee in the system, updates the headcount of the position and starts the onboarding.</p>
+<ol type="1">
+<li><p><img src="https://help.infinityhu.eu/media/img_787ab7c9e5ff.png" class="shot" loading="lazy"/>Candidate status: Offer accepted</p></li>
+<li><p>On the Kanban list, click on the candidate's record:</p></li>
+<li><p>The system sends out the employee data sheet</p></li>
+<li><p>The employee fills it in, uploads the necessary documents and saves — at this point they are created as a “partner” in Infinity.</p></li>
+<li><p>Check and complete the entry data (start date, manager, contract type, salary and so on).</p></li>
+<li><p>Finalise the hiring: the partner has to be converted into an employee, and an onboarding template — created in the settings — has to be assigned if needed.</p></li>
+<li><p>Check: the employee appears among the Employees, the onboarding has started.</p></li>
+</ol></div><div class="foot">Updated 2026.08.26 · v2026.08.26</div></body></html>

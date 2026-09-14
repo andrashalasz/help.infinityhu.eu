@@ -1,0 +1,170 @@
+<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Stellen – öffnen, verwalten, schließen</title><style>*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,-apple-system,'Segoe UI',sans-serif;background:#fff;color:#333B4D;
+font-size:14px;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:#1B3A6B}
+.bar{position:sticky;top:0;display:flex;align-items:center;gap:10px;padding:10px 16px;
+background:#FAFAF9;border-bottom:1px solid #E8E7E3;font-size:12px}
+.bar b{font-size:13px;color:#1E293B;font-weight:600;flex:1;min-width:0;overflow:hidden;
+text-overflow:ellipsis;white-space:nowrap}
+.bar a{color:#6B7280;text-decoration:none;white-space:nowrap;display:flex;align-items:center;gap:4px}
+.bar a:hover{color:#1B3A6B}
+.bar svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.pad{padding:18px 20px 30px}
+h1{font-size:19px;font-weight:700;color:#1E293B;margin:0 0 12px}
+h2{font-size:16px;font-weight:600;color:#1E293B;margin:22px 0 8px;scroll-margin-top:50px}
+h3{font-size:14.5px;font-weight:600;color:#1E293B;margin:18px 0 6px;scroll-margin-top:50px}
+h2 .hno,h3 .hno{color:#9CA3AF;font-weight:500;margin-right:6px}
+p{margin:0 0 11px}
+ul,ol{margin:0 0 11px;padding-left:20px}
+li{margin-bottom:4px}
+img{max-width:100%;height:auto;border:1px solid #E8E7E3;border-radius:5px;margin:5px 0}
+.call{background:#FAFAF9;border:1px solid #E8E7E3;border-left:3px solid #1B3A6B;border-radius:0 6px 6px 0;
+padding:11px 14px;margin:14px 0;font-size:13px}
+.call.warn{background:#FFFDF5;border-color:#F3E7C4;border-left-color:#F59E0B}
+.call strong{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;
+color:#6B7280;margin-bottom:3px}
+table{width:100%;border-collapse:collapse;margin:13px 0;font-size:12.5px}
+th{background:#FAFAF9;text-align:left;padding:7px 10px;font-size:10px;text-transform:uppercase;
+letter-spacing:.04em;color:#6B7280;border-bottom:1px solid #E8E7E3}
+td{padding:7px 10px;border-bottom:1px solid #F1F0EE;vertical-align:top}
+figcaption{font-size:11px;color:#9CA3AF;margin-top:4px}
+.foot{padding:14px 20px;border-top:1px solid #F1F0EE;font-size:11px;color:#9CA3AF}
+</style></head><body><div class="bar"><b>10.5 Stellen – öffnen, verwalten, schließen</b><a href="https://help.infinityhu.eu/de/10-5-poziciok-nyitas-kezeles-lezaras.html" target="_blank" rel="noopener">Volle Seite<svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></a></div><div class="pad"><p>Menü: HR → Stellen</p>
+<p>Eine Stelle ist eine konkrete zu besetzende Position. Das Recruiting ist immer an eine Stelle gebunden, daher kann ein Kandidat nur auf eine vorhandene, offene Stelle erfasst werden.</p><h2 id="10-5-1-pozicio-letrehozasa"><span class="hno">10.5.1</span>Stelle anlegen</h2><ol type="1">
+<li><p>Menü: HR → Stellen → Neue Stelle</p></li>
+<li><p>Geben Sie die Bezeichnung der Stelle an und wählen Sie die Funktion aus.</p></li>
+<li><p>Wählen Sie Division, Hiring Manager und Standort aus.</p></li>
+<li><p>Legen Sie Art des Arbeitsverhältnisses, Arbeitsform und Senioritätsstufe fest.</p></li>
+<li><p>Geben Sie die Personenzahl und das geplante Startdatum an.</p></li>
+<li><p>Füllen Sie bei Bedarf die Felder zur Vergütung und die weiteren Felder aus (Gehaltsband, Kostenstelle, Projekt).</p></li>
+<li><p>Speichern — der Status ist standardmäßig Entwurf; zum Start des Recruitings setzen Sie ihn auf Offen.</p>
+<p><img src="https://help.infinityhu.eu/media/img_ff33c591e0b0.png" class="shot" loading="lazy"/></p></li>
+</ol>
+<div class="tblwrap"><table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Feld</strong></th>
+<th><strong>Typ</strong></th>
+<th><strong>Pflicht?</strong></th>
+<th><strong>Erläuterung / Tipps</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Stellenbezeichnung</td>
+<td>Text</td>
+<td>Ja</td>
+<td>Der Name der Stelle; er erscheint in den Listen und im Recruiting.</td>
+</tr>
+<tr class="even">
+<td>Funktion</td>
+<td>Auswahlliste</td>
+<td>Ja</td>
+<td>Die Tätigkeitsart der Stelle. Wird aus den Stammdaten unter Einstellungen → Funktion und Beschäftigung → Funktionen geladen.</td>
+</tr>
+<tr class="odd">
+<td>Division</td>
+<td>Auswahlliste</td>
+<td>Nein</td>
+<td>Zu welcher Division sie gehört. Wird aus den Stammdaten unter Einstellungen → Organisationsstruktur → Division geladen.</td>
+</tr>
+<tr class="even">
+<td>Hiring Manager</td>
+<td>Auswahlliste</td>
+<td>Ja</td>
+<td>Die für die Stelle verantwortliche Führungskraft. In der Manageransicht sieht sie nur die eigenen Stellen.</td>
+</tr>
+<tr class="odd">
+<td>Standort</td>
+<td>Auswahlliste</td>
+<td>Nein</td>
+<td>Für welchen Standort sie gilt. Wird aus den Stammdaten unter Einstellungen → Organisationsstruktur → Standort geladen.</td>
+</tr>
+<tr class="even">
+<td>Personenzahl</td>
+<td>Zahl</td>
+<td>Ja</td>
+<td>Wie viele Personen einzustellen sind. Ist die Zahl erreicht, warnt das System beim Erfassen eines neuen Kandidaten.</td>
+</tr>
+<tr class="odd">
+<td>Status</td>
+<td>Auswahlliste</td>
+<td>Nein</td>
+<td>Standard: Entwurf. Das Recruiting kann nur bei Status Offen oder Pausiert gestartet werden.</td>
+</tr>
+<tr class="even">
+<td>Arbeitsverhältnis</td>
+<td>Auswahlliste</td>
+<td>Ja</td>
+<td>Die Art der Beschäftigung (z. B. Vollzeit, Teilzeit, Werkvertrag). Wird aus den Stammdaten unter Einstellungen → Funktion und Beschäftigung → Art der Beschäftigung geladen.</td>
+</tr>
+<tr class="odd">
+<td>Arbeitsform</td>
+<td>Auswahlliste</td>
+<td>Nein</td>
+<td>Büro / Hybrid / Remote. Wird aus den Stammdaten unter Einstellungen → Funktion und Beschäftigung → Arbeitsform geladen.</td>
+</tr>
+<tr class="even">
+<td>Geplantes Startdatum</td>
+<td>Datum</td>
+<td>Nein</td>
+<td>Wann die Stelle besetzt werden soll. Hilft bei der Priorisierung des Recruitings.</td>
+</tr>
+<tr class="odd">
+<td>Senioritätsstufe</td>
+<td>Auswahlliste</td>
+<td>Nein</td>
+<td>Die der Funktion zugeordnete Stufe (z. B. Junior, Medior, Senior). Wird aus den Stammdaten unter Einstellungen → Funktion und Beschäftigung → Senioritätsstufe geladen.</td>
+</tr>
+<tr class="even">
+<td>Gehaltsband min / max</td>
+<td>Zahl</td>
+<td>Nein</td>
+<td>Das geplante Gehaltsband. Berechtigungsabhängig — nur HR/Finance sehen es.</td>
+</tr>
+<tr class="odd">
+<td>Währung</td>
+<td>Auswahlliste</td>
+<td>Nein</td>
+<td>Die Währung des Gehaltsbands (z. B. HUF, EUR).</td>
+</tr>
+<tr class="even">
+<td>Kostenstelle</td>
+<td>Auswahlliste</td>
+<td>Nein</td>
+<td>Welcher Kostenstelle die Stelle belastet wird. Für Finanzberichte nützlich.</td>
+</tr>
+<tr class="odd">
+<td>Projekt</td>
+<td>Auswahlliste</td>
+<td>Nein</td>
+<td>Ist die Stelle an ein Projekt gebunden, kann sie hier zugeordnet werden.</td>
+</tr>
+<tr class="even">
+<td>Stellenbeschreibung</td>
+<td>Langtext</td>
+<td>Nein</td>
+<td>Die ausführliche Beschreibung der Rolle; auch für eine interne oder externe Ausschreibung verwendbar.</td>
+</tr>
+<tr class="odd">
+<td>Anforderungen</td>
+<td>Langtext</td>
+<td>Nein</td>
+<td>Erwartete Qualifikation, Erfahrung und Fähigkeiten.</td>
+</tr>
+<tr class="even">
+<td>Bemerkung für den internen Gebrauch</td>
+<td>Langtext</td>
+<td>Nein</td>
+<td>Nur HR und die Führungskraft sehen sie; Verhandlungsaspekte, interner Kontext.</td>
+</tr>
+</tbody>
+</table></div><h2 id="10-5-2-pozicio-statuszok-a-gyakorlatban"><span class="hno">10.5.2</span>Stellenstatuswerte in der Praxis</h2><p><strong>Entwurf:</strong> die Stelle ist noch nicht aktiv, das Recruiting kann nicht gestartet werden.</p>
+<p><strong>Offen:</strong> das Recruiting ist zulässig, neue Kandidaten können erfasst werden.</p>
+<p><strong>In Bearbeitung:</strong> die Auswahl läuft aktiv, die Stelle ist noch nicht besetzt.</p>
+<p><strong>Besetzt:</strong> die Personenzahl ist erreicht; das Erfassen neuer Kandidaten ist untersagt oder wird mit einer Warnung gekennzeichnet.</p>
+<p><strong>Gelöscht:</strong> abgeschlossene oder gelöschte Stelle, nur Archivansicht.</p>
+<blockquote>
+<p><strong>Tipp: Ist die Personenzahl erreicht, wird aber dennoch eine weitere Person benötigt, erhöhen Sie zuerst die Personenzahl und erfassen Sie erst danach die neue Einstellung.</strong></p>
+</blockquote></div><div class="foot">Aktualisiert 2026.08.26 · v2026.08.26</div></body></html>
