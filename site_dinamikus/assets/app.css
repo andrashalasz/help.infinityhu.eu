@@ -551,3 +551,8 @@ a:hover { text-decoration: underline; }
 .news-item__m { font-size: calc(12.2px * var(--fs)); color: var(--ink-3); }
 .news-item__s { font-size: calc(13.4px * var(--fs)); color: var(--ink-2); margin-top: 4px; }
 .news-date { font-size: calc(11.6px * var(--fs)); color: var(--ink-3); font-variant-numeric: tabular-nums; }
+
+/* ---------- 17. a szerkesztőben beállított kép-/videóméret ---------- */
+/* Az inline stílus (width/height) erősebb a stíluslapnál, ezért a beállított
+   méret érvényesül; a max-width viszont megvéd a kilógástól kis képernyőn. */
+.body img[style], .body video[style] { max-width: 100%; }

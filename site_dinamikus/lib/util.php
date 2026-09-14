@@ -93,11 +93,11 @@ function help_clean_html(string $html): string
         'table' => ['class'], 'thead' => [], 'tbody' => [], 'tfoot' => [],
         'tr' => ['class'], 'th' => ['class','colspan','rowspan','scope'], 'td' => ['class','colspan','rowspan'],
         'a' => ['href','title','target','rel'],
-        'img' => ['src','alt','title','width','height','class','loading'],
-        'video' => ['src','controls','preload','poster','width','height','class','muted','loop','playsinline'],
+        'img' => ['src','alt','title','width','height','class','loading','style'],
+        'video' => ['src','controls','preload','poster','width','height','class','muted','loop','playsinline','style'],
         'source' => ['src','type'],
         'track' => ['src','kind','srclang','label','default'],
-        'figure' => ['class'], 'figcaption' => ['class'],
+        'figure' => ['class','style'], 'figcaption' => ['class'],
         'div' => ['class','id'], 'span' => ['class'],
         'section' => ['class','id'],
     ];
@@ -150,6 +150,12 @@ function help_clean_html(string $html): string
                     $child->removeAttribute($attr->nodeName);
                     continue;
                 }
+                if ($name === 'style') {
+                    $clean = help_clean_style((string)$attr->nodeValue);
+                    if ($clean === '') { $child->removeAttribute('style'); }
+                    else { $child->setAttribute('style', $clean); }
+                    continue;
+                }
                 if ($name === 'href' || $name === 'src') {
                     $v = trim($attr->nodeValue ?? '');
                     $scheme = strtolower((string)parse_url($v, PHP_URL_SCHEME));
@@ -171,6 +177,41 @@ function help_clean_html(string $html): string
         $out .= $doc->saveHTML($c);
     }
     return trim($out);
+}
+
+/**
+ * Inline stilus szurese: CSAK meretezes marad benne.
+ *
+ * A szerkesztobol jovo kepek/videok meretet inline stilus hordozza (ez az egyetlen,
+ * ami felul tudja irni a stiluslap "height: auto" szabalyat, amikor a szerkeszto
+ * szandekosan kikapcsolja az aranytartast). Minden mas CSS-tulajdonsag kiesik,
+ * igy a mezo nem valik altalanos stilus-becsatornazasi lehetoseggé.
+ */
+function help_clean_style(string $style): string
+{
+    $allowed = ['width', 'height', 'max-width', 'max-height', 'object-fit'];
+    $out = [];
+
+    foreach (explode(';', $style) as $decl) {
+        if (!str_contains($decl, ':')) { continue; }
+        [$prop, $val] = explode(':', $decl, 2);
+        $prop = strtolower(trim($prop));
+        $val  = trim($val);
+
+        if (!in_array($prop, $allowed, true)) { continue; }
+
+        if ($prop === 'object-fit') {
+            if (in_array($val, ['fill', 'contain', 'cover', 'none', 'scale-down'], true)) {
+                $out[] = $prop . ':' . $val;
+            }
+            continue;
+        }
+        // csak egyszeru meretertek: 320px, 50%, auto - se url(), se calc(), se valtozo
+        if (preg_match('/^(auto|\d{1,5}(\.\d{1,2})?(px|%|em|rem|vw|vh))$/i', $val)) {
+            $out[] = $prop . ':' . strtolower($val);
+        }
+    }
+    return implode(';', $out);
 }
 
 /**

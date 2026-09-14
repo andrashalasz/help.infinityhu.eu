@@ -97,6 +97,11 @@ Bal oldalt a teljes fejezetlista nyelvenként, szűrővel. Jobb oldalt a szerkes
 - **Kép és videó feltöltése közvetlenül a szerkesztőből**: a **Kép** / **Videó** gomb, a fájl
   ráhúzása a szövegre, vagy vágólapról beillesztett képernyőkép — mind azonnal feltölt és beszúr.
   Nem kell előre a Képek fülre menni.
+- **Méretezés**: a szerkesztőben a képre vagy videóra kattintva megjelennek a húzható fogantyúk
+  és egy kis sáv: pontos szélesség/magasság megadható számmal, gyors 25 / 50 / 75 / 100%-os
+  méretek egy kattintással, és az **🔗 Arány** gombbal az arány-tartás **kikapcsolható**
+  (szabad, akár torzított méret). Az „Eredeti" gomb visszaállítja a kép saját méretét.
+  A százalékos méret a nyilvános oldalon is reszponzív marad.
 - **Tömeges műveletek**: a ☑ gombbal több fejezet jelölhető ki (Shift-kattintással tartomány,
   a modul fejlécével az egész csoport), majd egyszerre kapcsolható be/ki, tehető közzé,
   helyezhető át másik modulba vagy törölhető.
@@ -424,6 +429,10 @@ Az alábbiakat ténylegesen lefuttatva ellenőriztük a Docker környezetben, ne
 - **Kuka**: törölt fejezet visszaállítva a szakaszaival együtt
 - **parancspaletta**: `Ctrl+K`, „penz" keresésre 5 találat, első a „5 Pénzügy"
 - **mobil nézet** (375 px): a táblázatok kártyákká alakulnak, minden mező a saját címkéjével
+- **kép-/videóméretezés**: 50%-os előbeállítás → `width:50%;height:auto`; arány kikapcsolva és
+  140 px magasság → `width:50%;height:140px;object-fit:fill`; a méret mentés és közzététel után
+  a nyilvános oldalon is pontosan érvényesül (mérve: 407×143, illetve 320×140 képpont).
+  A stílus-szűrő közben kidobja a nem méret jellegű CSS-t (`position`, `background:url(...)` stb.)
 - **kép és videó feltöltése a szerkesztőből**: PNG feltöltve és beszúrva, MP4 felismerve
   (`video/mp4`), `vid_<hash>.mp4` néven eltárolva; nem támogatott fájltípus elutasítva
 - a videó kiszolgálása `Content-Type: video/mp4` fejléccel és `Range` kérésekkel (HTTP 206),

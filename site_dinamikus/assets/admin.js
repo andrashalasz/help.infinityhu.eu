@@ -293,10 +293,14 @@
       syncToSource();
     });
 
-    area.addEventListener('input', function () {
+    function markDirty() {
       var st = $('#ed-state');
       if (st && !st.dataset.dirty) { st.dataset.dirty = '1'; st.textContent = 'Nem mentett változások — Ctrl+S vagy „Vázlat mentése”.'; }
-    });
+    }
+    area.addEventListener('input', markDirty);
+
+    // kép/videó méretezése kattintásra
+    wireMediaResize(ed, area, syncToSource, markDirty);
 
     // figyelmeztetés mentetlen tartalomra
     window.addEventListener('beforeunload', function (e) {
@@ -313,6 +317,236 @@
       .replace(/\n(<\/(?:strong|em|u|s|a|code|span|b|i)>)/g, '$1')
       .replace(/(<(?:strong|em|u|s|a|code|span|b|i)[^>]*>)\n/g, '$1')
       .trim();
+  }
+
+
+  /* ---------------------------------------------------------- kép/videó méretezése */
+  function wireMediaResize(ed, area, syncToSource, markDirty) {
+    if (!ed || !area) { return; }
+
+    // a böngésző saját, esetleges fogantyúi helyett a sajátunkat használjuk
+    try { document.execCommand('enableObjectResizing', false, 'false'); } catch (e) {}
+
+    var sel = null;         // a kijelölt <img> vagy <video>
+    var locked = true;      // arány tartása
+
+    var box = document.createElement('div');
+    box.className = 'mres';
+    box.innerHTML =
+      '<span class="mres__h mres__h--e"  data-dir="e"  title="Szélesség"></span>' +
+      '<span class="mres__h mres__h--s"  data-dir="s"  title="Magasság"></span>' +
+      '<span class="mres__h mres__h--se" data-dir="se" title="Méret"></span>';
+    ed.appendChild(box);
+
+    var bar = document.createElement('div');
+    bar.className = 'mres__bar';
+    bar.innerHTML =
+      '<button type="button" class="mres__lock on" data-act="lock" title="Arány tartása – kattints a kikapcsoláshoz">🔗 Arány</button>' +
+      '<label>Sz <input type="number" class="mres__in" data-f="w" min="16" max="4000" step="1"></label>' +
+      '<label>Ma <input type="number" class="mres__in" data-f="h" min="16" max="4000" step="1"></label>' +
+      '<span class="mres__sep"></span>' +
+      '<button type="button" data-pct="25">25%</button>' +
+      '<button type="button" data-pct="50">50%</button>' +
+      '<button type="button" data-pct="75">75%</button>' +
+      '<button type="button" data-pct="100">100%</button>' +
+      '<span class="mres__sep"></span>' +
+      '<button type="button" data-act="reset" title="Beállított méret törlése">Eredeti</button>' +
+      '<button type="button" data-act="close" title="Kijelölés vége">✕</button>';
+    ed.appendChild(bar);
+
+    var inW = bar.querySelector('[data-f="w"]');
+    var inH = bar.querySelector('[data-f="h"]');
+    var lockBtn = bar.querySelector('[data-act="lock"]');
+
+    function ratioOf(el) {
+      var nw = el.naturalWidth || el.videoWidth || 0;
+      var nh = el.naturalHeight || el.videoHeight || 0;
+      if (nw > 0 && nh > 0) { return nw / nh; }
+      var r = el.getBoundingClientRect();
+      return r.height > 0 ? r.width / r.height : 16 / 9;
+    }
+
+    function place() {
+      if (!sel) { return; }
+      var edR = ed.getBoundingClientRect();
+      var r = sel.getBoundingClientRect();
+      box.style.left   = (r.left - edR.left) + 'px';
+      box.style.top    = (r.top - edR.top) + 'px';
+      box.style.width  = r.width + 'px';
+      box.style.height = r.height + 'px';
+
+      // a sáv a kép fölé kerül, ha elfér, különben alá
+      var above = (r.top - edR.top) > 46;
+      bar.style.left = (r.left - edR.left) + 'px';
+      bar.style.top  = (above ? (r.top - edR.top - 42) : (r.top - edR.top + r.height + 8)) + 'px';
+    }
+
+    function syncInputs() {
+      if (!sel) { return; }
+      var r = sel.getBoundingClientRect();
+      inW.value = Math.round(r.width);
+      inH.value = Math.round(r.height);
+    }
+
+    function select(el) {
+      sel = el;
+      box.classList.add('on');
+      bar.classList.add('on');
+      area.classList.add('ed--hasmedia');
+      place();
+      syncInputs();
+    }
+
+    function deselect() {
+      sel = null;
+      box.classList.remove('on');
+      bar.classList.remove('on');
+      area.classList.remove('ed--hasmedia');
+    }
+
+    function applySize(w, h) {
+      if (!sel) { return; }
+      if (w) { sel.style.width = Math.max(16, Math.round(w)) + 'px'; }
+      if (h) { sel.style.height = Math.max(16, Math.round(h)) + 'px'; }
+      else if (locked) { sel.style.height = 'auto'; }
+      // a videó kerete is kövesse a méretet
+      if (sel.tagName === 'VIDEO' && sel.parentElement && sel.parentElement.classList.contains('vid')) {
+        sel.parentElement.style.width = 'auto';
+      }
+      place();
+      syncInputs();
+      syncToSource();
+      markDirty();
+    }
+
+    area.addEventListener('click', function (e) {
+      var el = e.target.closest('img, video');
+      if (el && area.contains(el)) { select(el); }
+      else { deselect(); }
+    });
+
+    // gépelés vagy görgetés közben kövesse a helyét
+    ['scroll', 'resize'].forEach(function (ev) {
+      window.addEventListener(ev, function () { if (sel) { place(); } }, { passive: true });
+    });
+    area.addEventListener('input', function () { if (sel) { place(); } });
+    area.addEventListener('keydown', function (e) { if (e.key === 'Escape') { deselect(); } });
+
+    // ---- fogantyúk húzása ----
+    var drag = null;
+    box.addEventListener('pointerdown', function (e) {
+      var h = e.target.closest('.mres__h');
+      if (!h || !sel) { return; }
+      e.preventDefault();
+      var r = sel.getBoundingClientRect();
+      drag = { dir: h.dataset.dir, x: e.clientX, y: e.clientY, w: r.width, h: r.height, ratio: ratioOf(sel) };
+      h.setPointerCapture(e.pointerId);
+      box.classList.add('dragging');
+    });
+    box.addEventListener('pointermove', function (e) {
+      if (!drag || !sel) { return; }
+      var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      var w = drag.w, h = drag.h;
+
+      if (drag.dir === 'e')  { w = drag.w + dx; if (locked) { h = w / drag.ratio; } }
+      if (drag.dir === 's')  { h = drag.h + dy; if (locked) { w = h * drag.ratio; } }
+      if (drag.dir === 'se') {
+        w = drag.w + dx;
+        h = locked ? w / drag.ratio : drag.h + dy;
+      }
+      sel.style.width  = Math.max(16, Math.round(w)) + 'px';
+      sel.style.height = Math.max(16, Math.round(h)) + 'px';
+      place();
+      syncInputs();
+    });
+    ['pointerup', 'pointercancel'].forEach(function (ev) {
+      box.addEventListener(ev, function () {
+        if (!drag) { return; }
+        drag = null;
+        box.classList.remove('dragging');
+        if (locked && sel) { sel.style.height = 'auto'; place(); syncInputs(); }
+        syncToSource();
+        markDirty();
+      });
+    });
+
+    // ---- számmezők ----
+    [inW, inH].forEach(function (inp) {
+      inp.addEventListener('change', function () {
+        if (!sel) { return; }
+        var v = Number(inp.value);
+        if (!(v > 0)) { syncInputs(); return; }
+        var ratio = ratioOf(sel);
+        if (inp === inW) { applySize(v, locked ? null : Number(inH.value)); }
+        else {
+          // magasság: arány-tartással a szélesség is követi
+          if (locked) { applySize(v * ratio, null); }
+          else { sel.style.height = Math.round(v) + 'px'; place(); syncInputs(); syncToSource(); markDirty(); }
+        }
+      });
+    });
+
+    // ---- sáv gombjai ----
+    bar.addEventListener('click', function (e) {
+      var b = e.target.closest('button');
+      if (!b || !sel) { return; }
+      e.preventDefault();
+
+      if (b.dataset.act === 'lock') {
+        locked = !locked;
+        lockBtn.classList.toggle('on', locked);
+        lockBtn.innerHTML = locked ? '🔗 Arány' : '⛓ Szabad';
+        lockBtn.title = locked
+          ? 'Arány tartása – kattints a kikapcsoláshoz'
+          : 'Szabad méretezés – a kép torzulhat. Kattints az arány visszakapcsolásához.';
+        if (!locked) {
+          // rögzítjük a mostani magasságot, hogy legyen mit szabadon állítani
+          var r = sel.getBoundingClientRect();
+          sel.style.height = Math.round(r.height) + 'px';
+          sel.style.objectFit = 'fill';
+          syncToSource();
+        } else {
+          sel.style.height = 'auto';
+          sel.style.objectFit = '';
+          applySize(null, null);
+        }
+        syncInputs();
+        return;
+      }
+
+      if (b.dataset.pct) {
+        // százalékos szélesség: reszponzív marad a nyilvános oldalon is
+        sel.style.width = b.dataset.pct + '%';
+        sel.style.height = 'auto';
+        sel.style.objectFit = '';
+        locked = true;
+        lockBtn.classList.add('on');
+        lockBtn.innerHTML = '🔗 Arány';
+        setTimeout(function () { place(); syncInputs(); }, 30);
+        syncToSource();
+        markDirty();
+        return;
+      }
+
+      if (b.dataset.act === 'reset') {
+        sel.style.width = '';
+        sel.style.height = '';
+        sel.style.objectFit = '';
+        sel.removeAttribute('width');
+        sel.removeAttribute('height');
+        setTimeout(function () { place(); syncInputs(); }, 30);
+        syncToSource();
+        markDirty();
+        return;
+      }
+
+      if (b.dataset.act === 'close') { deselect(); }
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!sel) { return; }
+      if (!area.contains(e.target) && !bar.contains(e.target) && !box.contains(e.target)) { deselect(); }
+    });
   }
 
   /* ---------------------------------------------------------- Word-import */
