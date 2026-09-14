@@ -84,6 +84,13 @@ final class DocxParser
         $html = '';
         $openLists = [];
 
+        // A Word-ben a fejezetszam gyakran NEM a cim szovegeben van, hanem a
+        // cimsorstilus automatikus szamozasa adja - ilyenkor a <w:t> csak
+        // "Belépés a rendszerbe". Ezert magunk is szamolunk: az 1. szintu
+        // cimsor a modul sorszama, a 2. szintu a fejezete, a 3-4. a szakaszoke.
+        // Ha a szoveg maga tartalmaz szamot ("5.4 Kintlévőség kezelés"), az az eros.
+        $counter = [0, 0, 0, 0];
+
         $closeLists = function (int $toDepth) use (&$openLists, &$html): void {
             while (count($openLists) > $toDepth) {
                 $t = array_pop($openLists);
@@ -105,13 +112,26 @@ final class DocxParser
                     $closeLists(0);
                     if ($curArt !== null && $curModule !== null) {
                         $curArt['html'] = trim($html);
-                        $curModule['articles'][] = $curArt;
+                        if (!($curArt['implicit'] ?? false) || $curArt['html'] !== '') {
+                            $curModule['articles'][] = $curArt;
+                        }
                         $curArt = null;
                         $html = '';
                     }
                     if ($curModule !== null) { $modules[] = $curModule; }
                     [$no, $title] = $this->splitNumber($text);
+                    if ($no === '') {
+                        $no = (string)(++$counter[0]);
+                    } else {
+                        $counter[0] = (int)strtok($no, '.');
+                    }
+                    $counter[1] = $counter[2] = $counter[3] = 0;
                     $curModule = ['no' => $no, 'title' => $title, 'articles' => []];
+                    // A modulnak maganak is lehet tartalma (pl. "2 A keretrendszer"),
+                    // ilyenkor a modul szama alatt keletkezik egy fejezet. Ha nem lesz
+                    // szovege az elso alfejezetig, eldobjuk.
+                    $curArt = ['no' => $no, 'title' => $title, 'html' => '', 'imgs' => 0, 'implicit' => true];
+                    $html = '';
                     continue;
                 }
 
@@ -122,10 +142,21 @@ final class DocxParser
                     $closeLists(0);
                     if ($curArt !== null) {
                         $curArt['html'] = trim($html);
-                        $curModule['articles'][] = $curArt;
+                        if (!($curArt['implicit'] ?? false) || $curArt['html'] !== '') {
+                            $curModule['articles'][] = $curArt;
+                        }
                     }
                     $html = '';
                     [$no, $title] = $this->splitNumber($text);
+                    if ($no === '') {
+                        if ($counter[0] === 0) { $counter[0] = 1; }
+                        $no = $counter[0] . '.' . (++$counter[1]);
+                    } else {
+                        $parts = explode('.', $no);
+                        $counter[0] = (int)($parts[0] ?? 0);
+                        $counter[1] = (int)($parts[1] ?? 0);
+                    }
+                    $counter[2] = $counter[3] = 0;
                     $curArt = ['no' => $no, 'title' => $title, 'html' => '', 'imgs' => 0];
                     continue;
                 }
@@ -138,7 +169,24 @@ final class DocxParser
                 if ($level >= 3) {
                     $closeLists(0);
                     $tag = 'h' . min(4, $level);
-                    $html .= '<' . $tag . '>' . $this->inlineOf($node, $curArt) . '</' . $tag . '>';
+                    $inner = $this->inlineOf($node, $curArt);
+
+                    // szakasz-sorszam: vagy a szovegbol, vagy szamlalobol
+                    [$sno, $stitle] = $this->splitNumber($text);
+                    if ($sno === '') {
+                        if ($level === 3) {
+                            $sno = $curArt['no'] . '.' . (++$counter[2]);
+                            $counter[3] = 0;
+                        } else {
+                            $sno = $curArt['no'] . '.' . max(1, $counter[2]) . '.' . (++$counter[3]);
+                        }
+                    } else {
+                        $inner = $this->escapeText($stitle);   // a szam kikerul a cimbol
+                    }
+                    $anchor = help_slug($sno, $stitle !== '' ? $stitle : $text);
+                    $html .= '<' . $tag . ' id="' . htmlspecialchars($anchor, ENT_QUOTES, 'UTF-8') . '">'
+                           . '<span class="hno">' . htmlspecialchars($sno, ENT_QUOTES, 'UTF-8') . '</span>'
+                           . $inner . '</' . $tag . '>';
                     continue;
                 }
 
@@ -177,7 +225,9 @@ final class DocxParser
         $closeLists(0);
         if ($curArt !== null && $curModule !== null) {
             $curArt['html'] = trim($html);
-            $curModule['articles'][] = $curArt;
+            if (!($curArt['implicit'] ?? false) || $curArt['html'] !== '') {
+                $curModule['articles'][] = $curArt;
+            }
         }
         if ($curModule !== null) { $modules[] = $curModule; }
 
@@ -186,6 +236,11 @@ final class DocxParser
         $written = $this->writeImages();
 
         return ['modules' => $modules, 'images' => $written, 'paragraphs' => $paras];
+    }
+
+    private function escapeText(string $t): string
+    {
+        return htmlspecialchars($t, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     }
 
     /** "5.4 Kintlévőség kezelés" -> ['5.4', 'Kintlévőség kezelés'] */

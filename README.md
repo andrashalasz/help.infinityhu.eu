@@ -110,7 +110,11 @@ A felső szint: szám, név, URL-azonosító, sorrend — nyelvenként. Üres mo
 ### Word import
 Feltöltesz egy **.docx**-et, és a rendszer:
 
-1. fejezetekre bontja (**Címsor 1** = modul, **Címsor 2** = fejezet, **Címsor 3–4** = szakasz),
+1. fejezetekre bontja (**Címsor 1** = modul, **Címsor 2** = fejezet, **Címsor 3–4** = szakasz).
+   A fejezetszámot a címből olvassa ki („5.4 Kintlévőség kezelés”), **de ha a Word automatikus
+   címsor-számozását használod** — és a cím szövegében nincs szám —, akkor a címsorhierarchiából
+   számolja ki (a valódi útmutató pont ilyen). Ha egy modulnak magának is van szövege
+   (pl. „2 A keretrendszer”), abból a modul száma alatt lesz fejezet;
 2. a formázást (félkövér, dőlt, listák, táblázatok, hivatkozások) HTML-re fordítja,
 3. a képeket kibontja és a tartalmuk hash-éről nevezi el (`img_<hash>.png`) — ugyanaz a kép nem duplikálódik,
 4. a fejezetszám alapján **párosítja a meglévő fejezethez**, és **szó szintű összehasonlítást**
@@ -374,9 +378,13 @@ Az alábbiakat ténylegesen lefuttatva ellenőriztük a Docker környezetben, ne
   és a nyilvános oldalon **azonnal az új tartalom** látszik
 - korábbi változat visszatöltése → az eredeti tartalom visszaáll
 - fejezet ki-/bekapcsolása → a nyilvános oldal `404` / `200`-at ad
-- **Word import**: valódi .docx-ből 2 fejezet (1 meglévő + 1 új) és 1 kép kibontva,
-  a meglévőhöz szó szintű diff (19,7% egyezés), átvétel után vázlat, illetve új,
-  kikapcsolt fejezet jött létre
+- **Word import — a VALÓDI, 27 MB-os útmutatóval (`Infinity hasznalati utmutato 2026_v2.docx`)**:
+  a rendszer **110 fejezetet** olvasott ki 0,4 másodperc alatt, és a jelenlegi tartalomhoz mérve
+  **90 fejezet szó szerint azonos (100%)**, 19 apróságban tér el (98–99,8% egyezés),
+  1 pedig új. A 9 modul-szintű fejezet („2 A keretrendszer”, „5 Pénzügy”, …) mind 100%-on
+  párosult. A képeket felismerte, és mivel tartalom-hash a fájlnév, **egyet sem duplikált**.
+  Az egyetlen „új” találat a Word-ben lévő **üres `5.1 Beállítások` címsor** — a dokumentumban
+  nincs alatta szöveg, ezért a korábbi konverzió kihagyta; az import viszont jelzi, hogy döntsön róla ember.
 - mind a tíz fül hibamentesen renderel (a PHP naplóban nincs warning)
 - **kép és videó feltöltése a szerkesztőből**: PNG feltöltve és beszúrva, MP4 felismerve
   (`video/mp4`), `vid_<hash>.mp4` néven eltárolva; nem támogatott fájltípus elutasítva
