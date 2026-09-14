@@ -980,18 +980,6 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             exit;
         }
 
-        // Nyomtatasra kesz egyoldalas HTML - innen a bongeszo "Nyomtatas -> PDF"
-        // funkciojaval keszul a PDF, kulon eszkoz nelkul.
-        case 'export.html': {
-            $lang = array_key_exists(post('lang'), ADMIN_LANGS) ? post('lang') : 'hu';
-            $html = export_print_html($db, $cfg, $lang, !isset($_POST['include_hidden']));
-            audit_me($db, 'export.html', $lang);
-            header('Content-Type: text/html; charset=utf-8');
-            header('Content-Disposition: inline; filename="infinity-' . $lang . '.html"');
-            echo $html;
-            exit;
-        }
-
         // ================================================== beállítások
         case 'setting.save': {
             if (!auth_is('admin')) { flash('err', 'Ehhez adminisztrátori jog kell.'); back(['p' => 'settings']); }

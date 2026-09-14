@@ -76,6 +76,29 @@ if ($action !== '') {
     exit;
 }
 
+// ------------------------------------------------------------ nyomtatható / PDF export
+// Szandekosan GET: igy uj lapon nyilik, ujratoltheto, es nem kell "urlap
+// ujrakuldese" parbeszed. Csak olvas, elo munkamenetet igenyel.
+if (($_GET['a'] ?? '') === 'export.html') {
+    if (auth_user() === null) {
+        header('Location: ' . admin_url(['p' => 'login']), true, 303);
+        exit;
+    }
+    if (!auth_can('export')) {
+        http_response_code(403);
+        echo 'Nincs jogosultság az exporthoz.';
+        exit;
+    }
+    $expLang = array_key_exists((string)($_GET['lang'] ?? ''), ADMIN_LANGS) ? (string)$_GET['lang'] : 'hu';
+    $html = export_print_html($db, $cfg, $expLang, !isset($_GET['include_hidden']), isset($_GET['print']));
+    audit_me($db, 'export.html', $expLang);
+
+    header('Content-Type: text/html; charset=utf-8');
+    header('Cache-Control: no-store');
+    echo $html;
+    exit;
+}
+
 // ------------------------------------------------------------ parancspaletta keresője
 if (($_GET['a'] ?? '') === 'palette') {
     if (auth_user() === null) { help_json(['items' => []], 401); }

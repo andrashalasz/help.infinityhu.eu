@@ -600,10 +600,11 @@ function page_export(PDO $db, array $cfg, string $lang, array $counts): void
 <div class="page" style="max-width:1000px">
   <h1 class="pt">A használati útmutató exportálása</h1>
   <p class="lead">
-    A teljes útmutató letölthető <b>Word-fájlként</b> vagy nyomtatásra kész
-    <b>HTML-ként</b> (abból a böngésző <i>Nyomtatás → Mentés PDF-ként</i> funkciójával lesz PDF).
-    Mindkettő <b>tartalomjegyzékkel</b> készül, és mindig a <b>jelenlegi, közzétett</b>
-    adatbázis-tartalomból — nem egy korábbi pillanatképből.
+    A teljes útmutató letölthető <b>Word-fájlként</b>, vagy megnyitható <b>PDF-nyomtatásra</b>:
+    az utóbbi új lapon nyílik, és rögtön felajánlja a nyomtatást — ott válaszd a
+    <b>Cél: Mentés PDF-ként</b> lehetőséget. Mindkettő <b>tartalomjegyzékkel</b> és a
+    <b>logóval</b> készül, és mindig a <b>jelenlegi, közzétett</b> adatbázis-tartalomból —
+    nem egy korábbi pillanatképből.
   </p>
   <?= flash_render() ?>
 
@@ -629,12 +630,11 @@ function page_export(PDO $db, array $cfg, string $lang, array $counts): void
                 <input type="hidden" name="lang" value="<?= h($code) ?>">
                 <button class="btn btn--sm btn--p" type="submit">Word (.docx)</button>
               </form>
-              <form method="post" action="<?= h(admin_url()) ?>" target="_blank" style="display:inline">
-                <?= csrf_input() ?>
-                <input type="hidden" name="a" value="export.html">
-                <input type="hidden" name="lang" value="<?= h($code) ?>">
-                <button class="btn btn--sm" type="submit">Nyomtatható / PDF</button>
-              </form>
+              <a class="btn btn--sm" target="_blank" rel="noopener"
+                 href="<?= h(admin_url(['a' => 'export.html', 'lang' => $code, 'print' => 1])) ?>">PDF (nyomtatás)</a>
+              <a class="btn btn--sm btn--ghost" target="_blank" rel="noopener"
+                 href="<?= h(admin_url(['a' => 'export.html', 'lang' => $code])) ?>"
+                 title="Megnyitás nyomtatási párbeszéd nélkül">Előnézet</a>
             </td>
           </tr>
         <?php endforeach; ?>
@@ -646,6 +646,7 @@ function page_export(PDO $db, array $cfg, string $lang, array $counts): void
         <b>A Word-fájl tartalomjegyzéke automatikusan frissül.</b>
         A Wordben megnyitva a program felajánlja a mezők frissítését — vagy jelöld ki a
         tartalomjegyzéket és nyomj <span class="mono">F9</span>-et, hogy az oldalszámok bekerüljenek.
+        A logó a címlapra és minden lap jobb felső sarkába kerül, ahogy az eredeti útmutatóban.
         A videók nem kerülnek bele a dokumentumba (a Word nem játssza le őket), a helyükön hivatkozás marad.
       </div>
     </div>

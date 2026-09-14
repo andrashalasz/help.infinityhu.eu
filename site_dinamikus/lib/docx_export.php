@@ -26,9 +26,26 @@ final class DocxExport
     private int $bmSeq  = 1;
     private string $mediaDir;
 
-    public function __construct(string $mediaDir)
+    /** A logo fajlja (assets/logo.png vagy .jpg) - a fejlecbe es a cimlapra kerul. */
+    private ?string $logoPath = null;
+    private array $logoSize = [0, 0];
+
+    public function __construct(string $mediaDir, ?string $assetsDir = null)
     {
         $this->mediaDir = rtrim($mediaDir, '/');
+
+        $dir = $assetsDir !== null ? rtrim($assetsDir, '/') : __DIR__ . '/../assets';
+        foreach (['logo.png', 'logo.jpg', 'logo.jpeg'] as $name) {
+            $f = $dir . '/' . $name;
+            if (is_file($f)) {
+                $i = @getimagesize($f);
+                if (is_array($i) && in_array($i['mime'], ['image/png', 'image/jpeg'], true)) {
+                    $this->logoPath = $f;
+                    $this->logoSize = [(int)$i[0], (int)$i[1]];
+                }
+                break;
+            }
+        }
     }
 
     /**
@@ -108,9 +125,18 @@ final class DocxExport
     // ------------------------------------------------------------ elemek
     private function titlePage(array $L, string $company, string $version): string
     {
-        $out  = '<w:p><w:pPr><w:spacing w:before="2400" w:after="240"/><w:jc w:val="center"/></w:pPr>'
+        $out = '';
+        // logo a cimlap tetejen, kozepen
+        if ($this->logoPath !== null) {
+            $h = 1_100_000;                                   // ~2,9 cm magas
+            $w = (int)round($h * $this->logoSize[0] / max(1, $this->logoSize[1]));
+            $out .= '<w:p><w:pPr><w:spacing w:before="1400" w:after="0"/><w:jc w:val="center"/></w:pPr>'
+                  . $this->logoRun('rIdLogoDoc', $w, $h) . '</w:p>';
+        }
+        $out .= '<w:p><w:pPr><w:spacing w:before="' . ($this->logoPath !== null ? '360' : '2400') . '" w:after="240"/><w:jc w:val="center"/></w:pPr>'
               . '<w:r><w:rPr><w:b/><w:sz w:val="64"/><w:color w:val="1B3A6B"/></w:rPr>'
               . '<w:t xml:space="preserve">' . self::esc($L['title']) . '</w:t></w:r></w:p>';
+
         $out .= '<w:p><w:pPr><w:jc w:val="center"/><w:spacing w:after="120"/></w:pPr>'
               . '<w:r><w:rPr><w:sz w:val="28"/><w:color w:val="6B7280"/></w:rPr>'
               . '<w:t xml:space="preserve">' . self::esc($company) . '</w:t></w:r></w:p>';
@@ -411,6 +437,50 @@ final class DocxExport
              . '</pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r>';
     }
 
+    /** Egy kepet megjelenito futas adott rId-vel es EMU-merettel (a logohoz). */
+    private function logoRun(string $rid, int $cx, int $cy): string
+    {
+        $id = 9000 + $this->bmSeq++;
+        return '<w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0">'
+             . '<wp:extent cx="' . $cx . '" cy="' . $cy . '"/>'
+             . '<wp:docPr id="' . $id . '" name="Infinity logo"/>'
+             . '<a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">'
+             . '<pic:pic><pic:nvPicPr><pic:cNvPr id="' . $id . '" name="logo"/><pic:cNvPicPr/></pic:nvPicPr>'
+             . '<pic:blipFill><a:blip r:embed="' . $rid . '"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill>'
+             . '<pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="' . $cx . '" cy="' . $cy . '"/></a:xfrm>'
+             . '<a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr>'
+             . '</pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r>';
+    }
+
+    /**
+     * Oldalfejlec a logoval, jobbra zarva - ugyanugy, ahogy az eredeti
+     * Word-utmutatoban van (ott ~2,4 x 1,15 cm meretben, a lap tetejen jobbra).
+     */
+    private function headerXml(): string
+    {
+        $ns = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" '
+            . 'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" '
+            . 'xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" '
+            . 'xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" '
+            . 'xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"';
+
+        $body = '<w:p><w:pPr><w:jc w:val="right"/><w:spacing w:after="0"/></w:pPr>';
+        if ($this->logoPath !== null) {
+            $h = 437_040;                                     // ~1,15 cm - mint az eredetiben
+            $w = (int)round($h * $this->logoSize[0] / max(1, $this->logoSize[1]));
+            $body .= $this->logoRun('rIdLogoHdr', $w, $h);
+        }
+        $body .= '</w:p>';
+
+        return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:hdr ' . $ns . '>' . $body . '</w:hdr>';
+    }
+
+    private function logoName(): string
+    {
+        $ext = strtolower(pathinfo((string)$this->logoPath, PATHINFO_EXTENSION));
+        return 'infinity-logo.' . ($ext === 'jpeg' ? 'jpg' : $ext);
+    }
+
     private function innerHtml(DOMElement $el): string
     {
         $out = '';
@@ -429,7 +499,9 @@ final class DocxExport
             . 'xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" '
             . 'xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"';
 
-        $sect = '<w:sectPr><w:pgSz w:w="11906" w:h="16838"/>'
+        $sect = '<w:sectPr>'
+              . ($this->logoPath !== null ? '<w:headerReference w:type="default" r:id="rIdHdr"/>' : '')
+              . '<w:pgSz w:w="11906" w:h="16838"/>'
               . '<w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134" '
               . 'w:header="708" w:footer="708" w:gutter="0"/></w:sectPr>';
 
@@ -511,6 +583,9 @@ final class DocxExport
                . '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>'
                . '<Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>'
                . '<Override PartName="/word/numbering.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml"/>'
+               . ($this->logoPath !== null
+                    ? '<Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/>'
+                    : '')
                . '<Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>'
                . '</Types>';
 
@@ -524,6 +599,10 @@ final class DocxExport
                  . '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
                  . '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>'
                  . '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/numbering" Target="numbering.xml"/>';
+        if ($this->logoPath !== null) {
+            $docRels .= '<Relationship Id="rIdHdr" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header" Target="header1.xml"/>'
+                      . '<Relationship Id="rIdLogoDoc" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/' . self::esc($this->logoName()) . '"/>';
+        }
         foreach ($this->rels as $id => $r) {
             $docRels .= '<Relationship Id="' . $id . '" Type="' . $r['type'] . '" Target="' . self::esc($r['target']) . '"/>';
         }
@@ -547,6 +626,17 @@ final class DocxExport
         $zip->addFromString('word/styles.xml', $this->stylesXml());
         $zip->addFromString('word/numbering.xml', $this->numberingXml());
         $zip->addFromString('word/_rels/document.xml.rels', $docRels);
+
+        if ($this->logoPath !== null) {
+            $logo = (string)file_get_contents($this->logoPath);
+            $zip->addFromString('word/media/' . $this->logoName(), $logo);
+            $zip->addFromString('word/header1.xml', $this->headerXml());
+            $zip->addFromString('word/_rels/header1.xml.rels',
+                '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+                . '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+                . '<Relationship Id="rIdLogoHdr" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" '
+                . 'Target="media/' . self::esc($this->logoName()) . '"/></Relationships>');
+        }
         foreach ($this->images as $zipPath => $bytes) {
             $zip->addFromString($zipPath, $bytes);
         }
@@ -560,8 +650,23 @@ final class DocxExport
  * Nyomtatasra kesz, egyetlen HTML fajl a teljes utmutatobol, tartalomjegyzekkel.
  * A bongeszo "Nyomtatas -> Mentes PDF-kent" funkciojaval lesz belole PDF.
  */
-function export_print_html(PDO $db, array $cfg, string $lang, bool $onlyPublished = true): string
+function export_print_html(PDO $db, array $cfg, string $lang, bool $onlyPublished = true, bool $autoPrint = false): string
 {
+    // A logot beagyazzuk a fajlba (data: URI), igy a mentett HTML onmagaban is
+    // teljes - nem hivatkozik kifele, es a PDF-be is belekerul.
+    $logoTag = '';
+    foreach (['logo.png', 'logo.jpg', 'logo.jpeg', 'logo.svg'] as $name) {
+        $f = __DIR__ . '/../assets/' . $name;
+        if (!is_file($f)) { continue; }
+        $bytes = @file_get_contents($f);
+        if ($bytes === false) { break; }
+        $mime = match (strtolower(pathinfo($name, PATHINFO_EXTENSION))) {
+            'png' => 'image/png', 'svg' => 'image/svg+xml', default => 'image/jpeg',
+        };
+        $logoTag = '<img class="logo" src="data:' . $mime . ';base64,' . base64_encode($bytes) . '" alt="Infinity">';
+        break;
+    }
+
     $L = match ($lang) {
         'en' => ['title' => 'Infinity — User Guide', 'toc' => 'Table of contents', 'gen' => 'Generated'],
         'de' => ['title' => 'Infinity — Benutzerhandbuch', 'toc' => 'Inhaltsverzeichnis', 'gen' => 'Erstellt'],
@@ -605,7 +710,7 @@ function export_print_html(PDO $db, array $cfg, string $lang, bool $onlyPublishe
 *{box-sizing:border-box}
 body{margin:0;font:11pt/1.55 "Inter","Segoe UI",system-ui,sans-serif;color:#1f2a36;background:#fff}
 .wrap{max-width:190mm;margin:0 auto;padding:18mm 14mm}
-.cover{text-align:center;padding:60mm 0 0}
+.cover{text-align:center;padding:45mm 0 0;page-break-after:always}
 .cover h1{font-size:30pt;color:#1b3a6b;margin:0 0 6mm}
 .cover p{color:#6b7280;margin:0 0 2mm;font-size:12pt}
 .toc{page-break-after:always}
@@ -638,9 +743,19 @@ th,tr.header td{background:#f1f3f6;font-weight:600}
 .call strong{display:block;font-size:9.5pt;text-transform:uppercase;letter-spacing:.4pt;color:#0854a0;margin-bottom:1mm}
 .call.warn strong{color:#b8681a}
 .tblwrap{overflow:visible}
-@page{size:A4;margin:16mm 14mm}
-@media print{.wrap{max-width:none;padding:0}.noprint{display:none}}
-.noprint{position:fixed;top:0;left:0;right:0;background:#1c2a3a;color:#fff;padding:8px 14px;font-size:13px;text-align:center;z-index:9}
+/* a logo minden nyomtatott lap tetejen, jobbra - mint a Word-fejlecben */
+.runhead{position:fixed;top:6mm;right:10mm;z-index:5}
+.runhead .logo{height:11mm;width:auto;display:block}
+.cover__logo{margin:0 0 8mm}
+.cover__logo .logo{height:28mm;width:auto}
+@page{size:A4;margin:22mm 14mm 16mm}
+@media print{
+  .wrap{max-width:none;padding:0}
+  .noprint{display:none}
+  .runhead{position:fixed;top:4mm;right:0}
+}
+@media screen{.runhead{display:none}}
+.noprint{position:fixed;top:0;left:0;right:0;background:#1c2a3a;color:#fff;padding:8px 14px;font-size:13px;text-align:center;z-index:9;display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap}
 .noprint button{font:inherit;background:#0a6ed1;color:#fff;border:0;border-radius:4px;padding:5px 12px;margin-left:10px;cursor:pointer}
 body{padding-top:44px}
 @media print{body{padding-top:0}}
@@ -649,13 +764,19 @@ CSS;
     return '<!doctype html><html lang="' . h($lang) . '"><head><meta charset="utf-8">'
          . '<meta name="viewport" content="width=device-width,initial-scale=1">'
          . '<title>' . h($L['title']) . '</title><style>' . $css . '</style></head><body>'
-         . '<div class="noprint">A PDF-hez: <b>Nyomtatás → Mentés PDF-ként</b>'
-         . '<button onclick="window.print()">Nyomtatás</button></div>'
+         . '<div class="noprint">'
+         . '<span>A PDF-hez: <b>Nyomtatás → Cél: Mentés PDF-ként</b></span>'
+         . '<button type="button" onclick="window.print()">Nyomtatás / PDF mentése</button>'
+         . '</div>'
+         . ($logoTag !== '' ? '<div class="runhead">' . $logoTag . '</div>' : '')
          . '<div class="wrap">'
-         . '<div class="cover"><h1>' . h($L['title']) . '</h1><p>' . h($company) . '</p>'
+         . '<div class="cover">' . ($logoTag !== '' ? '<div class="cover__logo">' . $logoTag . '</div>' : '')
+         . '<h1>' . h($L['title']) . '</h1><p>' . h($company) . '</p>'
          . ($version !== '' ? '<p>' . h($version) . '</p>' : '')
          . '<p>' . h($L['gen'] . ': ' . date('Y-m-d')) . '</p></div>'
          . '<div class="toc"><h2>' . h($L['toc']) . '</h2><ul>' . $toc . '</ul></div>'
          . $body
-         . '</div></body></html>';
+         . '</div>'
+         . ($autoPrint ? '<script>window.addEventListener("load",function(){setTimeout(function(){window.print();},400);});</script>' : '')
+         . '</body></html>';
 }
