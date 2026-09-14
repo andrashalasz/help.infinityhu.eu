@@ -42,9 +42,17 @@ services:
       HELP_DB_DSN:  "pgsql:host=db;port=5432;dbname=${POSTGRES_DB:-help_infinityhu}"
       HELP_DB_USER: "${HELP_DB_USER:-help_ro}"
       HELP_DB_PASS: "${HELP_DB_PASS:-help_ro}"
+      # az admin felulet ir is - kulon, iras-olvasas jogu adatbazis-felhasznalo
+      HELP_DB_ADMIN_USER: "${HELP_DB_ADMIN_USER:-help_rw}"
+      HELP_DB_ADMIN_PASS: "${HELP_DB_ADMIN_PASS:-help_rw}"
+      HELP_MEDIA_DIR: "/srv/media"
+      # gepi forditas (nem kotelezo): none | deepl | libre | google
+      HELP_MT_PROVIDER: "${HELP_MT_PROVIDER:-}"
+      HELP_MT_ENDPOINT: "${HELP_MT_ENDPOINT:-}"
+      HELP_MT_KEY: "${HELP_MT_KEY:-}"
     volumes:
       - ./site_dinamikus:/var/www/html:ro
-      - ./media:/srv/media:ro
+      - ./media:/srv/media
     ports:
       - "${WEB_PORT:-8080}:80"
 
