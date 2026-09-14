@@ -1,7 +1,10 @@
-# Infinity Sugo - help.infinityhu.eu helyi/Docker kornyezet
+# Infinity Sugo - help.infinityhu.eu Docker kornyezet
 #
 #   docker compose up -d --build
 #   -> http://localhost:8080/
+#
+# A kontenerek neve a projekt nevebol jon (alapertelmezesben a mappa neve).
+# Sajat nevet a "docker compose -p sugo up -d" adhat.
 #
 # Az adatbazis elso indulaskor automatikusan felepul a db/*.sql fajlokbol
 # (sema + 109 fejezet x 3 nyelv + szerkeszto- es changelog-migracio).
@@ -9,7 +12,6 @@
 services:
   db:
     image: postgres:16
-    container_name: help_db
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-help_infinityhu}
@@ -33,7 +35,6 @@ services:
 
   web:
     build: ./docker/php
-    container_name: help_web
     restart: unless-stopped
     depends_on:
       db:
@@ -70,7 +71,6 @@ services:
   # Igy nem kell fizetos API-kulcs a gepi forditashoz.
   libretranslate:
     image: libretranslate/libretranslate:latest
-    container_name: help_mt
     profiles: ["mt"]
     restart: unless-stopped
     environment:
