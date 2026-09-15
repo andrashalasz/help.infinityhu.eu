@@ -6,9 +6,9 @@
  * igy a help.infinityhu.eu teljesen fuggetlenul frissul/all/esik, nem
  * oszt semmit az eles Infinity-vel.
  *
- * A sema pontosan ugyanaz, mint a fo rendszerben (help_article, help_module,
- * help_screen_map, help_section) - ugyanazokkal az SQL fajlokkal toltodik fel:
- *   psql -d help_infinityhu -f db/01_help_articles_i18n.sql   (es a tobbi)
+ * Adatbazis: MariaDB 11.8+.
+ * A sema es a teljes tartalom a db/ mappa SQL fajljaibol epul fel:
+ *   mariadb -u root -p help_infinityhu < db/01_sema.sql        (es a tobbi, sorrendben)
  *
  * KET adatbazis-felhasznalo van:
  *   - olvaso (help_ro): a nyilvanos oldal (index.php) ezt hasznalja
@@ -18,12 +18,12 @@
  */
 return [
     // --- nyilvanos oldal: csak olvas ---
-    'dsn'  => getenv('HELP_DB_DSN')  ?: 'pgsql:host=127.0.0.1;port=5432;dbname=help_infinityhu',
+    'dsn'  => getenv('HELP_DB_DSN')  ?: 'mysql:host=127.0.0.1;port=3306;dbname=help_infinityhu;charset=utf8mb4',
     'user' => getenv('HELP_DB_USER') ?: 'help_ro',
     'pass' => getenv('HELP_DB_PASS') ?: 'change-me',
 
     // --- admin felulet: ir is ---
-    'admin_dsn'  => getenv('HELP_DB_ADMIN_DSN')  ?: (getenv('HELP_DB_DSN') ?: 'pgsql:host=127.0.0.1;port=5432;dbname=help_infinityhu'),
+    'admin_dsn'  => getenv('HELP_DB_ADMIN_DSN')  ?: (getenv('HELP_DB_DSN') ?: 'mysql:host=127.0.0.1;port=3306;dbname=help_infinityhu;charset=utf8mb4'),
     'admin_user' => getenv('HELP_DB_ADMIN_USER') ?: 'help_rw',
     'admin_pass' => getenv('HELP_DB_ADMIN_PASS') ?: 'change-me',
 

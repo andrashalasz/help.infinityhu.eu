@@ -4,16 +4,34 @@
  */
 declare(strict_types=1);
 
+
+/** Kozos PDO beallitasok (MariaDB). */
+function help_pdo_options(): array
+{
+    return [
+        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES   => false,
+        PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4 COLLATE utf8mb4_uca1400_ai_ci",
+    ];
+}
+
+/**
+ * Munkamenet-beallitasok. A STRICT mod azert kell, hogy a tul hosszu ertek
+ * vagy a hibas datum hibat adjon, ne pedig csendben csonkoljon.
+ */
+function help_pdo_init(PDO $pdo): void
+{
+    $pdo->exec("SET SESSION sql_mode = 'STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION'");
+}
+
 /** Olvaso kapcsolat a nyilvanos oldalhoz. */
 function help_db(array $cfg): PDO
 {
     static $pdo = null;
     if ($pdo === null) {
-        $pdo = new PDO($cfg['dsn'], $cfg['user'], $cfg['pass'], [
-            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES   => false,
-        ]);
+        $pdo = new PDO($cfg['dsn'], $cfg['user'], $cfg['pass'], help_pdo_options());
+        help_pdo_init($pdo);
     }
     return $pdo;
 }
@@ -23,11 +41,8 @@ function help_db_rw(array $cfg): PDO
 {
     static $pdo = null;
     if ($pdo === null) {
-        $pdo = new PDO($cfg['admin_dsn'], $cfg['admin_user'], $cfg['admin_pass'], [
-            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES   => false,
-        ]);
+        $pdo = new PDO($cfg['admin_dsn'], $cfg['admin_user'], $cfg['admin_pass'], help_pdo_options());
+        help_pdo_init($pdo);
     }
     return $pdo;
 }
@@ -43,7 +58,12 @@ function fix_img_url(string $html): string
     return str_replace(['src="media/', "src='media/"], ['src="/media/', "src='/media/"], $html);
 }
 
-/** Ekezet-fuggetlen, kisbetus normalizalas (a Postgres erp_norm() PHP-s parja). */
+/**
+ * Ekezet-fuggetlen, kisbetus normalizalas.
+ *
+ * Az adatbazisban ezt a utf8mb4_uca1400_ai_ci rendezes intezi; ez a PHP-s par
+ * a kereso-kivonat kiemelesehez es a kliens oldali szurokhoz kell.
+ */
 function help_norm(string $s): string
 {
     $s = mb_strtolower($s, 'UTF-8');
@@ -312,4 +332,129 @@ function help_logo(int $size = 30, string $idSuffix = ''): string
          . '<path d="M32 16C26 4.6 12 4.6 12 16s14 11.4 20 0 20-11.4 20 0-14 11.4-20 0Z" '
          . 'fill="none" stroke="url(#' . $id . ')" stroke-width="5.6" stroke-linecap="round"/>'
          . '</svg>';
+}
+
+/**
+ * Kereso-kivonat: a talalat koruli par szo, a keresett kifejezes kiemelve.
+ *
+ * A PostgreSQL-valtozatban ezt a ts_headline() csinalta; a MariaDB-ben nincs
+ * ilyen, ezert itt allitjuk elo. Ekezet-fuggetlenul keres (help_norm), de a
+ * kiemeles az EREDETI szoveget mutatja, ekezetekkel egyutt.
+ */
+function help_snippet(string $plain, string $query, int $words = 22): string
+{
+    $plain = trim(preg_replace('/\s+/u', ' ', $plain) ?? '');
+    if ($plain === '') { return ''; }
+
+    $terms = array_values(array_filter(
+        preg_split('/\s+/u', $query) ?: [],
+        static fn($t) => mb_strlen($t) >= 2
+    ));
+    if (!$terms) {
+        return mb_substr($plain, 0, 160) . (mb_strlen($plain) > 160 ? '…' : '');
+    }
+
+    $normPlain = help_norm($plain);
+    $pos = false;
+    $hit = '';
+    foreach ($terms as $t) {
+        $p = mb_strpos($normPlain, help_norm($t));
+        if ($p !== false && ($pos === false || $p < $pos)) { $pos = $p; $hit = $t; }
+    }
+
+    if ($pos === false) {
+        return mb_substr($plain, 0, 160) . (mb_strlen($plain) > 160 ? '…' : '');
+    }
+
+    // a talalat koruli ablak szohataron
+    $before = mb_substr($plain, 0, $pos);
+    $tail   = mb_substr($plain, $pos);
+    $lead   = preg_split('/\s+/u', $before) ?: [];
+    $lead   = array_slice($lead, -(int)floor($words / 3));
+    $rest   = preg_split('/\s+/u', $tail) ?: [];
+    $rest   = array_slice($rest, 0, $words);
+
+    $text = trim(implode(' ', $lead) . ' ' . implode(' ', $rest));
+    $out  = h($text);
+
+    // minden keresett szo kiemelese (ekezet-fuggetlenul, de az eredetit mutatva)
+    foreach ($terms as $t) {
+        $out = help_mark($out, $t);
+    }
+
+    return (count($lead) ? '… ' : '') . $out . (count($rest) >= $words ? ' …' : '');
+}
+
+/** Egy kifejezes osszes elofordulasanak <mark>-kal jelolese, ekezet-fuggetlenul. */
+function help_mark(string $escapedHtml, string $term): string
+{
+    $needle = help_norm($term);
+    if ($needle === '') { return $escapedHtml; }
+
+    $out = '';
+    $i = 0;
+    $len = mb_strlen($escapedHtml);
+    $normHay = help_norm($escapedHtml);
+
+    while ($i < $len) {
+        $p = mb_strpos($normHay, $needle, $i);
+        if ($p === false) { $out .= mb_substr($escapedHtml, $i); break; }
+        // ne toljuk szet a HTML-entitasokat (&amp; stb.)
+        $chunk = mb_substr($escapedHtml, $p, mb_strlen($needle));
+        if (str_contains($chunk, '&') || str_contains($chunk, ';')) {
+            $out .= mb_substr($escapedHtml, $i, $p - $i + mb_strlen($needle));
+            $i = $p + mb_strlen($needle);
+            continue;
+        }
+        $out .= mb_substr($escapedHtml, $i, $p - $i) . '<mark>' . $chunk . '</mark>';
+        $i = $p + mb_strlen($needle);
+    }
+    return $out;
+}
+
+/**
+ * A kereses SQL-feltetele MariaDB-hez.
+ *
+ * Ket dolgot fesulunk ossze:
+ *   1. InnoDB FULLTEXT (MATCH ... AGAINST BOOLEAN MODE) - ez adja a rangsort,
+ *   2. LIKE a cimre es a szovegre - ez fogja meg a rovid szavakat (a FULLTEXT
+ *      alapbol csak a 3+ karakteres szavakat indexeli) es a szo belseji talalatot.
+ * Az ekezet-fuggetlenseget a tabla utf8mb4_uca1400_ai_ci rendezese adja.
+ *
+ * @return array{where:string, order:string, params:array<string,string>}
+ */
+function help_search_sql(string $q): array
+{
+    $terms = array_values(array_filter(
+        preg_split('/\s+/u', trim($q)) ?: [],
+        static fn($t) => mb_strlen($t) >= 2
+    ));
+
+    // BOOLEAN MODE kifejezes: minden szo kotelezo, elore-illesztessel
+    $bool = '';
+    foreach ($terms as $t) {
+        $clean = preg_replace('/[+\-><()~*"@]+/u', ' ', $t) ?? $t;
+        $clean = trim($clean);
+        if ($clean === '') { continue; }
+        $bool .= '+' . $clean . '* ';
+    }
+    $bool = trim($bool);
+
+    return [
+        'where'  => '(MATCH(a.title, a.plain_text) AGAINST (:ft IN BOOLEAN MODE)'
+                  . ' OR a.title LIKE :like OR a.plain_text LIKE :like2)',
+        // A cimben levo talalat mindig elozze meg a szovegtorzsben levot: egy
+        // sugoban a "Penzugy" fejezetet keresik, nem azt, amelyik a legtobbszor
+        // emliti. Azon belul rangsorol a FULLTEXT pontszam.
+        'order'  => '(a.title LIKE :like3) DESC,'
+                  . ' MATCH(a.title, a.plain_text) AGAINST (:ft2 IN BOOLEAN MODE) DESC,'
+                  . ' a.sort_order',
+        'params' => [
+            'ft'    => $bool !== '' ? $bool : $q,
+            'ft2'   => $bool !== '' ? $bool : $q,
+            'like'  => '%' . $q . '%',
+            'like2' => '%' . $q . '%',
+            'like3' => '%' . $q . '%',
+        ],
+    ];
 }

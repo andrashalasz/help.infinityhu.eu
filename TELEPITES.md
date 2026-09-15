@@ -7,7 +7,7 @@ Ez a dokumentum a rendszergazdának szól. Két telepítési módot ír le:
 | | mikor |
 |---|---|
 | **A) Docker** | ha a szerveren futhat Docker. Egy paranccsal elindul, a legkevesebb kézi lépés. |
-| **B) Klasszikus** | nginx + PHP-FPM + PostgreSQL a szerverre telepítve. Ez az ajánlott az éles `help.infinityhu.eu`-hoz, ha már van ilyen kiszolgáló. |
+| **B) Klasszikus** | nginx + PHP-FPM + MariaDB a szerverre telepítve. Ez az ajánlott az éles `help.infinityhu.eu`-hoz, ha már van ilyen kiszolgáló. |
 
 A kettő ugyanazt a kódot futtatja, ugyanazzal az adatbázissal. Váltani bármikor lehet.
 
@@ -16,7 +16,7 @@ A kettő ugyanazt a kódot futtatja, ugyanazzal az adatbázissal. Váltani bárm
 ## 0. Mi van a csomagban
 
 ```
-db/                   az adatbázis teljes felépítése + a teljes tartalom (7 SQL fájl)
+db/                   az adatbázis teljes felépítése + a teljes tartalom (5 SQL fájl)
 site_dinamikus/       maga az alkalmazás (PHP)
   index.php             a nyilvános súgó
   admin.php             a szerkesztői felület
@@ -26,13 +26,21 @@ site_dinamikus/       maga az alkalmazás (PHP)
 media/                275 képernyőkép (+ később a feltöltött képek, videók)
 site_kod/             statikus, előre generált HTML változat (alternatíva, nem kötelező)
 deploy/               kész nginx konfigok, a „?" gomb JS-e
-docker/, docker-compose.yml
+docker/, docker-compose.yml   nginx 1.28.3 + PHP 8.3 FPM + MariaDB 11.8.6
 README.md             funkcionális leírás (mit tud a rendszer)
 TELEPITES.md          ez a fájl
 ```
 
-**Amire szükség lesz:** PHP **8.1+** a `pdo_pgsql`, `dom`, `zip`, `gd`, `mbstring`, `fileinfo`
-kiterjesztésekkel, és **PostgreSQL 13+**. (A Docker változat mindezt hozza magával.)
+**Amire szükség lesz:**
+
+| | |
+|---|---|
+| nginx | **1.28.3** (vagy újabb) |
+| PHP | **8.1+** FPM, a `pdo_mysql`, `dom`, `zip`, `gd`, `mbstring`, `fileinfo`, `curl` kiterjesztésekkel |
+| MariaDB | **11.8.6** (vagy újabb 11.x) |
+| WeasyPrint | *opcionális* — a közvetlen PDF-letöltéshez |
+
+A Docker változat mindezt hozza magával, pontosan ezekben a verziókban.
 
 ---
 
@@ -49,11 +57,11 @@ Ennyi. Az első indulás kb. 1–2 perc (image-építés + az adatbázis feltöl
 |---|---|
 | Súgó | http://localhost:8080/ |
 | Admin | http://localhost:8080/admin.php |
-| PostgreSQL | `localhost:5433` |
+| MariaDB | `localhost:3307` |
 
 **Éles használat előtt kötelezően cseréld a jelszavakat.** Másold a `.env.example` fájlt
-`.env` néven, és írd át benne a `POSTGRES_PASSWORD`, `HELP_DB_PASS`, `HELP_DB_ADMIN_PASS`
-értékeket, majd:
+`.env` néven, és írd át benne a `MARIADB_ROOT_PASSWORD`, `MARIADB_PASSWORD`, `HELP_DB_PASS`,
+`HELP_DB_ADMIN_PASS` értékeket, majd:
 
 ```bash
 docker compose down -v      # FIGYELEM: törli az adatbázis kötetét is
@@ -70,16 +78,26 @@ munkamenet-süti a `Secure` jelzőt.
 
 ---
 
-## B) Klasszikus telepítés (nginx + PHP-FPM + PostgreSQL)
+## B) Klasszikus telepítés (nginx + PHP-FPM + MariaDB)
 
 ### B1. Csomagok
 
 ```bash
 sudo apt-get update
-sudo apt-get install -y nginx postgresql \
-     php-fpm php-pgsql php-xml php-zip php-gd php-mbstring php-curl
-php -m | grep -E 'pdo_pgsql|dom|zip|gd|mbstring|fileinfo'    # mind a öt legyen ott
+sudo apt-get install -y nginx mariadb-server \
+     php-fpm php-mysql php-xml php-zip php-gd php-mbstring php-curl
+
+# opcionalis, a kozvetlen PDF-letolteshez:
+sudo apt-get install -y weasyprint
+
+nginx -v                                                      # 1.28.3 vagy ujabb
+mariadb --version                                             # 11.8.x
+php -m | grep -E 'pdo_mysql|dom|zip|gd|mbstring|fileinfo'     # mind az ot legyen ott
 ```
+
+> Ha a disztribúció csomagja régebbi nginx-et vagy MariaDB-t ad, a gyártói tárolóból
+> érdemes telepíteni: <https://nginx.org/en/linux_packages.html>,
+> <https://mariadb.org/download/?t=repo-config>.
 
 ### B2. Adatbázis és felhasználók
 
@@ -94,48 +112,63 @@ Két adatbázis-felhasználó kell:
 | `help_rw` | ír és olvas | a szerkesztői felület (`admin.php`) |
 
 ```bash
-sudo -u postgres psql <<'SQL'
-CREATE DATABASE help_infinityhu ENCODING 'UTF8';
-CREATE ROLE help_ro LOGIN PASSWORD 'ide-egy-eros-jelszot';
-CREATE ROLE help_rw LOGIN PASSWORD 'ide-egy-masik-eros-jelszot';
+sudo mariadb <<'SQL'
+CREATE DATABASE help_infinityhu
+  CHARACTER SET utf8mb4 COLLATE utf8mb4_uca1400_ai_ci;
+
+CREATE USER 'help_ro'@'localhost' IDENTIFIED BY 'ide-egy-eros-jelszot';
+CREATE USER 'help_rw'@'localhost' IDENTIFIED BY 'ide-egy-masik-eros-jelszot';
+
+GRANT SELECT ON help_infinityhu.* TO 'help_ro'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON help_infinityhu.* TO 'help_rw'@'localhost';
+GRANT EXECUTE ON help_infinityhu.* TO 'help_rw'@'localhost';
+FLUSH PRIVILEGES;
 SQL
 ```
+
+> **A rendezés (`utf8mb4_uca1400_ai_ci`) fontos**: ez teszi a keresést ékezet-függetlenné.
+> Ne a `..._hungarian_ai_ci`-t add meg — az az `o`/`ö`/`ő` és `u`/`ü`/`ű` párokat külön
+> betűnek veszi, így a „penzugy" nem találná meg a „Pénzügy"-öt.
 
 Majd a séma és a tartalom, **ebben a sorrendben**:
 
 ```bash
 cd infinity-sugo
-for f in db/01_*.sql db/02_*.sql db/03_*.sql db/04_*.sql db/05_*.sql db/06_*.sql db/07_*.sql; do
+for f in db/01_sema.sql db/02_eljarasok.sql db/03_alapadatok.sql db/04_tartalom.sql; do
   echo ">>> $f"
-  sudo -u postgres psql -v ON_ERROR_STOP=1 -d help_infinityhu -f "$f" || break
+  sudo mariadb help_infinityhu < "$f" || break
 done
 ```
 
-> A `db/99_docker_roles.sql`-t **NE** futtasd le: az csak a Docker-környezet fejlesztői
-> jelszavait hozza létre. A jogosultságokat a következő lépés adja meg.
+> A `db/05_jogosultsagok.sql`-t **NE** futtasd le: az csak a Docker-környezet fejlesztői
+> jelszavait hozza létre. A jogosultságokat a fenti lépés már megadta.
 
-Jogosultságok:
+A MariaDB-nek engednie kell a nagy tartalmi mezőket és a rövid keresőszavakat.
+`/etc/mysql/mariadb.conf.d/60-help.cnf`:
 
-```bash
-sudo -u postgres psql -d help_infinityhu <<'SQL'
-GRANT USAGE ON SCHEMA public TO help_ro, help_rw;
-
-GRANT SELECT ON ALL TABLES IN SCHEMA public TO help_ro;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO help_ro;
-
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES    IN SCHEMA public TO help_rw;
-GRANT USAGE, SELECT, UPDATE          ON ALL SEQUENCES IN SCHEMA public TO help_rw;
-GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO help_rw;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES    TO help_rw;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE, SELECT, UPDATE          ON SEQUENCES TO help_rw;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT EXECUTE                        ON FUNCTIONS TO help_rw;
-SQL
+```ini
+[mariadb]
+character-set-server        = utf8mb4
+collation-server            = utf8mb4_uca1400_ai_ci
+max_allowed_packet          = 256M
+innodb_ft_min_token_size    = 2
 ```
 
-Ellenőrzés — 327 sort kell kapni (109 fejezet × 3 nyelv):
+```bash
+sudo systemctl restart mariadb
+```
+
+> Az `innodb_ft_min_token_size` **módosítása után** a teljes szöveges indexet újra kell építeni,
+> különben a rövid szavak nem kerülnek bele:
+> ```bash
+> sudo mariadb help_infinityhu -e "ALTER TABLE help_article DROP INDEX help_article_ft;
+>   ALTER TABLE help_article ADD FULLTEXT KEY help_article_ft (title, plain_text);"
+> ```
+
+Ellenőrzés — 109 sort kell kapni nyelvenként:
 
 ```bash
-sudo -u postgres psql -d help_infinityhu -c "SELECT lang, count(*) FROM help_article GROUP BY lang;"
+sudo mariadb help_infinityhu -e "SELECT lang, COUNT(*) FROM help_article GROUP BY lang;"
 ```
 
 ### B3. Fájlok a helyükre
@@ -174,7 +207,7 @@ pm.min_spare_servers = 1
 pm.max_spare_servers = 4
 
 ; --- adatbázis ---
-env[HELP_DB_DSN]        = "pgsql:host=127.0.0.1;port=5432;dbname=help_infinityhu"
+env[HELP_DB_DSN]        = "mysql:host=127.0.0.1;port=3306;dbname=help_infinityhu;charset=utf8mb4"
 env[HELP_DB_USER]       = "help_ro"
 env[HELP_DB_PASS]       = "ide-egy-eros-jelszot"
 env[HELP_DB_ADMIN_USER] = "help_rw"
@@ -207,7 +240,8 @@ A lényeg, ha kézzel írnád:
 
 ```nginx
 server {
-    listen 443 ssl http2;
+    listen 443 ssl;
+    http2 on;                               # nginx 1.25.1 ota kulon direktiva
     server_name help.infinityhu.eu;
 
     root  /var/www/help.infinityhu.eu/site_dinamikus;
@@ -223,8 +257,10 @@ server {
     location ^~ /lib/           { deny all; }
     location = /config.php      { deny all; }
 
-    # képek és videók a media mappából, PHP megkerülésével
-    location /media/ {
+    # Képek és videók a media mappából, PHP megkerülésével.
+    # A "^~" FONTOS: nélküle az alatta lévő reguláris kifejezéses szabály
+    # nyerne, és a /media/*.png kérések 404-et kapnának.
+    location ^~ /media/ {
         alias /var/www/help.infinityhu.eu/media/;
         add_header Cache-Control "public, max-age=604800" always;
         try_files $uri =404;
@@ -348,16 +384,17 @@ A böngészőben nézd meg:
 Az adatbázis és a `media` mappa együtt adja a teljes tartalmat:
 
 ```bash
-# napi mentés
-pg_dump -Fc -d help_infinityhu -f /backup/help_$(date +%F).dump
+# napi mentés (a tarolt eljarasokkal es a nezetekkel egyutt)
+mariadb-dump --single-transaction --routines --events \
+  help_infinityhu | gzip > /backup/help_$(date +%F).sql.gz
 tar czf /backup/help_media_$(date +%F).tar.gz -C /var/www/help.infinityhu.eu media
 ```
 
 Visszaállítás:
 
 ```bash
-pg_restore -d help_infinityhu -c /backup/help_2026-09-14.dump
-tar xzf /backup/help_media_2026-09-14.tar.gz -C /var/www/help.infinityhu.eu
+zcat /backup/help_2026-09-15.sql.gz | mariadb help_infinityhu
+tar xzf /backup/help_media_2026-09-15.tar.gz -C /var/www/help.infinityhu.eu
 ```
 
 ### Frissítés (új kódverzió)
@@ -400,16 +437,20 @@ Az első indulás pár perc, letölti a nyelvi modelleket (~1–2 GB).
 
 | tünet | ok / megoldás |
 |---|---|
-| „A súgó átmenetileg nem érhető el" | az `index.php` nem tud csatlakozni. Ellenőrizd a `HELP_DB_*` értékeket a PHP-FPM poolban, és hogy a `help_ro` tud-e belépni: `psql -h 127.0.0.1 -U help_ro -d help_infinityhu` |
+| „A súgó átmenetileg nem érhető el" | az `index.php` nem tud csatlakozni. Ellenőrizd a `HELP_DB_*` értékeket a PHP-FPM poolban, és hogy a `help_ro` tud-e belépni: `mariadb -h 127.0.0.1 -u help_ro -p help_infinityhu` |
 | Az adminban „Az adatbázis nem érhető el" | ugyanez, de a `HELP_DB_ADMIN_USER` / `HELP_DB_ADMIN_PASS` párossal (`help_rw`) |
 | Minden oldal 404 | hiányzik a `try_files ... /index.php` szabály, vagy rossz a `root` |
 | Az `/admin.php` a nyilvános súgót adja | a `SCRIPT_FILENAME` fixen az `index.php`-ra mutat — kell a külön `location = /admin.php` blokk (lásd B5) |
 | Kép/videó feltöltés nem sikerül | a `media` mappa nem írható a `www-data` számára, vagy kicsi az `upload_max_filesize` / `client_max_body_size` |
 | Word-import: „A fájl nem nyitható meg .docx-ként" | hiányzik a PHP `zip` kiterjesztés (`php -m \| grep zip`) |
+| Word-import nagy fájlnál megáll | kicsi a `max_allowed_packet` a MariaDB-ben (lásd B2) |
+| Az ékezetes keresés nem talál | rossz a rendezés. `SHOW CREATE TABLE help_article` — `utf8mb4_uca1400_ai_ci` kell, nem `..._hungarian_...` és nem `..._bin` |
+| A rövid szavakra nincs találat | `innodb_ft_min_token_size` = 2, és utána **újra kell építeni** a FULLTEXT indexet (lásd B2) |
 | Word-import 0 fejezetet talál | a dokumentumban nem címsorstílusok tagolnak. Címsor 1 = modul, Címsor 2 = fejezet, Címsor 3–4 = szakasz. A Word automatikus címsor-számozását a rendszer felismeri. |
 | A képek nem látszanak a fejezetekben | a `/media/` location hiányzik vagy rossz az `alias` (a végén a `/` is számít) |
 | Bejelentkezés után rögtön kidob | a munkamenet-süti `Secure`, de a kapcsolat HTTP. Vagy tedd HTTPS-re, vagy add át a `fastcgi_param HTTPS on;` sort proxy mögött |
-| „Túl sok sikertelen próbálkozás" | 5 hibás jelszó után 10 perc zárolás. Feloldás: `UPDATE help_user SET failed_logins=0, locked_until=NULL WHERE username='admin';` |
+| „Túl sok sikertelen próbálkozás" | 5 hibás jelszó után 10 perc zárolás. Feloldás: `mariadb help_infinityhu -e "UPDATE help_user SET failed_logins=0, locked_until=NULL WHERE username='admin';"` |
+| A PDF-letöltés gomb nem látszik | nincs telepítve a WeasyPrint. `apt-get install -y weasyprint`, majd PHP-FPM újraindítás |
 
 ---
 
@@ -417,30 +458,16 @@ Az első indulás pár perc, letölti a nyelvi modelleket (~1–2 GB).
 
 - [ ] az `admin` jelszava lecserélve
 - [ ] a `help_ro` és `help_rw` **saját, erős** jelszót kapott (nem a Dockerben lévő fejlesztőit)
-- [ ] a `db/99_docker_roles.sql` **nem** futott le éles adatbázison
+- [ ] a `db/05_jogosultsagok.sql` **nem** futott le éles adatbázison
 - [ ] a `/lib/` és a `/config.php` nem kérhető le (403/404)
 - [ ] a PHP-FPM pool fájl jogosultsága 640, mert jelszavakat tartalmaz
 - [ ] HTTPS él, a HTTP átirányít
 - [ ] `display_errors = off`
 - [ ] a `media` mappában nincs PHP-futtatás engedélyezve (a fenti nginx konfig statikusan szolgálja ki)
-- [ ] napi adatbázis-mentés beállítva
+- [ ] napi adatbázis-mentés beállítva (`--routines`-szal, hogy a tárolt eljárások is benne legyenek)
 
 ---
 
-## 6. Két megjegyzés a fejlesztőknek
-
-A `db/04_erp_norm_fix.sql` és a `db/05_admin_felulet.sql` **olyan hibákat is javít, amelyek
-az Infinity fő rendszerének súgó-adatbázisában is fennállnak** (ha ott ugyanez a séma fut):
-
-1. Az `erp_norm()` séma-minősítés nélkül hívta az `unaccent`-et, ezért az autovacuum/ANALYZE
-   elhasalt a kifejezés-indexes táblákon.
-2. Az összefoglalóval történő közzététel `not-null` hibával állt volna meg
-   (`help_changelog.released_at` / `doc_version`), a kereshető `plain_text` pedig
-   HTML-entitásokat tartalmazott.
-
-Érdemes ezt a két fájlt ott is lefuttatni.
-
----
 
 *Kérdés esetén a `README.md` írja le részletesen, mit tud a rendszer és hogyan működik
 a szerkesztő, a Word-import, a fordítás és az export.*

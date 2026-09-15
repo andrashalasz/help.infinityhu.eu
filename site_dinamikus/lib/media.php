@@ -114,7 +114,7 @@ function media_store(PDO $db, array $cfg, string $tmpPath, string $originalName,
     try {
         $db->prepare('INSERT INTO help_media (filename, sha256, mime, bytes, width, height, kind, title, uploaded_by)
                       VALUES (?,?,?,?,?,?,?,?,?)
-                      ON CONFLICT (sha256) DO UPDATE SET filename = excluded.filename')
+                      ON DUPLICATE KEY UPDATE filename = VALUES(filename)')
            ->execute([$name, $sha, $mime, $size, $w, $h, $kind,
                       mb_substr(pathinfo($originalName, PATHINFO_FILENAME), 0, 255), $userId]);
     } catch (Throwable $e) {

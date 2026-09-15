@@ -587,24 +587,24 @@ function page_export(PDO $db, array $cfg, string $lang, array $counts): void
 {
     $rows = $db->query("
         SELECT lang,
-               count(*) FILTER (WHERE is_published)     AS published,
-               count(*) FILTER (WHERE NOT is_published) AS hidden,
-               sum(img_count)                           AS images
+               COUNT(CASE WHEN is_published = 1 THEN 1 END) AS published,
+               COUNT(CASE WHEN is_published = 0 THEN 1 END) AS hidden,
+               SUM(img_count)                              AS images
           FROM help_article GROUP BY lang ORDER BY lang")->fetchAll();
     $stat = [];
     foreach ($rows as $r) { $stat[$r['lang']] = $r; }
-    $version = (string)$db->query("SELECT coalesce(max(doc_version), '') FROM help_article")->fetchColumn();
+    $version = (string)$db->query("SELECT COALESCE(MAX(doc_version), '') FROM help_article")->fetchColumn();
+    $hasPdf  = pdf_engine() !== null;
 
     admin_head('Export', 'export', $counts);
     ?>
 <div class="page" style="max-width:1000px">
   <h1 class="pt">A használati útmutató exportálása</h1>
   <p class="lead">
-    A teljes útmutató letölthető <b>Word-fájlként</b>, vagy megnyitható <b>PDF-nyomtatásra</b>:
-    az utóbbi új lapon nyílik, és rögtön felajánlja a nyomtatást — ott válaszd a
-    <b>Cél: Mentés PDF-ként</b> lehetőséget. Mindkettő <b>tartalomjegyzékkel</b> és a
-    <b>logóval</b> készül, és mindig a <b>jelenlegi, közzétett</b> adatbázis-tartalomból —
-    nem egy korábbi pillanatképből.
+    A teljes útmutató letölthető <b>Word</b>- és <b>PDF</b>-fájlként. Mindkettő rendes
+    kézikönyv: címlap (fejléc és lábléc nélkül), <b>tartalomjegyzék oldalszámokkal</b>, minden
+    lap tetején a logó, alul balra az <b>aktuális modul neve</b>, jobbra az <b>oldalszám</b>.
+    Mindig a <b>jelenlegi, közzétett</b> adatbázis-tartalomból készül, nem egy korábbi pillanatképből.
   </p>
   <?= flash_render() ?>
 
@@ -630,11 +630,18 @@ function page_export(PDO $db, array $cfg, string $lang, array $counts): void
                 <input type="hidden" name="lang" value="<?= h($code) ?>">
                 <button class="btn btn--sm btn--p" type="submit">Word (.docx)</button>
               </form>
-              <a class="btn btn--sm" target="_blank" rel="noopener"
-                 href="<?= h(admin_url(['a' => 'export.html', 'lang' => $code, 'print' => 1])) ?>">PDF (nyomtatás)</a>
+              <?php if ($hasPdf): ?>
+                <form method="post" action="<?= h(admin_url()) ?>" style="display:inline">
+                  <?= csrf_input() ?>
+                  <input type="hidden" name="a" value="export.pdf">
+                  <input type="hidden" name="lang" value="<?= h($code) ?>">
+                  <button class="btn btn--sm btn--p" type="submit"
+                          title="Oldalszámmal, futó lábléccel, kattintható tartalomjegyzékkel">PDF</button>
+                </form>
+              <?php endif; ?>
               <a class="btn btn--sm btn--ghost" target="_blank" rel="noopener"
                  href="<?= h(admin_url(['a' => 'export.html', 'lang' => $code])) ?>"
-                 title="Megnyitás nyomtatási párbeszéd nélkül">Előnézet</a>
+                 title="Megnyitás böngészőben (onnan is nyomtatható)">Előnézet</a>
             </td>
           </tr>
         <?php endforeach; ?>
@@ -642,6 +649,15 @@ function page_export(PDO $db, array $cfg, string $lang, array $counts): void
       </table>
     </div>
     <div class="panel__b">
+      <?php if (!$hasPdf): ?>
+        <div class="msg msg--warn">
+          <b>Nincs PDF-motor a szerveren</b>, ezért a közvetlen PDF-letöltés nem érhető el.
+          Telepítés: <span class="mono">apt-get install -y weasyprint</span> (a Docker-változat
+          már tartalmazza). Addig az <b>Előnézet</b> gombbal megnyitott oldalról a böngésző
+          <i>Nyomtatás → Mentés PDF-ként</i> funkciójával is készíthető PDF — abban viszont
+          nincs oldalszám és futó lábléc, mert azt a böngésző nem tudja.
+        </div>
+      <?php endif; ?>
       <div class="msg msg--info" style="margin:0">
         <b>A Word-fájl tartalomjegyzéke automatikusan frissül.</b>
         A Wordben megnyitva a program felajánlja a mezők frissítését — vagy jelöld ki a
@@ -803,7 +819,8 @@ function page_settings(PDO $db, array $cfg, array $counts): void
     $tr = Translator::fromConfig($cfg, $db);
     $release = $db->query("SELECT * FROM help_release WHERE status = 'open' LIMIT 1")->fetch();
     $closed  = $db->query("SELECT * FROM help_release WHERE status = 'closed' ORDER BY released_at DESC LIMIT 5")->fetchAll();
-    $pending = (int)$db->query("SELECT count(*) FROM help_changelog WHERE release_id = (SELECT id FROM help_release WHERE status='open' LIMIT 1)")->fetchColumn();
+    $pending = (int)$db->query("SELECT COUNT(*) FROM help_changelog
+                                  WHERE release_id = (SELECT id FROM (SELECT id FROM help_release WHERE status='open' LIMIT 1) r)")->fetchColumn();
     $envMt = ($cfg['mt_provider'] ?? '') !== '';
 
     admin_head('Beállítások', 'settings', $counts);
@@ -1065,14 +1082,15 @@ function palette_items(PDO $db, string $q): array
 
     // 2. fejezetek
     if ($q !== '' && auth_can('articles')) {
+        // az ekezet-fuggetlenseget a tabla utf8mb4_uca1400_ai_ci rendezese adja
         $st = $db->prepare("
             SELECT a.id, a.lang, a.chapter_no, a.title, a.is_published,
                    a.draft_html IS NOT NULL AS has_draft, m.title AS module_title
               FROM help_article a LEFT JOIN help_module m ON m.id = a.module_id
-             WHERE erp_norm(a.chapter_no || ' ' || a.title) LIKE '%' || erp_norm(?) || '%'
+             WHERE CONCAT(a.chapter_no, ' ', a.title) LIKE ?
           ORDER BY (a.lang = 'hu') DESC, a.sort_order
              LIMIT 25");
-        $st->execute([$q]);
+        $st->execute(['%' . $q . '%']);
         foreach ($st->fetchAll() as $r) {
             $flags = [];
             if ($r['has_draft'])     { $flags[] = 'vázlat'; }

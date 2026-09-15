@@ -12,7 +12,7 @@ declare(strict_types=1);
 function trash_put(PDO $db, string $kind, string $label, ?string $lang, array $payload, ?int $userId): int
 {
     $st = $db->prepare('INSERT INTO help_trash (kind, label, lang, payload, deleted_by)
-                        VALUES (?,?,?,?::jsonb,?) RETURNING id');
+                        VALUES (?,?,?,?,?)');
     $st->execute([
         $kind,
         mb_substr($label, 0, 300),
@@ -20,7 +20,7 @@ function trash_put(PDO $db, string $kind, string $label, ?string $lang, array $p
         json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE),
         $userId,
     ]);
-    return (int)$st->fetchColumn();
+    return (int)$db->lastInsertId();
 }
 
 /** Egy cikk torlese: elobb a kukaba tesszuk, csak utana toroljuk. */
@@ -109,17 +109,15 @@ function trash_restore(PDO $db, int $trashId): void
                     $vals[] = match ($c) {
                         'module_id' => $moduleId,
                         'slug'      => $slug,
-                        // a PDO a PHP bool-t ures sztringkent kuldene, amit a
-                        // Postgres nem tud boolean-re alakitani
-                        'is_published' => !empty($a[$c]) ? 'true' : 'false',
+                        'is_published' => !empty($a[$c]) ? 1 : 0,
                         default     => $a[$c] ?? null,
                     };
                 }
                 $sql = 'INSERT INTO help_article (' . implode(',', $cols) . ') VALUES ('
-                     . implode(',', array_fill(0, count($cols), '?')) . ') RETURNING id';
+                     . implode(',', array_fill(0, count($cols), '?')) . ')';
                 $ins = $db->prepare($sql);
                 $ins->execute($vals);
-                $newId = (int)$ins->fetchColumn();
+                $newId = (int)$db->lastInsertId();
 
                 $sec = $db->prepare('INSERT INTO help_section
                         (article_id, chapter_no, anchor, title, level, plain_text, sort_order)
@@ -137,10 +135,10 @@ function trash_restore(PDO $db, int $trashId): void
                                    $r['content_hash'], $r['note'], $r['created_by'], $r['created_at']]);
                 }
 
-                $map = $db->prepare('INSERT INTO help_screen_map (route, article_id, anchor, is_verified)
-                                     VALUES (?,?,?,?) ON CONFLICT (route) DO NOTHING');
+                $map = $db->prepare('INSERT IGNORE INTO help_screen_map (route, article_id, anchor, is_verified)
+                                     VALUES (?,?,?,?)');
                 foreach ($p['screens'] ?? [] as $r) {
-                    $map->execute([$r['route'], $newId, $r['anchor'], $r['is_verified'] ? 'true' : 'false']);
+                    $map->execute([$r['route'], $newId, $r['anchor'], $r['is_verified'] ? 1 : 0]);
                 }
                 break;
             }

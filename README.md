@@ -22,11 +22,14 @@ docker compose up -d --build
 |---|---|
 | **Súgó** | http://localhost:8080/ |
 | **Admin** | http://localhost:8080/admin.php — `admin` / `12345678` |
-| PostgreSQL | `localhost:5433`, db `help_infinityhu`, user `help` / `help` |
+| MariaDB | `localhost:3307`, db `help_infinityhu`, user `help` / `help` |
 
-Az első indításkor a PostgreSQL automatikusan lefuttatja a [`db/`](db/) alatti SQL-fájlokat
-(327 cikk = 109 fejezet × 3 nyelv, 663 szakasz, 51 modul-sor). Ez kb. 20–30 másodperc;
-addig a webes felület még `503`-at adhat.
+A kiszolgáló-összeállítás ugyanaz, mint az éles szerveren:
+**nginx 1.28.3 + PHP 8.3 FPM + MariaDB 11.8.6**.
+
+Az első indításkor a MariaDB automatikusan lefuttatja a [`db/`](db/) alatti SQL-fájlokat
+(327 cikk = 109 fejezet × 3 nyelv, 663 szakasz, 51 modul-sor). Ez kb. fél perc;
+addig a webes felület még hibát adhat.
 
 A jelszócsere **nem kötelező**: belépés után a rendszer egyszer emlékeztet rá, cserélni pedig a
 **Beállítások → Saját jelszó** résznél lehet, amikor jónak látod. Ha elrontanád a belépést:
@@ -239,8 +242,9 @@ build_site.py         a statikus változat generálása
 deploy/               éles nginx konfigok, a "?" gomb JS-e, példány-konfigok
 media/                275 valódi képernyőkép
 helyi_teszt/          a csomag eredeti, Yii2-alapú teszt-szkriptje (lásd lent)
-docker-compose.yml    PostgreSQL 16 + PHP 8.3/Apache
-docker/php/           a PHP image és az Apache vhost
+docker-compose.yml    nginx 1.28.3 + PHP 8.3 FPM + MariaDB 11.8.6
+docker/php/           a PHP-FPM image (pdo_mysql, zip, gd, WeasyPrint)
+docker/nginx/         az nginx konfig a Docker-környezethez
 ```
 
 ### Statikus vagy dinamikus?
@@ -249,7 +253,7 @@ docker/php/           a PHP image és az Apache vhost
 |---|---|---|
 | Frissítés | újra kell generálni és feltölteni | **azonnal látszik**, nincs build-lépés |
 | Szerkesztő | nincs | **van** (`/admin.php`) |
-| Szerver igénye | semmi (csak fájlkiszolgálás) | PHP + a külön súgó-adatbázis |
+| Szerver igénye | semmi (csak fájlkiszolgálás) | nginx + PHP-FPM + MariaDB |
 | Ha az Infinity áll | működik | működik — **saját, külön** adatbázisa van |
 
 A **dinamikus** az ajánlott, és a Docker környezet is ezt futtatja.
@@ -258,59 +262,34 @@ A **dinamikus** az ajánlott, és a Docker környezet is ezt futtatja.
 
 ## `db/` — az adatbázis
 
-A fájlok ábécé-sorrendben futnak le (így teszi a postgres image is):
+**MariaDB 11.8+.** A fájlok ábécé-sorrendben futnak le (így teszi a mariadb image is):
 
 | fájl | mi ez |
 |---|---|
-| `01_help_articles_i18n.sql` | séma (`help_module`, `help_article`, `help_section`, `help_screen_map`, `help_changelog`, `help_feedback`) + a teljes tartalom 3 nyelven |
-| `02_szerkeszto_migracio.sql` | szerkesztő: `draft_html`, revíziók, média-tábla, `help_publish()` |
-| `03_changelog_migracio.sql` | kiadás-kezelés: `help_release`, bővített `help_publish()`, `help_news` nézet |
-| `04_erp_norm_fix.sql` | **javítás** — lásd lent |
-| `05_admin_felulet.sql` | az admin felület táblái (`help_user`, `help_setting`, `help_import`, `help_audit`), a fordítási állapot mezői, és **két hibajavítás** — lásd lent |
-| `06_video_export_ujdonsag.sql` | videó a képek mellé (`help_media.kind`), újdonság-kiemelés (`help_article.highlight_until`, `help_whatsnew` nézet), automatikus fordítás kapcsolója |
-| `07_visszavonas.sql` | Kuka (`help_trash`) a visszaállítható törléshez, `help_unpublish()` a közzététel visszavonásához |
-| `99_docker_roles.sql` | a `help_ro` (olvasó) és `help_rw` (író) szerepkör, fejlesztői jelszóval |
+| `01_sema.sql` | a teljes séma: `help_module`, `help_article`, `help_section`, `help_screen_map`, `help_release`, `help_changelog`, `help_article_revision`, `help_media`, `help_user`, `help_setting`, `help_import(_item)`, `help_audit`, `help_trash` |
+| `02_eljarasok.sql` | tárolt eljárások (`help_publish`, `help_unpublish`, `help_close_release`), a `help_plain()` függvény és a nézetek (`help_news`, `help_whatsnew`, `help_article_public`) |
+| `03_alapadatok.sql` | a kezdő `admin` felhasználó, az alapértelmezett beállítások, egy nyitott kiadás |
+| `04_tartalom.sql` | a teljes tartalom: 109 fejezet × 3 nyelv, 663 szakasz, 51 modul-sor |
+| `05_jogosultsagok.sql` | a `help_ro` (olvasó) és `help_rw` (író) felhasználó, **fejlesztői jelszóval** — élesben ne ez fusson, lásd `TELEPITES.md` |
 
-Az első három fájl az eredeti csomag `01_infinity_fo_rendszerbe/sql/` mappájából származik,
-változtatás nélkül — ugyanezek kellenek az éles Infinity-be is.
+### Karakterkészlet és keresés
 
-### `04_erp_norm_fix.sql` — mit javít
+A séma `utf8mb4` / **`utf8mb4_uca1400_ai_ci`** rendezést használ: `ai` = ékezet-független,
+`ci` = kis-nagybetű független. Ezért a keresésben nincs szükség külön ékezet-eltávolító
+függvényre — a „szamla" magától megtalálja a „Számlá"-t, a „penzugy" a „Pénzügy"-öt.
 
-Az eredeti séma így definiálja a normalizáló függvényt:
+> Szándékosan **nem** a `..._hungarian_ai_ci` van beállítva: a magyar tájolás az `o`/`ö`/`ő`
+> és `u`/`ü`/`ű` párokat külön betűnek veszi, így a „penzugy" **nem** találná meg a „Pénzügy"-öt.
+> Rendezni úgyis `sort_order` és `chapter_no` szerint rendezünk, nem cím szerint.
 
-```sql
-SELECT lower(unaccent(coalesce(txt, '')));
-```
-
-Az `unaccent` itt nincs séma-minősítve. Mivel az `erp_norm(title)` **kifejezés-indexben**
-is szerepel (`help_article_trgm_idx`, `help_section_trgm_idx`), az autovacuum/ANALYZE
-munkafolyamat — ami üres `search_path`-tal fut — nem találja meg:
-
-```
-ERROR: function unaccent(text) does not exist
-```
-
-Ez a Docker indításkor valóban jelentkezett a naplóban. A javítás séma-minősíti, és a
-kétargumentumos, valóban `IMMUTABLE` `unaccent(regdictionary, text)` formát használja.
-
-### `05_admin_felulet.sql` — a két hibajavítás benne
-
-1. **A közzététel összefoglalóval elhasalt volna.** A 003 migráció `help_publish()`
-   függvénye `NULL`-t ír a `help_changelog.released_at` és `.doc_version` mezőkbe
-   (helyesen — ezeket a kiadás lezárása tölti ki), csakhogy a 001-ben ezek `NOT NULL`-ok.
-   Minden összefoglalóval történő közzététel *"null value in column released_at violates
-   not-null constraint"* hibával állt volna meg. A migráció feloldja a megszorítást.
-2. **A kereshető szöveg HTML-entitásokat tartalmazott.** A közzététel a `plain_text`-et
-   `regexp_replace(draft_html, '<[^>]+>', ' ')` mintával állította elő, ami a `&nbsp;`,
-   `&amp;` és társait benne hagyta. Egy `help_plain()` segédfüggvény ezt rendbe teszi,
-   és a `help_publish()` mostantól ezt használja.
-
-**Mindkét javítás az éles Infinity adatbázisban is érvényes.**
+A teljes szöveges keresést **InnoDB FULLTEXT** index szolgálja ki (`title` + `plain_text`),
+`LIKE`-tartalékkal a rövid szavakra és a szó belseji találatokra. A címben lévő találat mindig
+megelőzi a szövegtörzsben lévőt. A találati kivonatot (a keresett szó kiemelésével) a PHP
+állítja elő — a MariaDB-ben nincs `ts_headline()`.
 
 ### Képek útvonala
 
-Az adatbázis szándékosan úgy maradt, ahogy a csomagban volt: a `body_html` mezőkben
-`src="media/..."` szerepel. Az `index.php` futásidőben írja át `/media/`-ra — így **nem kell**
+A `body_html` mezőkben `src="media/..."` szerepel. Az `index.php` futásidőben írja át `/media/`-ra — így **nem kell**
 `UPDATE`-tel hozzányúlni a tartalomhoz, és ugyanez a dump változtatás nélkül betölthető az
 Infinity oldalára is (ahol `/help/media/` az útvonal).
 
@@ -318,22 +297,14 @@ Infinity oldalára is (ahol `/help/media/` az útvonal).
 
 ## Éles telepítés
 
-```bash
-psql -d help_infinityhu -f db/01_help_articles_i18n.sql
-psql -d help_infinityhu -f db/02_szerkeszto_migracio.sql
-psql -d help_infinityhu -f db/03_changelog_migracio.sql
-psql -d help_infinityhu -f db/04_erp_norm_fix.sql
-psql -d help_infinityhu -f db/05_admin_felulet.sql
-psql -d help_infinityhu -f db/06_video_export_ujdonsag.sql
-psql -d help_infinityhu -f db/07_visszavonas.sql
+Részletes, lépésenkénti leírás: **[`TELEPITES.md`](TELEPITES.md)**. Röviden:
 
-# a szerepkoroket SAJAT jelszoval hozd letre, ne a 99-es fajllal:
-psql -d help_infinityhu -c "CREATE ROLE help_ro LOGIN PASSWORD '...';"
-psql -d help_infinityhu -c "CREATE ROLE help_rw LOGIN PASSWORD '...';"
-psql -d help_infinityhu -c "GRANT USAGE ON SCHEMA public TO help_ro, help_rw;"
-psql -d help_infinityhu -c "GRANT SELECT ON ALL TABLES IN SCHEMA public TO help_ro;"
-psql -d help_infinityhu -c "GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO help_rw;"
-psql -d help_infinityhu -c "GRANT USAGE, SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA public TO help_rw;"
+```bash
+mariadb -u root -p -e "CREATE DATABASE help_infinityhu CHARACTER SET utf8mb4 COLLATE utf8mb4_uca1400_ai_ci;"
+for f in db/01_sema.sql db/02_eljarasok.sql db/03_alapadatok.sql db/04_tartalom.sql; do
+  mariadb -u root -p help_infinityhu < "$f"
+done
+# a help_ro / help_rw felhasznalot SAJAT jelszoval hozd letre (ne a db/05_jogosultsagok.sql-lel)
 ```
 
 Majd a `site_dinamikus/` tartalmát a webroot alá, a `media/` mappát mellé, és a
@@ -343,18 +314,16 @@ Környezeti változók (a jelszavakat **ne** a `config.php`-ba írd):
 
 | változó | mire |
 |---|---|
-| `HELP_DB_DSN` | az adatbázis DSN-je |
+| `HELP_DB_DSN` | pl. `mysql:host=127.0.0.1;port=3306;dbname=help_infinityhu;charset=utf8mb4` |
 | `HELP_DB_USER` / `HELP_DB_PASS` | az **olvasó** felhasználó (nyilvános oldal) |
 | `HELP_DB_ADMIN_USER` / `HELP_DB_ADMIN_PASS` | az **író** felhasználó (admin felület) |
 | `HELP_MEDIA_DIR` | a képek mappája a lemezen (írhatónak kell lennie a Word-importhoz) |
 | `HELP_MT_PROVIDER` / `HELP_MT_ENDPOINT` / `HELP_MT_KEY` | gépi fordító (nem kötelező) |
 
-Az éles vhost tiltsa a `lib/` mappát és a `config.php`-t — a Dockerben lévő Apache-konfig
-(`docker/php/help.conf`) megmutatja, hogyan.
+Az éles vhost tiltsa a `lib/` mappát és a `config.php`-t — a mellékelt nginx-konfig ezt már
+tartalmazza, ahogy az admin külön `location` blokkját is.
 
 **Az `/admin.php` HTTPS mögé való.** A munkamenet-süti `Secure` jelzőt csak HTTPS-en kap.
-
----
 
 ## `deploy/` — a „?" gomb és a példány-konfigok
 
@@ -398,7 +367,7 @@ törött kép. A végleges márkajelet tehát elég bemásolni ebbe a mappába, 
 Az alábbiakat ténylegesen lefuttatva ellenőriztük a Docker környezetben, nem csak feltételezés:
 
 **Adatbázis és olvasói oldal**
-- az adatbázis nulláról hiba nélkül felépül mind a hat SQL-fájlból: **327 cikk**, 663 szakasz, 51 modul-sor
+- az adatbázis nulláról hiba nélkül felépül mind az öt SQL-fájlból: **327 cikk**, 663 szakasz, 51 modul-sor
 - kezdőlap, fejezet-oldal, beágyazott nézet, 404 — mind a várt válasszal
 - a képek `/media/` alól, HTTP 200; a `lib/` és a `config.php` közvetlenül **nem kérhető le** (403)
 - keresés ékezet-függetlenül: `?q=szamla` → „Számlás értékesítés", kiemelt találattal

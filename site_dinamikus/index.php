@@ -105,7 +105,7 @@ function getModules(PDO $pdo, string $lang): array
     $ids = array_column($modules, 'id');
     $in  = implode(',', array_fill(0, count($ids), '?'));
     $st2 = $pdo->prepare("SELECT module_id, slug, chapter_no, title FROM help_article
-                           WHERE module_id IN ($in) AND lang = ? AND is_published
+                           WHERE module_id IN ($in) AND lang = ? AND is_published = 1
                         ORDER BY sort_order, id");
     $st2->execute([...$ids, $lang]);
 
@@ -121,7 +121,7 @@ function getArticle(PDO $pdo, string $slug, string $lang): ?array
 {
     $st = $pdo->prepare('SELECT a.*, m.title AS module_title, m.chapter_no AS module_no, m.slug AS module_slug
                            FROM help_article a JOIN help_module m ON m.id = a.module_id
-                          WHERE a.slug = ? AND a.lang = ? AND a.is_published LIMIT 1');
+                          WHERE a.slug = ? AND a.lang = ? AND a.is_published = 1 LIMIT 1');
     $st->execute([$slug, $lang]);
     $a = $st->fetch();
     if (!$a) { return null; }
@@ -135,19 +135,23 @@ function getArticle(PDO $pdo, string $slug, string $lang): ?array
 
 function searchArticles(PDO $pdo, string $lang, string $q): array
 {
-    $st = $pdo->prepare("
-        SELECT a.slug, a.chapter_no, a.title, m.title AS module,
-               ts_headline('simple', a.plain_text, plainto_tsquery('simple', erp_norm(:q)),
-                           'MaxWords=22, MinWords=8, ShortWord=2, MaxFragments=1') AS snippet
-          FROM help_article a JOIN help_module m ON m.id = a.module_id
-         WHERE a.lang = :lang AND a.is_published
-           AND (a.search_vector @@ plainto_tsquery('simple', erp_norm(:q))
-                OR erp_norm(a.title) LIKE '%' || erp_norm(:q) || '%')
-         ORDER BY ts_rank(a.search_vector, plainto_tsquery('simple', erp_norm(:q))) DESC,
-                  a.chapter_no
-         LIMIT 20");
-    $st->execute(['q' => $q, 'lang' => $lang]);
-    return $st->fetchAll();
+    $s = help_search_sql($q);
+    $sql = "SELECT a.slug, a.chapter_no, a.title, a.plain_text, m.title AS module
+              FROM help_article a JOIN help_module m ON m.id = a.module_id
+             WHERE a.lang = :lang AND a.is_published = 1
+               AND {$s['where']}
+          ORDER BY {$s['order']}
+             LIMIT 20";
+    $st = $pdo->prepare($sql);
+    $st->execute(['lang' => $lang] + $s['params']);
+
+    $rows = $st->fetchAll();
+    foreach ($rows as &$r) {
+        // a kivonatot itt allitjuk elo (a MariaDB-ben nincs ts_headline)
+        $r['snippet'] = help_snippet((string)$r['plain_text'], $q);
+        unset($r['plain_text']);
+    }
+    return $rows;
 }
 
 /**

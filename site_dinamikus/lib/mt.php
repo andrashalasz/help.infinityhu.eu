@@ -41,7 +41,7 @@ final class Translator
 
         if ($db !== null && ($provider === '' || $key === '')) {
             try {
-                $rows = $db->query("SELECT key, value FROM help_setting WHERE key IN ('mt_provider','mt_endpoint','mt_key')")->fetchAll();
+                $rows = $db->query("SELECT `key`, value FROM help_setting WHERE `key` IN ('mt_provider','mt_endpoint','mt_key')")->fetchAll();
                 $s = [];
                 foreach ($rows as $r) { $s[$r['key']] = (string)$r['value']; }
                 if ($provider === '') { $provider = $s['mt_provider'] ?? 'none'; }
@@ -196,23 +196,21 @@ function translate_store(
         $moduleId = (int)($mst->fetchColumn() ?: 0);
         if ($moduleId === 0) {
             $mi = $db->prepare('INSERT INTO help_module (chapter_no, slug, title, lang, sort_order)
-                                SELECT chapter_no, slug, title, ?, sort_order FROM help_module WHERE id = ?
-                                RETURNING id');
+                                SELECT chapter_no, slug, title, ?, sort_order FROM help_module WHERE id = ?');
             $mi->execute([$to, $src['module_id']]);
-            $moduleId = (int)$mi->fetchColumn();
+            $moduleId = (int)$db->lastInsertId();
         }
-        $ai = $db->prepare('INSERT INTO help_article
+        $ai = $db->prepare("INSERT INTO help_article
                 (module_id, chapter_no, slug, title, lang, body_html, plain_text, doc_version,
                  updated_at, content_hash, sort_order, is_published, draft_html, draft_title,
                  draft_by, draft_at, source)
-                VALUES (?,?,?,?,?,\'\',\'\',?, CURRENT_DATE, md5(?), ?, false, ?, ?, ?, now(), \'editor\')
-                RETURNING id');
+                VALUES (?,?,?,?,?,'','',?, CURRENT_DATE, MD5(?), ?, 0, ?, ?, ?, NOW(), 'editor')");
         $ai->execute([
             $moduleId, $src['chapter_no'], $src['slug'], $title !== '' ? $title : $src['title'], $to,
             $src['doc_version'], $src['slug'] . $to, (int)$src['sort_order'],
             $html, $title !== '' ? $title : null, $userId,
         ]);
-        $targetId = (int)$ai->fetchColumn();
+        $targetId = (int)$db->lastInsertId();
     } else {
         $db->prepare('UPDATE help_article SET draft_html = ?, draft_title = ?, draft_by = ?, draft_at = now() WHERE id = ?')
            ->execute([$html, $title !== '' ? $title : null, $userId, $targetId]);
@@ -222,8 +220,9 @@ function translate_store(
        ->execute([$src['content_hash'], mb_substr($how, 0, 16), $targetId]);
 
     if ($publish) {
-        $db->prepare('SELECT help_publish(?, ?, ?, ?, NULL, true)')
-           ->execute([$targetId, $userId, null, 'mod']);
+        $pub = $db->prepare('CALL help_publish(?, ?, ?, ?, NULL, 1)');
+        $pub->execute([$targetId, $userId, null, 'mod']);
+        $pub->closeCursor();
         $b = $db->prepare('SELECT body_html FROM help_article WHERE id = ?');
         $b->execute([$targetId]);
         sections_rebuild($db, $targetId, (string)$b->fetchColumn());
@@ -236,7 +235,7 @@ function translate_store(
 function mt_auto_on(PDO $db, array $cfg): bool
 {
     try {
-        $v = (string)$db->query("SELECT value FROM help_setting WHERE key = 'mt_auto'")->fetchColumn();
+        $v = (string)$db->query("SELECT value FROM help_setting WHERE `key` = 'mt_auto'")->fetchColumn();
     } catch (Throwable $e) {
         return false;
     }

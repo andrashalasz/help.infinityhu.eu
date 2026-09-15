@@ -106,14 +106,13 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
 
             $summary = post('summary');
             $kind    = in_array(post('kind'), ['new', 'mod', 'fix'], true) ? post('kind') : 'mod';
-            // a PDO a PHP bool-t ures sztringkent kuldene, amit a Postgres nem
-            // tud boolean-re alakitani - ezert szoveges 'true'/'false' megy at
-            $minor   = isset($_POST['minor']) ? 'true' : 'false';
+            $minor   = isset($_POST['minor']) ? 1 : 0;
 
             $db->beginTransaction();
             try {
-                $p = $db->prepare('SELECT help_publish(?, ?, ?, ?, NULL, ?)');
+                $p = $db->prepare('CALL help_publish(?, ?, ?, ?, NULL, ?)');
                 $p->execute([$id, auth_user()['id'], $summary !== '' ? $summary : null, $kind, $minor]);
+                $p->closeCursor();
 
                 $body = $db->prepare('SELECT body_html FROM help_article WHERE id = ?');
                 $body->execute([$id]);
@@ -146,7 +145,9 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
         // a nyilvanos oldalon. A tartalom es a vazlat erintetlen marad.
         case 'article.toggle': {
             $id = (int)post('id');
-            $st = $db->prepare('UPDATE help_article SET is_published = NOT is_published WHERE id = ? RETURNING is_published, title');
+            // a MariaDB nem ismer UPDATE ... RETURNING-et, ezert utana kerdezunk ra
+            $db->prepare('UPDATE help_article SET is_published = 1 - is_published WHERE id = ?')->execute([$id]);
+            $st = $db->prepare('SELECT is_published, title FROM help_article WHERE id = ?');
             $st->execute([$id]);
             $r = $st->fetch();
             if (!$r) {
@@ -168,7 +169,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             $slug = (string)$st->fetchColumn();
             $on   = post('on') === '1';
             $n = $db->prepare('UPDATE help_article SET is_published = ? WHERE slug = ?');
-            $n->execute([$on ? 'true' : 'false', $slug]);
+            $n->execute([$on ? 1 : 0, $slug]);
             audit_me($db, 'article.toggle-all', 'slug:' . $slug, $on ? 'be' : 'ki');
             flash('ok', $on
                 ? 'A fejezet <b>mindhárom nyelven</b> közzétéve.'
@@ -195,7 +196,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                    ->execute([
                        mb_substr($chapter, 0, 16), mb_substr($slug, 0, 160), mb_substr($title, 0, 255),
                        (int)post('module_id') ?: null, (int)post('sort_order'),
-                       isset($_POST['is_published']) ? 'true' : 'false',
+                       isset($_POST['is_published']) ? 1 : 0,
                        post('permission') !== '' ? mb_substr(post('permission'), 0, 64) : null,
                        $id,
                    ]);
@@ -221,18 +222,17 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             }
             $slug = post('slug') !== '' ? post('slug') : help_slug($chapter, $title);
 
-            $ver = (string)$db->query("SELECT coalesce(max(doc_version), 'v1') FROM help_article")->fetchColumn();
+            $ver = (string)$db->query("SELECT COALESCE(MAX(doc_version), 'v1') FROM help_article")->fetchColumn();
             try {
-                $st = $db->prepare('INSERT INTO help_article
+                $st = $db->prepare("INSERT INTO help_article
                         (module_id, chapter_no, slug, title, lang, body_html, plain_text, doc_version,
                          updated_at, content_hash, sort_order, is_published, draft_html, draft_by, draft_at, source)
-                        VALUES (?,?,?,?,?,\'\',\'\',?, CURRENT_DATE, md5(?), ?, false, \'\', ?, now(), \'editor\')
-                        RETURNING id');
+                        VALUES (?,?,?,?,?,'','',?, CURRENT_DATE, MD5(?), ?, 0, '', ?, NOW(), 'editor')");
                 $st->execute([
                     $module, mb_substr($chapter, 0, 16), mb_substr($slug, 0, 160), mb_substr($title, 0, 255),
                     $lang, $ver, $slug . $title, (int)post('sort_order'), auth_user()['id'],
                 ]);
-                $newId = (int)$st->fetchColumn();
+                $newId = (int)$db->lastInsertId();
             } catch (PDOException $e) {
                 flash('err', str_contains($e->getMessage(), 'help_article_slug_lang_key')
                     ? 'Ez az URL-azonosító (slug) már foglalt ezen a nyelven.'
@@ -284,9 +284,10 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
         // ---------- a legutobbi kozzetetel visszavonasa ----------
         case 'article.unpublish': {
             $id = (int)post('id');
-            $st = $db->prepare('SELECT help_unpublish(?, ?)');
+            $st = $db->prepare('CALL help_unpublish(?, ?, @help_ok)');
             $st->execute([$id, auth_user()['id']]);
-            $ok = $st->fetchColumn();
+            $st->closeCursor();
+            $ok = (int)$db->query('SELECT @help_ok')->fetchColumn() === 1;
 
             if (!$ok) {
                 flash('warn', 'Ezen a fejezeten még nem volt közzététel, nincs mit visszavonni.');
@@ -320,7 +321,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                 case 'publish-off': {
                     $on = $op === 'publish-on';
                     $st = $db->prepare("UPDATE help_article SET is_published = ? WHERE id IN ($in)");
-                    $st->execute([$on ? 'true' : 'false', ...$ids]);
+                    $st->execute([$on ? 1 : 0, ...$ids]);
                     $n = $st->rowCount();
                     audit_me($db, 'articles.bulk', $op, (string)$n);
                     flash('ok', "<b>{$n} fejezet</b> " . ($on ? 'bekapcsolva' : 'kikapcsolva') . '. '
@@ -336,9 +337,10 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                     foreach ($st->fetchAll() as $r) {
                         try {
                             $db->beginTransaction();
-                            $db->prepare('SELECT help_publish(?, ?, ?, ?, NULL, ?)')
-                               ->execute([$r['id'], auth_user()['id'], $summary !== '' ? $summary : null,
-                                          'mod', isset($_POST['minor']) ? 'true' : 'false']);
+                            $pub = $db->prepare('CALL help_publish(?, ?, ?, ?, NULL, ?)');
+                            $pub->execute([$r['id'], auth_user()['id'], $summary !== '' ? $summary : null,
+                                           'mod', isset($_POST['minor']) ? 1 : 0]);
+                            $pub->closeCursor();
                             $b = $db->prepare('SELECT body_html FROM help_article WHERE id = ?');
                             $b->execute([$r['id']]);
                             sections_rebuild($db, (int)$r['id'], (string)$b->fetchColumn());
@@ -557,13 +559,13 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
 
             $db->beginTransaction();
             $st = $db->prepare('INSERT INTO help_import (filename, lang, bytes, status, stats, uploaded_by)
-                                VALUES (?,?,?,?,?::jsonb,?) RETURNING id');
+                                VALUES (?,?,?,?,?,?)');
             $st->execute([
                 mb_substr((string)$f['name'], 0, 255), $lang, (int)$f['size'], 'parsed',
                 json_encode(['chapters' => $chapters, 'images' => $res['images'], 'paragraphs' => $res['paragraphs']], JSON_UNESCAPED_UNICODE),
                 auth_user()['id'],
             ]);
-            $importId = (int)$st->fetchColumn();
+            $importId = (int)$db->lastInsertId();
 
             $ins = $db->prepare('INSERT INTO help_import_item
                     (import_id, seq, chapter_no, title, slug, module_no, module_title,
@@ -633,31 +635,35 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                         $mst->execute([$lang, $it['module_no'], $it['module_title']]);
                         $moduleId = (int)($mst->fetchColumn() ?: 0);
                         if ($moduleId === 0) {
+                            // MariaDB nem enged ugyanabbol a tablabol olvasni INSERT kozben
+                            $nextSort = (int)$db->query(
+                                'SELECT COALESCE(MAX(sort_order),0)+10 FROM help_module WHERE lang = '
+                                . $db->quote($lang))->fetchColumn();
                             $mi = $db->prepare('INSERT INTO help_module (chapter_no, slug, title, lang, sort_order)
-                                                VALUES (?,?,?,?, (SELECT coalesce(max(sort_order),0)+10 FROM help_module WHERE lang = ?))
-                                                RETURNING id');
+                                                VALUES (?,?,?,?,?)');
                             $mi->execute([
                                 $it['module_no'], help_slug($it['module_no'], $it['module_title']),
-                                $it['module_title'], $lang, $lang,
+                                $it['module_title'], $lang, $nextSort,
                             ]);
-                            $moduleId = (int)$mi->fetchColumn();
+                            $moduleId = (int)$db->lastInsertId();
                         }
 
-                        $ver = (string)$db->query("SELECT coalesce(max(doc_version), 'v1') FROM help_article")->fetchColumn();
-                        $ai = $db->prepare('INSERT INTO help_article
+                        $ver = (string)$db->query("SELECT COALESCE(MAX(doc_version), 'v1') FROM help_article")->fetchColumn();
+                        $sortSt = $db->prepare('SELECT COALESCE(MAX(sort_order),0)+10 FROM help_article WHERE module_id = ?');
+                        $sortSt->execute([$moduleId]);
+                        $nextSort = (int)$sortSt->fetchColumn();
+
+                        $ai = $db->prepare("INSERT INTO help_article
                                 (module_id, chapter_no, slug, title, lang, body_html, plain_text, doc_version,
                                  updated_at, content_hash, img_count, sort_order, is_published,
                                  draft_html, draft_by, draft_at, source)
-                                VALUES (?,?,?,?,?,\'\',\'\',?, CURRENT_DATE, md5(?), ?,
-                                        (SELECT coalesce(max(sort_order),0)+10 FROM help_article WHERE module_id = ?),
-                                        false, ?, ?, now(), \'word\')
-                                RETURNING id');
+                                VALUES (?,?,?,?,?,'','',?, CURRENT_DATE, MD5(?), ?, ?, 0, ?, ?, NOW(), 'word')");
                         $ai->execute([
                             $moduleId, $it['chapter_no'], $it['slug'], $it['title'], $lang, $ver,
-                            $it['slug'] . $it['title'], (int)$it['img_count'], $moduleId,
+                            $it['slug'] . $it['title'], (int)$it['img_count'], $nextSort,
                             $it['body_html'], auth_user()['id'],
                         ]);
-                        $articleId = (int)$ai->fetchColumn();
+                        $articleId = (int)$db->lastInsertId();
                         $created++;
                     } else {
                         $db->prepare('UPDATE help_article
@@ -668,10 +674,11 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                     }
 
                     if ($publish) {
-                        $db->prepare('SELECT help_publish(?, ?, ?, ?, NULL, false)')
-                           ->execute([$articleId, auth_user()['id'],
-                                      'Word-import: ' . $it['chapter_no'] . ' ' . $it['title'],
-                                      $it['article_id'] ? 'mod' : 'new']);
+                        $pub = $db->prepare('CALL help_publish(?, ?, ?, ?, NULL, 0)');
+                        $pub->execute([$articleId, auth_user()['id'],
+                                       'Word-import: ' . $it['chapter_no'] . ' ' . $it['title'],
+                                       $it['article_id'] ? 'mod' : 'new']);
+                        $pub->closeCursor();
                         $b = $db->prepare('SELECT body_html FROM help_article WHERE id = ?');
                         $b->execute([$articleId]);
                         sections_rebuild($db, $articleId, (string)$b->fetchColumn());
@@ -798,10 +805,10 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             try {
                 if ($id > 0) {
                     $db->prepare('UPDATE help_screen_map SET route = ?, article_id = ?, anchor = ?, is_verified = ? WHERE id = ?')
-                       ->execute([mb_substr($route, 0, 160), $articleId, post('anchor') ?: null, isset($_POST['is_verified']) ? 'true' : 'false', $id]);
+                       ->execute([mb_substr($route, 0, 160), $articleId, post('anchor') ?: null, isset($_POST['is_verified']) ? 1 : 0, $id]);
                 } else {
                     $db->prepare('INSERT INTO help_screen_map (route, article_id, anchor, is_verified) VALUES (?,?,?,?)')
-                       ->execute([mb_substr($route, 0, 160), $articleId, post('anchor') ?: null, isset($_POST['is_verified']) ? 'true' : 'false']);
+                       ->execute([mb_substr($route, 0, 160), $articleId, post('anchor') ?: null, isset($_POST['is_verified']) ? 1 : 0]);
                 }
             } catch (PDOException $e) {
                 flash('err', str_contains($e->getMessage(), 'help_screen_map_route_key')
@@ -896,7 +903,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
 
             if ($id > 0) {
                 $db->prepare('UPDATE help_user SET display_name = ?, email = ?, role = ?, is_active = ? WHERE id = ?')
-                   ->execute([post('display_name'), post('email') ?: null, $role, isset($_POST['is_active']) ? 'true' : 'false', $id]);
+                   ->execute([post('display_name'), post('email') ?: null, $role, isset($_POST['is_active']) ? 1 : 0, $id]);
                 audit_me($db, 'user.update', 'user:' . $id);
                 flash('ok', 'A felhasználó adatai mentve.');
             } else {
@@ -941,7 +948,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                 flash('err', 'Saját magadat nem törölheted.');
                 back(['p' => 'users']);
             }
-            $n = (int)$db->query("SELECT count(*) FROM help_user WHERE role = 'admin' AND is_active")->fetchColumn();
+            $n = (int)$db->query("SELECT COUNT(*) FROM help_user WHERE role = 'admin' AND is_active = 1")->fetchColumn();
             $r = $db->prepare('SELECT role FROM help_user WHERE id = ?');
             $r->execute([$id]);
             if ($r->fetchColumn() === 'admin' && $n <= 1) {
@@ -980,6 +987,24 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             exit;
         }
 
+        case 'export.pdf': {
+            $lang = array_key_exists(post('lang'), ADMIN_LANGS) ? post('lang') : 'hu';
+            try {
+                $r = export_pdf($db, $cfg, $lang, !isset($_POST['include_hidden']));
+            } catch (Throwable $e) {
+                flash('err', h($e->getMessage()));
+                back(['p' => 'export']);
+            }
+            audit_me($db, 'export.pdf', $lang, help_bytes($r['bytes']));
+
+            header('Content-Type: application/pdf');
+            header('Content-Disposition: attachment; filename="' . $r['filename'] . '"');
+            header('Content-Length: ' . (string)$r['bytes']);
+            readfile($r['path']);
+            @unlink($r['path']);
+            exit;
+        }
+
         // ================================================== beállítások
         case 'setting.save': {
             if (!auth_is('admin')) { flash('err', 'Ehhez adminisztrátori jog kell.'); back(['p' => 'settings']); }
@@ -988,8 +1013,8 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                      'highlight_days', 'export_company', 'export_footer'];
             // a kipipalatlan jelolonegyzet nem kerul be a POST-ba
             if (isset($_POST['mt_provider'])) { $_POST['mt_auto'] = isset($_POST['mt_auto']) ? '1' : '0'; }
-            $st = $db->prepare('INSERT INTO help_setting (key, value, updated_by, updated_at) VALUES (?,?,?,now())
-                                ON CONFLICT (key) DO UPDATE SET value = excluded.value, updated_by = excluded.updated_by, updated_at = now()');
+            $st = $db->prepare('INSERT INTO help_setting (`key`, value, updated_by, updated_at) VALUES (?,?,?,NOW())
+                                ON DUPLICATE KEY UPDATE value = VALUES(value), updated_by = VALUES(updated_by), updated_at = NOW()');
             foreach ($keys as $k) {
                 if (!array_key_exists($k, $_POST)) { continue; }
                 $v = trim((string)$_POST[$k]);
@@ -1010,9 +1035,10 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                 back(['p' => 'settings']);
             }
             try {
-                $st = $db->prepare('SELECT help_close_release(?, ?, ?)');
+                $st = $db->prepare('CALL help_close_release(?, ?, ?, @help_cnt)');
                 $st->execute([$version, $next, auth_user()['id']]);
-                $n = (int)$st->fetchColumn();
+                $st->closeCursor();
+                $n = (int)$db->query('SELECT @help_cnt')->fetchColumn();
                 audit_me($db, 'release.close', $version, "{$n} bejegyzés");
                 flash('ok', "A(z) {$version} kiadás lezárva, {$n} bejegyzéssel. A következő nyitott kiadás: {$next}.");
             } catch (Throwable $e) {

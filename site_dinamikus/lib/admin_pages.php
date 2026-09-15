@@ -166,22 +166,22 @@ function page_dashboard(PDO $db, array $cfg, array $counts): void
         SELECT
           (SELECT count(*) FROM help_article)                                    AS articles,
           (SELECT count(*) FROM help_article WHERE draft_html IS NOT NULL)       AS drafts,
-          (SELECT count(*) FROM help_article WHERE NOT is_published)             AS hidden,
+          (SELECT count(*) FROM help_article WHERE is_published = 0)             AS hidden,
           (SELECT count(*) FROM help_module)                                     AS modules,
           (SELECT count(*) FROM help_screen_map)                                 AS screens,
           (SELECT count(*) FROM help_media)                                      AS media
     ")->fetch();
 
     $stale = (int)$db->query("
-        SELECT count(*) FROM help_article t
+        SELECT COUNT(*) FROM help_article t
           JOIN help_article s ON s.slug = t.slug AND s.lang = 'hu'
          WHERE t.lang <> 'hu'
-           AND (t.translated_from_hash IS NULL OR t.translated_from_hash <> s.content_hash)
+           AND NOT (t.translated_from_hash <=> s.content_hash)
     ")->fetchColumn();
 
     $missing = (int)$db->query("
-        SELECT count(*) FROM help_article s
-         CROSS JOIN (VALUES ('en'),('de')) AS l(lang)
+        SELECT COUNT(*) FROM help_article s
+         CROSS JOIN (SELECT 'en' AS lang UNION ALL SELECT 'de') AS l
          WHERE s.lang = 'hu'
            AND NOT EXISTS (SELECT 1 FROM help_article t WHERE t.slug = s.slug AND t.lang = l.lang)
     ")->fetchColumn();
@@ -190,7 +190,7 @@ function page_dashboard(PDO $db, array $cfg, array $counts): void
         SELECT a.id, a.lang, a.chapter_no, a.title, a.draft_at, u.display_name
           FROM help_article a LEFT JOIN help_user u ON u.id = a.draft_by
          WHERE a.draft_html IS NOT NULL
-      ORDER BY a.draft_at DESC NULLS LAST LIMIT 12")->fetchAll();
+      ORDER BY a.draft_at IS NULL, a.draft_at DESC LIMIT 12")->fetchAll();
 
     $imports = $db->query("
         SELECT i.*, u.display_name FROM help_import i LEFT JOIN help_user u ON u.id = i.uploaded_by

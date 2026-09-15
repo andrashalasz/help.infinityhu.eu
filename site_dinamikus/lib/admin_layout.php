@@ -196,7 +196,7 @@ function admin_setting(PDO $db, string $key, string $default = ''): string
     static $cache = null;
     if ($cache === null) {
         $cache = [];
-        foreach ($db->query('SELECT key, value FROM help_setting')->fetchAll() as $r) {
+        foreach ($db->query('SELECT `key`, value FROM help_setting')->fetchAll() as $r) {
             $cache[$r['key']] = (string)$r['value'];
         }
     }

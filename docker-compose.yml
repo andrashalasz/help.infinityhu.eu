@@ -3,44 +3,47 @@
 #   docker compose up -d --build
 #   -> http://localhost:8080/
 #
+# Az osszeallitas ugyanaz, mint az eles szerveren:
+#   nginx 1.28.3  +  PHP 8.3 FPM  +  MariaDB 11.8.6
+#
 # A kontenerek neve a projekt nevebol jon (alapertelmezesben a mappa neve).
 # Sajat nevet a "docker compose -p sugo up -d" adhat.
-#
-# Az adatbazis elso indulaskor automatikusan felepul a db/*.sql fajlokbol
-# (sema + 109 fejezet x 3 nyelv + szerkeszto- es changelog-migracio).
 
 services:
   db:
-    image: postgres:16
+    image: mariadb:11.8.6
     restart: unless-stopped
+    command: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_uca1400_ai_ci
+      --innodb-ft-min-token-size=2
+      --max-allowed-packet=256M
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-help_infinityhu}
-      POSTGRES_USER: ${POSTGRES_USER:-help}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-help}
-      # a postgres image-ben nincs hu_HU locale; UTF8 + C.UTF-8 bven eleg,
-      # a kereses ugyis az erp_norm()/unaccent fuggvenyen keresztul megy
-      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C.UTF-8"
+      MARIADB_DATABASE: ${MARIADB_DATABASE:-help_infinityhu}
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:-root}
+      MARIADB_USER: ${MARIADB_USER:-help}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD:-help}
     volumes:
-      - help_pgdata:/var/lib/postgresql/data
-      # a postgres image abc-sorrendben futtatja le ezeket az ELSO indulaskor
+      - help_dbdata:/var/lib/mysql
+      # a mariadb image abc-sorrendben futtatja le ezeket az ELSO indulaskor
       - ./db:/docker-entrypoint-initdb.d:ro
     ports:
-      # 5433 a hoston, hogy ne utkozzon egy esetleg mar futo helyi PostgreSQL-lel
-      - "${DB_PORT:-5433}:5432"
+      # 3307 a hoston, hogy ne utkozzon egy esetleg mar futo helyi MariaDB-vel
+      - "${DB_PORT:-3307}:3306"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-help} -d ${POSTGRES_DB:-help_infinityhu}"]
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 5s
       timeout: 5s
-      retries: 20
+      retries: 30
 
-  web:
+  php:
     build: ./docker/php
     restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
     environment:
-      HELP_DB_DSN:  "pgsql:host=db;port=5432;dbname=${POSTGRES_DB:-help_infinityhu}"
+      HELP_DB_DSN:  "mysql:host=db;port=3306;dbname=${MARIADB_DATABASE:-help_infinityhu};charset=utf8mb4"
       HELP_DB_USER: "${HELP_DB_USER:-help_ro}"
       HELP_DB_PASS: "${HELP_DB_PASS:-help_ro}"
       # az admin felulet ir is - kulon, iras-olvasas jogu adatbazis-felhasznalo
@@ -54,6 +57,16 @@ services:
     volumes:
       - ./site_dinamikus:/var/www/html:ro
       - ./media:/srv/media
+
+  web:
+    image: nginx:1.28.3
+    restart: unless-stopped
+    depends_on:
+      - php
+    volumes:
+      - ./docker/nginx/help.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./site_dinamikus:/var/www/html:ro
+      - ./media:/srv/media:ro
     ports:
       - "${WEB_PORT:-8080}:80"
 
@@ -66,7 +79,6 @@ services:
   # Elso indulaskor letolti a hu/en/de nyelvi modelleket (par perc, ~1-2 GB).
   # Utana az admin Beallitasok fulen:
   #     Szolgaltato = LibreTranslate,  Vegpont = http://libretranslate:5000
-  # (vagy .env-ben: HELP_MT_PROVIDER=libre, HELP_MT_ENDPOINT=http://libretranslate:5000)
   #
   # Igy nem kell fizetos API-kulcs a gepi forditashoz.
   libretranslate:
@@ -82,5 +94,5 @@ services:
       - "${MT_PORT:-5050}:5000"
 
 volumes:
-  help_pgdata:
+  help_dbdata:
   help_mt_models:

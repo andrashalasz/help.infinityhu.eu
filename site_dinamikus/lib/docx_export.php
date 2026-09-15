@@ -65,7 +65,7 @@ final class DocxExport
 
         $art = $db->prepare('SELECT id, module_id, chapter_no, title, body_html
                                FROM help_article
-                              WHERE lang = ?' . ($onlyPublished ? ' AND is_published' : '') . '
+                              WHERE lang = ?' . ($onlyPublished ? ' AND is_published = 1' : '') . '
                            ORDER BY sort_order, id');
         $art->execute([$lang]);
         $byModule = [];
@@ -452,6 +452,56 @@ final class DocxExport
              . '</pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r>';
     }
 
+    /** Ures fejlec/lablec a cimlapra (a <w:titlePg/> miatt kulon resz kell). */
+    private function emptyPartXml(string $tag): string
+    {
+        $ns = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" '
+            . 'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"';
+        return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+             . '<w:' . $tag . ' ' . $ns . '><w:p/></w:' . $tag . '>';
+    }
+
+    /**
+     * Oldallablec: balra az eppen aktualis modul neve (STYLEREF mezo a
+     * Cimsor 1 stilusra), jobbra "oldal / osszes" (PAGE es NUMPAGES mezok).
+     * A Word ezeket lapozaskor magatol frissiti.
+     */
+    private function footerXml(): string
+    {
+        $ns = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" '
+            . 'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"';
+
+        $fld = static function (string $instr, string $placeholder): string {
+            return '<w:r><w:fldChar w:fldCharType="begin"/></w:r>'
+                 . '<w:r><w:instrText xml:space="preserve"> ' . $instr . ' </w:instrText></w:r>'
+                 . '<w:r><w:fldChar w:fldCharType="separate"/></w:r>'
+                 . '<w:r><w:t>' . $placeholder . '</w:t></w:r>'
+                 . '<w:r><w:fldChar w:fldCharType="end"/></w:r>';
+        };
+
+        $rpr = '<w:rPr><w:sz w:val="16"/><w:color w:val="6B7280"/></w:rPr>';
+
+        $body = '<w:p><w:pPr>'
+              . '<w:pBdr><w:top w:val="single" w:sz="4" w:space="4" w:color="D9DEE5"/></w:pBdr>'
+              . '<w:tabs><w:tab w:val="right" w:pos="9638"/></w:tabs>'
+              . '<w:spacing w:before="60" w:after="0"/>'
+              . $rpr . '</w:pPr>'
+              . $fld('STYLEREF 1 \\* MERGEFORMAT', 'modul')
+              . '<w:r>' . $rpr . '<w:tab/></w:r>'
+              . $fld('PAGE \\* MERGEFORMAT', '1')
+              . '<w:r>' . $rpr . '<w:t xml:space="preserve"> / </w:t></w:r>'
+              . $fld('NUMPAGES \\* MERGEFORMAT', '1')
+              . '</w:p>';
+
+        // a mezok koruli futasok is halvanyak legyenek
+        $body = str_replace('<w:r><w:fldChar', '<w:r>' . $rpr . '<w:fldChar', $body);
+        $body = str_replace('<w:r><w:instrText', '<w:r>' . $rpr . '<w:instrText', $body);
+        $body = str_replace('<w:r><w:t>', '<w:r>' . $rpr . '<w:t>', $body);
+
+        return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+             . '<w:ftr ' . $ns . '>' . $body . '</w:ftr>';
+    }
+
     /**
      * Oldalfejlec a logoval, jobbra zarva - ugyanugy, ahogy az eredeti
      * Word-utmutatoban van (ott ~2,4 x 1,15 cm meretben, a lap tetejen jobbra).
@@ -501,6 +551,10 @@ final class DocxExport
 
         $sect = '<w:sectPr>'
               . ($this->logoPath !== null ? '<w:headerReference w:type="default" r:id="rIdHdr"/>' : '')
+              . '<w:headerReference w:type="first" r:id="rIdHdrFirst"/>'
+              . '<w:footerReference w:type="default" r:id="rIdFtr"/>'
+              . '<w:footerReference w:type="first" r:id="rIdFtrFirst"/>'
+              . '<w:titlePg/>'                       // a cimlapon nincs fejlec/lablec
               . '<w:pgSz w:w="11906" w:h="16838"/>'
               . '<w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134" '
               . 'w:header="708" w:footer="708" w:gutter="0"/></w:sectPr>';
@@ -586,6 +640,9 @@ final class DocxExport
                . ($this->logoPath !== null
                     ? '<Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/>'
                     : '')
+               . '<Override PartName="/word/header2.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/>'
+               . '<Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/>'
+               . '<Override PartName="/word/footer2.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/>'
                . '<Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>'
                . '</Types>';
 
@@ -603,6 +660,9 @@ final class DocxExport
             $docRels .= '<Relationship Id="rIdHdr" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header" Target="header1.xml"/>'
                       . '<Relationship Id="rIdLogoDoc" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/' . self::esc($this->logoName()) . '"/>';
         }
+        $docRels .= '<Relationship Id="rIdHdrFirst" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header" Target="header2.xml"/>'
+                  . '<Relationship Id="rIdFtr" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/>'
+                  . '<Relationship Id="rIdFtrFirst" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer2.xml"/>';
         foreach ($this->rels as $id => $r) {
             $docRels .= '<Relationship Id="' . $id . '" Type="' . $r['type'] . '" Target="' . self::esc($r['target']) . '"/>';
         }
@@ -627,6 +687,11 @@ final class DocxExport
         $zip->addFromString('word/numbering.xml', $this->numberingXml());
         $zip->addFromString('word/_rels/document.xml.rels', $docRels);
 
+        // cimlap: ures fejlec es lablec; tobbi lap: logos fejlec + oldalszamos lablec
+        $zip->addFromString('word/header2.xml', $this->emptyPartXml('hdr'));
+        $zip->addFromString('word/footer2.xml', $this->emptyPartXml('ftr'));
+        $zip->addFromString('word/footer1.xml', $this->footerXml());
+
         if ($this->logoPath !== null) {
             $logo = (string)file_get_contents($this->logoPath);
             $zip->addFromString('word/media/' . $this->logoName(), $logo);
@@ -650,7 +715,7 @@ final class DocxExport
  * Nyomtatasra kesz, egyetlen HTML fajl a teljes utmutatobol, tartalomjegyzekkel.
  * A bongeszo "Nyomtatas -> Mentes PDF-kent" funkciojaval lesz belole PDF.
  */
-function export_print_html(PDO $db, array $cfg, string $lang, bool $onlyPublished = true, bool $autoPrint = false): string
+function export_print_html(PDO $db, array $cfg, string $lang, bool $onlyPublished = true, bool $autoPrint = false, bool $forPdf = false): string
 {
     // A logot beagyazzuk a fajlba (data: URI), igy a mentett HTML onmagaban is
     // teljes - nem hivatkozik kifele, es a PDF-be is belekerul.
@@ -679,14 +744,14 @@ function export_print_html(PDO $db, array $cfg, string $lang, bool $onlyPublishe
 
     $art = $db->prepare('SELECT id, module_id, chapter_no, slug, title, body_html
                            FROM help_article
-                          WHERE lang = ?' . ($onlyPublished ? ' AND is_published' : '') . '
+                          WHERE lang = ?' . ($onlyPublished ? ' AND is_published = 1' : '') . '
                        ORDER BY sort_order, id');
     $art->execute([$lang]);
     $byModule = [];
     foreach ($art->fetchAll() as $a) { $byModule[(int)$a['module_id']][] = $a; }
 
     $company = admin_setting($db, 'export_company', 'Infinity ERP');
-    $version = (string)$db->query("SELECT coalesce(max(doc_version), '') FROM help_article")->fetchColumn();
+    $version = (string)$db->query("SELECT COALESCE(MAX(doc_version), '') FROM help_article")->fetchColumn();
 
     $toc = '';
     $body = '';
@@ -708,75 +773,203 @@ function export_print_html(PDO $db, array $cfg, string $lang, bool $onlyPublishe
 
     $css = <<<'CSS'
 *{box-sizing:border-box}
-body{margin:0;font:11pt/1.55 "Inter","Segoe UI",system-ui,sans-serif;color:#1f2a36;background:#fff}
-.wrap{max-width:190mm;margin:0 auto;padding:18mm 14mm}
-.cover{text-align:center;padding:45mm 0 0;page-break-after:always}
-.cover h1{font-size:30pt;color:#1b3a6b;margin:0 0 6mm}
-.cover p{color:#6b7280;margin:0 0 2mm;font-size:12pt}
-.toc{page-break-after:always}
-.toc h2{font-size:18pt;color:#1b3a6b;border-bottom:2px solid #0a6ed1;padding-bottom:3mm}
+body{margin:0;font:10.5pt/1.5 "Inter","Segoe UI",system-ui,sans-serif;color:#1f2a36;background:#fff}
+
+/* ---------- oldalbeállítás ---------- */
+@page{
+  size:A4;
+  margin:24mm 18mm 20mm;
+  /* futó fejléc: a logó jobbra */
+  @top-right{content:element(runlogo);vertical-align:bottom;}
+  /* futó lábléc: balra az aktuális modul, jobbra az oldalszám */
+  @bottom-left{
+    content:string(modul);
+    font:8.5pt "Inter",system-ui,sans-serif;color:#6b7280;
+    vertical-align:top;padding-top:4mm;
+  }
+  @bottom-right{
+    content:counter(page) " / " counter(pages);
+    font:8.5pt "Inter",system-ui,sans-serif;color:#6b7280;
+    vertical-align:top;padding-top:4mm;
+  }
+}
+/* a címlapon nincs se fejléc, se lábléc, se oldalszám */
+@page :first{
+  margin:0;
+  @top-right{content:none}
+  @bottom-left{content:none}
+  @bottom-right{content:none}
+}
+/* a tartalomjegyzék lapjain a lábléc szövege sem kell */
+@page toc{
+  @bottom-left{content:none}
+}
+
+.runhead{position:running(runlogo)}
+.runhead .logo{height:10mm;width:auto;display:block}
+
+/* ---------- címlap ---------- */
+.cover{page:cover;page-break-after:always;text-align:center;padding:62mm 22mm 0}
+.cover__logo{margin:0 0 12mm}
+.cover__logo .logo{height:38mm;width:auto;display:inline-block}
+.cover h1{font-size:28pt;color:#1b3a6b;margin:0 0 6mm;letter-spacing:-.5pt;line-height:1.2;border:0;padding:0}
+.cover .rule{width:52mm;height:1.2mm;background:#0a6ed1;border-radius:1mm;margin:0 auto 9mm}
+.cover p{color:#6b7280;margin:0 0 2.5mm;font-size:12pt}
+.cover .ver{font-size:10.5pt;color:#9ca3af}
+
+/* ---------- tartalomjegyzék ---------- */
+.toc{page:toc;page-break-after:always}
+.toc h2{font-size:20pt;color:#1b3a6b;margin:0 0 6mm;padding-bottom:3mm;border-bottom:1.5pt solid #0a6ed1}
 .toc ul{list-style:none;padding-left:0;margin:0}
-.toc ul ul{padding-left:8mm}
-.toc li{margin:1mm 0;font-size:10.5pt}
-.toc li.m{margin-top:3mm;font-size:11.5pt}
-.toc a{color:#1f2a36;text-decoration:none}
-.toc b{color:#0a6ed1;display:inline-block;min-width:14mm}
+.toc ul ul{padding-left:7mm;margin:1mm 0 2mm}
+.toc li{margin:.8mm 0;font-size:10pt;line-height:1.45}
+.toc li.m{margin-top:3.5mm;font-size:11pt;font-weight:600}
+.toc a{color:#1f2a36;text-decoration:none;display:block}
+.toc b{color:#0a6ed1;display:inline-block;min-width:13mm;font-weight:700}
+/* pontsor és oldalszám a tartalomjegyzékben (PDF-motorral) */
+.toc a::after{content:leader('.') target-counter(attr(href url),page);color:#9ca3af;font-weight:400}
+
+/* ---------- modulok, fejezetek ---------- */
 .mod{page-break-before:always}
-h1{font-size:22pt;color:#1b3a6b;margin:0 0 8mm;padding-bottom:3mm;border-bottom:2px solid #0a6ed1}
+/* a modul címe adja a lábléc szövegét */
+.mod>h1{string-set:modul content(text)}
+h1{font-size:20pt;color:#1b3a6b;margin:0 0 7mm;padding-bottom:3mm;border-bottom:1.5pt solid #0a6ed1;line-height:1.25}
 h1 span{color:#0a6ed1}
-h2{font-size:15pt;margin:10mm 0 4mm;page-break-after:avoid}
-h2 span{color:#0a6ed1}
-article h2:first-of-type{margin-top:6mm}
-article h2,article h3,article h4{page-break-after:avoid}
-.body h2,h3{font-size:12.5pt;margin:6mm 0 2mm}
-h4{font-size:11.5pt;margin:5mm 0 2mm}
-p{margin:0 0 3mm}
+h2{font-size:14pt;margin:9mm 0 3mm;color:#1f2a36;page-break-after:avoid;line-height:1.3}
+h2 span{color:#0a6ed1;font-weight:700}
+article{page-break-inside:auto}
+article+article{margin-top:2mm}
+.body h2,h3{font-size:11.5pt;margin:5mm 0 2mm;page-break-after:avoid}
+h4{font-size:11pt;margin:4mm 0 1.5mm;page-break-after:avoid}
+p{margin:0 0 2.6mm;orphans:2;widows:2}
 ul,ol{margin:0 0 3mm;padding-left:7mm}
-img{max-width:100%;height:auto;border:1px solid #d9dee5;border-radius:2mm;page-break-inside:avoid;margin:2mm 0}
+li{margin-bottom:1mm}
+strong{font-weight:600}
+
+img{max-width:100%;height:auto;border:.3mm solid #d9dee5;border-radius:1.5mm;page-break-inside:avoid;margin:2mm 0}
 video{display:none}
-table{border-collapse:collapse;width:100%;font-size:9.5pt;margin:0 0 4mm;page-break-inside:avoid}
-th,td{border:1px solid #d9dee5;padding:1.5mm 2mm;text-align:left;vertical-align:top}
+
+table{border-collapse:collapse;width:100%;font-size:9pt;margin:0 0 4mm;page-break-inside:avoid}
+th,td{border:.25mm solid #d9dee5;padding:1.4mm 2mm;text-align:left;vertical-align:top}
 th,tr.header td{background:#f1f3f6;font-weight:600}
-.hno{color:#0a6ed1;font-weight:700;margin-right:2mm}
-.call{padding:3mm 4mm;border-left:1mm solid #0a6ed1;background:#e8f1fb;border-radius:0 1mm 1mm 0;margin:0 0 4mm;page-break-inside:avoid}
-.call.warn{border-left-color:#b8681a;background:#fdf3e7}
-.call strong{display:block;font-size:9.5pt;text-transform:uppercase;letter-spacing:.4pt;color:#0854a0;margin-bottom:1mm}
-.call.warn strong{color:#b8681a}
 .tblwrap{overflow:visible}
-/* a logo minden nyomtatott lap tetejen, jobbra - mint a Word-fejlecben */
-.runhead{position:fixed;top:6mm;right:10mm;z-index:5}
-.runhead .logo{height:11mm;width:auto;display:block}
-.cover__logo{margin:0 0 8mm}
-.cover__logo .logo{height:28mm;width:auto}
-@page{size:A4;margin:22mm 14mm 16mm}
+
+.hno{color:#0a6ed1;font-weight:700;margin-right:2mm}
+.call{padding:3mm 4mm;border-left:1mm solid #0a6ed1;background:#e8f1fb;border-radius:0 1.5mm 1.5mm 0;margin:0 0 3.5mm;page-break-inside:avoid}
+.call.warn{border-left-color:#b8681a;background:#fdf3e7}
+.call strong{display:block;font-size:8.5pt;text-transform:uppercase;letter-spacing:.3pt;color:#0854a0;margin-bottom:1mm}
+.call.warn strong{color:#b8681a}
+
+/* ---------- képernyőn (nem nyomtatáskor) ---------- */
+@media screen{
+  .wrap{max-width:200mm;margin:0 auto;padding:44px 16mm 20mm}
+  .runhead{position:static;text-align:right;opacity:.9}
+  .runhead .logo{height:12mm;margin-left:auto}
+  .cover{height:auto;padding:20mm 0}
+  .toc a::after{content:''}
+}
 @media print{
   .wrap{max-width:none;padding:0}
   .noprint{display:none}
-  .runhead{position:fixed;top:4mm;right:0}
 }
-@media screen{.runhead{display:none}}
 .noprint{position:fixed;top:0;left:0;right:0;background:#1c2a3a;color:#fff;padding:8px 14px;font-size:13px;text-align:center;z-index:9;display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap}
-.noprint button{font:inherit;background:#0a6ed1;color:#fff;border:0;border-radius:4px;padding:5px 12px;margin-left:10px;cursor:pointer}
-body{padding-top:44px}
-@media print{body{padding-top:0}}
+.noprint button{font:inherit;background:#0a6ed1;color:#fff;border:0;border-radius:4px;padding:5px 12px;cursor:pointer}
+.noprint a{color:#9fd0ff}
 CSS;
 
     return '<!doctype html><html lang="' . h($lang) . '"><head><meta charset="utf-8">'
          . '<meta name="viewport" content="width=device-width,initial-scale=1">'
          . '<title>' . h($L['title']) . '</title><style>' . $css . '</style></head><body>'
-         . '<div class="noprint">'
-         . '<span>A PDF-hez: <b>Nyomtatás → Cél: Mentés PDF-ként</b></span>'
-         . '<button type="button" onclick="window.print()">Nyomtatás / PDF mentése</button>'
-         . '</div>'
+         . ($forPdf ? '' :
+             '<div class="noprint">'
+             . '<span>A PDF-hez: <b>Nyomtatás → Cél: Mentés PDF-ként</b></span>'
+             . '<button type="button" onclick="window.print()">Nyomtatás / PDF mentése</button>'
+             . '</div>')
          . ($logoTag !== '' ? '<div class="runhead">' . $logoTag . '</div>' : '')
          . '<div class="wrap">'
          . '<div class="cover">' . ($logoTag !== '' ? '<div class="cover__logo">' . $logoTag . '</div>' : '')
-         . '<h1>' . h($L['title']) . '</h1><p>' . h($company) . '</p>'
-         . ($version !== '' ? '<p>' . h($version) . '</p>' : '')
-         . '<p>' . h($L['gen'] . ': ' . date('Y-m-d')) . '</p></div>'
+         . '<h1>' . h($L['title']) . '</h1><div class="rule"></div><p>' . h($company) . '</p>'
+         . ($version !== '' ? '<p class="ver">' . h($version) . '</p>' : '')
+         . '<p class="ver">' . h($L['gen'] . ': ' . date('Y-m-d')) . '</p></div>'
          . '<div class="toc"><h2>' . h($L['toc']) . '</h2><ul>' . $toc . '</ul></div>'
          . $body
          . '</div>'
          . ($autoPrint ? '<script>window.addEventListener("load",function(){setTimeout(function(){window.print();},400);});</script>' : '')
          . '</body></html>';
+}
+
+/**
+ * Van-e a szerveren PDF-motor?
+ *
+ * A bongeszo "Nyomtatas -> Mentes PDF-kent" utja mindig mukodik, de a bongeszo
+ * NEM tud oldalszamot es futo lablecet tenni a lapokra (a CSS @page margo-dobozait
+ * egyik bongeszo sem tamogatja). Ezert ha a szerveren ott a WeasyPrint, azzal
+ * keszitunk igazi, konyv-szeru PDF-et: cimlap fejlec/lablec nelkul, utana minden
+ * lapon a logo, alul a modul neve es az oldalszam, a tartalomjegyzekben
+ * oldalszamokkal.
+ */
+function pdf_engine(): ?string
+{
+    static $found = false, $path = null;
+    if ($found) { return $path; }
+    $found = true;
+
+    foreach (['/usr/bin/weasyprint', '/usr/local/bin/weasyprint', 'weasyprint'] as $cand) {
+        $which = @shell_exec('command -v ' . escapeshellarg($cand) . ' 2>/dev/null');
+        if (is_string($which) && trim($which) !== '') {
+            $path = trim($which);
+            return $path;
+        }
+    }
+    return null;
+}
+
+/**
+ * Valodi PDF eloallitasa. Hiba eseten RuntimeException.
+ *
+ * @return array{path:string, filename:string, bytes:int}
+ */
+function export_pdf(PDO $db, array $cfg, string $lang, bool $onlyPublished = true): array
+{
+    $bin = pdf_engine();
+    if ($bin === null) {
+        throw new RuntimeException(
+            'Nincs PDF-motor a szerveren. Telepítés: apt-get install -y weasyprint — '
+            . 'addig a „PDF (nyomtatás)" gomb használható, ott a böngésző készíti a PDF-et.');
+    }
+
+    $html = export_print_html($db, $cfg, $lang, $onlyPublished, false, true);
+
+    // A kepek /media/... alakban hivatkozottak; a PDF-motor a lemezrol olvassa oket.
+    $dir = rtrim($cfg['media_dir'], '/');
+    $html = str_replace(['src="/media/', "src='/media/"],
+                        ['src="file://' . $dir . '/', "src='file://" . $dir . '/'],
+                        $html);
+
+    $out = tempnam(sys_get_temp_dir(), 'helppdf') . '.pdf';
+    $cmd = escapeshellarg($bin) . ' --encoding utf-8 - ' . escapeshellarg($out) . ' 2>&1';
+
+    $proc = proc_open($cmd, [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes);
+    if (!is_resource($proc)) {
+        throw new RuntimeException('A PDF-motor nem indítható el.');
+    }
+    fwrite($pipes[0], $html);
+    fclose($pipes[0]);
+    $stdout = stream_get_contents($pipes[1]); fclose($pipes[1]);
+    $stderr = stream_get_contents($pipes[2]); fclose($pipes[2]);
+    $code = proc_close($proc);
+
+    if (!is_file($out) || filesize($out) < 1000) {
+        @unlink($out);
+        $msg = trim((string)$stderr) !== '' ? $stderr : $stdout;
+        throw new RuntimeException('A PDF elkészítése nem sikerült (kód ' . $code . '): '
+            . mb_substr(trim((string)$msg), 0, 300));
+    }
+
+    $names = ['en' => 'User_Guide', 'de' => 'Benutzerhandbuch'];
+    return [
+        'path'     => $out,
+        'filename' => sprintf('Infinity_%s_%s.pdf', $names[$lang] ?? 'Hasznalati_utmutato', date('Y-m-d')),
+        'bytes'    => (int)filesize($out),
+    ];
 }
