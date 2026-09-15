@@ -4,3 +4,7 @@ site/
 *.log
 helyi_teszt/app/
 helyi_teszt/yii2/
+
+# a szerkesztobol feltoltott teszt-fajlok (a 275 eredeti kepernyokep verziokezelt)
+media/img_d4e74cb58cbe.png
+media/vid_b7bacd88293c.mov
