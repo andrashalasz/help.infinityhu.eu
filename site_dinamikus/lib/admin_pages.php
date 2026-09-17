@@ -13,7 +13,7 @@ function csrf_input(): string
 function lang_switch(string $page, string $lang, array $extra = []): string
 {
     $out = '<div class="seg" style="max-width:280px">';
-    foreach (ADMIN_LANGS as $code => $label) {
+    foreach (admin_langs() as $code => $label) {
         $url = admin_url(array_merge(['p' => $page, 'lang' => $code], $extra));
         $out .= '<a class="btn btn--sm' . ($code === $lang ? ' btn--p' : '') . '" href="' . h($url) . '" style="flex:1">' . h($label) . '</a>';
     }
@@ -518,7 +518,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
 
             <div class="lbl" style="margin-top:6px">A főfejezet neve nyelvenként</div>
             <div class="row">
-              <?php foreach (ADMIN_LANGS as $code => $label):
+              <?php foreach (admin_langs() as $code => $label):
                   $one = $moduleFamily[$code] ?? null; ?>
                 <div class="field">
                   <label><?= h($label) ?> <span class="mono muted"><?= h($code) ?></span></label>
@@ -587,7 +587,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
           </form>
         </div>
         <div class="panel__b" style="display:flex;gap:10px;flex-wrap:wrap">
-          <?php foreach (ADMIN_LANGS as $code => $label):
+          <?php foreach (admin_langs() as $code => $label):
               $r = $siblings[$code] ?? null; ?>
             <div class="langcard<?= $r && $r['is_published'] ? ' on' : '' ?>">
  <div class="langcard__t"><?= h($label) ?> <span class="mono muted"><?= h($code) ?></span></div>
@@ -635,9 +635,9 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
           <button class="btn btn--sm" type="button" data-toggle="#meta-form">Adatok</button>
           <a class="btn btn--sm<?= $revisions ? '' : ' btn--ghost' ?>" href="#revisions"
              title="<?= $revisions
-                 ? 'Korábbi változatok — összehasonlítás és visszatöltés'
+                 ? 'A fejezet korábbi állapotai — összehasonlítás és visszatöltés'
                  : 'Még nem volt közzététel ezen a fejezeten, ezért nincs korábbi változat' ?>">
-            Verziók<?php if ($revisions): ?> <span class="badge"><?= count($revisions) ?></span><?php endif; ?>
+            Változatok<?php if ($revisions): ?> <span class="badge"><?= count($revisions) ?></span><?php endif; ?>
           </a>
           <button class="btn btn--sm btn--danger" type="button" data-modal="del-article"
                   title="A fejezet a Kukába kerül, ahonnan visszaállítható">Törlés</button>
@@ -917,7 +917,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
       <input type="hidden" name="a" value="module.save">
       <input type="hidden" name="lang" value="<?= h($lang) ?>">
       <input type="hidden" name="from" value="articles">
-      <div class="modal__h">Új főfejezet (<?= h(ADMIN_LANGS[$lang]) ?>)</div>
+      <div class="modal__h">Új főfejezet (<?= h(admin_langs()[$lang]) ?>)</div>
       <div class="modal__b">
         <div class="row">
           <div class="field" style="flex:0 1 110px"><label>Szám</label>
@@ -942,7 +942,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
       <?= csrf_input() ?>
       <input type="hidden" name="a" value="article.create">
       <input type="hidden" name="lang" value="<?= h($lang) ?>">
-      <div class="modal__h">Új fejezet (<?= h(ADMIN_LANGS[$lang]) ?>)</div>
+      <div class="modal__h">Új fejezet (<?= h(admin_langs()[$lang]) ?>)</div>
       <div class="modal__b">
         <div class="field"><label>Modul</label>
           <select class="sel" name="module_id" id="new-module" required>
@@ -990,7 +990,7 @@ function page_modules(PDO $db, string $lang, array $counts): void
   <div style="margin-bottom:14px"><?= lang_switch('modules', $lang) ?></div>
 
   <div class="panel">
- <div class="panel__h"><h2><?= h(ADMIN_LANGS[$lang]) ?> modulok</h2><span class="sp"></span>
+ <div class="panel__h"><h2><?= h(admin_langs()[$lang]) ?> modulok</h2><span class="sp"></span>
       <button class="btn btn--p btn--sm" type="button" data-modal="new-module">+ Új modul</button></div>
     <div class="panel__b panel__b--flush">
       <div class="hint" style="padding:10px 16px 0">
@@ -1043,7 +1043,7 @@ function page_modules(PDO $db, string $lang, array $counts): void
       <?= csrf_input() ?>
       <input type="hidden" name="a" value="module.save">
       <input type="hidden" name="lang" value="<?= h($lang) ?>">
-      <div class="modal__h">Új modul (<?= h(ADMIN_LANGS[$lang]) ?>)</div>
+      <div class="modal__h">Új modul (<?= h(admin_langs()[$lang]) ?>)</div>
       <div class="modal__b">
         <div class="row">
  <div class="field inp"><label>Szám</label><input name="chapter_no" placeholder="18"></div>

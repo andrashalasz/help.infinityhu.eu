@@ -33,7 +33,26 @@ try {
     exit;
 }
 
+/**
+ * A sugo nyelvei az adatbazisbol. Uj nyelvhez nem kell kodot modositani -
+ * a Beallitasok fulon vehetsz fel ujat. Ha a 07_nyelvek.sql meg nem futott
+ * le, marad a beepitett harom.
+ */
 $LANGS = ['hu', 'en', 'de'];
+$LANG_NAMES = [];
+try {
+    $lrows = $pdo->query('SELECT code, name, own_name FROM help_lang WHERE is_active = 1
+                          ORDER BY is_source DESC, sort_order, code')->fetchAll();
+    if ($lrows) {
+        $LANGS = [];
+        foreach ($lrows as $lr) {
+            $LANGS[] = (string)$lr['code'];
+            $LANG_NAMES[(string)$lr['code']] = (string)($lr['own_name'] ?: $lr['name']);
+        }
+    }
+} catch (Throwable $e) {
+    // a nyelvek tablaja meg nincs meg
+}
 $UI = [
     'hu' => [
         'title' => 'Infinity Súgó', 'search' => 'Keresés a súgóban…', 'onpage' => 'Ezen az oldalon',
@@ -227,7 +246,10 @@ if (!in_array($lang, $LANGS, true)) {
     exit;
 }
 
-$u       = $UI[$lang];
+// A felulet feliratai. Ujonnan felvett nyelvhez meg nincs sajat keszlet,
+// ezert angolra, vegso esetben az elso keszletre esunk vissza - igy a lap
+// nem marad felirat nelkul, amig a forditas el nem keszul.
+$u = ($UI[$lang] ?? []) + ($UI['en'] ?? []) + $UI[array_key_first($UI)];
 $isEmbed = ($parts[1] ?? '') === 'embed';
 $slug    = $isEmbed ? ($parts[2] ?? null) : ($parts[1] ?? null);
 $modules = getModules($pdo, $lang);

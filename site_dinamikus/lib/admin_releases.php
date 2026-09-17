@@ -47,9 +47,12 @@ function page_releases(PDO $db, array $counts, int $showId = 0): void
 <div class="page">
   <h1 class="pt">Kiadások</h1>
   <p class="lead">
-    Minden közzétételkor keletkezik egy bejegyzés, és a <b>nyitott</b> kiadásba gyűlik.
+    Minden közzétételkor keletkezik egy <b>változásnapló-bejegyzés</b>, és a <b>nyitott</b>
+    kiadásba gyűlik. Ez az a szöveg, amit az olvasó a <b>Frissítések</b> lapon lát.
     A kiadás lezárása dátumot és verziószámot ad nekik, leveszi az újdonságjelzéseket,
     és megnyit egy újat.
+    <br><span class="muted">A fejezetek <b>korábbi állapotai</b> nem itt, hanem a Fejezetek
+    fülön, a <b>Változatok</b> gomb alatt vannak.</span>
   </p>
   <?= flash_render() ?>
 
@@ -115,14 +118,14 @@ function page_releases(PDO $db, array $counts, int $showId = 0): void
         </div>
 
         <div class="panel">
-          <div class="panel__h"><h2>Mi változott</h2><span class="sp"></span>
+          <div class="panel__h"><h2>Változásnapló</h2><span class="sp"></span>
             <span class="badge"><?= count($entries) ?></span></div>
           <div class="panel__b panel__b--flush">
             <?php if (!$entries): ?>
               <div class="empty">Ebben a kiadásban még nincs bejegyzés — tegyél közzé egy fejezetet.</div>
             <?php else: ?>
               <table class="tbl">
-                <thead><tr><th>Fejezet</th><th>Mi történt</th><th>Típus</th><th>Ki</th><th></th></tr></thead>
+                <thead><tr><th>Fejezet</th><th>Amit az olvasó lát</th><th>Típus</th><th>Ki</th><th></th></tr></thead>
                 <tbody>
                 <?php foreach ($entries as $c):
                     [$cls, $lbl] = $KIND[$c['change_type']] ?? ['', (string)$c['change_type']]; ?>
@@ -134,7 +137,7 @@ function page_releases(PDO $db, array $counts, int $showId = 0): void
                         <span class="mono muted"><?= h((string)$c['lang']) ?></span>
                       <?php else: ?><span class="muted">—</span><?php endif; ?>
                     </td>
-                    <td data-label="Mi történt">
+                    <td data-label="Amit az olvasó lát">
                       <form method="post" action="<?= h(admin_url()) ?>" class="row" style="gap:6px;align-items:center">
                         <?= csrf_input() ?>
                         <input type="hidden" name="a" value="changelog.save">

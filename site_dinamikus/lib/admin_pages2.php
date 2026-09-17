@@ -48,7 +48,7 @@ function page_import(PDO $db, array $cfg, string $lang, int $importId, array $co
           <div class="field" style="flex:0 1 200px">
             <label for="imp-lang">Melyik nyelvhez</label>
             <select class="sel" id="imp-lang" name="lang">
-              <?php foreach (ADMIN_LANGS as $code => $label): ?>
+              <?php foreach (admin_langs() as $code => $label): ?>
                 <option value="<?= h($code) ?>" <?= $code === $lang ? 'selected' : '' ?>><?= h($label) ?></option>
               <?php endforeach; ?>
             </select>
@@ -205,7 +205,7 @@ function page_translate(PDO $db, array $cfg, int $srcId, string $to, array $coun
 {
     // Ket nyelv latszik egymas mellett, es a SZERKESZTO valasztja meg, melyik
     // ketto. Alapertelmezes: a forras (magyar) es az elso celnyelv.
-    $langCodes = array_keys(ADMIN_LANGS);
+    $langCodes = array_keys(admin_langs());
     if (!in_array($left, $langCodes, true))  { $left  = admin_source_lang(); }
     if (!in_array($right, $langCodes, true)) { $right = (string)array_key_first(admin_target_langs()); }
     if ($left === $right) {
@@ -218,7 +218,7 @@ function page_translate(PDO $db, array $cfg, int $srcId, string $to, array $coun
     if (!isset($STATES[$state])) { $state = 'all'; }
 
     $tr = Translator::fromConfig($cfg, $db);
-    if (!array_key_exists($to, ADMIN_LANGS) || $to === 'hu') { $to = 'en'; }
+    if (!array_key_exists($to, admin_langs()) || $to === 'hu') { $to = 'en'; }
 
     $src = null; $target = null;
     if ($srcId > 0) {
@@ -350,7 +350,7 @@ function page_translate(PDO $db, array $cfg, int $srcId, string $to, array $coun
             <span class="picker__langs">
               <?php foreach ($targetCodes as $code):
                   [$st2, $cls2, $lbl2] = $stateIn($r, $code); ?>
-                <span class="badge <?= $cls2 ?>" title="<?= h(ADMIN_LANGS[$code] . ': ' . $lbl2) ?>"><?= h(strtoupper($code)) ?></span>
+                <span class="badge <?= $cls2 ?>" title="<?= h(admin_langs()[$code] . ': ' . $lbl2) ?>"><?= h(strtoupper($code)) ?></span>
               <?php endforeach; ?>
             </span>
           </a>
@@ -367,7 +367,7 @@ function page_translate(PDO $db, array $cfg, int $srcId, string $to, array $coun
  <div class="panel"><div class="empty">Válassz egy fejezetet a bal oldali listából.</div></div>
       <?php else: ?>
         <?php
-        // MINDEN celnyelv egy oldalon. Uj nyelv felvetele az ADMIN_LANGS-ban
+        // MINDEN celnyelv egy oldalon. Uj nyelv felvetele az admin_langs()-ban
         // eleg - itt magatol megjelenik egy uj oszlop.
         $targets = [];
         foreach (array_keys(admin_target_langs()) as $code) {
@@ -411,7 +411,7 @@ function page_translate(PDO $db, array $cfg, int $srcId, string $to, array $coun
               <div class="panel tr-col">
                 <div class="panel__h">
                   <select class="ed-sel tr-lang" data-slot="<?= (int)$slot ?>">
-                    <?php foreach (ADMIN_LANGS as $c => $lbl): ?>
+                    <?php foreach (admin_langs() as $c => $lbl): ?>
                       <option value="<?= h($c) ?>" <?= $c === $code ? 'selected' : '' ?>
                               <?= $c === $other ? 'disabled' : '' ?>><?= h($lbl) ?></option>
                     <?php endforeach; ?>
@@ -439,7 +439,7 @@ function page_translate(PDO $db, array $cfg, int $srcId, string $to, array $coun
 
                 <div class="panel__h">
                   <select class="ed-sel tr-lang" data-slot="<?= (int)$slot ?>">
-                    <?php foreach (ADMIN_LANGS as $c => $lbl): ?>
+                    <?php foreach (admin_langs() as $c => $lbl): ?>
                       <option value="<?= h($c) ?>" <?= $c === $code ? 'selected' : '' ?>
                               <?= $c === $other ? 'disabled' : '' ?>><?= h($lbl) ?></option>
                     <?php endforeach; ?>
@@ -728,7 +728,7 @@ function page_export(PDO $db, array $cfg, string $lang, array $counts): void
  <thead><tr><th>Nyelv</th><th class="num">Közzétett fejezet</th><th class="num">Kikapcsolt</th>
           <th class="num">Kép</th><th>Letöltés</th></tr></thead>
         <tbody>
-        <?php foreach (ADMIN_LANGS as $code => $label):
+        <?php foreach (admin_langs() as $code => $label):
             $s = $stat[$code] ?? ['published' => 0, 'hidden' => 0, 'images' => 0]; ?>
           <tr>
             <td><b><?= h($label) ?></b> <span class="badge"><?= h($code) ?></span></td>
@@ -789,7 +789,7 @@ function page_export(PDO $db, array $cfg, string $lang, array $counts): void
         <div class="row">
           <div class="field" style="flex:0 1 200px"><label>Nyelv</label>
             <select class="sel" name="lang">
-              <?php foreach (ADMIN_LANGS as $code => $label): ?>
+              <?php foreach (admin_langs() as $code => $label): ?>
                 <option value="<?= h($code) ?>" <?= $code === $lang ? 'selected' : '' ?>><?= h($label) ?></option>
               <?php endforeach; ?>
             </select></div>
@@ -928,6 +928,12 @@ function page_users(PDO $db, array $counts): void
 // ============================================================ BEÁLLÍTÁSOK
 function page_settings(PDO $db, array $cfg, array $counts): void
 {
+    $langs = [];
+    try {
+        $langs = $db->query('SELECT * FROM help_lang ORDER BY is_source DESC, sort_order, code')->fetchAll();
+    } catch (Throwable $e) {
+        // a 07_nyelvek.sql meg nem futott le
+    }
     $tr = Translator::fromConfig($cfg, $db);
     $release = $db->query("SELECT * FROM help_release WHERE status = 'open' LIMIT 1")->fetch();
     $closed  = $db->query("SELECT * FROM help_release WHERE status = 'closed' ORDER BY released_at DESC LIMIT 5")->fetchAll();
@@ -948,7 +954,7 @@ function page_settings(PDO $db, array $cfg, array $counts): void
         <?= csrf_input() ?>
         <input type="hidden" name="a" value="setting.save">
         <div class="row">
-          <?php foreach (ADMIN_LANGS as $code => $label): ?>
+          <?php foreach (admin_langs() as $code => $label): ?>
             <div class="field"><label><?= h($label) ?></label>
               <input class="inp" name="site_title_<?= h($code) ?>" value="<?= h(admin_setting($db, 'site_title_' . $code)) ?>"></div>
           <?php endforeach; ?>
@@ -1046,6 +1052,85 @@ function page_settings(PDO $db, array $cfg, array $counts): void
         így a formázás és a képek a helyükön maradnak. Gépi fordító nélkül is használható a Fordítás fül,
         csak a nyersfordítás gomb marad inaktív.
       </div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-bottom:16px">
+    <div class="panel__h"><h2>Nyelvek</h2><span class="sp"></span>
+      <span class="badge"><?= count($langs) ?></span></div>
+    <div class="panel__b">
+      <p class="lead" style="margin-bottom:12px">
+        A súgó nyelvei. Az elsőt <b>forrásnyelvnek</b> hívjuk: ezen írod a fejezeteket,
+        és ebből készül a fordítás. Új nyelv felvételéhez nem kell fejlesztő —
+        a felvétel után rögtön megjelenik a Fordítás fülön és a nyilvános oldalon.
+      </p>
+
+      <table class="tbl">
+        <thead><tr><th>Kód</th><th>Név</th><th>Saját neve</th><th>Sorrend</th><th>Aktív</th><th></th></tr></thead>
+        <tbody>
+        <?php foreach ($langs as $l): ?>
+          <tr>
+            <form method="post" action="<?= h(admin_url()) ?>">
+              <?= csrf_input() ?>
+              <input type="hidden" name="a" value="lang.save">
+              <input type="hidden" name="code" value="<?= h($l['code']) ?>">
+              <td data-label="Kód">
+                <b class="mono"><?= h($l['code']) ?></b>
+                <?php if ((int)$l['is_source']): ?>
+                  <span class="badge badge--ok">forrás</span>
+                <?php endif; ?>
+              </td>
+              <td data-label="Név"><input class="inp" name="name" value="<?= h($l['name']) ?>" required></td>
+              <td data-label="Saját neve"><input class="inp" name="own_name" value="<?= h((string)$l['own_name']) ?>"
+                     placeholder="ahogy azon a nyelven hívják"></td>
+              <td data-label="Sorrend" style="width:110px">
+                <input class="inp" name="sort_order" type="number" value="<?= (int)$l['sort_order'] ?>"></td>
+              <td data-label="Aktív">
+                <?php if ((int)$l['is_source']): ?>
+                  <span class="muted">mindig</span>
+                <?php else: ?>
+                  <label class="check"><input type="checkbox" name="is_active" value="1"
+                         <?= (int)$l['is_active'] ? 'checked' : '' ?>> látszik</label>
+                <?php endif; ?>
+              </td>
+              <td class="nowrap" data-label="">
+                <button class="btn btn--sm" type="submit">Mentés</button>
+              </td>
+            </form>
+            <?php if (!(int)$l['is_source']): ?>
+              <td class="nowrap" style="padding-left:0">
+                <form method="post" action="<?= h(admin_url()) ?>"
+                      data-confirm="Törlöd a(z) &quot;<?= h($l['name']) ?>&quot; nyelvet? Csak akkor sikerül, ha nincs rajta egyetlen fejezet sem.">
+                  <?= csrf_input() ?>
+                  <input type="hidden" name="a" value="lang.delete">
+                  <input type="hidden" name="code" value="<?= h($l['code']) ?>">
+                  <button class="btn btn--sm btn--danger" type="submit">Törlés</button>
+                </form>
+              </td>
+            <?php endif; ?>
+          </tr>
+        <?php endforeach; ?>
+        </tbody>
+      </table>
+
+      <form method="post" action="<?= h(admin_url()) ?>" style="margin-top:14px">
+        <?= csrf_input() ?>
+        <input type="hidden" name="a" value="lang.add">
+        <div class="lbl">Új nyelv</div>
+        <div class="row">
+          <div class="field" style="flex:0 1 110px"><label>Kód</label>
+            <input class="inp mono" name="code" placeholder="sk" maxlength="5" required>
+            <div class="hint">két betű (ISO)</div></div>
+          <div class="field"><label>Név (magyarul)</label>
+            <input class="inp" name="name" placeholder="Szlovák" required></div>
+          <div class="field"><label>Saját neve</label>
+            <input class="inp" name="own_name" placeholder="Slovenčina"></div>
+          <div class="field" style="flex:0 1 auto;align-self:flex-end">
+            <button class="btn btn--p" type="submit">Nyelv hozzáadása</button></div>
+        </div>
+        <div class="hint">A felvételkor a főfejezetek átmásolódnak az új nyelvre (magyar névvel,
+          amit utána a Fejezetek fülön írhatsz át), hogy legyen hova tenni a fordításokat.</div>
+      </form>
     </div>
   </div>
 

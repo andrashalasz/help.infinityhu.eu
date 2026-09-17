@@ -386,7 +386,7 @@ function mt_auto_on(PDO $db, array $cfg): bool
  */
 function mt_auto_translate(PDO $db, array $cfg, int $srcId, ?int $userId, ?array $targets = null): array
 {
-    // alapbol MINDEN celnyelv (az ADMIN_LANGS-bol), hogy uj nyelv felvetelekor
+    // alapbol MINDEN celnyelv (az admin_langs()-bol), hogy uj nyelv felvetelekor
     // ne kelljen ezt a helyet is megkeresni
     $targets ??= function_exists('admin_target_langs') ? array_keys(admin_target_langs()) : ['en', 'de'];
     $done = []; $failed = [];

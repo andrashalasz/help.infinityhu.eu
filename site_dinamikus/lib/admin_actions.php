@@ -312,7 +312,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
         }
 
         case 'article.create': {
-            $lang    = array_key_exists(post('lang'), ADMIN_LANGS) ? post('lang') : 'hu';
+            $lang    = array_key_exists(post('lang'), admin_langs()) ? post('lang') : 'hu';
             $module  = (int)post('module_id');
             $chapter = post('chapter_no');
             $title   = post('title');
@@ -424,7 +424,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
         case 'articles.bulk': {
             $ids = array_values(array_unique(array_filter(array_map('intval', (array)($_POST['ids'] ?? [])))));
             $op   = post('op');
-            $lang = array_key_exists(post('lang'), ADMIN_LANGS) ? post('lang') : 'hu';
+            $lang = array_key_exists(post('lang'), admin_langs()) ? post('lang') : 'hu';
 
             if (!$ids) {
                 flash('warn', 'Nem jelöltél ki egyetlen fejezetet sem.');
@@ -626,7 +626,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
         // ================================================== modulok
         case 'module.save': {
             $id    = (int)post('id');
-            $lang  = array_key_exists(post('lang'), ADMIN_LANGS) ? post('lang') : 'hu';
+            $lang  = array_key_exists(post('lang'), admin_langs()) ? post('lang') : 'hu';
             $title = post('title');
             if ($title === '') {
                 flash('err', 'A főfejezet neve nem lehet üres.');
@@ -689,7 +689,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                     }
 
                     $ins = $db->prepare('INSERT INTO help_module (chapter_no, slug, title, lang, sort_order) VALUES (?,?,?,?,?)');
-                    foreach (array_keys(ADMIN_LANGS) as $l) {
+                    foreach (array_keys(admin_langs()) as $l) {
                         $exists = $db->prepare('SELECT 1 FROM help_module WHERE chapter_no = ? AND lang = ?');
                         $exists->execute([$no, $l]);
                         if ($exists->fetchColumn()) { continue; }
@@ -756,7 +756,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
 
         // ================================================== Word import
         case 'import.upload': {
-            $lang = array_key_exists(post('lang'), ADMIN_LANGS) ? post('lang') : 'hu';
+            $lang = array_key_exists(post('lang'), admin_langs()) ? post('lang') : 'hu';
             $f = $_FILES['docx'] ?? null;
 
             if (!is_array($f) || ($f['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
@@ -968,7 +968,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
         case 'translate.machine': {
             $srcId = (int)post('src_id');
             $to    = post('to');
-            if (!array_key_exists($to, ADMIN_LANGS)) { help_json(['ok' => false, 'error' => 'Ismeretlen célnyelv.'], 400); }
+            if (!array_key_exists($to, admin_langs())) { help_json(['ok' => false, 'error' => 'Ismeretlen célnyelv.'], 400); }
 
             $st = $db->prepare('SELECT lang, body_html, draft_html, title, draft_title
                                   FROM help_article WHERE id = ?');
@@ -1215,7 +1215,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
 
         // ================================================== export
         case 'export.docx': {
-            $lang = array_key_exists(post('lang'), ADMIN_LANGS) ? post('lang') : 'hu';
+            $lang = array_key_exists(post('lang'), admin_langs()) ? post('lang') : 'hu';
             $version = (string)$db->query("SELECT coalesce(max(doc_version), '') FROM help_article")->fetchColumn();
             try {
                 $exp = new DocxExport($cfg['media_dir']);
@@ -1240,7 +1240,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
         }
 
         case 'export.pdf': {
-            $lang = array_key_exists(post('lang'), ADMIN_LANGS) ? post('lang') : 'hu';
+            $lang = array_key_exists(post('lang'), admin_langs()) ? post('lang') : 'hu';
             try {
                 $r = export_pdf($db, $cfg, $lang, !isset($_POST['include_hidden']));
             } catch (Throwable $e) {
@@ -1275,6 +1275,91 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             }
             audit_me($db, 'setting.save');
             flash('ok', 'A beállítások mentve.');
+            back(['p' => 'settings']);
+        }
+
+        // ================================================== nyelvek
+        case 'lang.add': {
+            if (!auth_is('admin')) { flash('err', 'Ehhez adminisztrátori jog kell.'); back(['p' => 'settings']); }
+            $code = strtolower(trim(post('code')));
+            $name = trim(post('name'));
+            if (!preg_match('/^[a-z]{2,5}$/', $code) || $name === '') {
+                flash('err', 'A kód két-öt betű legyen (pl. sk), a név pedig nem lehet üres.');
+                back(['p' => 'settings']);
+            }
+
+            $exists = $db->prepare('SELECT 1 FROM help_lang WHERE code = ?');
+            $exists->execute([$code]);
+            if ($exists->fetchColumn()) {
+                flash('err', 'Ez a nyelvkód már szerepel a listában.');
+                back(['p' => 'settings']);
+            }
+
+            $max = (int)$db->query('SELECT COALESCE(MAX(sort_order), 0) FROM help_lang')->fetchColumn();
+            $db->prepare('INSERT INTO help_lang (code, name, own_name, is_source, is_active, sort_order)
+                          VALUES (?,?,?,0,1,?)')
+               ->execute([$code, mb_substr($name, 0, 60),
+                          mb_substr(trim(post('own_name')), 0, 60) ?: null, $max + 10]);
+
+            // A fofejezetek atmasolasa, hogy legyen hova tenni a forditasokat.
+            $src = admin_source_lang();
+            $copied = $db->prepare('INSERT INTO help_module (chapter_no, slug, title, lang, sort_order)
+                                    SELECT chapter_no, slug, title, ?, sort_order
+                                      FROM help_module WHERE lang = ?');
+            $copied->execute([$code, $src]);
+
+            audit_me($db, 'lang.add', $code, $name);
+            flash('ok', 'A(z) <b>' . h($name) . '</b> nyelv felvéve, ' . $copied->rowCount()
+                . ' főfejezettel. A Fordítás fülön máris megjelenik — a főfejezetek nevét a '
+                . 'Fejezetek fülön írhatod át erre a nyelvre.');
+            back(['p' => 'settings']);
+        }
+
+        case 'lang.save': {
+            if (!auth_is('admin')) { flash('err', 'Ehhez adminisztrátori jog kell.'); back(['p' => 'settings']); }
+            $code = strtolower(trim(post('code')));
+            $q = $db->prepare('SELECT is_source FROM help_lang WHERE code = ?');
+            $q->execute([$code]);
+            $isSource = (int)$q->fetchColumn();
+
+            $db->prepare('UPDATE help_lang SET name = ?, own_name = ?, sort_order = ?, is_active = ? WHERE code = ?')
+               ->execute([
+                   mb_substr(trim(post('name')), 0, 60),
+                   mb_substr(trim(post('own_name')), 0, 60) ?: null,
+                   (int)post('sort_order'),
+                   $isSource ? 1 : (isset($_POST['is_active']) ? 1 : 0),
+                   $code,
+               ]);
+            audit_me($db, 'lang.save', $code);
+            flash('ok', 'A nyelv mentve.');
+            back(['p' => 'settings']);
+        }
+
+        case 'lang.delete': {
+            if (!auth_is('admin')) { flash('err', 'Ehhez adminisztrátori jog kell.'); back(['p' => 'settings']); }
+            $code = strtolower(trim(post('code')));
+
+            $q = $db->prepare('SELECT is_source, name FROM help_lang WHERE code = ?');
+            $q->execute([$code]);
+            $row = $q->fetch();
+            if (!$row) { flash('err', 'Nincs ilyen nyelv.'); back(['p' => 'settings']); }
+            if ((int)$row['is_source']) {
+                flash('err', 'A forrásnyelvet nem lehet törölni — ezen íródnak a fejezetek.');
+                back(['p' => 'settings']);
+            }
+
+            $n = $db->prepare('SELECT COUNT(*) FROM help_article WHERE lang = ?');
+            $n->execute([$code]);
+            if ((int)$n->fetchColumn() > 0) {
+                flash('err', 'Ezen a nyelven még vannak fejezetek — előbb töröld őket. '
+                    . 'Ha csak el akarod rejteni, vedd ki a „látszik" pipát.');
+                back(['p' => 'settings']);
+            }
+
+            $db->prepare('DELETE FROM help_module WHERE lang = ?')->execute([$code]);
+            $db->prepare('DELETE FROM help_lang WHERE code = ?')->execute([$code]);
+            audit_me($db, 'lang.delete', $code, (string)$row['name']);
+            flash('ok', 'A(z) <b>' . h((string)$row['name']) . '</b> nyelv törölve.');
             back(['p' => 'settings']);
         }
 

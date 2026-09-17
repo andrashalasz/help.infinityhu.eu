@@ -24,18 +24,44 @@ const ADMIN_ICON_PAGES = ['settings' => 'Beállítások'];
  * (magyar), a tobbi celnyelv. Minden felulet ebbol dolgozik: a Forditas ful
  * oszlopai, a gepi forditas celnyelvei, a nyelvi kartyak es az export.
  */
-const ADMIN_LANGS = ['hu' => 'Magyar', 'en' => 'English', 'de' => 'Deutsch'];
+/**
+ * Tartalek nyelvlista, ha a help_lang tabla meg nem letezik (regi telepites,
+ * a 07_nyelvek.sql meg nem futott le).
+ */
+const ADMIN_LANGS_FALLBACK = ['hu' => 'Magyar', 'en' => 'English', 'de' => 'Deutsch'];
 
-/** A forrasnyelv kodja (az ADMIN_LANGS elso eleme). */
+/**
+ * A sugo nyelvei az ADATBAZISBOL: kod => nev, a beallitott sorrendben.
+ * Uj nyelvhez nem kell kodot modositani - a Beallitasok fulon vehetsz fel.
+ */
+function admin_langs(?PDO $db = null): array
+{
+    static $cache = null;
+    if ($cache !== null) { return $cache; }
+
+    try {
+        $pdo = $db ?? help_db_rw(require __DIR__ . '/../config.php');
+        $rows = $pdo->query('SELECT code, name FROM help_lang WHERE is_active = 1
+                             ORDER BY is_source DESC, sort_order, code')->fetchAll();
+        $out = [];
+        foreach ($rows as $r) { $out[(string)$r['code']] = (string)$r['name']; }
+        if ($out) { return $cache = $out; }
+    } catch (Throwable $e) {
+        // a tabla meg nincs meg - menjen a tartalek
+    }
+    return $cache = ADMIN_LANGS_FALLBACK;
+}
+
+/** A forrasnyelv kodja (a lista elso eleme). */
 function admin_source_lang(): string
 {
-    return (string)array_key_first(ADMIN_LANGS);
+    return (string)array_key_first(admin_langs());
 }
 
 /** A celnyelvek: minden nyelv a forrasnyelv nelkul. */
 function admin_target_langs(): array
 {
-    $l = ADMIN_LANGS;
+    $l = admin_langs();
     unset($l[admin_source_lang()]);
     return $l;
 }

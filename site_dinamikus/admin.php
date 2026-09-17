@@ -91,7 +91,7 @@ if (($_GET['a'] ?? '') === 'export.html') {
         echo 'Nincs jogosultság az exporthoz.';
         exit;
     }
-    $expLang = array_key_exists((string)($_GET['lang'] ?? ''), ADMIN_LANGS) ? (string)$_GET['lang'] : 'hu';
+    $expLang = array_key_exists((string)($_GET['lang'] ?? ''), admin_langs()) ? (string)$_GET['lang'] : 'hu';
     $html = export_print_html($db, $cfg, $expLang, !isset($_GET['include_hidden']), isset($_GET['print']));
     audit_me($db, 'export.html', $expLang);
 
@@ -122,7 +122,7 @@ if ($user['must_change'] && ($_GET['p'] ?? '') === '') {
 }
 
 $page = (string)($_GET['p'] ?? 'dashboard');
-$lang = array_key_exists((string)($_GET['lang'] ?? ''), ADMIN_LANGS) ? (string)$_GET['lang'] : 'hu';
+$lang = array_key_exists((string)($_GET['lang'] ?? ''), admin_langs()) ? (string)$_GET['lang'] : 'hu';
 
 // a füleken megjelenő számok
 $counts = [];
