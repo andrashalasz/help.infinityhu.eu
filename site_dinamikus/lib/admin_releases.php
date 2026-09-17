@@ -40,12 +40,12 @@ function page_releases(PDO $db, array $counts, int $showId = 0): void
         $entries = $e->fetchAll();
     }
 
-    $KIND = ['new' => ['badge--ok', 'új'], 'mod' => ['badge--info', 'módosítás'], 'fix' => ['badge--warn', 'javítás']];
+    $KIND = ['new' => ['badge--ok', t('új')], 'mod' => ['badge--info', t('módosítás')], 'fix' => ['badge--warn', t('javítás')]];
 
     admin_head('Kiadások', 'releases', $counts);
     ?>
 <div class="page">
-  <h1 class="pt">Kiadások</h1>
+  <h1 class="pt"><?= h(t('Kiadások')) ?></h1>
   <p class="lead">
     Minden közzétételkor keletkezik egy <b>változásnapló-bejegyzés</b>, és a <b>nyitott</b>
     kiadásba gyűlik. Ez az a szöveg, amit az olvasó a <b>Frissítések</b> lapon lát.
@@ -63,29 +63,29 @@ function page_releases(PDO $db, array $counts, int $showId = 0): void
           <a class="picker__a<?= (int)$r['id'] === $showId ? ' on' : '' ?>"
              href="<?= h(admin_url(['p' => 'releases', 'rel' => $r['id']])) ?>">
             <em><?= h($r['version']) ?></em>
-            <span><?= $r['status'] === 'open' ? 'nyitott' : h((string)$r['released_at']) ?></span>
+            <span><?= $r['status'] === 'open' ? h(t('nyitott')) : h((string)$r['released_at']) ?></span>
             <span class="badge <?= $r['status'] === 'open' ? 'badge--warn' : '' ?>"
                   style="margin-left:auto"><?= (int)$r['n_major'] ?></span>
           </a>
         <?php endforeach; ?>
-        <?php if (!$releases): ?><div class="empty">Még nincs kiadás.</div><?php endif; ?>
+        <?php if (!$releases): ?><div class="empty"><?= h(t('Még nincs kiadás.')) ?></div><?php endif; ?>
       </div>
     </div>
 
     <div>
       <?php if (!$shown): ?>
-        <div class="panel"><div class="empty">Válassz egy kiadást a bal oldali listából.</div></div>
+        <div class="panel"><div class="empty"><?= h(t('Válassz egy kiadást a bal oldali listából.')) ?></div></div>
       <?php else: ?>
 
         <div class="panel" style="margin-bottom:16px">
           <div class="panel__h">
             <h2><?= h($shown['version']) ?></h2>
             <span class="badge <?= $shown['status'] === 'open' ? 'badge--warn' : 'badge--ok' ?>">
-              <?= $shown['status'] === 'open' ? 'nyitott' : 'lezárva ' . h((string)$shown['released_at']) ?></span>
+              <?= $shown['status'] === 'open' ? t('nyitott') : t('lezárva') . ' ' . h((string)$shown['released_at']) ?></span>
             <span class="sp"></span>
-            <span class="muted"><?= (int)$shown['n_major'] ?> bejegyzés<?php
+            <span class="muted"><?= (int)$shown['n_major'] ?> <?= h(t('bejegyzés')) ?><?php
               if ((int)$shown['n_all'] > (int)$shown['n_major']): ?>
-              · <?= (int)$shown['n_all'] - (int)$shown['n_major'] ?> apró javítás<?php endif; ?></span>
+              · <?= (int)$shown['n_all'] - (int)$shown['n_major'] ?> <?= h(t('apró javítás')) ?><?php endif; ?></span>
           </div>
 
           <?php if ($shown['status'] === 'open'): ?>
@@ -104,13 +104,13 @@ function page_releases(PDO $db, array $counts, int $showId = 0): void
                 <input type="hidden" name="a" value="release.close">
                 <input type="hidden" name="from" value="releases">
                 <div class="row">
-                  <div class="field"><label>Lezárandó verzió neve</label>
+                  <div class="field"><label><?= h(t('Lezárandó verzió neve')) ?></label>
                     <input class="inp" name="version" value="<?= h($shown['version']) ?>" required></div>
-                  <div class="field"><label>A következő (nyitott) verzió</label>
+                  <div class="field"><label><?= h(t('A következő (nyitott) verzió')) ?></label>
                     <input class="inp" name="next" value="<?= h($nextVersion) ?>" required>
-                    <div class="hint">Automatikusan a következő hónap — átírható.</div></div>
+                    <div class="hint"><?= h(t('Automatikusan a következő hónap — átírható.')) ?></div></div>
                   <div class="field" style="flex:0 1 auto;align-self:flex-end">
-                    <button class="btn btn--p" type="submit">Kiadás lezárása</button></div>
+                    <button class="btn btn--p" type="submit"><?= h(t('Kiadás lezárása')) ?></button></div>
                 </div>
               </form>
             </div>
@@ -118,14 +118,14 @@ function page_releases(PDO $db, array $counts, int $showId = 0): void
         </div>
 
         <div class="panel">
-          <div class="panel__h"><h2>Változásnapló</h2><span class="sp"></span>
+          <div class="panel__h"><h2><?= h(t('Változásnapló')) ?></h2><span class="sp"></span>
             <span class="badge"><?= count($entries) ?></span></div>
           <div class="panel__b panel__b--flush">
             <?php if (!$entries): ?>
-              <div class="empty">Ebben a kiadásban még nincs bejegyzés — tegyél közzé egy fejezetet.</div>
+              <div class="empty"><?= h(t('Ebben a kiadásban még nincs bejegyzés — tegyél közzé egy fejezetet.')) ?></div>
             <?php else: ?>
               <table class="tbl">
-                <thead><tr><th>Fejezet</th><th>Amit az olvasó lát</th><th>Típus</th><th>Ki</th><th></th></tr></thead>
+                <thead><tr><th><?= h(t('Fejezet')) ?></th><th><?= h(t('Amit az olvasó lát')) ?></th><th><?= h(t('Típus')) ?></th><th><?= h(t('Ki')) ?></th><th></th></tr></thead>
                 <tbody>
                 <?php foreach ($entries as $c):
                     [$cls, $lbl] = $KIND[$c['change_type']] ?? ['', (string)$c['change_type']]; ?>
@@ -146,9 +146,9 @@ function page_releases(PDO $db, array $counts, int $showId = 0): void
                         <input class="inp" name="description" value="<?= h((string)$c['description']) ?>"
                                style="flex:1;min-width:200px">
                         <label class="check" title="Az apró javítás nem jelenik meg a Frissítések lapon">
-                          <input type="checkbox" name="is_minor" value="1" <?= (int)$c['is_minor'] ? 'checked' : '' ?>> apró
+                          <input type="checkbox" name="is_minor" value="1" <?= (int)$c['is_minor'] ? 'checked' : '' ?>> <?= h(t('apró')) ?>
                         </label>
-                        <button class="btn btn--sm" type="submit">Mentés</button>
+                        <button class="btn btn--sm" type="submit"><?= h(t('Mentés')) ?></button>
                       </form>
                     </td>
                     <td data-label="Típus"><span class="badge <?= h($cls) ?>"><?= h($lbl) ?></span></td>
@@ -160,7 +160,7 @@ function page_releases(PDO $db, array $counts, int $showId = 0): void
                         <input type="hidden" name="a" value="changelog.delete">
                         <input type="hidden" name="id" value="<?= (int)$c['id'] ?>">
                         <input type="hidden" name="rel" value="<?= (int)$showId ?>">
-                        <button class="btn btn--sm btn--danger" type="submit">Törlés</button>
+                        <button class="btn btn--sm btn--danger" type="submit"><?= h(t('Törlés')) ?></button>
                       </form>
                     </td>
                   </tr>

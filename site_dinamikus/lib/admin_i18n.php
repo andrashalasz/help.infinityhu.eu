@@ -66,8 +66,39 @@ function t(string $key, array $vars = [], string $fallback = ''): string
 }
 
 /**
- * A forrasnyelvi (magyar) alapszovegek. Ez a lista egyben a forditando
- * kulcsok jegyzeke is - a Beallitasok fulon ebbol keszul a forditó tablazat.
+ * A kodban ELOFORDULO forditando szovegek jegyzeke.
+ *
+ * Vegigolvassa a forrasfajlokat, es kigyujti a t('...') hivasok kulcsat.
+ * Igy a Beallitasok fuloni forditó tablazat magatol koveti a kodot - nem kell
+ * kulon karbantartani egy listat, es nem maradhat le rola uj szoveg.
+ *
+ * @return array<string,string>  kulcs => alapszoveg (a kulcs maga, ha nincs jegyezve)
+ */
+function ui_keys_in_use(): array
+{
+    static $keys = null;
+    if ($keys !== null) { return $keys; }
+
+    $known = ui_default();
+    $found = [];
+    foreach (glob(__DIR__ . '/*.php') ?: [] as $file) {
+        if (basename($file) === 'admin_i18n.php') { continue; }   // sajat magat ne olvassa
+        $src = (string)@file_get_contents($file);
+        if (preg_match_all("/\bt\(\s*'((?:[^'\\\\]|\\\\.)*)'/", $src, $m)) {
+            foreach ($m[1] as $k) {
+                $k = str_replace(["\\'", '\\\\'], ["'", '\\'], $k);
+                $found[$k] = $known[$k] ?? $k;
+            }
+        }
+    }
+    ksort($found);
+    return $keys = $found ?: $known;
+}
+
+/**
+ * A forrasnyelvi (magyar) alapszovegek azokhoz a kulcsokhoz, amelyek nem
+ * maguk a magyar szoveg (pl. 'tab.articles'). Ami nincs itt, annal a KULCS
+ * maga az alapszoveg - igy t('Mentés') forditas nelkul is helyesen jelenik meg.
  */
 function ui_default(string $key = ''): string|array
 {
