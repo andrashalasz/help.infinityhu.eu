@@ -70,21 +70,40 @@
      A böngésző window.confirm() ablakát több környezet letiltja, és olyankor
      a művelet némán elmarad. Ezért minden megerősítés a saját ablakunkkal
      megy: <form data-confirm="..."> vagy askConfirm(szöveg, callback). */
-  function askConfirm(text, onYes, title) {
+  /**
+   * @param opts {okLabel, altLabel, onAlt, danger} - a masodik gomb elhagyhato
+   */
+  function askConfirm(text, onYes, title, opts) {
+    opts = opts || {};
     var modal = document.querySelector('#modal-confirm');
     if (!modal) { if (window.confirm(text)) { onYes(); } return; }
 
     modal.querySelector('#confirm-text').textContent = text;
     modal.querySelector('#confirm-title').textContent = title || 'Megerősítés';
-    var ok = modal.querySelector('#confirm-ok');
 
-    // friss gomb, hogy ne maradjon rajta korabbi esemenykezelo
-    var fresh = ok.cloneNode(true);
-    ok.parentNode.replaceChild(fresh, ok);
-    fresh.addEventListener('click', function () {
-      modal.classList.remove('on');
-      onYes();
-    });
+    function swap(sel, label, handler, show) {
+      var b = modal.querySelector(sel);
+      var fresh = b.cloneNode(false);          // friss gomb: nincs rajta regi kezelo
+      fresh.textContent = label;
+      fresh.hidden = !show;
+      b.parentNode.replaceChild(fresh, b);
+      if (show && handler) {
+        fresh.addEventListener('click', function () {
+          modal.classList.remove('on');
+          handler();
+        });
+      }
+      return fresh;
+    }
+
+    var ok = swap('#confirm-ok', opts.okLabel || 'Igen, folytatom', onYes, true);
+    ok.id = 'confirm-ok';
+    ok.className = 'btn ' + (opts.danger === false ? 'btn--p' : 'btn--danger');
+
+    var alt = swap('#confirm-alt', opts.altLabel || '', opts.onAlt, !!opts.altLabel);
+    alt.id = 'confirm-alt';
+    alt.className = 'btn';
+
     modal.classList.add('on');
   }
 
@@ -373,6 +392,52 @@
         markDirty();
       });
     }
+
+    /* ---------- elnavigálás mentetlen szöveggel ----------
+       Ha a szerkesztőben van el nem mentett változás, és a szerkesztő
+       elkattint (pl. a Fordítás fülre), megkérdezzük, mentsük-e. Enélkül a
+       fordítás a RÉGI szöveget látná, és az imént beírt rész elveszne. */
+    function isDirty() {
+      var st = $('#ed-state');
+      return !!(st && st.dataset.dirty);
+    }
+
+    document.addEventListener('click', function (e) {
+      if (!isDirty()) { return; }
+      var a = e.target.closest ? e.target.closest('a[href]') : null;
+      if (!a) { return; }
+
+      var href = a.getAttribute('href') || '';
+      if (a.target === '_blank' || a.hasAttribute('download')) { return; }
+      if (href === '' || href.charAt(0) === '#' || /^(javascript|mailto|tel):/i.test(href)) { return; }
+      if (a.closest('#ed-area')) { return; }          // a szövegen belüli hivatkozás
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      askConfirm(
+        'A szerkesztőben van el nem mentett szöveg. Mentsem vázlatként, mielőtt továbblépsz?',
+        function () {                                  // Mentés és tovább
+          syncToSource();
+          var fd = new FormData(form);
+          fd.append('fmt', 'json');
+          fetch('admin.php', { method: 'POST', body: fd, credentials: 'same-origin' })
+            .then(function () { window.location.href = a.href; })
+            .catch(function () { window.location.href = a.href; });
+        },
+        'Nem mentett változások',
+        {
+          okLabel: 'Mentés és tovább',
+          danger: false,
+          altLabel: 'Tovább mentés nélkül',
+          onAlt: function () {
+            var st = $('#ed-state');
+            if (st) { delete st.dataset.dirty; }       // ne kérdezzen újra
+            window.location.href = a.href;
+          }
+        }
+      );
+    }, true);
 
     /* ---------- a fejezet címe: azonnal látszik, magától mentődik ---------- */
     var titleIn = $('#ed-title-in');

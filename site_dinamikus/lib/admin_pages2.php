@@ -218,9 +218,20 @@ function page_translate(PDO $db, array $cfg, int $srcId, string $to, array $coun
         $st->execute([$srcId]);
         $src = $st->fetch() ?: null;
         if ($src) {
-            $t = $db->prepare('SELECT * FROM help_article WHERE slug = ? AND lang = ?');
-            $t->execute([$src['slug'], $to]);
-            $target = $t->fetch() ?: null;
+            // A nyelvi valtozatokat a FEJEZETSZAM koti ossze: a slug mar
+            // nyelvenkent elter (az angol oldal angol cimet kap), ezert a
+            // slug szerinti parositas minden forditast "hianyzonak" mutatott.
+            $target = null;
+            if ((string)$src['chapter_no'] !== '') {
+                $t = $db->prepare('SELECT * FROM help_article WHERE chapter_no = ? AND lang = ? LIMIT 1');
+                $t->execute([$src['chapter_no'], $to]);
+                $target = $t->fetch() ?: null;
+            }
+            if (!$target) {
+                $t = $db->prepare('SELECT * FROM help_article WHERE slug = ? AND lang = ? LIMIT 1');
+                $t->execute([$src['slug'], $to]);
+                $target = $t->fetch() ?: null;
+            }
         }
     }
 
@@ -231,7 +242,9 @@ function page_translate(PDO $db, array $cfg, int $srcId, string $to, array $coun
                t.draft_html IS NOT NULL AS t_draft, t.is_published AS t_published
           FROM help_article s
           LEFT JOIN help_module m ON m.id = s.module_id
-          LEFT JOIN help_article t ON t.slug = s.slug AND t.lang = ?
+          LEFT JOIN help_article t
+                 ON t.lang = ?
+                AND ((s.chapter_no <> '' AND t.chapter_no = s.chapter_no) OR t.slug = s.slug)
          WHERE s.lang = 'hu'
       ORDER BY m.sort_order, s.sort_order, s.id");
     $rows->execute([$to]);

@@ -172,9 +172,13 @@ function page_dashboard(PDO $db, array $cfg, array $counts): void
           (SELECT count(*) FROM help_media)                                      AS media
     ")->fetch();
 
+    // A nyelvi valtozatokat a FEJEZETSZAM koti ossze (a slug nyelvenkent elter),
+    // a slug csak tartalek a szam nelkuli fejezetekhez.
     $stale = (int)$db->query("
         SELECT COUNT(*) FROM help_article t
-          JOIN help_article s ON s.slug = t.slug AND s.lang = 'hu'
+          JOIN help_article s
+            ON s.lang = 'hu'
+           AND ((s.chapter_no <> '' AND s.chapter_no = t.chapter_no) OR s.slug = t.slug)
          WHERE t.lang <> 'hu'
            AND NOT (t.translated_from_hash <=> s.content_hash)
     ")->fetchColumn();
@@ -183,7 +187,10 @@ function page_dashboard(PDO $db, array $cfg, array $counts): void
         SELECT COUNT(*) FROM help_article s
          CROSS JOIN (SELECT 'en' AS lang UNION ALL SELECT 'de') AS l
          WHERE s.lang = 'hu'
-           AND NOT EXISTS (SELECT 1 FROM help_article t WHERE t.slug = s.slug AND t.lang = l.lang)
+           AND NOT EXISTS (
+                 SELECT 1 FROM help_article t
+                  WHERE t.lang = l.lang
+                    AND ((s.chapter_no <> '' AND t.chapter_no = s.chapter_no) OR t.slug = s.slug))
     ")->fetchColumn();
 
     $drafts = $db->query("

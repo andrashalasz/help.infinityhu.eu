@@ -150,6 +150,7 @@ function admin_foot(): void
     </div>
     <div class="modal__f">
       <button class="btn btn--ghost" type="button" data-close>Mégsem</button>
+      <button class="btn" type="button" id="confirm-alt" hidden></button>
       <button class="btn btn--danger" type="button" id="confirm-ok">Igen, folytatom</button>
     </div>
   </div>
