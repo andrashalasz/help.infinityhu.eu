@@ -33,6 +33,7 @@ require __DIR__ . '/lib/admin_releases.php';
 require __DIR__ . '/lib/admin_actions.php';
 require __DIR__ . '/lib/admin_pages.php';
 require __DIR__ . '/lib/admin_pages2.php';
+require __DIR__ . '/lib/admin_uitexts.php';
 
 $cfg = require __DIR__ . '/config.php';
 auth_start($cfg);
@@ -199,6 +200,9 @@ switch ($page) {
         break;
     case 'settings':
         page_settings($db, $cfg, $counts);
+        break;
+    case 'uitexts':
+        page_uitexts($db, $cfg, $counts);
         break;
     default:
         page_dashboard($db, $cfg, $counts);

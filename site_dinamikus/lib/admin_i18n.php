@@ -211,6 +211,71 @@ function ui_default(string $key = ''): string|array
             . 'mellé az idegen nyelvű változatot — vagy kérj gépi nyersfordítást, és javíts bele. '
             . 'A mentés <b>vázlatot</b> készít, közzétenni külön kell.',
 
+        // --- osszehasonlitas ---
+        'diff.cim'           => 'Összehasonlítás: {n}. változat → {mihez}',
+        'diff.cim.valtozott' => 'A cím is változott: „<b>{regi}</b>” → „<b>{uj}</b>”',
+        'diff.uj.szo'        => '{n} új szó',
+        'diff.elhagyott.szo' => '{n} elhagyott szó',
+
+        // --- Word import magyarazat ---
+        'import.bevezeto' => 'Tölts fel egy <b>.docx</b> fájlt: a rendszer fejezetekre bontja, a '
+            . 'képeket kibontja, és <b>összehasonlítja a mostani tartalommal</b>. Te döntöd el '
+            . 'fejezetenként, mit veszek át. Ami átkerül, az <b>vázlat</b> lesz — a nyilvános '
+            . 'oldalon csak közzététel után látszik.',
+        'import.tagolas' => 'A tagolás a <b>címsorstílusokból</b> jön: <b>Címsor 1</b> = modul, '
+            . '<b>Címsor 2</b> = fejezet, <b>Címsor 3–5</b> = a fejezeten belüli szakaszok. A '
+            . 'fejezetszámot a címből olvassa ki („5.4 Kintlévőség kezelés”), és ez alapján '
+            . 'párosítja a meglévő fejezethez. A képek a tartalmuk hash-ével kapnak nevet, így '
+            . 'nem duplikálódnak.',
+
+        // --- a felulet gepi forditasa ---
+        'flash.ui.translate.nincs-mit' => 'Ezen a nyelven minden szöveg le van fordítva.',
+        'flash.ui.translate.kesz'      => '<b>{n} szöveg</b> lefordítva {nyelv} nyelvre. '
+            . 'Nézd át őket alább — amit átírsz, azt a gép többé nem bántja.',
+        'flash.ui.translate.hiba'      => 'A gépi fordítás megszakadt: {reszlet} '
+            . 'Ami addig elkészült, elmentve — nyomd meg újra a gombot a folytatáshoz.',
+        'mt.ui.tul.hosszu' => 'A köteg túl hosszú volt a fordítónak. Nyomd meg újra a gombot — '
+            . 'a rendszer kisebb adagokban folytatja.',
+        'mt.ui.rossz.valasz'           => 'A fordító {kert} szöveget kapott, de {kapott} darabot '
+            . 'adott vissza. Próbáld újra.',
+        'ui.forditas.gomb'  => 'Hiányzó szövegek gépi fordítása',
+        'ui.forditas.sugo'  => 'A {nyelv} nyelven még lefordítatlan felületszövegeket a beállított '
+            . 'gépi fordító átülteti. Amit már kézzel beírtál, ahhoz nem nyúl. Sok szövegnél ez '
+            . 'eltarthat egy percig.',
+
+        // --- a felulet szovegeinek lapja ---
+        'uitext.bevezeto' => 'Ezek a kezelőfelület saját feliratai — gombok, címkék, üzenetek. '
+            . 'A bal oldali oszlop a forrásnyelvi szöveg, azt a kód adja. Amit üresen hagysz, az a '
+            . 'forrásnyelven jelenik meg, tehát a felület sosem marad felirat nélkül.',
+        'uitext.forditsd'     => '{n} hiányzó lefordítása',
+        'uitext.kesz'         => 'Minden lefordítva',
+        'uitext.kereses'      => 'Keresés a szövegek között…',
+        'uitext.szuro.mind'   => 'Mind',
+        'uitext.szuro.hianyzo'=> 'Csak a hiányzók',
+        'uitext.szuro.kesz'   => 'Csak a lefordítottak',
+        'uitext.mentes.sugo'  => 'A módosítások csak mentés után lépnek érvénybe.',
+        'uitext.talalat'      => '{n} szöveg',
+        'uitext.folyamat'     => 'Fordítás… {kesz} / {ossz}',
+        // teruletek nevei
+        'Menü és fejléc' => 'Menü és fejléc',
+        'Fejezetlista' => 'Fejezetlista',
+        'Törlés és megerősítés' => 'Törlés és megerősítés',
+        'Szerkesztő' => 'Szerkesztő',
+        'Változatok' => 'Változatok',
+        'Közzététel' => 'Közzététel',
+        'Kiadások' => 'Kiadások',
+        'Word import' => 'Word import',
+        'Fordítás' => 'Fordítás',
+        'Gépi fordítás' => 'Gépi fordítás',
+        'Felületszövegek' => 'Felületszövegek',
+        'Képek, videók' => 'Képek, videók',
+        'Belépés és jelszó' => 'Belépés és jelszó',
+        'Visszajelző üzenetek' => 'Visszajelző üzenetek',
+        'Állapotok' => 'Állapotok',
+        'Súgószövegek' => 'Súgószövegek',
+        'Visszavonás' => 'Visszavonás',
+        'Általános' => 'Általános',
+
         // --- kozzetetel ---
         'kozzetetel.forditas.marad' => 'A fordítások maradjanak naprakészek',
         'kozzetetel.forditas.sugo'  => 'Egy fordítás attól lesz <b>elavult</b>, hogy a magyar '

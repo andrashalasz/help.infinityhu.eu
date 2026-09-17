@@ -32,9 +32,7 @@ function page_import(PDO $db, array $cfg, string $lang, int $importId, array $co
 <div class="page">
   <h1 class="pt"><?= h(t('Word import')) ?></h1>
   <p class="lead">
-    Tölts fel egy <b>.docx</b> fájlt: a rendszer fejezetekre bontja, a képeket kibontja, és
-    <b><?= h(t('összehasonlítja a jelenlegi tartalommal')) ?></b>. Te döntöd el fejezetenként, mit veszek át.
-    Ami átkerül, az <b><?= h(t('vázlat')) ?></b> lesz — a nyilvános oldalon csak közzététel után látszik.
+    <?= t('import.bevezeto') ?>
   </p>
   <?= flash_render() ?>
 
@@ -62,9 +60,7 @@ function page_import(PDO $db, array $cfg, string $lang, int $importId, array $co
           </div>
         </div>
         <div class="hint">
-          A tagolás a <b><?= h(t('címsorstílusokból')) ?></b> jön: <b><?= h(t('Címsor 1')) ?></b> = modul, <b><?= h(t('Címsor 2')) ?></b> = fejezet,
-          <b><?= h(t('Címsor 3–4')) ?></b> = a fejezeten belüli szakaszok. A fejezetszámot a címből olvassa ki („5.4 Kintlévőség kezelés”),
-          és ez alapján párosítja a meglévő fejezethez. A képek a tartalmuk hash-ével kapnak nevet, így nem duplikálódnak.
+          <?= t('import.tagolas') ?>
         </div>
       </form>
     </div>
@@ -114,8 +110,8 @@ function page_import(PDO $db, array $cfg, string $lang, int $importId, array $co
 
       <div class="panel__b panel__b--flush">
         <div class="diff-legend" style="padding:10px 14px 0">
-          <span><i style="background:var(--err-soft);color:var(--err)">– törölt</i></span>
-          <span><i style="background:var(--ok-soft);color:var(--ok)">+ új</i></span>
+          <span><i style="background:var(--err-soft);color:var(--err)"><?= h(t('– törölt')) ?></i></span>
+          <span><i style="background:var(--ok-soft);color:var(--ok)"><?= h(t('+ új')) ?></i></span>
           <span class="muted"><?= h(t('a jelenlegi közzétett szöveghez képest')) ?></span>
         </div>
 
@@ -322,7 +318,7 @@ function page_translate(PDO $db, array $cfg, int $srcId, string $to, array $coun
     </div>
     <span style="flex:1"></span>
     <div class="muted">
-      Gépi fordító: <b><?= h($tr->label()) ?></b>
+      <?= h(t('Gépi fordító:')) ?> <b><?= h($tr->label()) ?></b>
       <?php if (!$tr->isConfigured()): ?>
         — <a href="<?= h(admin_url(['p' => 'settings'])) ?>"><?= h(t('beállítás')) ?></a>. Enélkül a kézi fordítás működik.
       <?php endif; ?>
@@ -475,7 +471,7 @@ function page_translate(PDO $db, array $cfg, int $srcId, string $to, array $coun
         <div class="btnbar" style="margin-top:12px">
           <button class="btn" type="submit" form="tr-auto-form"
                   <?= $tr->isConfigured() ? '' : 'disabled title="' . h(t('Nincs beállítva gépi fordító')) . '"' ?>>
-            Gépi nyersfordítás <b>mindegyik nyelvre</b>
+            <?= t('Gépi nyersfordítás <b>mindegyik nyelvre</b>') ?>
           </button>
           <span class="muted"><?= h(t('A gépi fordítás mindig vázlatot készít — közzétenni külön kell.')) ?></span>
         </div>
@@ -1058,49 +1054,28 @@ function page_settings(PDO $db, array $cfg, array $counts): void
     </div>
   </div>
 
+  <?php // A felulet szovegei sajat lapot kaptak: 600+ sor egy tablazatban
+        // kezelhetetlen volt. Itt csak a bejarat es a keszultseg latszik. ?>
   <div class="panel" style="margin-bottom:16px">
-    <div class="panel__h"><h2><?= h(t('A kezelőfelület szövegei')) ?></h2><span class="sp"></span>
-      <span class="badge"><?= count($uiKeys) ?></span></div>
+    <div class="panel__h"><h2><?= h(t('A kezelőfelület szövegei')) ?></h2>
+      <span class="sp"></span>
+      <a class="btn btn--sm btn--p" href="<?= h(admin_url(['p' => 'uitexts'])) ?>"><?= h(t('Megnyitás')) ?> →</a>
+    </div>
     <div class="panel__b">
-      <p class="lead" style="margin-bottom:12px">
-        A bal oldali oszlop a forrásnyelvi (magyar) szöveg — ezt a kód adja, nem szerkeszthető.
-        Mellette nyelvenként beírhatod a fordítást. Amit üresen hagysz, az magyarul jelenik meg,
-        tehát a felület sosem marad felirat nélkül.
-        <br><span class="muted"><?= h(t('A saját felületed nyelvét a fejlécben, a kódválasztóval állítod.')) ?></span>
-      </p>
-
-      <form method="post" action="<?= h(admin_url()) ?>">
-        <?= csrf_input() ?>
-        <input type="hidden" name="a" value="ui.save">
-        <table class="tbl">
-          <thead><tr>
-            <th style="width:220px">Kulcs</th>
-            <th><?= h(t('Magyar (forrás)')) ?></th>
-            <?php foreach ($uiTargets as $code => $label): ?>
-              <th><?= h($label) ?></th>
-            <?php endforeach; ?>
-          </tr></thead>
-          <tbody>
-          <?php foreach ($uiKeys as $key => $hu): ?>
-            <tr>
-              <td class="mono muted" data-label="Kulcs"><?= h($key) ?></td>
-              <td data-label="Magyar"><?= h($hu) ?></td>
-              <?php foreach ($uiTargets as $code => $label): ?>
-                <td data-label="<?= h($label) ?>">
-                  <input class="inp" name="ui[<?= h($code) ?>][<?= h($key) ?>]"
-                         value="<?= h($uiText[$code][$key] ?? '') ?>"
-                         placeholder="<?= h($hu) ?>">
-                </td>
-              <?php endforeach; ?>
-            </tr>
-          <?php endforeach; ?>
-          </tbody>
-        </table>
-        <div class="btnbar" style="margin-top:12px">
-          <button class="btn btn--p" type="submit"><?= h(t('Szövegek mentése')) ?></button>
-          <span class="muted"><?= h(t('Új nyelv felvételekor az oszlopa automatikusan megjelenik itt.')) ?></span>
-        </div>
-      </form>
+      <p class="lead" style="margin:0 0 10px"><?= t('uitext.bevezeto') ?></p>
+      <div class="uit-stats">
+        <?php foreach ($uiTargets as $code => $label):
+            $kesz = 0;
+            foreach ($uiKeys as $k => $srcTxt) { if (trim((string)($uiText[$code][$k] ?? '')) !== '') { $kesz++; } }
+            $pct = count($uiKeys) ? (int)round($kesz / count($uiKeys) * 100) : 100;
+        ?>
+          <div class="uit-stat">
+            <div class="uit-stat__h"><b><?= h($label) ?></b>
+              <span class="muted"><?= $kesz ?> / <?= count($uiKeys) ?></span></div>
+            <div class="uit-bar"><i style="width:<?= $pct ?>%"></i></div>
+          </div>
+        <?php endforeach; ?>
+      </div>
     </div>
   </div>
 

@@ -857,3 +857,49 @@ a.stat:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 }
 .sbtn--sel:hover { background: var(--shell-hover); }
 .sbtn--sel option { color: var(--ink); background: var(--surface); }
+
+/* ---------- A kezelőfelület szövegei (saját lap) ---------- */
+/* 600+ szoveg: a lenyeg, hogy gyorsan meg lehessen TALALNI, amit keresunk,
+   es lassuk, hol tartunk. Ezert kereso + szuro + teruleti csoportok +
+   nyelvenkenti haladasjelzo. */
+.uit-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.uit-stat {
+  border: 1px solid var(--line); border-radius: var(--r); padding: 10px 12px;
+  background: var(--surface-2); display: flex; flex-direction: column; gap: 8px;
+}
+.uit-stat__h { display: flex; align-items: baseline; gap: 8px; font-size: calc(13px * var(--fs)); }
+.uit-stat__h .muted { margin-left: auto; font-variant-numeric: tabular-nums; }
+.uit-bar { height: 6px; border-radius: 100px; background: var(--surface-3); overflow: hidden; }
+.uit-bar i { display: block; height: 100%; background: var(--ok); transition: width .3s; }
+
+.uit-toolbar { gap: 8px; flex-wrap: wrap; }
+.uit-group { margin-bottom: 18px; }
+.uit-group__h {
+  position: sticky; top: 0; z-index: 2; margin: 0 0 6px;
+  padding: 8px 2px; background: var(--surface);
+  font-size: calc(13px * var(--fs)); font-weight: 700; color: var(--ink-2);
+  border-bottom: 1px solid var(--line-soft);
+}
+.uit-row {
+  display: grid; grid-template-columns: minmax(200px, 1fr) repeat(auto-fit, minmax(200px, 1fr));
+  gap: 8px; padding: 7px 2px; border-bottom: 1px solid var(--line-soft); align-items: center;
+}
+.uit-row:hover { background: var(--surface-2); }
+.uit-row--missing .uit-src { font-weight: 600; }
+.uit-src { font-size: calc(13px * var(--fs)); color: var(--ink); line-height: 1.4; }
+.uit-cell { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.uit-cell__l {
+  flex: none; font-size: 10px; font-weight: 700; letter-spacing: .5px; color: var(--ink-3);
+  width: 22px; text-align: right;
+}
+.uit-cell .inp { min-width: 0; }
+/* a mentes mindig kezugyben */
+.uit-save {
+  position: sticky; bottom: 0; z-index: 5; display: flex; align-items: center; gap: 12px;
+  margin-top: 14px; padding: 12px 14px; border: 1px solid var(--line);
+  border-radius: var(--r); background: var(--surface); box-shadow: var(--shadow-2);
+}
+@media (max-width: 760px) {
+  .uit-row { grid-template-columns: minmax(0, 1fr); }
+  .uit-group__h { position: static; }
+}

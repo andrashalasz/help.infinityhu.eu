@@ -183,6 +183,85 @@
     });
   }
 
+  /* ------------------------------- a kezelofelulet szovegeinek lapja
+     Kereses, szures es a hianyzok gepi forditasa. A forditas KOTEGENKENT
+     megy (kb. 40 szoveg / keres): 600+ szoveg egy keresben tullepne a
+     webkiszolgalo idokorlatjat. A bongeszo hajtja vegig, es kozben mutatja,
+     hol tart - igy nincs idotullepes, es ami elkeszult, az mentve van. */
+  function wireUiTexts() {
+    var search = $('#uit-search'), filter = $('#uit-filter'), countEl = $('#uit-count');
+    var rows = $$('.uit-row');
+    if (!rows.length) { return; }
+
+    function norm(s) {
+      return (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
+    function apply() {
+      var q = norm(search ? search.value.trim() : '');
+      var mode = filter ? filter.value : 'all';
+      var shown = 0;
+      rows.forEach(function (r) {
+        var missing = r.classList.contains('uit-row--missing');
+        var okMode = mode === 'all' || (mode === 'missing' ? missing : !missing);
+        var hay = norm(r.textContent) + ' ' +
+                  $$('input', r).map(function (i) { return norm(i.value); }).join(' ');
+        var okQ = !q || hay.indexOf(q) >= 0;
+        var on = okMode && okQ;
+        r.style.display = on ? '' : 'none';
+        if (on) { shown++; }
+      });
+      // ures csoportot ne mutassunk
+      $$('.uit-group').forEach(function (g) {
+        var any = $$('.uit-row', g).some(function (r) { return r.style.display !== 'none'; });
+        g.style.display = any ? '' : 'none';
+      });
+      if (countEl) { countEl.textContent = shown + ' / ' + rows.length; }
+    }
+    if (search) { search.addEventListener('input', apply); }
+    if (filter) { filter.addEventListener('change', apply); }
+    apply();
+
+    $$('[data-ui-translate]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var lang = btn.getAttribute('data-ui-translate');
+        var label = btn.textContent;
+        var total = 0, done = 0;
+        btn.disabled = true;
+
+        function step() {
+          var fd = new FormData();
+          var csrf = document.querySelector('[name=csrf]');
+          fd.append('csrf', csrf ? csrf.value : '');
+          fd.append('a', 'ui.translate');
+          fd.append('lang', lang);
+          fd.append('fmt', 'json');
+          fetch('admin.php', { method: 'POST', body: fd, credentials: 'same-origin' })
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+              if (!d.ok) {
+                toast(d.error || 'A gépi fordítás megszakadt.', 'err');
+                btn.disabled = false; btn.textContent = label;
+                return;
+              }
+              done += d.done;
+              if (total === 0) { total = d.done + d.left; }
+              btn.textContent = 'Fordítás… ' + done + ' / ' + (total || done);
+              if (d.left > 0) { step(); return; }
+              toast(done + ' szöveg lefordítva. Töltsd újra a lapot.');
+              btn.textContent = 'Kész — töltsd újra';
+              btn.disabled = false;
+              btn.addEventListener('click', function () { location.reload(); }, { once: true });
+            })
+            .catch(function () {
+              toast('A gépi fordítás megszakadt.', 'err');
+              btn.disabled = false; btn.textContent = label;
+            });
+        }
+        step();
+      });
+    });
+  }
+
   function wireConfirmForms() {
     document.addEventListener('submit', function (e) {
       var f = e.target;
@@ -2123,6 +2202,7 @@
 
     wireFlash();
     wireFontSize();
+    wireUiTexts();
     wireConfirmForms();
     wireScopeForms();
     wirePickerFold();

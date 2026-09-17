@@ -1442,6 +1442,74 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             back(['p' => 'settings']);
         }
 
+        // A HIANYZO felulet-szovegek gepi leforditasa. Kezzel 600+ szoveget
+        // nyelvenkent vegigirni nem jarhato ut; a Claude kotegelve viszi.
+        // Amit a felhasznalo mar beirt, ahhoz NEM nyulunk.
+        case 'ui.translate': {
+            if (!auth_is('admin')) { flash('err', t('flash.ui.save.ehhez-adminisztratori-jog')); back(['p' => 'settings']); }
+            $to = strtolower(trim(post('lang')));
+            if (!array_key_exists($to, admin_langs()) || $to === admin_source_lang()) {
+                flash('err', t('Ismeretlen célnyelv.'));
+                back(['p' => 'settings']);
+            }
+
+            $have = [];
+            $q = $db->prepare("SELECT ui_key FROM help_ui WHERE lang = ? AND text <> ''");
+            $q->execute([$to]);
+            foreach ($q->fetchAll(PDO::FETCH_COLUMN) as $k) { $have[$k] = true; }
+
+            $todo = [];
+            foreach (ui_keys_in_use() as $key => $src) {
+                if (!isset($have[$key]) && trim($src) !== '') { $todo[$key] = $src; }
+            }
+            if (!$todo) {
+                if ($wantsJson) { help_json(['ok' => true, 'done' => 0, 'left' => 0]); }
+                flash('ok', t('flash.ui.translate.nincs-mit'));
+                back(['p' => 'settings']);
+            }
+
+            $tr = Translator::fromConfig($cfg, $db);
+            $ins = $db->prepare('INSERT INTO help_ui (lang, ui_key, text) VALUES (?,?,?)
+                                 ON DUPLICATE KEY UPDATE text = VALUES(text)');
+
+            // EGY koteget forditunk kereskent (kb. 12 masodperc). 600+ szoveg
+            // egyben tullepne a webkiszolgalo idokorlatjat, ezert a bongeszo
+            // hajtja vegig: annyiszor kuldi el, ahanyszor kell, es kozben
+            // mutatja, hol tart. Igy nincs idotullepes, es ami elkeszult, az
+            // minden korben mentve van.
+            // meret szerint kotegelunk: nehany hosszu sugoszoveg tullokne a
+            // valasz keretet, es akkor uresen jonne vissza
+            $chunks = mt_ui_chunks($todo);
+            $chunk  = $chunks[0] ?? [];
+            $done  = 0; $err = null;
+            try {
+                $out = $tr->translateUi(array_map(static fn($k) => $todo[$k], $chunk),
+                                        admin_source_lang(), $to);
+                foreach ($chunk as $i => $k) {
+                    $text = trim((string)($out[$i] ?? ''));
+                    if ($text === '') { continue; }
+                    $ins->execute([$to, $k, $text]);
+                    $done++;
+                }
+            } catch (Throwable $e) {
+                $err = $e->getMessage();
+            }
+            $maradt = max(0, count($todo) - $done);
+
+            audit_me($db, 'ui.translate', $to, $done . ' szoveg');
+            if ($wantsJson) {
+                help_json(['ok' => $err === null, 'done' => $done, 'left' => $maradt,
+                           'error' => $err === null ? null : strip_tags($err)], $err === null ? 200 : 500);
+            }
+            if ($done > 0) {
+                flash('ok', t('flash.ui.translate.kesz', ['n' => $done, 'nyelv' => strtoupper($to)]));
+            }
+            if ($err !== null) {
+                flash('err', t('flash.ui.translate.hiba', ['reszlet' => h($err)]));
+            }
+            back(['p' => 'settings']);
+        }
+
         case 'ui.save': {
             if (!auth_is('admin')) { flash('err', t('flash.ui.save.ehhez-adminisztratori-jog')); back(['p' => 'settings']); }
             $known = array_keys(ui_default());

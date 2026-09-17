@@ -17,7 +17,7 @@ function admin_tabs(): array
 }
 
 /** A fulsavon kivul, a fejlec ikonjai kozott elerheto lapok. */
-const ADMIN_ICON_PAGES = ['settings' => 'Beállítások'];
+const ADMIN_ICON_PAGES = ['settings' => 'Beállítások', 'uitexts' => 'A kezelőfelület szövegei'];
 
 /**
  * A sugo nyelvei. UJ NYELVET ITT kell felvenni - a forrasnyelv az elso elem

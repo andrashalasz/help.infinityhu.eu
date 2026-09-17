@@ -114,6 +114,92 @@ final class Translator
     }
 
     /**
+     * A KEZELOFELULET szovegeinek forditasa, kotegelve.
+     *
+     * Mas feladat, mint a fejezetek forditasa: itt rovid gombfeliratok es
+     * mondatok vannak, tobb szaz darab. Egyesevel kuldve tobb szaz keres
+     * lenne, ezert egy hivasban megy 40-50 szoveg, szamozott listaban.
+     *
+     * A {helyorzoket} es a HTML-jelolest valtozatlanul kell hagyni - ezek
+     * nem szoveg, hanem a mondatba beillesztett ertekek.
+     *
+     * @param array<int,string> $texts
+     * @return array<int,string> ugyanannyi elem, ugyanabban a sorrendben
+     */
+    public function translateUi(array $texts, string $from, string $to): array
+    {
+        $texts = array_values($texts);
+        if (!$texts) { return []; }
+        if (!$this->isConfigured()) {
+            throw new RuntimeException(t('Nincs beállítva gépi fordító. Beállítások → Gépi fordítás.'));
+        }
+        // A tobbi szolgaltato nem tud utasitast fogadni, ott marad az
+        // egyesevel valo forditas (ok HTML-toredeket kapnak).
+        if ($this->provider !== 'claude') {
+            $out = [];
+            foreach ($texts as $t) { $out[] = $this->translateHtml($t, $from, $to); }
+            return $out;
+        }
+
+        $langName = ['hu' => 'Hungarian', 'en' => 'English', 'de' => 'German'];
+        $src = $langName[$from] ?? $from;
+        $dst = $langName[$to] ?? $to;
+
+        $system = <<<TXT
+        You translate the user interface of "Infinity Súgó", the help system of a
+        Hungarian business management (ERP) product. Translate from {$src} to {$dst}.
+
+        You receive a JSON array of interface strings. Return ONLY a JSON array of
+        the same length, in the same order, with each string translated.
+
+        Rules you must follow exactly:
+        1. Keep every {placeholder} in curly braces EXACTLY as it is. They are values
+           inserted at runtime (names, counts, URLs) - never translate or reorder them.
+        2. Keep HTML tags (<b>, <br>, <a href="{url}">, <span class="...">) exactly as
+           they are, including attributes. Translate only the text between tags.
+        3. Keep leading and trailing spaces, punctuation and symbols (✕ ⠿ ● ○ ↕ ⊟ + ✎).
+        4. These are BUTTON LABELS, TOOLTIPS and SHORT MESSAGES. Use the wording a
+           native {$dst} software interface would use, not a literal translation.
+        5. Product names stay: Infinity, Infinity Súgó, Word, PDF, Claude, DeepL.
+        6. Return the JSON array and nothing else - no explanation, no code fence.
+        TXT;
+
+        $base = $this->endpoint !== '' ? $this->endpoint : 'https://api.anthropic.com';
+        $res = $this->post($base . '/v1/messages', [
+            'model'         => self::CLAUDE_MODEL,
+            'max_tokens'    => 32000,
+            'output_config' => ['effort' => 'medium'],
+            'system'        => $system,
+            'messages'      => [['role' => 'user',
+                                 'content' => json_encode($texts, JSON_UNESCAPED_UNICODE)]],
+        ], [
+            'content-type: application/json',
+            'x-api-key: ' . $this->key,
+            'anthropic-version: 2023-06-01',
+        ], true, 300);
+
+        $j = json_decode($res, true);
+        if (($j['stop_reason'] ?? '') === 'refusal') {
+            throw new RuntimeException(t('A Claude elutasította a kérést: ')
+                . (string)($j['stop_details']['explanation'] ?? t('nincs indoklás')));
+        }
+        if (($j['stop_reason'] ?? '') === 'max_tokens') {
+            throw new RuntimeException(t('mt.ui.tul.hosszu'));
+        }
+        $txt = trim((string)($j['content'][0]['text'] ?? ''));
+        if ($txt === '') { throw new RuntimeException(t('A Claude üres választ adott.')); }
+
+        // ha kodkeretbe tette volna, leszedjuk
+        $txt = preg_replace('/^```(?:json)?\s*|\s*```$/m', '', $txt);
+        $out = json_decode((string)$txt, true);
+        if (!is_array($out) || count($out) !== count($texts)) {
+            throw new RuntimeException(t('mt.ui.rossz.valasz', ['kert' => count($texts),
+                                                               'kapott' => is_array($out) ? count($out) : 0]));
+        }
+        return array_map(static fn($v): string => (string)$v, $out);
+    }
+
+    /**
      * Forditas Claude-dal (Anthropic Messages API).
      *
      * A tobbi szolgaltatotol elteroen itt UTASITAST adunk, nem csak szoveget:
@@ -368,6 +454,35 @@ function translate_store(
 }
 
 /** Be van-e kapcsolva az automatikus forditas, es van-e mivel forditani? */
+/**
+ * A felulet-szovegek kotegekre bontasa a HOSSZUK szerint.
+ *
+ * Fix darabszammal nem mukodik: a legtobb szoveg ket szo, de akad 240
+ * karakteres sugoszoveg is. Negyven ilyenbol mar akkora keres lesz, hogy a
+ * valasz nem fer a keretbe - es akkor uresen jon vissza.
+ *
+ * @param array<string,string> $todo kulcs => forrasszoveg
+ * @return array<int, array<int,string>> kulcskotegek
+ */
+function mt_ui_chunks(array $todo, int $maxChars = 4000, int $maxItems = 40): array
+{
+    $chunks = [];
+    $cur = [];
+    $len = 0;
+    foreach ($todo as $key => $src) {
+        $l = mb_strlen((string)$src) + 8;          // + a JSON idezojelek, vesszo
+        if ($cur && ($len + $l > $maxChars || count($cur) >= $maxItems)) {
+            $chunks[] = $cur;
+            $cur = [];
+            $len = 0;
+        }
+        $cur[] = $key;
+        $len += $l;
+    }
+    if ($cur) { $chunks[] = $cur; }
+    return $chunks;
+}
+
 function mt_auto_on(PDO $db, array $cfg): bool
 {
     try {

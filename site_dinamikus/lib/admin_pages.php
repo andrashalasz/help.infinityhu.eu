@@ -30,7 +30,7 @@ function page_login(): void
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>Bejelentkezés — Infinity Súgó admin</title>
+<title><?= h(t('Bejelentkezés')) ?> — Infinity Súgó admin</title>
 <meta name="color-scheme" content="light dark">
 <script>(function(){try{var t=localStorage.getItem('help.theme');
   if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
@@ -567,7 +567,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
       <div class="panel" style="margin-bottom:14px">
         <div class="panel__h">
           <h2 style="font-size:calc(12.4px * var(--fs));text-transform:uppercase;letter-spacing:.6px;color:var(--ink-3)">
-            Nyelvenkénti megjelenés</h2>
+            <?= h(t('Nyelvenkénti megjelenés')) ?></h2>
           <span class="sp"></span>
           <form method="post" action="<?= h(admin_url()) ?>" style="display:inline">
             <?= csrf_input() ?>
@@ -629,7 +629,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
           <a class="btn btn--sm<?= $revisions ? '' : ' btn--ghost' ?>" href="#revisions"
              title="<?= $revisions
                  ? t('A fejezet korábbi állapotai — összehasonlítás és visszatöltés') : t('Még nem volt közzététel ezen a fejezeten, ezért nincs korábbi változat') ?>">
-            Változatok<?php if ($revisions): ?> <span class="badge"><?= count($revisions) ?></span><?php endif; ?>
+            <?= h(t('Változatok')) ?><?php if ($revisions): ?> <span class="badge"><?= count($revisions) ?></span><?php endif; ?>
           </a>
           <button class="btn btn--sm btn--danger" type="button" data-modal="del-article"
                   title="<?= h(t('A fejezet a Kukába kerül, ahonnan visszaállítható')) ?>"><?= h(t('Törlés')) ?></button>
@@ -707,7 +707,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
         $cmp = diff_html(help_plain((string)$diffRow['body_html']), help_plain($nowHtml));
         ?>
         <div class="panel" style="margin-top:16px">
-          <div class="panel__h"><h2>Összehasonlítás: <?= (int)$diffRow['rev_no'] ?>. változat → <?= h($nowLabel) ?></h2>
+          <div class="panel__h"><h2><?= h(t('diff.cim', ['n' => (int)$diffRow['rev_no'], 'mihez' => $nowLabel])) ?></h2>
             <span class="sp"></span>
             <a class="btn btn--sm btn--ghost"
                href="<?= h(admin_url(['p' => 'articles', 'lang' => $lang, 'id' => $article['id']])) ?>"><?= h(t('Bezárás')) ?></a>
@@ -721,7 +721,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
                    ]) ?><?php
                 if ((string)$diffRow['note'] !== ''): ?> — „<?= h((string)$diffRow['note']) ?>"<?php endif; ?>.
               <?php if ((string)$diffRow['title'] !== $nowTitle): ?>
-                <br>A cím is változott: „<b><?= h((string)$diffRow['title']) ?></b>" → „<b><?= h($nowTitle) ?></b>"
+                <br><?= t('diff.cim.valtozott', ['regi' => h((string)$diffRow['title']), 'uj' => h($nowTitle)]) ?>
               <?php endif; ?>
             </div>
 
@@ -729,8 +729,8 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
               <div class="msg msg--info" style="margin:0">A két változat szövege <b><?= h(t('szó szerint megegyezik')) ?></b>.</div>
             <?php else: ?>
               <div class="diff-legend">
-                <span><i style="background:var(--ok-soft);color:var(--ok)">+ <?= (int)$cmp['added'] ?> új szó</i></span>
-                <span><i style="background:var(--err-soft);color:var(--err)">− <?= (int)$cmp['removed'] ?> elhagyott szó</i></span>
+                <span><i style="background:var(--ok-soft);color:var(--ok)">+ <?= h(t('diff.uj.szo', ['n' => (int)$cmp['added']])) ?></i></span>
+                <span><i style="background:var(--err-soft);color:var(--err)">− <?= h(t('diff.elhagyott.szo', ['n' => (int)$cmp['removed']])) ?></i></span>
                 <span class="muted"><?= h(t('A zöld a mostaniban van benne, a piros a régiben volt.')) ?></span>
               </div>
               <div class="diff"><?= $cmp['html'] ?></div>
@@ -802,7 +802,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
             <div class="modal__b">
               <p class="lead" style="margin-bottom:14px"><?= t('A vázlat élesítése: ettől kezdve ez látszik a nyilvános oldalon. A korábbi változat megmarad, bármikor visszatölthető.') ?></p>
               <div class="field">
-                <label for="summary">Mi változott? (a Mi újság listába kerül)</label>
+                <label for="summary"><?= h(t('Mi változott? (a Frissítések listába kerül)')) ?></label>
                 <input class="inp" id="summary" name="summary" placeholder="<?= h(t('pl. Frissített képernyőképek a kintlévőség-kezelésnél')) ?>">
                 <div class="hint"><?= h(t('Üresen hagyva nem készül változásnapló-bejegyzés.')) ?></div>
               </div>
@@ -952,7 +952,7 @@ function page_modules(PDO $db, string $lang, array $counts): void
       <?= csrf_input() ?>
       <input type="hidden" name="a" value="module.save">
       <input type="hidden" name="lang" value="<?= h($lang) ?>">
-      <div class="modal__h">Új modul (<?= h(admin_langs()[$lang]) ?>)</div>
+      <div class="modal__h"><?= h(t('Új modul')) ?> (<?= h(admin_langs()[$lang]) ?>)</div>
       <div class="modal__b">
         <div class="row">
  <div class="field inp"><label><?= h(t('Szám')) ?></label><input name="chapter_no" placeholder="18"></div>
