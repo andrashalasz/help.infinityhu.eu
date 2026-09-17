@@ -245,27 +245,51 @@ function page_translate(PDO $db, array $cfg, int $srcId, string $to, array $coun
         }
     }
 
-    // a teljes HU lista a celnyelvi allapottal
-    $rows = $db->prepare("
-        SELECT s.id, s.chapter_no, s.title, s.content_hash, m.title AS module_title, m.chapter_no AS module_no,
-               t.id AS t_id, t.title AS t_title, t.translated_from_hash, t.translated_by,
-               t.draft_html IS NOT NULL AS t_draft, t.is_published AS t_published
+    // A magyar lista, MINDEN celnyelv allapotaval. Korabban egy "Celnyelv"
+    // valaszto dontotte el, melyik nyelvre vonatkoznak a cimkek - de ez
+    // sehol nem latszott, ezert ugy tunt, mintha semmit nem csinalna.
+    // Most nyelvenkent kulon cimke all a sorban.
+    $targetCodes = array_keys(admin_target_langs());
+
+    $rows = $db->query("
+        SELECT s.id, s.chapter_no, s.title, s.slug, s.content_hash,
+               m.title AS module_title, m.chapter_no AS module_no
           FROM help_article s
           LEFT JOIN help_module m ON m.id = s.module_id
-          LEFT JOIN help_article t
-                 ON t.lang = ?
-                AND ((s.chapter_no <> '' AND t.chapter_no = s.chapter_no) OR t.slug = s.slug)
          WHERE s.lang = 'hu'
-      ORDER BY m.sort_order, s.sort_order, s.id");
-    $rows->execute([$to]);
-    $list = $rows->fetchAll();
+      ORDER BY m.sort_order, s.sort_order, s.id")->fetchAll();
 
-    $stateOf = static function (array $r): array {
-        if (!$r['t_id'])                                        { return ['missing', 'badge--err',  'hiányzik']; }
-        if ($r['translated_from_hash'] !== $r['content_hash'])   { return ['stale',   'badge--warn', 'elavult']; }
-        if ($r['t_draft'])                                      { return ['draft',   'badge--info', 'vázlat']; }
+    $tq = $db->prepare("SELECT lang, chapter_no, slug, translated_from_hash,
+                               draft_html IS NOT NULL AS t_draft, is_published
+                          FROM help_article WHERE lang <> 'hu'");
+    $tq->execute();
+    $byNo = [];
+    $bySlug = [];
+    foreach ($tq->fetchAll() as $t) {
+        if ((string)$t['chapter_no'] !== '') { $byNo[$t['lang'] . '|' . $t['chapter_no']] = $t; }
+        $bySlug[$t['lang'] . '|' . $t['slug']] = $t;
+    }
+
+    /** Egy fejezet allapota egy adott celnyelven. */
+    $stateIn = static function (array $r, string $code) use ($byNo, $bySlug): array {
+        $t = $byNo[$code . '|' . $r['chapter_no']] ?? $bySlug[$code . '|' . $r['slug']] ?? null;
+        if (!$t)                                                { return ['missing', 'badge--err',  'hiányzik']; }
+        if ($t['translated_from_hash'] !== $r['content_hash'])   { return ['stale',   'badge--warn', 'elavult']; }
+        if ($t['t_draft'])                                      { return ['draft',   'badge--info', 'vázlat']; }
         return ['ok', 'badge--ok', 'naprakész'];
     };
+
+    /** A fejezet OSSZESITETT allapota: a legrosszabb a celnyelvek kozul. */
+    $stateOf = static function (array $r) use ($stateIn, $targetCodes): array {
+        $rank = ['missing' => 0, 'stale' => 1, 'draft' => 2, 'ok' => 3];
+        $worst = null;
+        foreach ($targetCodes as $c) {
+            $st = $stateIn($r, $c);
+            if ($worst === null || $rank[$st[0]] < $rank[$worst[0]]) { $worst = $st; }
+        }
+        return $worst ?? ['ok', 'badge--ok', 'naprakész'];
+    };
+    $list = $rows;
 
     // allapotonkenti darabszam a szurogombokra
     $stateCount = ['missing' => 0, 'stale' => 0, 'draft' => 0, 'ok' => 0];
@@ -287,14 +311,6 @@ function page_translate(PDO $db, array $cfg, int $srcId, string $to, array $coun
   <?= flash_render() ?>
 
  <div class="panel panel__b" style="margin-bottom:14px"><div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center">
-    <div>
-      <span class="lbl" style="display:inline">A lista állapota eszerint:</span>
-      <?php foreach (array_keys(admin_target_langs()) as $code): ?>
-        <a class="btn btn--sm <?= $to === $code ? 'btn--p' : '' ?>"
-           href="<?= h(admin_url(['p' => 'translate', 'to' => $code, 'st' => $state] + ($srcId ? ['src' => $srcId] : []))) ?>">
-          <?= h(ADMIN_LANGS[$code]) ?></a>
-      <?php endforeach; ?>
-    </div>
     <div>
       <span class="lbl" style="display:inline">Állapot:</span>
       <?php foreach ($STATES as $code => $label): ?>
@@ -331,7 +347,12 @@ function page_translate(PDO $db, array $cfg, int $srcId, string $to, array $coun
           <a class="picker__a<?= (int)$r['id'] === $srcId ? ' on' : '' ?>"
              href="<?= h(admin_url(['p' => 'translate', 'to' => $to, 'st' => $state, 'src' => $r['id']])) ?>">
             <em><?= h($r['chapter_no']) ?></em><span><?= h($r['title']) ?></span>
-            <span class="badge <?= $cls ?>" style="margin-left:auto"><?= h($label) ?></span>
+            <span class="picker__langs">
+              <?php foreach ($targetCodes as $code):
+                  [$st2, $cls2, $lbl2] = $stateIn($r, $code); ?>
+                <span class="badge <?= $cls2 ?>" title="<?= h(ADMIN_LANGS[$code] . ': ' . $lbl2) ?>"><?= h(strtoupper($code)) ?></span>
+              <?php endforeach; ?>
+            </span>
           </a>
         <?php endforeach; ?>
         <?php if (!$list): ?>
