@@ -199,11 +199,23 @@ p.lead { margin: 0 0 18px; color: var(--ink-3); font-size: calc(13.4px * var(--f
 
 /* ---------- fejezetválasztó (bal oldali lista) ---------- */
 .picker { display: flex; flex-direction: column; max-height: calc(100vh - 118px); }
-.picker__f { padding: 10px; border-bottom: 1px solid var(--line-soft); display: flex; gap: 8px; }
+.picker__f { padding: 10px 10px 0; display: flex; gap: 8px; }
+/* A lista gombjai sajat sorban, a szuro alatt, egyenlo reszen osztozva.
+   Egy sorban a szuroval osszeszorultak, es nehez volt eltalalni oket. */
+.picker__tools {
+  display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
+  gap: 6px; padding: 8px 10px 10px; border-bottom: 1px solid var(--line-soft);
+}
+.picker__tools .btn { width: 100%; justify-content: center; }
 .picker__l { overflow-y: auto; padding: 6px; }
+/* Nincs uppercase: ezek valodi fejezetcimek, nem cimkek - csupa nagybetuvel
+   a hosszabbak ("Vezeto Informacios Rendszer") nehezen olvashatok. Ez a
+   szabaly korabban is itt allt, de sosem ervenyesult: a cim <button> volt,
+   arra a bongeszo text-transform: none-t tesz. Amikor a cim link lett, a
+   link viszont OROKOLTE - igy lett a lista fele nagybetus, fele nem. */
 .picker__m {
-  padding: 10px 10px 5px; font-size: calc(12.2px * var(--fs)); font-weight: 800;
-  color: var(--ink-3); text-transform: uppercase; letter-spacing: .5px;
+  padding: 10px 10px 5px; font-size: calc(12.4px * var(--fs)); font-weight: 800;
+  color: var(--ink-2); letter-spacing: .2px;
 }
 .picker__m { display: flex; align-items: center; gap: 6px; }
 .picker__mt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

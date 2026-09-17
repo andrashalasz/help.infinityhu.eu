@@ -402,6 +402,10 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
   <div class="panel picker" id="picker">
     <div class="picker__f">
       <input class="inp" id="pick-filter" placeholder="Szűrés…  (Ctrl+K a kereséshez)" autocomplete="off">
+    </div>
+    <?php // A gombok kulon sorban, a szuro ALATT: egy sorban osszeszorulva
+          // aprok voltak es nehez volt eltalalni oket. ?>
+    <div class="picker__tools">
       <button class="btn btn--sm" type="button" id="pick-foldall" title="Mindent összecsuk / kinyit">⊟</button>
       <button class="btn btn--sm" type="button" id="pick-select" title="Több fejezet kijelölése">☑</button>
       <button class="btn btn--sm" type="button" id="pick-sort" title="Sorrend átrendezése húzással">↕</button>
