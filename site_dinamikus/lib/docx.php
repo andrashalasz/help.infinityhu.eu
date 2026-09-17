@@ -52,14 +52,14 @@ final class DocxParser
     {
         $zip = new ZipArchive();
         if ($zip->open($docxPath) !== true) {
-            throw new RuntimeException('A fájl nem nyitható meg .docx-ként (sérült vagy nem Word-fájl).');
+            throw new RuntimeException(t('A fájl nem nyitható meg .docx-ként (sérült vagy nem Word-fájl).'));
         }
         $this->zip = $zip;
 
         $xml = $zip->getFromName('word/document.xml');
         if ($xml === false) {
             $zip->close();
-            throw new RuntimeException('Hiányzik a word/document.xml – ez nem érvényes .docx fájl.');
+            throw new RuntimeException(t('Hiányzik a word/document.xml – ez nem érvényes .docx fájl.'));
         }
 
         $this->loadRels();
@@ -74,7 +74,7 @@ final class DocxParser
         $body = $doc->getElementsByTagNameNS(self::W, 'body')->item(0);
         if (!$body) {
             $zip->close();
-            throw new RuntimeException('A dokumentum üres.');
+            throw new RuntimeException(t('A dokumentum üres.'));
         }
 
         $modules   = [];

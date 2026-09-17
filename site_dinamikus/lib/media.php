@@ -54,7 +54,7 @@ function media_detect(string $path): string
 function media_store(PDO $db, array $cfg, string $tmpPath, string $originalName, ?int $userId): array
 {
     if (!is_file($tmpPath)) {
-        return ['ok' => false, 'error' => 'A feltöltött fájl nem érhető el.'];
+        return ['ok' => false, 'error' => t('A feltöltött fájl nem érhető el.')];
     }
 
     $dir = media_dir($cfg);
@@ -77,8 +77,7 @@ function media_store(PDO $db, array $cfg, string $tmpPath, string $originalName,
         $ext  = MEDIA_VIDEO_TYPES[$mime];
         $max  = MEDIA_MAX_VIDEO;
     } else {
-        return ['ok' => false, 'error' => 'Nem támogatott fájltípus: ' . $mime
-            . '. Kép: PNG, JPG, GIF, WebP, SVG — videó: MP4, WebM, MOV.'];
+        return ['ok' => false, 'error' => t('media.tipus', ['tipus' => $mime])];
     }
 
     if ($size > $max) {
@@ -88,7 +87,7 @@ function media_store(PDO $db, array $cfg, string $tmpPath, string $originalName,
 
     $sha  = hash_file('sha256', $tmpPath);
     if ($sha === false) {
-        return ['ok' => false, 'error' => 'A fájl nem olvasható.'];
+        return ['ok' => false, 'error' => t('A fájl nem olvasható.')];
     }
     $name   = ($kind === 'video' ? 'vid_' : 'img_') . substr($sha, 0, 12) . '.' . $ext;
     $target = $dir . '/' . $name;
@@ -100,7 +99,7 @@ function media_store(PDO $db, array $cfg, string $tmpPath, string $originalName,
             ? @move_uploaded_file($tmpPath, $target)
             : @copy($tmpPath, $target);
         if (!$moved) {
-            return ['ok' => false, 'error' => 'A fájl mentése nem sikerült.'];
+            return ['ok' => false, 'error' => t('A fájl mentése nem sikerült.')];
         }
         @chmod($target, 0664);
     }
@@ -153,12 +152,12 @@ function media_upload_error(int $code): string
 {
     return match ($code) {
         UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE =>
-            'A fájl nagyobb, mint amennyit a szerver elfogad (upload_max_filesize / post_max_size).',
-        UPLOAD_ERR_PARTIAL    => 'A feltöltés félbeszakadt.',
-        UPLOAD_ERR_NO_FILE    => 'Nem választottál fájlt.',
-        UPLOAD_ERR_NO_TMP_DIR => 'Hiányzik az ideiglenes mappa a szerveren.',
-        UPLOAD_ERR_CANT_WRITE => 'A szerver nem tudta lemezre írni a fájlt.',
-        UPLOAD_ERR_EXTENSION  => 'Egy PHP-kiterjesztés megállította a feltöltést.',
-        default               => 'A feltöltés nem sikerült.',
+            t('A fájl nagyobb, mint amennyit a szerver elfogad (upload_max_filesize / post_max_size).'),
+        UPLOAD_ERR_PARTIAL    => t('A feltöltés félbeszakadt.'),
+        UPLOAD_ERR_NO_FILE    => t('Nem választottál fájlt.'),
+        UPLOAD_ERR_NO_TMP_DIR => t('Hiányzik az ideiglenes mappa a szerveren.'),
+        UPLOAD_ERR_CANT_WRITE => t('A szerver nem tudta lemezre írni a fájlt.'),
+        UPLOAD_ERR_EXTENSION  => t('Egy PHP-kiterjesztés megállította a feltöltést.'),
+        default               => t('A feltöltés nem sikerült.'),
     };
 }

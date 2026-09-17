@@ -85,7 +85,7 @@ final class Translator
             'deepl'  => 'DeepL',
             'libre'  => 'LibreTranslate',
             'google' => 'Google Translate',
-            default  => 'nincs beállítva',
+            default  => t('nincs beállítva'),
         };
     }
 
@@ -102,7 +102,7 @@ final class Translator
     {
         if (trim($html) === '') { return ''; }
         if (!$this->isConfigured()) {
-            throw new RuntimeException('Nincs beállítva gépi fordító. Beállítások → Gépi fordítás.');
+            throw new RuntimeException(t('Nincs beállítva gépi fordító. Beállítások → Gépi fordítás.'));
         }
         return match ($this->provider) {
             'claude' => $this->claude($html, $from, $to),
@@ -176,7 +176,7 @@ final class Translator
         }
         if (($j['stop_reason'] ?? '') === 'refusal') {
             throw new RuntimeException('A Claude elutasította a kérést: '
-                . (string)($j['stop_details']['explanation'] ?? 'nincs indoklás'));
+                . (string)($j['stop_details']['explanation'] ?? t('nincs indoklás')));
         }
         if (!isset($j['content']) || !is_array($j['content'])) {
             throw new RuntimeException('A Claude váratlan választ adott: ' . mb_substr($res, 0, 200));
@@ -192,10 +192,10 @@ final class Translator
 
         if (($j['stop_reason'] ?? '') === 'max_tokens') {
             throw new RuntimeException('A fejezet túl hosszú volt egy menetben — '
-                . 'a fordítás félbeszakadt. Bontsd rövidebb fejezetekre.');
+                . t('a fordítás félbeszakadt. Bontsd rövidebb fejezetekre.'));
         }
         if ($out === '') {
-            throw new RuntimeException('A Claude üres választ adott.');
+            throw new RuntimeException(t('A Claude üres választ adott.'));
         }
 
         // Ha megis kodblokkba tette volna, lehantjuk
@@ -257,7 +257,7 @@ final class Translator
                          int $timeout = 60): string
     {
         if (!function_exists('curl_init')) {
-            throw new RuntimeException('A PHP cURL kiterjesztés hiányzik, enélkül nincs gépi fordítás.');
+            throw new RuntimeException(t('A PHP cURL kiterjesztés hiányzik, enélkül nincs gépi fordítás.'));
         }
         $ch = curl_init($url);
         curl_setopt_array($ch, [

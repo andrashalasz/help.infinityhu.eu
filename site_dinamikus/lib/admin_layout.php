@@ -4,7 +4,7 @@
  */
 declare(strict_types=1);
 
-/** A fulek sorrendje. A feliratuk a forditasbol jon: t('tab.<kulcs>'). */
+/** A fulek sorrendje. A feliratuk a forditasbol jon: 'tab.<kulcs>'. */
 const ADMIN_TAB_KEYS = ['dashboard', 'articles', 'import', 'translate', 'media',
                         'releases', 'export', 'users', 'trash'];
 

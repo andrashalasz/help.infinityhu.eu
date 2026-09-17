@@ -111,9 +111,9 @@ final class DocxExport
             'de' => ['title' => 'Infinity — Benutzerhandbuch', 'toc' => 'Inhaltsverzeichnis',
                      'file' => 'Benutzerhandbuch', 'gen' => 'Erstellt', 'page' => 'Seite',
                      'note' => 'Dieses Dokument wurde aus der Infinity-Hilfedatenbank erzeugt.'],
-            default => ['title' => 'Infinity — Használati útmutató', 'toc' => 'Tartalomjegyzék',
+            default => ['title' => t('Infinity — Használati útmutató'), 'toc' => t('Tartalomjegyzék'),
                         'file' => 'Hasznalati_utmutato', 'gen' => 'Készült', 'page' => 'Oldal',
-                        'note' => 'Ez a dokumentum az Infinity Súgó adatbázisából készült.'],
+                        'note' => t('Ez a dokumentum az Infinity Súgó adatbázisából készült.')],
         };
     }
 
@@ -626,7 +626,7 @@ final class DocxExport
         $path = tempnam(sys_get_temp_dir(), 'helpdoc') . '.docx';
         $zip = new ZipArchive();
         if ($zip->open($path, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
-            throw new RuntimeException('A .docx fájl nem hozható létre.');
+            throw new RuntimeException(t('A .docx fájl nem hozható létre.'));
         }
 
         $types = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
@@ -738,7 +738,7 @@ function export_print_html(PDO $db, array $cfg, string $lang, bool $onlyPublishe
     $L = match ($lang) {
         'en' => ['title' => 'Infinity — User Guide', 'toc' => 'Table of contents', 'gen' => 'Generated'],
         'de' => ['title' => 'Infinity — Benutzerhandbuch', 'toc' => 'Inhaltsverzeichnis', 'gen' => 'Erstellt'],
-        default => ['title' => 'Infinity — Használati útmutató', 'toc' => 'Tartalomjegyzék', 'gen' => 'Készült'],
+        default => ['title' => t('Infinity — Használati útmutató'), 'toc' => t('Tartalomjegyzék'), 'gen' => 'Készült'],
     };
 
     $mods = $db->prepare('SELECT id, chapter_no, title FROM help_module WHERE lang = ? ORDER BY sort_order, id');
@@ -943,7 +943,7 @@ function export_pdf(PDO $db, array $cfg, string $lang, bool $onlyPublished = tru
     if ($bin === null) {
         throw new RuntimeException(
             'Nincs PDF-motor a szerveren. Telepítés: apt-get install -y weasyprint — '
-            . 'addig a „PDF (nyomtatás)" gomb használható, ott a böngésző készíti a PDF-et.');
+            . t('addig a „PDF (nyomtatás)" gomb használható, ott a böngésző készíti a PDF-et.'));
     }
 
     $html = export_print_html($db, $cfg, $lang, $onlyPublished, false, true);
@@ -959,7 +959,7 @@ function export_pdf(PDO $db, array $cfg, string $lang, bool $onlyPublished = tru
 
     $proc = proc_open($cmd, [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes);
     if (!is_resource($proc)) {
-        throw new RuntimeException('A PDF-motor nem indítható el.');
+        throw new RuntimeException(t('A PDF-motor nem indítható el.'));
     }
     fwrite($pipes[0], $html);
     fclose($pipes[0]);

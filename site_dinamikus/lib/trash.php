@@ -70,7 +70,7 @@ function trash_restore(PDO $db, int $trashId): void
     $st->execute([$trashId]);
     $t = $st->fetch();
     if (!$t) {
-        throw new RuntimeException('Nincs ilyen elem a Kukában.');
+        throw new RuntimeException(t('Nincs ilyen elem a Kukában.'));
     }
     if ($t['restored_at'] !== null) {
         throw new RuntimeException('Ezt már visszaállították: ' . $t['label']);

@@ -4,7 +4,7 @@
  *
  * A kod kulcsokat hasznal, nem beegetett magyar szoveget:
  *
- *     t('save')                    ->  "Mentés" / "Save" / "Speichern"
+ *     'save'                    ->  "Mentés" / "Save" / "Speichern"
  *     t('n_chapters', ['n' => 5])  ->  "5 fejezet"
  *
  * Ami nincs leforditva, az MAGYARUL jelenik meg (a kulcs melle irt
@@ -68,7 +68,7 @@ function t(string $key, array $vars = [], string $fallback = ''): string
 /**
  * A kodban ELOFORDULO forditando szovegek jegyzeke.
  *
- * Vegigolvassa a forrasfajlokat, es kigyujti a t('...') hivasok kulcsat.
+ * Vegigolvassa a forrasfajlokat, es kigyujti a '...' hivasok kulcsat.
  * Igy a Beallitasok fuloni forditó tablazat magatol koveti a kodot - nem kell
  * kulon karbantartani egy listat, es nem maradhat le rola uj szoveg.
  *
@@ -98,7 +98,7 @@ function ui_keys_in_use(): array
 /**
  * A forrasnyelvi (magyar) alapszovegek azokhoz a kulcsokhoz, amelyek nem
  * maguk a magyar szoveg (pl. 'tab.articles'). Ami nincs itt, annal a KULCS
- * maga az alapszoveg - igy t('Mentés') forditas nelkul is helyesen jelenik meg.
+ * maga az alapszoveg - igy 'Mentés' forditas nelkul is helyesen jelenik meg.
  */
 function ui_default(string $key = ''): string|array
 {
@@ -157,6 +157,13 @@ function ui_default(string $key = ''): string|array
         'flash.module.quick.kesz' => 'Létrehoztam a(z) <b>{szam}.</b> főfejezetet minden nyelven. '
                                      . '<b>Írd be a nevét</b> a szerkesztő tetején — az lesz a '
                                      . 'főfejezet neve is —, és írd meg, mire való ez a menüpont.',
+
+        // --- osszefuzott uzenetek: a valtozo resz {helyorzoben} all, hogy a
+        //     fordito EGESZ mondatot lasson, ne toredeket ---
+        'media.tipus' => 'Nem támogatott fájltípus: {tipus}. Kép: PNG, JPG, GIF, WebP, SVG '
+                         . '— videó: MP4, WebM, MOV.',
+        'valtozat.mentette' => 'A <b>{n}. változatot</b> {mikor}-kor mentette <b>{ki}</b>',
+        'ismeretlen' => 'ismeretlen',
 
         // --- kozzetetel ---
         'kozzetetel.forditas.marad' => 'A fordítások maradjanak naprakészek',

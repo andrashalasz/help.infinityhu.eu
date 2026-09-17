@@ -720,9 +720,11 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
           </div>
           <div class="panel__b">
             <div class="hint" style="margin-bottom:10px">
-              A <b><?= (int)$diffRow['rev_no'] ?><?= h(t('. változatot')) ?></b>
-              <?= h(substr((string)$diffRow['created_at'], 0, 16)) ?>-kor mentette
-              <b><?= h((string)($diffRow['display_name'] ?: 'ismeretlen')) ?></b><?php
+              <?= t('valtozat.mentette', [
+                     'n'    => (int)$diffRow['rev_no'],
+                     'mikor' => h(substr((string)$diffRow['created_at'], 0, 16)),
+                     'ki'   => h((string)($diffRow['display_name'] ?: t('ismeretlen'))),
+                   ]) ?><?php
                 if ((string)$diffRow['note'] !== ''): ?> — „<?= h((string)$diffRow['note']) ?>"<?php endif; ?>.
               <?php if ((string)$diffRow['title'] !== $nowTitle): ?>
                 <br>A cím is változott: „<b><?= h((string)$diffRow['title']) ?></b>" → „<b><?= h($nowTitle) ?></b>"
@@ -807,8 +809,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
             <input type="hidden" name="id" value="<?= (int)$article['id'] ?>">
             <div class="modal__h"><?= h(t('Közzététel')) ?></div>
             <div class="modal__b">
-              <p class="lead" style="margin-bottom:14px">A vázlat élesítése: ettől kezdve ez látszik a nyilvános oldalon.
-                A korábbi változat megmarad, bármikor visszatölthető.</p>
+              <p class="lead" style="margin-bottom:14px"><?= t('A vázlat élesítése: ettől kezdve ez látszik a nyilvános oldalon. A korábbi változat megmarad, bármikor visszatölthető.') ?></p>
               <div class="field">
                 <label for="summary">Mi változott? (a Mi újság listába kerül)</label>
                 <input class="inp" id="summary" name="summary" placeholder="<?= h(t('pl. Frissített képernyőképek a kintlévőség-kezelésnél')) ?>">
@@ -905,8 +906,7 @@ function page_modules(PDO $db, string $lang, array $counts): void
     ?>
 <div class="page">
   <h1 class="pt"><?= h(t('Modulok')) ?></h1>
-  <p class="lead">A súgó felső szintje. A fejezetek ezekbe vannak besorolva, a sorrend itt állítható.
-    Minden nyelvnek saját modulsora van — az összetartozást a fejezetszám köti össze.</p>
+  <p class="lead"><?= t('A súgó felső szintje. A fejezetek ezekbe vannak besorolva, a sorrend itt állítható. Minden nyelvnek saját modulsora van — az összetartozást a fejezetszám köti össze.') ?></p>
   <?= flash_render() ?>
   <div style="margin-bottom:14px"><?= lang_switch('modules', $lang) ?></div>
 
@@ -914,9 +914,7 @@ function page_modules(PDO $db, string $lang, array $counts): void
  <div class="panel__h"><h2><?= h(admin_langs()[$lang]) ?> modulok</h2><span class="sp"></span>
       <button class="btn btn--p btn--sm" type="button" data-modal="new-module"><?= h(t('+ Új modul')) ?></button></div>
     <div class="panel__b panel__b--flush">
-      <div class="hint" style="padding:10px 16px 0">
-        A sorrendet a sor eleji <b>⠿</b> fogantyúval húzva is átrendezheted — a mentés automatikus.
-      </div>
+      <div class="hint" style="padding:10px 16px 0"><?= t('A sorrendet a sor eleji <b>⠿</b> fogantyúval húzva is átrendezheted — a mentés automatikus.') ?></div>
       <?php foreach ($modules as $m): ?>
         <form method="post" action="<?= h(admin_url()) ?>" id="mf<?= (int)$m['id'] ?>">
           <input type="hidden" name="csrf" value="<?= h(csrf_token()) ?>">

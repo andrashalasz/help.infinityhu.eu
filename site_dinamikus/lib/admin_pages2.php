@@ -506,9 +506,7 @@ function page_screens(PDO $db, array $counts): void
     ?>
 <div class="page">
   <h1 class="pt"><?= h(t('Képernyő → fejezet hozzárendelés')) ?></h1>
-  <p class="lead">
-    Ez mondja meg, hogy az Infinity egy adott képernyőjén a <b>?</b> gomb melyik fejezetet nyissa meg.
-    Az útvonal az Infinity route-ja, például <span class="mono">penzugy/egyenleg/index</span>.
+  <p class="lead"><?= t('Ez mondja meg, hogy az Infinity egy adott képernyőjén a <b>?</b> gomb melyik fejezetet nyissa meg. Az útvonal az Infinity route-ja, például <span class="mono">penzugy/egyenleg/index') ?></span>.
   </p>
   <?= flash_render() ?>
 
@@ -818,11 +816,7 @@ function page_users(PDO $db, array $counts): void
     ?>
 <div class="page">
   <h1 class="pt"><?= h(t('Felhasználók')) ?></h1>
-  <p class="lead">
-    Szerepkörök: <b>admin</b> — mindent; <b>editor</b> — fejezetek, modulok, import, fordítás, képernyők, képek;
-    <b>translator</b> — csak a Fordítás fül. A jelszó cseréje nem kötelező; a Beállítások fülön
-    bármikor elvégezhető.
-  </p>
+  <p class="lead"><?= t('Szerepkörök: <b>admin</b> — mindent; <b>editor</b> — fejezetek, modulok, import, fordítás, képernyők, képek; <b>translator</b> — csak a Fordítás fül. A jelszó cseréje nem kötelező; a Beállítások fülön bármikor elvégezhető.') ?></p>
   <?= flash_render() ?>
 
   <div class="panel" style="margin-bottom:16px">
@@ -1185,8 +1179,7 @@ function page_settings(PDO $db, array $cfg, array $counts): void
           <div class="field" style="flex:0 1 auto;align-self:flex-end">
             <button class="btn btn--p" type="submit"><?= h(t('Nyelv hozzáadása')) ?></button></div>
         </div>
-        <div class="hint">A felvételkor a főfejezetek átmásolódnak az új nyelvre (magyar névvel,
-          amit utána a Fejezetek fülön írhatsz át), hogy legyen hova tenni a fordításokat.</div>
+        <div class="hint"><?= t('A felvételkor a főfejezetek átmásolódnak az új nyelvre (magyar névvel, amit utána a Fejezetek fülön írhatsz át), hogy legyen hova tenni a fordításokat.') ?></div>
       </form>
     </div>
   </div>
@@ -1194,10 +1187,7 @@ function page_settings(PDO $db, array $cfg, array $counts): void
   <div class="panel">
     <div class="panel__h"><h2><?= h(t('Kiadások')) ?></h2></div>
     <div class="panel__b">
-      <p class="lead" style="margin-bottom:14px">
-        A közzétételkor megadott összefoglalók a nyitott kiadásba gyűlnek. A kiadás lezárása dátumot és
-        verziószámot ad nekik, és megnyit egy újat.
-      </p>
+      <p class="lead" style="margin-bottom:14px"><?= t('A közzétételkor megadott összefoglalók a nyitott kiadásba gyűlnek. A kiadás lezárása dátumot és verziószámot ad nekik, és megnyit egy újat.') ?></p>
       <?php if ($release): ?>
         <div class="msg msg--info" style="margin-bottom:14px">
           Nyitott kiadás: <b><?= h($release['version']) ?></b> — <?= $pending ?> bejegyzés vár benne.
@@ -1262,11 +1252,7 @@ function page_trash(PDO $db, array $counts): void
     ?>
 <div class="page" style="max-width:1100px">
   <h1 class="pt"><?= h(t('Kuka')) ?></h1>
-  <p class="lead">
-    A törölt fejezetek és modulok <b>nem vesznek el</b>: teljes tartalmukkal ide kerülnek —
-    a szakaszaikkal, a verziótörténetükkel és a képernyő-hozzárendeléseikkel együtt —, és
-    egy kattintással visszaállíthatók. Véglegesen csak innen törlődnek.
-  </p>
+  <p class="lead"><?= t('A törölt fejezetek és modulok <b>nem vesznek el</b>: teljes tartalmukkal ide kerülnek — a szakaszaikkal, a verziótörténetükkel és a képernyő-hozzárendeléseikkel együtt —, és egy kattintással visszaállíthatók. Véglegesen csak innen törlődnek.') ?></p>
   <?= flash_render() ?>
 
   <div class="panel">
