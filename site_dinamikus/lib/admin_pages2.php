@@ -325,7 +325,7 @@ function page_translate(PDO $db, array $cfg, int $srcId, string $to, array $coun
     <div class="muted">
       Gépi fordító: <b><?= h($tr->label()) ?></b>
       <?php if (!$tr->isConfigured()): ?>
-        — <a href="<?= h(admin_url(['p' => 'settings'])) ?>">' . h(t('beállítás')) . '</a>. Enélkül a kézi fordítás működik.
+        — <a href="<?= h(admin_url(['p' => 'settings'])) ?>"><?= h(t('beállítás')) ?></a>. Enélkül a kézi fordítás működik.
       <?php endif; ?>
     </div>
   </div></div>
@@ -464,7 +464,7 @@ function page_translate(PDO $db, array $cfg, int $srcId, string $to, array $coun
                     <span style="flex:1"></span>
                     <?php if ($d['row']): ?>
                       <a class="btn btn--sm btn--ghost"
-                         href="<?= h(admin_url(['p' => 'articles', 'lang' => $code, 'id' => $d['row']['id']])) ?>">' . h(t('Megnyitás')) . '</a>
+                         href="<?= h(admin_url(['p' => 'articles', 'lang' => $code, 'id' => $d['row']['id']])) ?>"><?= h(t('Megnyitás')) ?></a>
                     <?php endif; ?>
                   </div>
                 </div>

@@ -295,7 +295,7 @@ function page_dashboard(PDO $db, array $cfg, array $counts): void
           <?php if ($release): ?>
             <div class="stat__n" style="font-size:calc(20px * var(--fs))"><?= h($release['version']) ?></div>
             <div class="hint">A közzétételkor megadott összefoglalók ebbe a kiadásba gyűlnek.
-              Lezárni a <a href="<?= h(admin_url(['p' => 'settings'])) ?>">' . h(t('Beállítások')) . '</a> fülön lehet.</div>
+              Lezárni a <a href="<?= h(admin_url(['p' => 'settings'])) ?>"><?= h(t('Beállítások')) ?></a> fülön lehet.</div>
           <?php else: ?>
             <div class="muted"><?= h(t('Nincs nyitott kiadás.')) ?></div>
           <?php endif; ?>
@@ -716,7 +716,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
           <div class="panel__h"><h2>Összehasonlítás: <?= (int)$diffRow['rev_no'] ?>. változat → <?= h($nowLabel) ?></h2>
             <span class="sp"></span>
             <a class="btn btn--sm btn--ghost"
-               href="<?= h(admin_url(['p' => 'articles', 'lang' => $lang, 'id' => $article['id']])) ?>">' . h(t('Bezárás')) . '</a>
+               href="<?= h(admin_url(['p' => 'articles', 'lang' => $lang, 'id' => $article['id']])) ?>"><?= h(t('Bezárás')) ?></a>
           </div>
           <div class="panel__b">
             <div class="hint" style="margin-bottom:10px">
