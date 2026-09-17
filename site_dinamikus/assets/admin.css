@@ -253,7 +253,10 @@ a.picker__mt:hover { text-decoration: none; }
   border: 1px dashed var(--line);
 }
 .picker__miss:hover { color: var(--brand-strong); border-color: var(--brand-ring); }
-.picker__mt--miss { color: var(--ink-3); }
+/* A leiras nelkuli fofejezet UGYANOLYAN szinu, mint a tobbi: hogy nincs
+   leirasa, azt a mellette allo "nincs leiras" jelzes mondja meg. Halvanyra
+   festve ugy nezett ki, mintha minden masodik fofejezet mas szinu lenne. */
+.picker__mt--miss { color: inherit; }
 .picker__mt span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .picker__caret { flex: none; color: var(--ink-3); transition: transform .16s; }
 .picker__m.folded .picker__caret { transform: rotate(-90deg); }

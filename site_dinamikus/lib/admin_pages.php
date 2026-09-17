@@ -471,14 +471,15 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
                     data-confirm-new="<?= h(t('fofejezet.leiras.kerdes', ['nev' => $m['chapter_no'] . ' ' . $m['title']])) ?>"
                     title="<?= h(t('fofejezet.leiras.nincs')) ?>"><?= h(t('nincs leírás')) ?></button>
           <?php endif; ?>
-          <?= visibility_form('module', (int)$m['id'], (bool)$m['is_published'], $lang,
-                              $m['chapter_no'] . ' ' . $m['title']) ?>
-          <a class="picker__madd picker__medit"
-             href="<?= h(admin_url(['p' => 'articles', 'lang' => $lang, 'mod' => $m['id']])) ?>"
-             title="A főfejezet neve, száma, URL-je — mindhárom nyelven">✎</a>
+          <?php // Minden soron ugyanaz a sorrend: +  ✎  szem  ✕ ?>
           <button type="button" class="picker__madd" data-new-in="<?= (int)$m['id'] ?>"
                   data-new-no="<?= h((string)($nextNoByModule[(int)$m['id']] ?? '')) ?>"
                   title="Új fejezet ebbe a főfejezetbe">+</button>
+          <a class="picker__madd picker__medit"
+             href="<?= h(admin_url(['p' => 'articles', 'lang' => $lang, 'mod' => $m['id']])) ?>"
+             title="A főfejezet neve, száma, URL-je — minden nyelven">✎</a>
+          <?= visibility_form('module', (int)$m['id'], (bool)$m['is_published'], $lang,
+                              $m['chapter_no'] . ' ' . $m['title']) ?>
           <form method="post" action="<?= h(admin_url()) ?>" style="display:inline"
                 data-confirm="Törlöd a(z) &quot;<?= h($m['chapter_no'] . ' ' . $m['title']) ?>&quot; főfejezetet? Mind a három nyelven a Kukába kerül, ahonnan visszaállítható. Csak akkor sikerül, ha egyetlen nyelven sincs benne fejezet.">
             <?= csrf_input() ?>
@@ -501,6 +502,11 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
               <?php if (!$a['is_published']): ?><span class="dot dot--hidden" title="Kikapcsolva – nem látszik a nyilvános oldalon"></span><?php endif; ?>
               <?php if ($a['has_draft']): ?><span class="dot dot--draft" title="Van közzétételre váró vázlat"></span><?php endif; ?>
             </a>
+            <?php if ($a['next_sub'] !== ''): ?>
+              <button type="button" class="picker__madd picker__radd"
+                      data-new-in="<?= (int)$m['id'] ?>" data-new-no="<?= h($a['next_sub']) ?>"
+                      title="Alfejezet ide: <?= h($a['next_sub']) ?>">+</button>
+            <?php endif; ?>
             <?= visibility_form('article', (int)$a['id'], (bool)$a['is_published'], $lang,
                                 $a['chapter_no'] . ' ' . $a['title']) ?>
             <form method="post" action="<?= h(admin_url()) ?>" class="picker__delf"
@@ -511,11 +517,6 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
               <button type="submit" class="picker__madd picker__rdel"
                       title="<?= h(t('torles.cim')) ?>">✕</button>
             </form>
-            <?php if ($a['next_sub'] !== ''): ?>
-              <button type="button" class="picker__madd picker__radd"
-                      data-new-in="<?= (int)$m['id'] ?>" data-new-no="<?= h($a['next_sub']) ?>"
-                      title="Alfejezet ide: <?= h($a['next_sub']) ?>">+</button>
-            <?php endif; ?>
           </div>
         <?php endforeach; ?>
         </div>
