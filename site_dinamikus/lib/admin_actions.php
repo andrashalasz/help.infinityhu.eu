@@ -95,12 +95,24 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
 
         case 'article.publish': {
             $id = (int)post('id');
-            $st = $db->prepare('SELECT lang, slug, draft_html FROM help_article WHERE id = ?');
+            $st = $db->prepare('SELECT lang, slug, chapter_no, title, draft_html FROM help_article WHERE id = ?');
             $st->execute([$id]);
             $before = $st->fetch();
             if (!$before || $before['draft_html'] === null) {
                 if ($wantsJson) { help_json(['ok' => false, 'error' => 'Nincs közzétételre váró vázlat.'], 400); }
                 flash('warn', 'Nincs közzétételre váró vázlat ehhez a fejezethez.');
+                back(['p' => 'articles', 'id' => $id]);
+            }
+
+            // Idegen nyelvu fejezet csak akkor mehet ki, ha van benne szoveg.
+            // Ures angol/nemet oldal rosszabb, mint a magyar tartalek, amit a
+            // nyilvanos oldal enelkul is megmutat.
+            if ($before['lang'] !== 'hu' && trim(help_plain((string)$before['draft_html'])) === '') {
+                $msg = 'Ez a(z) ' . strtoupper($before['lang']) . ' változat még nincs lefordítva — '
+                     . 'üresen nem teszem közzé. Írd meg a fordítást, vagy kérj gépi nyersfordítást '
+                     . 'a <b>Fordítás</b> fülön.';
+                if ($wantsJson) { help_json(['ok' => false, 'error' => strip_tags($msg)], 400); }
+                flash('err', $msg);
                 back(['p' => 'articles', 'id' => $id]);
             }
 
@@ -231,10 +243,14 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             $module  = (int)post('module_id');
             $chapter = post('chapter_no');
             $title   = post('title');
-            if ($title === '' || $module === 0) {
-                flash('err', 'Modult és címet is meg kell adni.');
+            if ($module === 0) {
+                flash('err', 'Modult meg kell adni.');
                 back(['p' => 'articles', 'lang' => $lang]);
             }
+            // A "+" gomb cim nelkul hozza letre a fejezetet: a cimet a
+            // szerkesztoben irja be a szerkeszto, ez az elso mezo ott.
+            $untitled = $title === '';
+            if ($untitled) { $title = 'Névtelen fejezet'; }
             // Ha nincs megadva fejezetszam, a modul alatti kovetkezo szabad
             // szamot kapja (pl. az "1 Elso lepesek" modulban 1.4 utan 1.5-ot),
             // es a lista vegere kerul. Igy nem marad szam nelkuli fejezet.
@@ -260,7 +276,9 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                 back(['p' => 'articles', 'lang' => $lang]);
             }
             audit_me($db, 'article.create', 'article:' . $newId, $title);
-            flash('ok', 'Fejezet létrehozva. Írd meg a tartalmát, majd tedd közzé.');
+            flash('ok', $untitled
+                ? 'Fejezet létrehozva — <b>írd be a címét</b> a szerkesztő tetején, majd mentsd a vázlatot.'
+                : 'Fejezet létrehozva. Írd meg a tartalmát, majd tedd közzé.');
             back(['p' => 'articles', 'lang' => $lang, 'id' => $newId]);
         }
 
@@ -337,15 +355,43 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             $n = 0;
 
             switch ($op) {
-                case 'publish-on':
-                case 'publish-off': {
-                    $on = $op === 'publish-on';
-                    $st = $db->prepare("UPDATE help_article SET is_published = ? WHERE id IN ($in)");
-                    $st->execute([$on ? 1 : 0, ...$ids]);
+                case 'publish-on': {
+                    // ures idegen nyelvu fejezetet nem kapcsolunk be
+                    $chk = $db->prepare("SELECT id, lang, title FROM help_article WHERE id IN ($in)");
+                    $chk->execute($ids);
+                    $blocked = [];
+                    $okIds = [];
+                    foreach ($chk->fetchAll() as $row) {
+                        $body = $db->prepare('SELECT COALESCE(draft_html, body_html) FROM help_article WHERE id = ?');
+                        $body->execute([$row['id']]);
+                        if ($row['lang'] !== 'hu' && trim(help_plain((string)$body->fetchColumn())) === '') {
+                            $blocked[] = strtoupper($row['lang']) . ' ' . $row['title'];
+                            continue;
+                        }
+                        $okIds[] = (int)$row['id'];
+                    }
+                    if ($blocked) {
+                        flash('warn', '<b>' . count($blocked) . ' fejezet kimaradt</b>, mert még nincs '
+                            . 'lefordítva: ' . h(implode(', ', array_slice($blocked, 0, 5)))
+                            . (count($blocked) > 5 ? ' …' : ''));
+                    }
+                    if (!$okIds) { break; }
+                    $inOk = implode(',', array_fill(0, count($okIds), '?'));
+                    $st = $db->prepare("UPDATE help_article SET is_published = 1 WHERE id IN ($inOk)");
+                    $st->execute($okIds);
                     $n = $st->rowCount();
-                    audit_me($db, 'articles.bulk', $op, (string)$n);
-                    flash('ok', "<b>{$n} fejezet</b> " . ($on ? 'bekapcsolva' : 'kikapcsolva') . '. '
-                        . undo_button($db, 'articles.bulk', ['op' => $on ? 'publish-off' : 'publish-on',
+                    audit_me($db, 'articles.bulk', 'publish-on', (string)$n);
+                    flash('ok', "<b>{$n} fejezet</b> bekapcsolva.");
+                    break;
+                }
+
+                case 'publish-off': {
+                    $st = $db->prepare("UPDATE help_article SET is_published = 0 WHERE id IN ($in)");
+                    $st->execute($ids);
+                    $n = $st->rowCount();
+                    audit_me($db, 'articles.bulk', 'publish-off', (string)$n);
+                    flash('ok', "<b>{$n} fejezet</b> kikapcsolva. "
+                        . undo_button($db, 'articles.bulk', ['op' => 'publish-on',
                                                              'lang' => $lang, 'ids' => $ids], 'Visszavonom'));
                     break;
                 }
@@ -506,15 +552,37 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                     $db->prepare('UPDATE help_module SET chapter_no = ?, slug = ?, title = ?, sort_order = ? WHERE id = ?')
                        ->execute([mb_substr(post('chapter_no'), 0, 16), mb_substr($slug, 0, 120), mb_substr($title, 0, 255), (int)post('sort_order'), $id]);
                 } else {
-                    $db->prepare('INSERT INTO help_module (chapter_no, slug, title, lang, sort_order) VALUES (?,?,?,?,?)')
-                       ->execute([mb_substr(post('chapter_no'), 0, 16), mb_substr($slug, 0, 120), mb_substr($title, 0, 255), $lang, (int)post('sort_order')]);
+                    // Uj fofejezet: a lista VEGERE kerul, es MINDEN nyelven
+                    // letrejon - kulonben az angol/nemet oldalon nem lenne
+                    // hova tenni a leforditott fejezeteket.
+                    $no = mb_substr(post('chapter_no'), 0, 16);
+                    if ($no === '') {
+                        $no = (string)((int)$db->query(
+                            "SELECT COALESCE(MAX(CAST(chapter_no AS UNSIGNED)), 0) FROM help_module WHERE lang = 'hu'"
+                        )->fetchColumn() + 1);
+                    }
+                    $sort = (int)post('sort_order');
+                    if ($sort === 0) {
+                        $sort = (int)$db->query('SELECT COALESCE(MAX(sort_order), 0) FROM help_module')->fetchColumn() + 10;
+                    }
+
+                    $ins = $db->prepare('INSERT INTO help_module (chapter_no, slug, title, lang, sort_order) VALUES (?,?,?,?,?)');
+                    foreach (array_keys(ADMIN_LANGS) as $l) {
+                        $exists = $db->prepare('SELECT 1 FROM help_module WHERE chapter_no = ? AND lang = ?');
+                        $exists->execute([$no, $l]);
+                        if ($exists->fetchColumn()) { continue; }
+                        $ins->execute([$no, mb_substr($slug, 0, 120), mb_substr($title, 0, 255), $l, $sort]);
+                    }
                 }
             } catch (PDOException $e) {
                 flash('err', 'Mentési hiba: ' . h($e->getMessage()));
                 back(['p' => 'modules', 'lang' => $lang]);
             }
             audit_me($db, 'module.save', 'module:' . ($id ?: 'new'), $title);
-            flash('ok', 'Főfejezet mentve.');
+            flash('ok', $id > 0
+                ? 'Főfejezet mentve.'
+                : 'Főfejezet létrehozva mindhárom nyelven, a lista végén. '
+                  . 'Az angol és német nevét a Modulok fülön írhatod át.');
             // ha a Fejezetek fulrol nyitottak, oda terjunk vissza
             back(['p' => post('from') === 'articles' ? 'articles' : 'modules', 'lang' => $lang]);
         }
@@ -522,21 +590,41 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
         case 'module.delete': {
             $id   = (int)post('id');
             $lang = post('lang', 'hu');
-            $n = $db->prepare('SELECT count(*) FROM help_article WHERE module_id = ?');
-            $n->execute([$id]);
-            if ((int)$n->fetchColumn() > 0) {
-                flash('err', 'Ez a modul még tartalmaz fejezeteket – előbb helyezd át vagy töröld őket.');
-                back(['p' => 'modules', 'lang' => $lang]);
-            }
+
             $m = $db->prepare('SELECT * FROM help_module WHERE id = ?');
             $m->execute([$id]);
             $row = $m->fetch();
-            if (!$row) { flash('err', 'Nincs ilyen modul.'); back(['p' => 'modules', 'lang' => $lang]); }
+            if (!$row) { flash('err', 'Nincs ilyen főfejezet.'); back(['p' => 'modules', 'lang' => $lang]); }
 
-            $tid = trash_module($db, $row, auth_user()['id']);
-            audit_me($db, 'module.delete', 'module:' . $id, $row['title']);
-            flash('ok', 'A modul a <b>Kukába</b> került. '
-                . undo_button($db, 'trash.restore', ['id' => $tid, 'back' => 'modules'], 'Visszaállítom'));
+            // A fofejezet mindharom nyelven letezik ugyanazzal a szammal, es
+            // egyben mozog: kulonben az egyik nyelven torolt fofejezet a
+            // tobbin ottmaradna, es ugy tunne, hogy "nem torol".
+            $sib = $db->prepare('SELECT * FROM help_module WHERE chapter_no = ?');
+            $sib->execute([$row['chapter_no']]);
+            $family = $sib->fetchAll();
+            if (!$family) { $family = [$row]; }
+
+            $ids = array_map(static fn(array $r): int => (int)$r['id'], $family);
+            $in  = implode(',', array_fill(0, count($ids), '?'));
+            $cnt = $db->prepare("SELECT lang, COUNT(*) n FROM help_article
+                                  WHERE module_id IN ($in) GROUP BY lang");
+            $cnt->execute($ids);
+            $byLang = $cnt->fetchAll();
+
+            if ($byLang) {
+                $parts = array_map(
+                    static fn(array $r): string => strtoupper((string)$r['lang']) . ': ' . (int)$r['n'],
+                    $byLang);
+                flash('err', 'Ez a főfejezet még tartalmaz fejezeteket (' . h(implode(', ', $parts))
+                    . ') — előbb helyezd át vagy töröld őket. A többi nyelven is nézd meg.');
+                back(['p' => 'modules', 'lang' => $lang]);
+            }
+
+            $tids = [];
+            foreach ($family as $one) { $tids[] = trash_module($db, $one, auth_user()['id']); }
+            audit_me($db, 'module.delete', 'module:' . $id, $row['title'] . ' (' . count($family) . ' nyelv)');
+            flash('ok', 'A főfejezet mind a(z) <b>' . count($family) . ' nyelven</b> a <b>Kukába</b> került. '
+                . undo_button($db, 'trash.restore-many', ['ids' => $tids, 'back' => 'modules'], 'Visszaállítom'));
             back(['p' => 'modules', 'lang' => $lang]);
         }
 

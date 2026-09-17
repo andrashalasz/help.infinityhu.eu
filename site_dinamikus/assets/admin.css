@@ -223,6 +223,17 @@ p.lead { margin: 0 0 18px; color: var(--ink-3); font-size: calc(13.4px * var(--f
 .dot--stale { background: var(--err); }
 
 /* ---------- szerkesztő ---------- */
+/* --- a fejezet címe közvetlenül a szerkesztő fölött --- */
+.ed-title { margin-bottom: 10px; }
+.ed-title label {
+  display: block; font-size: 12px; font-weight: 600; color: var(--ink-3);
+  margin-bottom: 4px; text-transform: uppercase; letter-spacing: .3px;
+}
+.ed-title__in {
+  width: 100%; height: 40px; font-size: calc(17px * var(--fs)); font-weight: 700;
+  color: var(--ink);
+}
+
 .ed-toolbar {
   display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 6px 8px;
   background: var(--surface-2); border: 1px solid var(--line); border-bottom: 0;

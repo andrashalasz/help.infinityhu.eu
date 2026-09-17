@@ -520,7 +520,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts): void
       <!-- fejezet adatai -->
       <div class="panel" style="margin-bottom:14px">
         <div class="panel__h">
-          <h2><?= h($article['chapter_no']) ?> <?= h($article['title']) ?></h2>
+          <h2><?= h($article['chapter_no']) ?> <span id="ed-title-echo"><?= h($article['title']) ?></span></h2>
           <span class="badge badge--info"><?= h($article['lang']) ?></span>
           <span class="sp"></span>
           <form method="post" action="<?= h(admin_url()) ?>" style="display:inline">
@@ -586,7 +586,12 @@ function page_articles(PDO $db, string $lang, int $id, array $counts): void
         <?= csrf_input() ?>
         <input type="hidden" name="a" value="article.draft">
         <input type="hidden" name="id" value="<?= (int)$article['id'] ?>">
-        <input type="hidden" name="title" value="<?= h((string)($article['draft_title'] ?? $article['title'])) ?>">
+        <div class="ed-title">
+          <label for="ed-title-in">A fejezet címe</label>
+          <input class="inp ed-title__in" id="ed-title-in" name="title" required
+                 placeholder="Írd ide a fejezet címét"
+                 value="<?= h((string)($article['draft_title'] ?? $article['title'])) ?>">
+        </div>
 
         <?php
         // A szerkesztoben hasznalt betu- es kiemeloszinek. A kimenetet a
@@ -1007,9 +1012,9 @@ function page_modules(PDO $db, string $lang, array $counts): void
             <td class="num" data-label="Fejezet"><?= (int)$m['n'] ?></td>
             <td class="nowrap" data-label="">
               <button class="btn btn--sm btn--p" form="mf<?= (int)$m['id'] ?>" type="submit">Mentés</button>
-              <?php if ((int)$m['n'] === 0): ?>
+              <?php if (true): ?>
                 <form method="post" action="<?= h(admin_url()) ?>" style="display:inline"
-                      data-confirm="Biztosan törlöd ezt az üres modult?">
+                      data-confirm="Törlöd ezt a főfejezetet? Mind a három nyelven a Kukába kerül, ahonnan visszaállítható. Csak akkor sikerül, ha egyetlen nyelven sincs benne fejezet.">
                   <?= csrf_input() ?>
                   <input type="hidden" name="a" value="module.delete">
                   <input type="hidden" name="id" value="<?= (int)$m['id'] ?>">

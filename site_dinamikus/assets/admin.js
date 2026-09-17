@@ -196,25 +196,37 @@
 
     // A modul fejlécén levő "+" gomb: megnyitja az Új fejezet ablakot,
     // ERRE a modulra állítva, hogy ne kelljen a legördülőben keresgélni.
-    // A "+" gombok a teljes "Új fejezet" ablakot nyitjak meg, eleve kitoltve:
-    // a modul be van allitva, a fejezetszam pedig a kovetkezo szabad szam
-    // (egy fejezet sora melletti "+" eseten a konkret alfejezet-szam).
+    // A "+" gombok NEM nyitnak ablakot: rogton letrehozzak a fejezetet a
+    // kovetkezo szabad szammal, es a szerkesztoben nyitjak meg, ahol a cim
+    // az elso mezo. Igy egy kattintassal lehet irni kezdeni.
     $$('[data-new-in]').forEach(function (b) {
       b.addEventListener('click', function (e) {
         e.stopPropagation();
         e.preventDefault();
 
-        sel.value = b.getAttribute('data-new-in');
-        syncPlaceholder();
-
+        var moduleId = b.getAttribute('data-new-in');
         var no = b.getAttribute('data-new-no');
-        inp.value = no || (sel.options[sel.selectedIndex]
-                    ? sel.options[sel.selectedIndex].getAttribute('data-next') : '') || '';
+        if (!no) {
+          var opt = sel.querySelector('option[value="' + moduleId + '"]');
+          no = (opt && opt.getAttribute('data-next')) || '';
+        }
 
-        var modal = $('#modal-new-article');
-        if (modal) { modal.classList.add('on'); }
-        var t = modal && modal.querySelector('[name=title]');
-        if (t) { t.value = ''; t.focus(); }
+        b.disabled = true;
+        var f = document.createElement('form');
+        f.method = 'post';
+        f.action = 'admin.php';
+        var csrf = document.querySelector('[name=csrf]');
+        var langEl = document.querySelector('#bulkbar [name=lang]');
+        [['csrf', csrf ? csrf.value : ''], ['a', 'article.create'],
+         ['lang', langEl ? langEl.value : 'hu'], ['module_id', moduleId],
+         ['chapter_no', no], ['title', ''], ['sort_order', '']]
+          .forEach(function (kv) {
+            var i = document.createElement('input');
+            i.type = 'hidden'; i.name = kv[0]; i.value = kv[1];
+            f.appendChild(i);
+          });
+        document.body.appendChild(f);
+        f.submit();
       });
     });
   }
@@ -360,6 +372,56 @@
         syncToSource();
         markDirty();
       });
+    }
+
+    /* ---------- a fejezet címe: azonnal látszik, magától mentődik ---------- */
+    var titleIn = $('#ed-title-in');
+    if (titleIn) {
+      var echo = $('#ed-title-echo');
+      var rowLink = document.querySelector('.picker__a.on span');
+      var titleTimer = null;
+
+      titleIn.addEventListener('input', function () {
+        var v = titleIn.value.trim();
+        // azonnali visszajelzés a fejlécben és a bal oldali listában
+        if (echo) { echo.textContent = v || 'Névtelen fejezet'; }
+        if (rowLink) { rowLink.textContent = v || 'Névtelen fejezet'; }
+        document.title = (v || 'Névtelen fejezet') + ' — Infinity Súgó admin';
+        markDirty();
+
+        // és rövid szünet után el is mentjük, hogy ne vesszen el
+        clearTimeout(titleTimer);
+        titleTimer = setTimeout(saveDraftQuietly, 900);
+      });
+      titleIn.addEventListener('blur', function () {
+        clearTimeout(titleTimer);
+        saveDraftQuietly();
+      });
+      // Enter ne kuldje be az urlapot, csak mentsen
+      titleIn.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); titleIn.blur(); }
+      });
+    }
+
+    /** Vazlat mentese hattérben, oldalujratoltes nelkul. */
+    function saveDraftQuietly() {
+      if (!form) { return; }
+      syncToSource();
+      var fd = new FormData(form);
+      fd.append('fmt', 'json');
+      fetch('admin.php', { method: 'POST', body: fd, credentials: 'same-origin' })
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          var st = $('#ed-state');
+          if (!st) { return; }
+          if (j && j.ok) {
+            delete st.dataset.dirty;
+            st.textContent = 'Mentve ' + (j.saved_at || '') + ' — a vázlat csak a szerkesztőben látszik.';
+          } else if (j && j.error) {
+            toast(j.error, 'err');
+          }
+        })
+        .catch(function () { /* halozati hiba eseten marad a kezi mentes */ });
     }
 
     var renumBtn = $('#ed-renumber');
