@@ -7,7 +7,6 @@ declare(strict_types=1);
 const ADMIN_TABS = [
     'dashboard' => 'Áttekintés',
     'articles'  => 'Fejezetek',
-    'modules'   => 'Modulok',
     'import'    => 'Word import',
     'translate' => 'Fordítás',
     'screens'   => 'Képernyők',
@@ -15,8 +14,10 @@ const ADMIN_TABS = [
     'export'    => 'Export',
     'users'     => 'Felhasználók',
     'trash'     => 'Kuka',
-    'settings'  => 'Beállítások',
 ];
+
+/** A fulsavon kivul, a fejlec ikonjai kozott elerheto lapok. */
+const ADMIN_ICON_PAGES = ['settings' => 'Beállítások'];
 
 /**
  * A sugo nyelvei. UJ NYELVET ITT kell felvenni - a forrasnyelv az elso elem
@@ -108,6 +109,16 @@ function admin_head(string $title, string $page = '', array $counts = []): void
     <span class="ashell__av"><?= h(mb_strtoupper(mb_substr($u['display_name'], 0, 1))) ?></span>
     <span><?= h($u['display_name']) ?> · <?= h($u['role']) ?></span>
   </span>
+  <?php if (auth_can('settings')): ?>
+    <a class="sbtn<?= $page === 'settings' ? ' on' : '' ?>" href="<?= h(admin_url(['p' => 'settings'])) ?>"
+       title="Beállítások">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.14.35.4.64.73.82.29.16.62.24.95.24H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </a>
+  <?php endif; ?>
   <a class="sbtn" href="<?= h(admin_url(['p' => 'account'])) ?>" title="Saját fiók, jelszócsere">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></svg>
   </a>

@@ -575,7 +575,10 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             if (!$ids) { help_json(['ok' => false, 'error' => 'Üres sorrend.'], 400); }
             $db->beginTransaction();
             try {
-                $st = $db->prepare('UPDATE help_module SET sort_order = ? WHERE id = ?');
+                // a sorrend nyelvfuggetlen: a testvereket is allitjuk
+                $st = $db->prepare('UPDATE help_module SET sort_order = ?
+                                     WHERE chapter_no = (SELECT chapter_no FROM (
+                                             SELECT chapter_no FROM help_module WHERE id = ?) AS x)');
                 foreach ($ids as $i => $id) { $st->execute([($i + 1) * 10, $id]); }
                 $db->commit();
             } catch (Throwable $e) {
@@ -633,8 +636,43 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
 
             try {
                 if ($id > 0) {
-                    $db->prepare('UPDATE help_module SET chapter_no = ?, slug = ?, title = ?, sort_order = ? WHERE id = ?')
-                       ->execute([mb_substr(post('chapter_no'), 0, 16), mb_substr($slug, 0, 120), mb_substr($title, 0, 255), (int)post('sort_order'), $id]);
+                    // A szam, az URL es a sorrend MINDEN nyelven egyutt valtozik
+                    // (ez koti ossze a nyelvi valtozatokat), a nev viszont
+                    // nyelvenkent kulon allithato.
+                    $cur = $db->prepare('SELECT chapter_no FROM help_module WHERE id = ?');
+                    $cur->execute([$id]);
+                    $oldNo = (string)$cur->fetchColumn();
+
+                    $no   = mb_substr(post('chapter_no'), 0, 16);
+                    $sort = (int)post('sort_order');
+
+                    $fam = $db->prepare('SELECT id, lang FROM help_module WHERE chapter_no = ?');
+                    $fam->execute([$oldNo]);
+                    $family = $fam->fetchAll();
+
+                    $up = $db->prepare('UPDATE help_module SET chapter_no = ?, slug = ?, title = ?, sort_order = ? WHERE id = ?');
+                    foreach ($family as $one) {
+                        $l = (string)$one['lang'];
+                        $t = post('title_' . $l);
+                        if ($t === '') { $t = (int)$one['id'] === $id ? $title : ''; }
+                        if ($t === '') {
+                            // ezen a nyelven nem adtak nevet: marad a regi
+                            $g = $db->prepare('SELECT title FROM help_module WHERE id = ?');
+                            $g->execute([$one['id']]);
+                            $t = (string)$g->fetchColumn();
+                        }
+                        $up->execute([$no, mb_substr($slug, 0, 120), mb_substr($t, 0, 255), $sort, (int)$one['id']]);
+                    }
+
+                    // a fejezetek szama koveti a fofejezet szamat (5.x -> 6.x)
+                    if ($no !== '' && $oldNo !== '' && $no !== $oldNo) {
+                        $ids = implode(',', array_map(static fn($r) => (int)$r['id'], $family));
+                        $db->prepare("UPDATE help_article
+                                         SET chapter_no = CONCAT(?, SUBSTRING(chapter_no, CHAR_LENGTH(?) + 1))
+                                       WHERE module_id IN ($ids)
+                                         AND chapter_no LIKE CONCAT(?, '.%')")
+                           ->execute([$no, $oldNo, $oldNo]);
+                    }
                 } else {
                     // Uj fofejezet: a lista VEGERE kerul, es MINDEN nyelven
                     // letrejon - kulonben az angol/nemet oldalon nem lenne

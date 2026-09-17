@@ -173,6 +173,10 @@ p.lead { margin: 0 0 18px; color: var(--ink-3); font-size: calc(13.4px * var(--f
 }
 .picker__m:hover .picker__madd { border-color: var(--line); background: var(--surface); }
 .picker__madd:hover { color: var(--brand-strong); border-color: var(--brand-ring); }
+.picker__mgrip { display: none; cursor: grab; color: var(--ink-3); flex: none; }
+.picker--sort .picker__mgrip { display: inline-block; }
+.picker__medit { text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+.picker__medit:hover { text-decoration: none; }
 .picker__mdel { font-size: 12px; }
 .picker__mdel:hover { color: var(--err); border-color: color-mix(in srgb, var(--err) 40%, transparent); }
 

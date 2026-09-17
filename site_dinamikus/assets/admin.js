@@ -1729,10 +1729,24 @@
           sortBtn.classList.toggle('on', on);
           if (hint) {
             hint.hidden = !on;
-            hint.textContent = 'Húzd a ⠿ fogantyút a sorrend átrendezéséhez. Másik modul alá is húzhatod. A mentés automatikus.';
+            hint.textContent = 'Húzd a ⠿ fogantyút: a fejezetek másik főfejezet alá is vihetők, a főfejezetek pedig egymáshoz képest átrendezhetők. A mentés automatikus.';
           }
         });
       }
+      // fofejezetek sorrendje (a fejezetek vele mozognak, mert egy dobozban vannak)
+      var list = $('#pick-list', picker);
+      if (list) {
+        makeSortable(list, '.picker__mod', '.picker__mgrip', function (item, cont) {
+          var ids = $$('.picker__mod', cont).map(function (r) { return r.dataset.id; });
+          post('modules.reorder', { order: ids })
+            .then(function (d) {
+              if (d.ok) { toast('Főfejezetek sorrendje mentve.'); }
+              else { toast('Nem sikerült: ' + (d.error || ''), 'err'); }
+            })
+            .catch(function () { toast('A sorrend mentése nem sikerült.', 'err'); });
+        });
+      }
+
       $$('.picker__group', picker).forEach(function (group) {
         makeSortable(group, '.picker__row', '.picker__grip', function (item, cont) {
           var ids = $$('.picker__row', cont).map(function (r) { return r.dataset.id; });

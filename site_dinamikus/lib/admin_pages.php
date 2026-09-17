@@ -324,8 +324,23 @@ function page_dashboard(PDO $db, array $cfg, array $counts): void
 }
 
 // ============================================================ FEJEZETEK
-function page_articles(PDO $db, string $lang, int $id, array $counts): void
+function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId = 0): void
 {
+    // A fofejezet szerkesztesehez a jobb oldali oszlop a fejezet-szerkeszto
+    // helyett a fofejezet adatlapjat mutatja.
+    $module = null;
+    $moduleFamily = [];
+    if ($modId > 0) {
+        $q = $db->prepare('SELECT * FROM help_module WHERE id = ?');
+        $q->execute([$modId]);
+        $module = $q->fetch() ?: null;
+        if ($module) {
+            $lang = (string)$module['lang'];
+            $f = $db->prepare('SELECT * FROM help_module WHERE chapter_no = ? ORDER BY lang');
+            $f->execute([$module['chapter_no']]);
+            foreach ($f->fetchAll() as $r) { $moduleFamily[(string)$r['lang']] = $r; }
+        }
+    }
     $tree = admin_tree($db, $lang);
 
     $article = null;
@@ -388,14 +403,19 @@ function page_articles(PDO $db, string $lang, int $id, array $counts): void
 
     <div class="picker__l" id="pick-list">
       <?php foreach ($tree as $m): ?>
+        <div class="picker__mod" data-id="<?= (int)$m['id'] ?>">
         <div class="picker__m" data-module="<?= (int)$m['id'] ?>">
           <label class="picker__mchk"><input type="checkbox" class="pick-mod-all" tabindex="-1"></label>
+          <span class="picker__grip picker__mgrip" title="Húzd a főfejezetek sorrendjének átrendezéséhez" aria-hidden="true">⠿</span>
           <button type="button" class="picker__mt" data-fold="<?= (int)$m['id'] ?>"
                   title="Kattints a ki- és összecsukáshoz">
             <svg class="picker__caret" width="12" height="12" viewBox="0 0 24 24" fill="none"
                  stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
             <span><?= h($m['chapter_no']) ?> <?= h($m['title']) ?></span>
           </button>
+          <a class="picker__madd picker__medit"
+             href="<?= h(admin_url(['p' => 'articles', 'lang' => $lang, 'mod' => $m['id']])) ?>"
+             title="A főfejezet neve, száma, URL-je — mindhárom nyelven">✎</a>
           <button type="button" class="picker__madd" data-new-in="<?= (int)$m['id'] ?>"
                   title="Új fejezet ebbe a főfejezetbe">+</button>
           <form method="post" action="<?= h(admin_url()) ?>" style="display:inline"
@@ -428,8 +448,9 @@ function page_articles(PDO $db, string $lang, int $id, array $counts): void
           </div>
         <?php endforeach; ?>
         </div>
+        </div>
       <?php endforeach; ?>
-      <?php if (!$tree): ?><div class="empty">Ezen a nyelven még nincs modul.</div><?php endif; ?>
+      <?php if (!$tree): ?><div class="empty">Ezen a nyelven még nincs főfejezet.</div><?php endif; ?>
     </div>
 
     <!-- tömeges műveletek sávja -->
@@ -461,9 +482,57 @@ function page_articles(PDO $db, string $lang, int $id, array $counts): void
   <div>
     <?= flash_render() ?>
 
-    <?php if (!$article): ?>
+    <?php if ($module): ?>
+      <div class="panel">
+        <div class="panel__h"><h2>Főfejezet: <?= h($module['chapter_no'] . ' ' . $module['title']) ?></h2>
+          <span class="sp"></span>
+          <a class="btn btn--sm btn--ghost" href="<?= h(admin_url(['p' => 'articles', 'lang' => $lang])) ?>">Bezárás</a>
+        </div>
+        <div class="panel__b">
+          <form method="post" action="<?= h(admin_url()) ?>">
+            <?= csrf_input() ?>
+            <input type="hidden" name="a" value="module.save">
+            <input type="hidden" name="id" value="<?= (int)$module['id'] ?>">
+            <input type="hidden" name="lang" value="<?= h($lang) ?>">
+            <input type="hidden" name="from" value="articles">
+
+            <div class="row">
+              <div class="field" style="flex:0 1 120px"><label>Szám</label>
+                <input class="inp" name="chapter_no" value="<?= h($module['chapter_no']) ?>"></div>
+              <div class="field"><label>URL-azonosító</label>
+                <input class="inp mono" name="slug" value="<?= h($module['slug']) ?>"></div>
+              <div class="field" style="flex:0 1 120px"><label>Sorrend</label>
+                <input class="inp" name="sort_order" type="number" value="<?= (int)$module['sort_order'] ?>"></div>
+            </div>
+
+            <div class="lbl" style="margin-top:6px">A főfejezet neve nyelvenként</div>
+            <div class="row">
+              <?php foreach (ADMIN_LANGS as $code => $label):
+                  $one = $moduleFamily[$code] ?? null; ?>
+                <div class="field">
+                  <label><?= h($label) ?> <span class="mono muted"><?= h($code) ?></span></label>
+                  <input class="inp" name="title_<?= h($code) ?>"
+                         value="<?= h($one ? (string)$one['title'] : '') ?>"
+                         <?= $one ? '' : 'placeholder="ezen a nyelven még nincs"' ?>>
+                </div>
+              <?php endforeach; ?>
+            </div>
+            <div class="hint">A számot és az URL-t mindhárom nyelven együtt állítjuk — ez köti össze
+              a nyelvi változatokat. A nevet nyelvenként külön írhatod.</div>
+
+            <div class="btnbar" style="margin-top:12px">
+              <button class="btn btn--p" type="submit">Mentés</button>
+              <span style="flex:1"></span>
+              <span class="muted"><?= (int)$db->query('SELECT COUNT(*) FROM help_article WHERE module_id = ' . (int)$module['id'])->fetchColumn() ?> fejezet ezen a nyelven</span>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    <?php elseif (!$article): ?>
       <div class="panel"><div class="empty">
         Válassz egy fejezetet a bal oldali listából — vagy hozz létre újat a <b>+</b> gombbal.
+        A <b>✎</b> gombbal a főfejezet nevét, számát és URL-jét szerkesztheted, mindhárom nyelven.
       </div></div>
 
     <?php else:

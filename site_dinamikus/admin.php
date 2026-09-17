@@ -157,11 +157,13 @@ if (!auth_can($page) && $page !== 'dashboard') {
 
 switch ($page) {
     case 'articles':
-        page_articles($db, $lang, (int)($_GET['id'] ?? 0), $counts);
+        page_articles($db, $lang, (int)($_GET['id'] ?? 0), $counts, (int)($_GET['mod'] ?? 0));
         break;
     case 'modules':
-        page_modules($db, $lang, $counts);
-        break;
+        // A Modulok ful beolvadt a Fejezetek fulbe: a fofejezetek ott
+        // szerkeszthetok, huzhatok, hozhatok letre es torolhetok.
+        header('Location: ' . admin_url(['p' => 'articles', 'lang' => $lang]), true, 302);
+        exit;
     case 'import':
         page_import($db, $cfg, $lang, (int)($_GET['import'] ?? 0), $counts);
         break;
