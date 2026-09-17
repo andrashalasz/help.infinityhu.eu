@@ -385,14 +385,13 @@ function page_translate(PDO $db, array $cfg, int $srcId, string $to, array $coun
                         <?= $tr->isConfigured() ? '' : 'disabled title="Nincs beállítva gépi fordító"' ?>>
                   Gépi nyersfordítás
                 </button>
-                <form method="post" action="<?= h(admin_url()) ?>" style="display:inline">
-                  <?= csrf_input() ?>
-                  <input type="hidden" name="a" value="translate.auto">
-                  <input type="hidden" name="src_id" value="<?= (int)$src['id'] ?>">
-                  <button class="btn btn--sm" type="submit"
-                          <?= $tr->isConfigured() ? '' : 'disabled title="Nincs beállítva gépi fordító"' ?>
-                          title="Angol és német vázlat egyszerre">EN + DE egyben</button>
-                </form>
+                <?php /* Az urlap a lap aljan all: itt egy masik urlapon BELUL
+                         lennenk, az egymasba agyazott form pedig ervenytelen -
+                         a bongeszo eldobja, es a gomb a kulso urlapot kuldi be.
+                         A form attributum koti ossze a kettot. */ ?>
+                <button class="btn btn--sm" type="submit" form="tr-auto-form"
+                        <?= $tr->isConfigured() ? '' : 'disabled title="Nincs beállítva gépi fordító"' ?>
+                        title="Angol és német vázlat egyszerre">EN + DE egyben</button>
               </div>
               <div class="panel__b">
                 <div class="field"><label>Cím</label>
@@ -425,6 +424,12 @@ function page_translate(PDO $db, array $cfg, int $srcId, string $to, array $coun
             <?php endif; ?>
           </div>
         </form>
+
+<form method="post" action="<?= h(admin_url()) ?>" id="tr-auto-form">
+  <?= csrf_input() ?>
+  <input type="hidden" name="a" value="translate.auto">
+  <input type="hidden" name="src_id" value="<?= (int)$src['id'] ?>">
+</form>
       <?php endif; ?>
     </div>
   </div>

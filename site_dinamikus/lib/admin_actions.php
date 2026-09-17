@@ -996,7 +996,13 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                 flash('err', strtoupper($lang) . ': ' . h($err));
             }
             if (!$r['done'] && !$r['failed']) {
-                flash('warn', 'Nem történt fordítás — csak magyar forrásfejezetet tudok fordítani.');
+                flash('warn', match ($r['why'] ?? '') {
+                    'ures'       => 'Nem történt fordítás — ennek a fejezetnek <b>még nincs tartalma</b>. '
+                                  . 'Írd meg a magyar szöveget, és mentsd legalább vázlatként.',
+                    'nem-magyar' => 'Nem történt fordítás — a forrás csak magyar fejezet lehet.',
+                    'nincs'      => 'Nem történt fordítás — nincs ilyen fejezet.',
+                    default      => 'Nem történt fordítás.',
+                });
             }
             back(['p' => 'translate', 'src' => $srcId]);
         }

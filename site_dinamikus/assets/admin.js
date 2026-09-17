@@ -567,14 +567,20 @@
         pickR = +e.target.dataset.r; pickC = +e.target.dataset.c;
         paintGrid();
       });
+      // Kattintasra ROGTON beszurjuk a tablazatot, ahogy a Word is teszi.
+      // (Korabban a kattintas ugyanazt csinalta, mint a ramutatas, ezert a
+      // meret nem "ragadt meg", es ugy tunt, hogy a gomb nem csinal semmit.)
       grid.addEventListener('click', function (e) {
         if (e.target.tagName !== 'I') { return; }
         pickR = +e.target.dataset.r; pickC = +e.target.dataset.c;
         paintGrid();
+        insertTable();
       });
       paintGrid();
 
-      $('#tbl-insert').addEventListener('click', function () {
+      $('#tbl-insert').addEventListener('click', insertTable);
+
+      function insertTable() {
         var withHead = $('#tbl-new-head').checked;
         var rows = withHead ? Math.max(1, pickR - 1) : pickR;
         var html = '<table class="erp-table tbl--grid">';
@@ -612,7 +618,7 @@
         syncToSource();
         markDirty();
         refreshTableBar();
-      });
+      }
     }
 
     /* ---------- táblázat-eszközök (a kurzor alatti táblára hatnak) ---------- */
@@ -1343,6 +1349,13 @@
         var on = all.filter(function (b) { return b.checked; });
         var chk = $('.pick-mod-all', h);
         if (!chk) { return; }
+        // Ures fofejezetnel a negyzet nem tud mit kijelolni - magatol
+        // visszaugrana, ami ugy nez ki, mintha nem lehetne bepipalni.
+        // Ilyenkor letiltjuk, es az X gombra iranyitunk.
+        chk.disabled = all.length === 0;
+        chk.title = all.length === 0
+          ? 'Ez a főfejezet üres — nincs mit kijelölni. Törléshez használd az ✕ gombot.'
+          : '';
         chk.checked = all.length > 0 && on.length === all.length;
         chk.indeterminate = on.length > 0 && on.length < all.length;
       });

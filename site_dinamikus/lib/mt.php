@@ -389,12 +389,21 @@ function mt_auto_translate(PDO $db, array $cfg, int $srcId, ?int $userId, array 
     $done = []; $failed = [];
     $tr = Translator::fromConfig($cfg, $db);
 
-    $st = $db->prepare("SELECT lang, title, body_html FROM help_article WHERE id = ?");
+    $st = $db->prepare("SELECT lang, title, body_html, draft_html, draft_title
+                          FROM help_article WHERE id = ?");
     $st->execute([$srcId]);
     $src = $st->fetch();
-    if (!$src || $src['lang'] !== 'hu') { return ['done' => [], 'failed' => []]; }
+    if (!$src)                 { return ['done' => [], 'failed' => [], 'why' => 'nincs']; }
+    if ($src['lang'] !== 'hu') { return ['done' => [], 'failed' => [], 'why' => 'nem-magyar']; }
+
+    // A meg kozze nem tett vazlatot is forditjuk: egy frissen megirt fejezetnek
+    // a body_html-je ures, a szoveg a draft_html-ben all.
+    if (trim(help_plain((string)$src['body_html'])) === '' && $src['draft_html'] !== null) {
+        $src['body_html'] = $src['draft_html'];
+        if ((string)($src['draft_title'] ?? '') !== '') { $src['title'] = $src['draft_title']; }
+    }
     if (trim(help_plain((string)$src['body_html'])) === '') {
-        return ['done' => [], 'failed' => []];   // ures fejezetbol nincs mit forditani
+        return ['done' => [], 'failed' => [], 'why' => 'ures'];
     }
 
     foreach ($targets as $to) {
@@ -410,5 +419,5 @@ function mt_auto_translate(PDO $db, array $cfg, int $srcId, ?int $userId, array 
             $failed[$to] = $e->getMessage();
         }
     }
-    return ['done' => $done, 'failed' => $failed];
+    return ['done' => $done, 'failed' => $failed, 'why' => ''];
 }
