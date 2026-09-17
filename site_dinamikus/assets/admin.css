@@ -392,8 +392,10 @@ p.lead { margin: 0 0 18px; color: var(--ink-3); font-size: calc(13.4px * var(--f
 /* --- több célnyelv egymás mellett ---
    Minden hasáb UGYANOLYAN magas, és belül görget. E nélkül a hosszú forrás
    felnyújtotta az egészet, a rövid fordítás mellett pedig üres sáv maradt. */
-.tr-grid--multi {
-  grid-template-columns: repeat(var(--tr-cols, 2), minmax(420px, 1fr));
+.tr-grid.tr-grid--multi {
+  /* A ket nyelv EGYMAS MELLETT marad - ez a lenyege. Ha nincs eleg hely,
+     inkabb oldalra gorget, mint hogy egymas ala ugorjon. */
+  grid-template-columns: repeat(var(--tr-cols, 2), minmax(330px, 1fr));
   align-items: stretch;
   overflow-x: auto;
   padding-bottom: 6px;
@@ -412,9 +414,31 @@ p.lead { margin: 0 0 18px; color: var(--ink-3); font-size: calc(13.4px * var(--f
 /* a forrás marad szem előtt, miközben a fordítást írod */
 .tr-col--src { position: sticky; left: 0; z-index: 2; }
 
-@media (max-width: 1200px) {
-  .tr-grid--multi { grid-template-columns: minmax(0, 1fr); }
+/* Csak telefonon van ertelme egymas ala tenni oket. */
+@media (max-width: 560px) {
+  .tr-grid.tr-grid--multi { grid-template-columns: minmax(0, 1fr); overflow-x: visible; }
   .tr-col--src { position: static; }
+}
+
+/* A forditas lapon ket teljes szerkeszto all egymas mellett, ezert itt a lap
+   a TELJES ablakot hasznalja - az 1600 px-es korlat mashol jo, itt szuk. */
+.page--tr { max-width: none; }
+
+/* A bal lista is keskenyebb, hogy a ket nyelvnek maradjon hely. */
+@media (max-width: 1400px) {
+  .page--tr .page--split { grid-template-columns: 230px minmax(0, 1fr); }
+}
+@media (max-width: 1000px) {
+  .page--tr .page--split { grid-template-columns: minmax(0, 1fr); }
+  .page--tr .picker { max-height: 240px; overflow: auto; }
+}
+
+/* Keskeny hasabban az eszkoztar surubb, hogy ne toltson meg negy sort. */
+@media (max-width: 1300px) {
+  .tr-col .ed-toolbar { gap: 2px; padding: 4px 5px; }
+  .tr-col .ed-toolbar button { min-width: 26px; height: 26px; padding: 0 5px; font-size: 12px; }
+  .tr-col .ed-sel { height: 26px; font-size: 12px; padding: 0 22px 0 6px; }
+  .tr-col .ed-chk { height: 26px; font-size: 11.5px; padding: 0 5px; }
 }
 
 .tr-src {

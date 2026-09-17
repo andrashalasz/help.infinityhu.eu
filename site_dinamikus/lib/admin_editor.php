@@ -199,5 +199,6 @@ function editor_block(string $chapter, string $body): void
 
           <div class="ed-area body" contenteditable="true" spellcheck="true"><?= fix_img_url($body) ?></div>
           <textarea class="ta ed-src" name="body"></textarea>
+        </div>
     <?php
 }

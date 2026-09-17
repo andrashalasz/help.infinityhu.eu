@@ -690,7 +690,6 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
         $edMarks = ['#fff3a3' => 'Sárga', '#d6f2e0' => 'Zöld', '#fde2e2' => 'Piros', '#dceafd' => 'Kék'];
         ?>
         <?php editor_block((string)$article['chapter_no'], $body); ?>
-        </div>
 
         <div class="hint" style="margin-top:6px">
           Képet és videót a <b>Kép</b> / <b>Videó</b> gombbal tölthetsz fel — vagy egyszerűen

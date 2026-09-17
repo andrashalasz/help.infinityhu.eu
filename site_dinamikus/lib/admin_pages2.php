@@ -278,7 +278,7 @@ function page_translate(PDO $db, array $cfg, int $srcId, string $to, array $coun
 
     admin_head('Fordítás', 'translate', $counts);
     ?>
-<div class="page">
+<div class="page page--tr">
   <h1 class="pt">Fordítás</h1>
   <p class="lead">
     A magyar a forrásnyelv. Válaszd ki a fejezetet, és írd meg mellé az idegen nyelvű változatot —
