@@ -391,18 +391,18 @@ function visibility_form(string $what, int $id, bool $on, string $lang, string $
           . '<path d="m3 3 18 18"/><path d="M9.7 9.8a2.6 2.6 0 0 0 3.5 3.6"/></svg>';
 
     $title = $on
-        ? t('lathato.ki', ['nev' => $label], '„{nev}” látszik a nyilvános oldalon — kattints az elrejtéshez')
-        : t('lathato.be', ['nev' => $label], '„{nev}” el van rejtve — kattints a megjelenítéshez');
+        ? t('lathato.ki', ['nev' => $label])
+        : t('lathato.be', ['nev' => $label]);
 
     $ask = $on
-        ? t('lathato.kerdes.ki', ['nev' => $label], 'Elrejted a nyilvános oldalról: „{nev}”?')
-        : t('lathato.kerdes.be', ['nev' => $label], 'Megjelenik a nyilvános oldalon: „{nev}”?');
+        ? t('lathato.kerdes.ki', ['nev' => $label])
+        : t('lathato.kerdes.be', ['nev' => $label]);
 
     ob_start(); ?>
 <form method="post" action="<?= h(admin_url()) ?>" class="picker__eyef" data-scope-ask="<?= h($ask) ?>"
-      data-scope-title="<?= h(t('lathato.cim', [], 'Megjelenés a súgóban')) ?>"
-      data-scope-all="<?= h(t('lathato.mind', [], 'Minden nyelven')) ?>"
-      data-scope-one="<?= h(t('lathato.egy', [], 'Csak ezen a nyelven')) ?>">
+      data-scope-title="<?= h(t('lathato.cim')) ?>"
+      data-scope-all="<?= h(t('lathato.mind')) ?>"
+      data-scope-one="<?= h(t('lathato.egy')) ?>">
   <?= csrf_input() ?>
   <input type="hidden" name="a" value="<?= h($what) ?>.toggle">
   <input type="hidden" name="id" value="<?= (int)$id ?>">
@@ -423,14 +423,12 @@ function visibility_form(string $what, int $id, bool $on, string $lang, string $
 function visibility_flash(bool $on, string $name, string $scope, int $langs, string $lang): string
 {
     $hol = $scope === 'all'
-        ? t('lathato.hol.mind', ['n' => $langs], '<b>{n} nyelven</b>')
-        : t('lathato.hol.egy', ['ny' => mb_strtoupper($lang)], 'csak <b>{ny}</b> nyelven');
+        ? t('lathato.hol.mind', ['n' => $langs])
+        : t('lathato.hol.egy', ['ny' => mb_strtoupper($lang)]);
 
     return $on
-        ? t('lathato.kesz.be', ['nev' => $name, 'hol' => $hol],
-            '„{nev}” mostantól <b>látszik</b> a nyilvános oldalon — {hol}.')
-        : t('lathato.kesz.ki', ['nev' => $name, 'hol' => $hol],
-            '„{nev}” <b>elrejtve</b> a nyilvános oldalról — {hol}. A tartalma megmarad.');
+        ? t('lathato.kesz.be', ['nev' => $name, 'hol' => $hol])
+        : t('lathato.kesz.ki', ['nev' => $name, 'hol' => $hol]);
 }
 
 function admin_setting(PDO $db, string $key, string $default = ''): string

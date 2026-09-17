@@ -86,15 +86,15 @@ function auth_login(PDO $db, string $username, string $password): array
     // Idozites-kiegyenlites: ismeretlen felhasznalonal is futtatunk egy hash-ellenorzest.
     if (!$u) {
         password_verify($password, '$2y$10$usesomesillystringforsalt0000000000000000000000000000000');
-        return ['ok' => false, 'error' => 'Hibás felhasználónév vagy jelszó.'];
+        return ['ok' => false, 'error' => t('auth.rossz-jelszo')];
     }
 
     if (!$u['is_active']) {
-        return ['ok' => false, 'error' => 'Ez a fiók inaktív.'];
+        return ['ok' => false, 'error' => t('auth.inaktiv')];
     }
     if ($u['locked_until'] !== null && strtotime((string)$u['locked_until']) > time()) {
         $mins = max(1, (int)ceil((strtotime((string)$u['locked_until']) - time()) / 60));
-        return ['ok' => false, 'error' => "Túl sok sikertelen próbálkozás. Próbáld újra {$mins} perc múlva."];
+        return ['ok' => false, 'error' => t('auth.zarolva', ['perc' => $mins])];
     }
 
     if (!password_verify($password, $u['password_hash'])) {
@@ -103,7 +103,7 @@ function auth_login(PDO $db, string $username, string $password): array
         $db->prepare("UPDATE help_user SET failed_logins = ?, locked_until = {$lock} WHERE id = ?")
            ->execute([$fails, $u['id']]);
         audit($db, null, $username, 'login.fail', 'user:' . $username, "sikertelen probalkozas #{$fails}");
-        return ['ok' => false, 'error' => 'Hibás felhasználónév vagy jelszó.'];
+        return ['ok' => false, 'error' => t('auth.rossz-jelszo')];
     }
 
     // A bcrypt-koltseg emelese eseten frissitjuk a hasht.
@@ -144,20 +144,20 @@ function auth_logout(): void
 function auth_password_problem(string $pw, string $username = ''): ?string
 {
     if (mb_strlen($pw) < 8) {
-        return 'A jelszó legyen legalább 8 karakter.';
+        return t('auth.pw.rovid');
     }
     if (mb_strlen($pw) > 200) {
-        return 'A jelszó túl hosszú (legfeljebb 200 karakter).';
+        return t('auth.pw.hosszu');
     }
     if ($username !== '' && mb_strtolower($pw) === mb_strtolower($username)) {
-        return 'A jelszó ne egyezzen meg a felhasználónévvel.';
+        return t('auth.pw.azonos-nevvel');
     }
     $weak = ['12345678', '123456789', '1234567890', 'password', 'jelszo123', 'qwertyui', 'admin123', 'infinity'];
     if (in_array(mb_strtolower($pw), $weak, true)) {
-        return 'Ez a jelszó túl könnyen kitalálható, válassz másikat.';
+        return t('auth.pw.gyenge');
     }
     if (!preg_match('/[A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű]/u', $pw) || !preg_match('/\d/', $pw)) {
-        return 'A jelszó tartalmazzon betűt és számot is.';
+        return t('auth.pw.betu-szam');
     }
     return null;
 }

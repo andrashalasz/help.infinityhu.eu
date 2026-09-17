@@ -441,7 +441,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
           <?php if ($intro !== null): ?>
             <a class="picker__mt<?= $article && (int)$intro['id'] === (int)$article['id'] ? ' on' : '' ?>"
                href="<?= h(admin_url(['p' => 'articles', 'lang' => $lang, 'id' => $intro['id']])) ?>"
-               title="<?= h(t('fofejezet.leiras.nyit', [], 'A főfejezet leírása: mire való ez a menüpont')) ?>">
+               title="<?= h(t('fofejezet.leiras.nyit')) ?>">
               <span><?= h($m['chapter_no']) ?> <?= h($m['title']) ?></span>
               <?php if (!$intro['is_published']): ?><span class="dot dot--hidden" title="Kikapcsolva – nem látszik a nyilvános oldalon"></span><?php endif; ?>
               <?php if ($intro['has_draft']): ?><span class="dot dot--draft" title="Van közzétételre váró vázlat"></span><?php endif; ?>
@@ -449,7 +449,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
           <?php else: ?>
             <button type="button" class="picker__mt picker__mt--miss"
                     data-new-in="<?= (int)$m['id'] ?>" data-new-no="<?= h($m['chapter_no']) ?>"
-                    title="<?= h(t('fofejezet.leiras.nincs', [], 'Ehhez a főfejezethez még nincs leírás — kattints, és megírhatod, mire való')) ?>">
+                    title="<?= h(t('fofejezet.leiras.nincs')) ?>">
               <span><?= h($m['chapter_no']) ?> <?= h($m['title']) ?></span>
               <span class="picker__miss"><?= h(t('nincs leírás')) ?></span>
             </button>

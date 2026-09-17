@@ -25,7 +25,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
 
     if (!csrf_check($_POST['csrf'] ?? ($_GET['csrf'] ?? null))) {
         if ($wantsJson) { help_json(['ok' => false, 'error' => 'Lejárt munkamenet – töltsd újra az oldalt.'], 419); }
-        flash('err', 'Lejárt vagy érvénytelen munkamenet – töltsd újra az oldalt, és próbáld meg ismét.');
+        flash('err', t('flash.session.lejart-vagy-ervenytelen-munkamenet'));
         back($action === 'login' ? ['p' => 'login'] : []);
     }
 
@@ -93,11 +93,11 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             $hash = (string)$row->fetchColumn();
 
             if (!password_verify($cur, $hash)) {
-                flash('err', 'A jelenlegi jelszó nem stimmel.');
+                flash('err', t('flash.chpw.jelenlegi-jelszo-stimmel'));
                 back(['p' => 'settings']);
             }
             if ($new !== $new2) {
-                flash('err', 'A két új jelszó nem egyezik.');
+                flash('err', t('flash.chpw.ket-uj-jelszo-egyezik'));
                 back(['p' => 'settings']);
             }
             if (($problem = auth_password_problem($new, $u['username'])) !== null) {
@@ -105,12 +105,12 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                 back(['p' => 'settings']);
             }
             if (password_verify($new, $hash)) {
-                flash('err', 'Az új jelszó nem lehet ugyanaz, mint a régi.');
+                flash('err', t('flash.chpw.uj-jelszo-ugyanaz-mint'));
                 back(['p' => 'settings']);
             }
             auth_set_password($db, (int)$u['id'], $new);
             audit_me($db, 'password.change', 'user:' . $u['username']);
-            flash('ok', 'A jelszó megváltozott.');
+            flash('ok', t('flash.chpw.jelszo-megvaltozott'));
             back(['p' => 'settings']);
         }
 
@@ -162,7 +162,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             audit_me($db, 'article.draft', 'article:' . $id);
 
             if ($wantsJson) { help_json(['ok' => true, 'saved_at' => date('H:i:s'), 'renamed' => $renamed]); }
-            flash('ok', 'Vázlat mentve.');
+            flash('ok', t('flash.article.draft.vazlat-mentve'));
             back(['p' => 'articles', 'id' => $id]);
         }
 
@@ -173,7 +173,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             $before = $st->fetch();
             if (!$before || $before['draft_html'] === null) {
                 if ($wantsJson) { help_json(['ok' => false, 'error' => 'Nincs közzétételre váró vázlat.'], 400); }
-                flash('warn', 'Nincs közzétételre váró vázlat ehhez a fejezethez.');
+                flash('warn', t('flash.article.publish.nincs-kozzetetelre-varo-vazlat'));
                 back(['p' => 'articles', 'id' => $id]);
             }
 
@@ -206,7 +206,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             } catch (Throwable $e) {
                 $db->rollBack();
                 if ($wantsJson) { help_json(['ok' => false, 'error' => $e->getMessage()], 500); }
-                flash('err', 'A közzététel nem sikerült: ' . h($e->getMessage()));
+                flash('err', t('flash.article.publish.hiba', ['reszlet' => h($e->getMessage())]));
                 back(['p' => 'articles', 'id' => $id]);
             }
             audit_me($db, 'article.publish', 'article:' . $id, $summary);
@@ -218,17 +218,18 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             if ($before['lang'] === 'hu' && mt_auto_on($db, $cfg)) {
                 $r = mt_auto_translate($db, $cfg, $id, auth_user()['id']);
                 if ($r['done']) {
-                    $mtMsg = ' Gépi fordítás: <b>' . implode(', ', array_map('strtoupper', $r['done']))
-                           . '</b> vázlat elkészült.';
+                    $mtMsg = ' ' . t('flash.article.publish.mt',
+                        ['nyelvek' => implode(', ', array_map('strtoupper', $r['done']))]);
                 }
                 foreach ($r['failed'] as $l => $err) {
-                    flash('err', 'Gépi fordítás (' . strtoupper($l) . '): ' . h($err));
+                    flash('err', t('flash.article.publish.mt.hiba',
+                                   ['nyelv' => strtoupper($l), 'reszlet' => h($err)]));
                 }
             }
 
             if ($wantsJson) { help_json(['ok' => true]); }
-            flash('ok', 'A fejezet közzétéve — a nyilvános oldalon már ez látszik.' . $mtMsg . ' '
-                . undo_button($db, 'article.unpublish', ['id' => $id], 'Közzététel visszavonása'));
+            flash('ok', t('flash.article.publish.kesz') . $mtMsg . ' '
+                . undo_button($db, 'article.unpublish', ['id' => $id], t('undo.publish')));
             back(['p' => 'articles', 'id' => $id]);
         }
 
@@ -237,7 +238,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             $db->prepare('UPDATE help_article SET draft_html = NULL, draft_title = NULL, draft_by = NULL, draft_at = NULL WHERE id = ?')
                ->execute([$id]);
             audit_me($db, 'article.discard', 'article:' . $id);
-            flash('ok', 'A vázlat eldobva, a közzétett tartalom változatlan.');
+            flash('ok', t('flash.article.discard.vazlat-eldobva-kozzetett-tartalom'));
             back(['p' => 'articles', 'id' => $id]);
         }
 
@@ -322,7 +323,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             $chapter = post('chapter_no');
             $title = post('title');
             if ($title === '') {
-                flash('err', 'A cím nem lehet üres.');
+                flash('err', t('flash.article.meta.cim-ures'));
                 back(['p' => 'articles', 'id' => $id]);
             }
             if ($slug === '') { $slug = help_slug($chapter, $title); }
@@ -341,12 +342,12 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                    ]);
             } catch (PDOException $e) {
                 flash('err', str_contains($e->getMessage(), 'help_article_slug_lang_key')
-                    ? 'Ez az URL-azonosító (slug) már foglalt ezen a nyelven.'
-                    : 'Mentési hiba: ' . h($e->getMessage()));
+                    ? t('flash.slug.foglalt')
+                    : t('flash.mentesi.hiba', ['reszlet' => h($e->getMessage())]));
                 back(['p' => 'articles', 'id' => $id]);
             }
             audit_me($db, 'article.meta', 'article:' . $id);
-            flash('ok', 'A fejezet adatai mentve.');
+            flash('ok', t('flash.article.meta.fejezet-adatai-mentve'));
             back(['p' => 'articles', 'id' => $id]);
         }
 
@@ -356,7 +357,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             $chapter = post('chapter_no');
             $title   = post('title');
             if ($module === 0) {
-                flash('err', 'Modult meg kell adni.');
+                flash('err', t('flash.article.create.modult-adni'));
                 back(['p' => 'articles', 'lang' => $lang]);
             }
             // A "+" gomb cim nelkul hozza letre a fejezetet: a cimet a
@@ -383,14 +384,12 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                 $newId = (int)$db->lastInsertId();
             } catch (PDOException $e) {
                 flash('err', str_contains($e->getMessage(), 'help_article_slug_lang_key')
-                    ? 'Ez az URL-azonosító (slug) már foglalt ezen a nyelven.'
-                    : 'Létrehozási hiba: ' . h($e->getMessage()));
+                    ? t('flash.slug.foglalt')
+                    : t('flash.letrehozasi.hiba', ['reszlet' => h($e->getMessage())]));
                 back(['p' => 'articles', 'lang' => $lang]);
             }
             audit_me($db, 'article.create', 'article:' . $newId, $title);
-            flash('ok', $untitled
-                ? 'Fejezet létrehozva — <b>írd be a címét</b> a szerkesztő tetején, majd mentsd a vázlatot.'
-                : 'Fejezet létrehozva. Írd meg a tartalmát, majd tedd közzé.');
+            flash('ok', t($untitled ? 'flash.article.create.cimtelen' : 'flash.article.create.kesz'));
             back(['p' => 'articles', 'lang' => $lang, 'id' => $newId]);
         }
 
@@ -403,7 +402,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             $st->execute([$id]);
             $a = $st->fetch();
             if (!$a) {
-                flash('err', 'Nincs ilyen fejezet.');
+                flash('err', t('flash.article.delete.nincs-ilyen-fejezet'));
                 back(['p' => 'articles']);
             }
             $family = $siblings($db, $a);
@@ -414,9 +413,10 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             $extra = count($family) > 1
                 ? ' A(z) ' . (count($family) - 1) . ' idegen nyelvű változatával együtt.'
                 : '';
-            flash('ok', 'A fejezet a <b>Kukába</b> került: ' . h($a['chapter_no'] . ' ' . $a['title'])
-                . '.' . $extra . ' '
-                . undo_button($db, 'trash.restore-many', ['ids' => $tids], 'Visszaállítom'));
+            flash('ok', t('flash.article.delete.kesz',
+                          ['nev' => h($a['chapter_no'] . ' ' . $a['title'])])
+                . $extra . ' '
+                . undo_button($db, 'trash.restore-many', ['ids' => $tids], t('undo.restore')));
             back(['p' => 'articles', 'lang' => $a['lang']]);
         }
 
@@ -427,7 +427,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             $st->execute([$id, $rev]);
             $r = $st->fetch();
             if (!$r) {
-                flash('err', 'Nincs ilyen korábbi változat.');
+                flash('err', t('flash.article.restore.nincs-ilyen-korabbi-valtozat'));
                 back(['p' => 'articles', 'id' => $id]);
             }
             $db->prepare('UPDATE help_article SET draft_html = ?, draft_title = ?, draft_by = ?, draft_at = now() WHERE id = ?')
@@ -446,7 +446,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             $ok = (int)$db->query('SELECT @help_ok')->fetchColumn() === 1;
 
             if (!$ok) {
-                flash('warn', 'Ezen a fejezeten még nem volt közzététel, nincs mit visszavonni.');
+                flash('warn', t('flash.article.unpublish.ezen-fejezeten-volt-kozzetetel'));
                 back(['p' => 'articles', 'id' => $id]);
             }
             $b = $db->prepare('SELECT body_html FROM help_article WHERE id = ?');
@@ -454,8 +454,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             sections_rebuild($db, $id, (string)$b->fetchColumn());
 
             audit_me($db, 'article.unpublish', 'article:' . $id);
-            flash('ok', 'A közzététel <b>visszavonva</b> — a nyilvános oldalon ismét az előző '
-                . 'változat látszik. A visszavont szöveg vázlatként megmaradt, nem veszett el.');
+            flash('ok', t('flash.article.unpublish.kesz'));
             back(['p' => 'articles', 'id' => $id]);
         }
 
@@ -466,7 +465,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             $lang = array_key_exists(post('lang'), admin_langs()) ? post('lang') : 'hu';
 
             if (!$ids) {
-                flash('warn', 'Nem jelöltél ki egyetlen fejezetet sem.');
+                flash('warn', t('flash.articles.bulk.jeloltel-ki-egyetlen-fejezetet'));
                 back(['p' => 'articles', 'lang' => $lang]);
             }
             $in = implode(',', array_fill(0, count($ids), '?'));
@@ -489,9 +488,11 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                         $okIds[] = (int)$row['id'];
                     }
                     if ($blocked) {
-                        flash('warn', '<b>' . count($blocked) . ' fejezet kimaradt</b>, mert még nincs '
-                            . 'lefordítva: ' . h(implode(', ', array_slice($blocked, 0, 5)))
-                            . (count($blocked) > 5 ? ' …' : ''));
+                        flash('warn', t('flash.bulk.kimaradt', [
+                            'n'    => count($blocked),
+                            'lista' => h(implode(', ', array_slice($blocked, 0, 5)))
+                                     . (count($blocked) > 5 ? ' …' : ''),
+                        ]));
                     }
                     if (!$okIds) { break; }
                     $inOk = implode(',', array_fill(0, count($okIds), '?'));
@@ -499,7 +500,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                     $st->execute($okIds);
                     $n = $st->rowCount();
                     audit_me($db, 'articles.bulk', 'publish-on', (string)$n);
-                    flash('ok', "<b>{$n} fejezet</b> bekapcsolva.");
+                    flash('ok', t('flash.bulk.bekapcsolva', ['n' => $n]));
                     break;
                 }
 
@@ -508,9 +509,9 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                     $st->execute($ids);
                     $n = $st->rowCount();
                     audit_me($db, 'articles.bulk', 'publish-off', (string)$n);
-                    flash('ok', "<b>{$n} fejezet</b> kikapcsolva. "
+                    flash('ok', t('flash.bulk.kikapcsolva', ['n' => $n]) . ' '
                         . undo_button($db, 'articles.bulk', ['op' => 'publish-on',
-                                                             'lang' => $lang, 'ids' => $ids], 'Visszavonom'));
+                                                             'lang' => $lang, 'ids' => $ids], t('undo.undo')));
                     break;
                 }
 
@@ -535,14 +536,14 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                         }
                     }
                     audit_me($db, 'articles.bulk', 'publish-drafts', (string)$n);
-                    flash('ok', "<b>{$n} fejezet</b> közzétéve.");
+                    flash('ok', t('flash.bulk.kozzeteve', ['n' => $n]));
                     break;
                 }
 
                 case 'move': {
                     $moduleId = (int)post('module_id');
                     if ($moduleId === 0) {
-                        flash('err', 'Válaszd ki, melyik modulba kerüljenek.');
+                        flash('err', t('flash.move.valaszd-ki-melyik-modulba'));
                         back(['p' => 'articles', 'lang' => $lang]);
                     }
                     // az eredeti modulok feljegyzese, hogy a visszavonas is mukodjon
@@ -557,8 +558,8 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                     $tid = trash_put($db, 'move', 'Áthelyezés visszavonása', $lang,
                                      ['articles' => $before], auth_user()['id']);
                     audit_me($db, 'articles.bulk', 'move', "{$n} -> module {$moduleId}");
-                    flash('ok', "<b>{$n} fejezet</b> áthelyezve. "
-                        . undo_button($db, 'trash.restore', ['id' => $tid], 'Visszavonom'));
+                    flash('ok', t('flash.bulk.athelyezve', ['n' => $n]) . ' '
+                        . undo_button($db, 'trash.restore', ['id' => $tid], t('undo.undo')));
                     break;
                 }
 
@@ -576,13 +577,13 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                         }
                     }
                     audit_me($db, 'articles.bulk', 'delete', (string)$n);
-                    flash('ok', "<b>{$n} fejezet</b> a Kukába került. "
-                        . undo_button($db, 'trash.restore-many', ['ids' => $tids], 'Mindet visszaállítom'));
+                    flash('ok', t('flash.bulk.kukaba', ['n' => $n]) . ' '
+                        . undo_button($db, 'trash.restore-many', ['ids' => $tids], t('undo.restore.all')));
                     break;
                 }
 
                 default:
-                    flash('err', 'Ismeretlen művelet.');
+                    flash('err', t('flash.delete.ismeretlen-muvelet'));
             }
             back(['p' => 'articles', 'lang' => $lang]);
         }
@@ -644,7 +645,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                 }
             }
             audit_me($db, 'trash.restore', null, (string)$ok);
-            if ($ok) { flash('ok', "<b>{$ok} elem</b> visszaállítva."); }
+            if ($ok) { flash('ok', t('flash.trash.restore.kesz', ['n' => $ok])); }
             foreach (array_slice($err, 0, 3) as $e) { flash('err', h($e)); }
             back(['p' => (string)($_POST['back'] ?? 'trash')]);
         }
@@ -653,10 +654,10 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             $id = (int)post('id');
             if ($id > 0) {
                 $db->prepare('DELETE FROM help_trash WHERE id = ?')->execute([$id]);
-                flash('ok', 'Véglegesen törölve.');
+                flash('ok', t('flash.trash.purge.veglegesen-torolve'));
             } else {
                 $n = $db->exec('DELETE FROM help_trash WHERE restored_at IS NULL');
-                flash('ok', "A Kuka kiürítve ({$n} elem).");
+                flash('ok', t('flash.trash.purge.mind', ['n' => $n]));
             }
             audit_me($db, 'trash.purge', $id > 0 ? 'trash:' . $id : 'all');
             back(['p' => 'trash']);
@@ -668,7 +669,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             $lang  = array_key_exists(post('lang'), admin_langs()) ? post('lang') : 'hu';
             $title = post('title');
             if ($title === '') {
-                flash('err', 'A főfejezet neve nem lehet üres.');
+                flash('err', t('flash.module.save.fofejezet-neve-ures'));
                 back(['p' => post('from') === 'articles' ? 'articles' : 'modules', 'lang' => $lang]);
             }
             $slug = post('slug') !== '' ? post('slug') : help_slug(post('chapter_no'), $title);
@@ -736,14 +737,11 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                     }
                 }
             } catch (PDOException $e) {
-                flash('err', 'Mentési hiba: ' . h($e->getMessage()));
+                flash('err', t('flash.mentesi.hiba', ['reszlet' => h($e->getMessage())]));
                 back(['p' => 'modules', 'lang' => $lang]);
             }
             audit_me($db, 'module.save', 'module:' . ($id ?: 'new'), $title);
-            flash('ok', $id > 0
-                ? 'Főfejezet mentve.'
-                : 'Főfejezet létrehozva mindhárom nyelven, a lista végén. '
-                  . 'Az angol és német nevét a Modulok fülön írhatod át.');
+            flash('ok', t($id > 0 ? 'flash.module.save.mentve' : 'flash.module.save.uj'));
             // ha a Fejezetek fulrol nyitottak, oda terjunk vissza
             back(['p' => post('from') === 'articles' ? 'articles' : 'modules', 'lang' => $lang]);
         }
@@ -756,7 +754,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             $m->execute([$id]);
             $row = $m->fetch();
             if (!$row) {
-                flash('err', 'Nincs ilyen főfejezet.');
+                flash('err', t('flash.module.delete.nincs-ilyen-fofejezet'));
                 back(['p' => post('from') === 'articles' ? 'articles' : 'modules', 'lang' => $lang]);
             }
 
@@ -779,17 +777,16 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                 $parts = array_map(
                     static fn(array $r): string => strtoupper((string)$r['lang']) . ': ' . (int)$r['n'],
                     $byLang);
-                flash('err', 'Ez a főfejezet még tartalmaz fejezeteket (' . h(implode(', ', $parts))
-                    . ') — előbb helyezd át vagy töröld őket. Figyelj rá, hogy a magyar mellett az '
-                    . 'angol és német változatban is lehetnek fejezetek.');
+                flash('err', t('flash.module.delete.nem-ures',
+                               ['lista' => h(implode(', ', $parts))]));
                 back(['p' => post('from') === 'articles' ? 'articles' : 'modules', 'lang' => $lang]);
             }
 
             $tids = [];
             foreach ($family as $one) { $tids[] = trash_module($db, $one, auth_user()['id']); }
             audit_me($db, 'module.delete', 'module:' . $id, $row['title'] . ' (' . count($family) . ' nyelv)');
-            flash('ok', 'A főfejezet mind a(z) <b>' . count($family) . ' nyelven</b> a <b>Kukába</b> került. '
-                . undo_button($db, 'trash.restore-many', ['ids' => $tids, 'back' => 'modules'], 'Visszaállítom'));
+            flash('ok', t('flash.module.delete.kesz', ['n' => count($family)]) . ' '
+                . undo_button($db, 'trash.restore-many', ['ids' => $tids, 'back' => 'modules'], t('undo.restore')));
             back(['p' => post('from') === 'articles' ? 'articles' : 'modules', 'lang' => $lang]);
         }
 
@@ -807,11 +804,11 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                     UPLOAD_ERR_NO_TMP_DIR=> 'Hiányzik az ideiglenes mappa a szerveren.',
                     UPLOAD_ERR_CANT_WRITE=> 'A szerver nem tudta lemezre írni a fájlt.',
                 ];
-                flash('err', h($codes[$f['error'] ?? UPLOAD_ERR_NO_FILE] ?? 'A feltöltés nem sikerült.'));
+                flash('err', h($codes[$f['error'] ?? UPLOAD_ERR_NO_FILE] ?? t('flash.upload.hiba')));
                 back(['p' => 'import', 'lang' => $lang]);
             }
             if (!preg_match('/\.docx$/i', (string)$f['name'])) {
-                flash('err', 'Csak .docx fájlt tudok beolvasni (a régi .doc formátumot nem).');
+                flash('err', t('flash.import.upload.csak-docx-fajlt-tudok'));
                 back(['p' => 'import', 'lang' => $lang]);
             }
 
@@ -819,15 +816,14 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                 $parser = new DocxParser($cfg['media_dir']);
                 $res = $parser->parse((string)$f['tmp_name']);
             } catch (Throwable $e) {
-                flash('err', 'A Word-fájl feldolgozása nem sikerült: ' . h($e->getMessage()));
+                flash('err', t('flash.import.upload.hiba', ['reszlet' => h($e->getMessage())]));
                 back(['p' => 'import', 'lang' => $lang]);
             }
 
             $chapters = 0;
             foreach ($res['modules'] as $m) { $chapters += count($m['articles']); }
             if ($chapters === 0) {
-                flash('warn', 'A dokumentumban nem találtam fejezeteket. A modulokat 1. szintű, '
-                    . 'a fejezeteket 2. szintű címsorral kell jelölni (Címsor 1 / Címsor 2).');
+                flash('warn', t('flash.import.upload.nincs-fejezet'));
                 back(['p' => 'import', 'lang' => $lang]);
             }
 
@@ -876,8 +872,8 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             $db->commit();
             audit_me($db, 'import.upload', 'import:' . $importId, $f['name'] . " ({$chapters} fejezet)");
 
-            flash('ok', "Beolvasva: <b>{$chapters} fejezet</b>, {$res['images']} új kép. "
-                . 'Nézd át az eltéréseket, és jelöld ki, mit importáljak.');
+            flash('ok', t('flash.import.upload.kesz',
+                          ['n' => $chapters, 'kepek' => (int)$res['images']]));
             back(['p' => 'import', 'lang' => $lang, 'import' => $importId]);
         }
 
@@ -885,7 +881,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             $importId = (int)post('import_id');
             $ids = array_values(array_filter(array_map('intval', (array)($_POST['items'] ?? []))));
             if (!$ids) {
-                flash('warn', 'Nem jelöltél ki egyetlen fejezetet sem.');
+                flash('warn', t('flash.import.apply.jeloltel-ki-egyetlen-fejezetet'));
                 back(['p' => 'import', 'import' => $importId]);
             }
             $publish = isset($_POST['publish_now']);
@@ -984,11 +980,13 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             }
             audit_me($db, 'import.apply', 'import:' . $importId, "{$created} új, {$updated} frissített, {$published} közzétett");
 
-            $msg = "Kész: <b>{$created}</b> új fejezet, <b>{$updated}</b> frissített vázlat";
-            $msg .= $publish ? ", <b>{$published}</b> közzétéve." : '. A vázlatokat a Fejezetek fülön nézheted át és teheted közzé.';
+            $msg  = t('flash.import.apply.kesz', ['uj' => $created, 'frissitett' => $updated]);
+            $msg .= $publish
+                ? t('flash.import.apply.kozzeteve', ['n' => $published])
+                : t('flash.import.apply.vazlatok');
             if ($autoOk || $autoFail) {
-                $msg .= " Gépi fordítás: <b>{$autoOk}</b> nyelvi változat elkészült"
-                      . ($autoFail ? ", {$autoFail} nem sikerült." : '.');
+                $msg .= ' ' . t('flash.import.apply.mt', ['n' => $autoOk])
+                      . ($autoFail ? ' ' . t('flash.import.apply.mt.hiba', ['n' => $autoFail]) : '.');
             }
             flash($errors ? 'warn' : 'ok', $msg);
             foreach (array_slice($errors, 0, 5) as $e) { flash('err', h($e)); }
@@ -999,7 +997,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             $importId = (int)post('import_id');
             $db->prepare('DELETE FROM help_import WHERE id = ?')->execute([$importId]);
             audit_me($db, 'import.discard', 'import:' . $importId);
-            flash('ok', 'Az import eldobva. (A fejezetek érintetlenek maradtak.)');
+            flash('ok', t('flash.import.discard.import-eldobva-fejezetek-erintetlenek'));
             back(['p' => 'import']);
         }
 
@@ -1052,12 +1050,12 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                 $db->commit();
             } catch (Throwable $e) {
                 if ($db->inTransaction()) { $db->rollBack(); }
-                flash('err', 'A fordítás mentése nem sikerült: ' . h($e->getMessage()));
+                flash('err', t('flash.translate.save.hiba', ['reszlet' => h($e->getMessage())]));
                 back(['p' => 'translate', 'src' => $srcId, 'to' => $to]);
             }
 
             audit_me($db, 'translate.save', 'article:' . $srcId, 'hu->' . $to . ($publishNow ? ' + közzététel' : ''));
-            flash('ok', $publishNow ? 'A fordítás mentve és közzétéve.' : 'A fordítás vázlatként mentve.');
+            flash('ok', t($publishNow ? 'flash.translate.save.kozzeteve' : 'flash.translate.save.vazlat'));
             back(['p' => 'translate', 'src' => $srcId, 'to' => $to]);
         }
 
@@ -1066,20 +1064,20 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             $srcId = (int)post('src_id');
             $r = mt_auto_translate($db, $cfg, $srcId, auth_user()['id']);
             if ($r['done']) {
-                flash('ok', 'Gépi fordítás kész: <b>' . implode(', ', array_map('strtoupper', $r['done']))
-                    . '</b> — vázlatként mentve, nézd át és tedd közzé.');
+                flash('ok', t('flash.translate.auto.kesz',
+                              ['nyelvek' => implode(', ', array_map('strtoupper', $r['done']))]));
             }
             foreach ($r['failed'] as $lang => $err) {
-                flash('err', strtoupper($lang) . ': ' . h($err));
+                flash('err', t('flash.translate.auto.hiba',
+                               ['nyelv' => strtoupper($lang), 'reszlet' => h($err)]));
             }
             if (!$r['done'] && !$r['failed']) {
-                flash('warn', match ($r['why'] ?? '') {
-                    'ures'       => 'Nem történt fordítás — ennek a fejezetnek <b>még nincs tartalma</b>. '
-                                  . 'Írd meg a magyar szöveget, és mentsd legalább vázlatként.',
-                    'nem-magyar' => 'Nem történt fordítás — a forrás csak magyar fejezet lehet.',
-                    'nincs'      => 'Nem történt fordítás — nincs ilyen fejezet.',
-                    default      => 'Nem történt fordítás.',
-                });
+                flash('warn', t(match ($r['why'] ?? '') {
+                    'ures'       => 'flash.translate.auto.ures',
+                    'nem-magyar' => 'flash.translate.auto.nem-forras',
+                    'nincs'      => 'flash.translate.auto.nincs',
+                    default      => 'flash.translate.auto.semmi',
+                }));
             }
             back(['p' => 'translate', 'src' => $srcId]);
         }
@@ -1090,7 +1088,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             $route = post('route');
             $articleId = (int)post('article_id');
             if ($route === '' || $articleId === 0) {
-                flash('err', 'Az útvonalat és a fejezetet is meg kell adni.');
+                flash('err', t('flash.screen.save.utvonalat-fejezetet-is-adni'));
                 back(['p' => 'screens']);
             }
             try {
@@ -1103,19 +1101,19 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                 }
             } catch (PDOException $e) {
                 flash('err', str_contains($e->getMessage(), 'help_screen_map_route_key')
-                    ? 'Ehhez az útvonalhoz már tartozik fejezet.'
-                    : 'Mentési hiba: ' . h($e->getMessage()));
+                    ? t('flash.screen.save.foglalt')
+                    : t('flash.mentesi.hiba', ['reszlet' => h($e->getMessage())]));
                 back(['p' => 'screens']);
             }
             audit_me($db, 'screen.save', 'route:' . $route);
-            flash('ok', 'Hozzárendelés mentve.');
+            flash('ok', t('flash.screen.save.hozzarendeles-mentve'));
             back(['p' => 'screens']);
         }
 
         case 'screen.delete': {
             $db->prepare('DELETE FROM help_screen_map WHERE id = ?')->execute([(int)post('id')]);
             audit_me($db, 'screen.delete', 'screen:' . post('id'));
-            flash('ok', 'Hozzárendelés törölve.');
+            flash('ok', t('flash.screen.delete.hozzarendeles-torolve'));
             back(['p' => 'screens']);
         }
 
@@ -1123,7 +1121,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
         case 'media.upload': {
             $files = $_FILES['files'] ?? ($_FILES['images'] ?? null);
             if (!is_array($files) || !isset($files['tmp_name'])) {
-                flash('err', 'Nem választottál fájlt.');
+                flash('err', t('flash.media.upload.valasztottal-fajlt'));
                 back(['p' => 'media']);
             }
             $ok = 0; $skipped = 0; $problems = [];
@@ -1137,7 +1135,8 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                 if ($r['ok']) { $ok++; } else { $skipped++; $problems[] = $files['name'][$i] . ': ' . $r['error']; }
             }
             audit_me($db, 'media.upload', null, "{$ok} fajl");
-            flash($ok ? 'ok' : 'err', "Feltöltve: <b>{$ok}</b> fájl." . ($skipped ? " Kihagyva: {$skipped}." : ''));
+            flash($ok ? 'ok' : 'err', t('flash.media.upload.kesz', ['n' => $ok])
+                . ($skipped ? ' ' . t('flash.media.upload.kihagyva', ['n' => $skipped]) : ''));
             foreach (array_slice($problems, 0, 4) as $pr) { flash('warn', h($pr)); }
             back(['p' => 'media']);
         }
@@ -1168,26 +1167,26 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
         case 'media.delete': {
             $name = post('filename');
             if (!preg_match('/^(img|vid)_[0-9a-f]{12}\.[a-z0-9]{2,5}$/', $name)) {
-                flash('err', 'Érvénytelen fájlnév.');
+                flash('err', t('flash.media.delete.ervenytelen-fajlnev'));
                 back(['p' => 'media']);
             }
             $used = $db->prepare("SELECT count(*) FROM help_article
                                    WHERE body_html LIKE ? OR coalesce(draft_html, '') LIKE ?");
             $used->execute(['%' . $name . '%', '%' . $name . '%']);
             if ((int)$used->fetchColumn() > 0) {
-                flash('err', 'Ezt a fájlt még használja legalább egy fejezet, ezért nem töröltem.');
+                flash('err', t('flash.media.delete.fajlt-hasznalja-legalabb-fejezet'));
                 back(['p' => 'media']);
             }
             @unlink(media_dir($cfg) . '/' . $name);
             $db->prepare('DELETE FROM help_media WHERE filename = ?')->execute([$name]);
             audit_me($db, 'media.delete', $name);
-            flash('ok', 'A fájl törölve.');
+            flash('ok', t('flash.media.delete.fajl-torolve'));
             back(['p' => 'media']);
         }
 
         // ================================================== felhasználók
         case 'user.save': {
-            if (!auth_is('admin')) { flash('err', 'Ehhez adminisztrátori jog kell.'); back(['p' => 'users']); }
+            if (!auth_is('admin')) { flash('err', t('flash.user.save.ehhez-adminisztratori-jog')); back(['p' => 'users']); }
             $id = (int)post('id');
             $username = post('username');
             $role = in_array(post('role'), HELP_ROLES, true) ? post('role') : 'editor';
@@ -1196,10 +1195,10 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                 $db->prepare('UPDATE help_user SET display_name = ?, email = ?, role = ?, is_active = ? WHERE id = ?')
                    ->execute([post('display_name'), post('email') ?: null, $role, isset($_POST['is_active']) ? 1 : 0, $id]);
                 audit_me($db, 'user.update', 'user:' . $id);
-                flash('ok', 'A felhasználó adatai mentve.');
+                flash('ok', t('flash.user.save.felhasznalo-adatai-mentve'));
             } else {
                 $pw = (string)($_POST['password'] ?? '');
-                if ($username === '') { flash('err', 'A felhasználónév kötelező.'); back(['p' => 'users']); }
+                if ($username === '') { flash('err', t('flash.user.save.felhasznalonev-kotelezo')); back(['p' => 'users']); }
                 if (($problem = auth_password_problem($pw, $username)) !== null) { flash('err', h($problem)); back(['p' => 'users']); }
                 try {
                     $db->prepare('INSERT INTO help_user (username, password_hash, display_name, email, role, must_change_pw)
@@ -1207,17 +1206,17 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                        ->execute([$username, password_hash($pw, PASSWORD_BCRYPT, ['cost' => 10]),
                                   post('display_name') ?: $username, post('email') ?: null, $role]);
                 } catch (PDOException $e) {
-                    flash('err', 'Ez a felhasználónév már foglalt.');
+                    flash('err', t('flash.user.save.felhasznalonev-foglalt'));
                     back(['p' => 'users']);
                 }
                 audit_me($db, 'user.create', 'user:' . $username, $role);
-                flash('ok', 'Felhasználó létrehozva. Az első belépéskor jelszót kell cserélnie.');
+                flash('ok', t('flash.user.save.felhasznalo-letrehozva-elso-belepeskor'));
             }
             back(['p' => 'users']);
         }
 
         case 'user.resetpw': {
-            if (!auth_is('admin')) { flash('err', 'Ehhez adminisztrátori jog kell.'); back(['p' => 'users']); }
+            if (!auth_is('admin')) { flash('err', t('flash.user.resetpw.ehhez-adminisztratori-jog')); back(['p' => 'users']); }
             $id = (int)post('id');
             $pw = (string)($_POST['password'] ?? '');
             $un = $db->prepare('SELECT username FROM help_user WHERE id = ?');
@@ -1228,27 +1227,27 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             $db->prepare('UPDATE help_user SET password_hash = ?, must_change_pw = true, failed_logins = 0, locked_until = NULL WHERE id = ?')
                ->execute([password_hash($pw, PASSWORD_BCRYPT, ['cost' => 10]), $id]);
             audit_me($db, 'user.resetpw', 'user:' . $username);
-            flash('ok', "A(z) {$username} jelszava beállítva. Első belépéskor cserélnie kell.");
+            flash('ok', t('flash.user.resetpw.kesz', ['nev' => h($username)]));
             back(['p' => 'users']);
         }
 
         case 'user.delete': {
-            if (!auth_is('admin')) { flash('err', 'Ehhez adminisztrátori jog kell.'); back(['p' => 'users']); }
+            if (!auth_is('admin')) { flash('err', t('flash.user.delete.ehhez-adminisztratori-jog')); back(['p' => 'users']); }
             $id = (int)post('id');
             if ($id === (int)auth_user()['id']) {
-                flash('err', 'Saját magadat nem törölheted.');
+                flash('err', t('flash.user.delete.sajat-magadat-torolheted'));
                 back(['p' => 'users']);
             }
             $n = (int)$db->query("SELECT COUNT(*) FROM help_user WHERE role = 'admin' AND is_active = 1")->fetchColumn();
             $r = $db->prepare('SELECT role FROM help_user WHERE id = ?');
             $r->execute([$id]);
             if ($r->fetchColumn() === 'admin' && $n <= 1) {
-                flash('err', 'Az utolsó adminisztrátort nem lehet törölni.');
+                flash('err', t('flash.user.delete.utolso-adminisztratort-torolni'));
                 back(['p' => 'users']);
             }
             $db->prepare('DELETE FROM help_user WHERE id = ?')->execute([$id]);
             audit_me($db, 'user.delete', 'user:' . $id);
-            flash('ok', 'Felhasználó törölve.');
+            flash('ok', t('flash.user.delete.felhasznalo-torolve'));
             back(['p' => 'users']);
         }
 
@@ -1264,7 +1263,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                     'only_published' => !isset($_POST['include_hidden']),
                 ]);
             } catch (Throwable $e) {
-                flash('err', 'Az export nem sikerült: ' . h($e->getMessage()));
+                flash('err', t('flash.export.hiba', ['reszlet' => h($e->getMessage())]));
                 back(['p' => 'export']);
             }
             audit_me($db, 'export.docx', $lang, $r['chapters'] . ' fejezet, ' . $r['images'] . ' kép');
@@ -1298,7 +1297,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
 
         // ================================================== beállítások
         case 'setting.save': {
-            if (!auth_is('admin')) { flash('err', 'Ehhez adminisztrátori jog kell.'); back(['p' => 'settings']); }
+            if (!auth_is('admin')) { flash('err', t('flash.setting.save.ehhez-adminisztratori-jog')); back(['p' => 'settings']); }
             $keys = ['site_title_hu', 'site_title_en', 'site_title_de',
                      'mt_provider', 'mt_endpoint', 'mt_key', 'mt_auto', 'mt_glossary',
                      'highlight_days', 'export_company', 'export_footer'];
@@ -1313,12 +1312,12 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                 $st->execute([$k, $v, auth_user()['id']]);
             }
             audit_me($db, 'setting.save');
-            flash('ok', 'A beállítások mentve.');
+            flash('ok', t('flash.setting.save.beallitasok-mentve'));
             back(['p' => 'settings']);
         }
 
         case 'ui.save': {
-            if (!auth_is('admin')) { flash('err', 'Ehhez adminisztrátori jog kell.'); back(['p' => 'settings']); }
+            if (!auth_is('admin')) { flash('err', t('flash.ui.save.ehhez-adminisztratori-jog')); back(['p' => 'settings']); }
             $known = array_keys(ui_default());
             $langs = array_keys(admin_langs());
 
@@ -1339,7 +1338,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                 }
             }
             audit_me($db, 'ui.save', null, $n . ' szöveg');
-            flash('ok', '<b>' . $n . ' szöveg</b> mentve. Az üresen hagyottak magyarul jelennek meg.');
+            flash('ok', t('flash.ui.save.kesz', ['n' => $n]));
             back(['p' => 'settings']);
         }
 
@@ -1354,18 +1353,18 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
 
         // ================================================== nyelvek
         case 'lang.add': {
-            if (!auth_is('admin')) { flash('err', 'Ehhez adminisztrátori jog kell.'); back(['p' => 'settings']); }
+            if (!auth_is('admin')) { flash('err', t('flash.lang.add.ehhez-adminisztratori-jog')); back(['p' => 'settings']); }
             $code = strtolower(trim(post('code')));
             $name = trim(post('name'));
             if (!preg_match('/^[a-z]{2,5}$/', $code) || $name === '') {
-                flash('err', 'A kód két-öt betű legyen (pl. sk), a név pedig nem lehet üres.');
+                flash('err', t('flash.lang.add.kod-ket-ot-betu'));
                 back(['p' => 'settings']);
             }
 
             $exists = $db->prepare('SELECT 1 FROM help_lang WHERE code = ?');
             $exists->execute([$code]);
             if ($exists->fetchColumn()) {
-                flash('err', 'Ez a nyelvkód már szerepel a listában.');
+                flash('err', t('flash.lang.add.nyelvkod-szerepel-listaban'));
                 back(['p' => 'settings']);
             }
 
@@ -1383,14 +1382,13 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             $copied->execute([$code, $src]);
 
             audit_me($db, 'lang.add', $code, $name);
-            flash('ok', 'A(z) <b>' . h($name) . '</b> nyelv felvéve, ' . $copied->rowCount()
-                . ' főfejezettel. A Fordítás fülön máris megjelenik — a főfejezetek nevét a '
-                . 'Fejezetek fülön írhatod át erre a nyelvre.');
+            flash('ok', t('flash.lang.add.kesz',
+                          ['nev' => h($name), 'n' => $copied->rowCount()]));
             back(['p' => 'settings']);
         }
 
         case 'lang.save': {
-            if (!auth_is('admin')) { flash('err', 'Ehhez adminisztrátori jog kell.'); back(['p' => 'settings']); }
+            if (!auth_is('admin')) { flash('err', t('flash.lang.save.ehhez-adminisztratori-jog')); back(['p' => 'settings']); }
             $code = strtolower(trim(post('code')));
             $q = $db->prepare('SELECT is_source FROM help_lang WHERE code = ?');
             $q->execute([$code]);
@@ -1405,63 +1403,62 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                    $code,
                ]);
             audit_me($db, 'lang.save', $code);
-            flash('ok', 'A nyelv mentve.');
+            flash('ok', t('flash.lang.save.nyelv-mentve'));
             back(['p' => 'settings']);
         }
 
         case 'lang.delete': {
-            if (!auth_is('admin')) { flash('err', 'Ehhez adminisztrátori jog kell.'); back(['p' => 'settings']); }
+            if (!auth_is('admin')) { flash('err', t('flash.lang.delete.ehhez-adminisztratori-jog')); back(['p' => 'settings']); }
             $code = strtolower(trim(post('code')));
 
             $q = $db->prepare('SELECT is_source, name FROM help_lang WHERE code = ?');
             $q->execute([$code]);
             $row = $q->fetch();
-            if (!$row) { flash('err', 'Nincs ilyen nyelv.'); back(['p' => 'settings']); }
+            if (!$row) { flash('err', t('flash.lang.delete.nincs-ilyen-nyelv')); back(['p' => 'settings']); }
             if ((int)$row['is_source']) {
-                flash('err', 'A forrásnyelvet nem lehet törölni — ezen íródnak a fejezetek.');
+                flash('err', t('flash.lang.delete.forrasnyelvet-torolni-ezen-irodnak'));
                 back(['p' => 'settings']);
             }
 
             $n = $db->prepare('SELECT COUNT(*) FROM help_article WHERE lang = ?');
             $n->execute([$code]);
             if ((int)$n->fetchColumn() > 0) {
-                flash('err', 'Ezen a nyelven még vannak fejezetek — előbb töröld őket. '
-                    . 'Ha csak el akarod rejteni, vedd ki a „látszik" pipát.');
+                flash('err', t('flash.lang.delete.nem-ures'));
                 back(['p' => 'settings']);
             }
 
             $db->prepare('DELETE FROM help_module WHERE lang = ?')->execute([$code]);
             $db->prepare('DELETE FROM help_lang WHERE code = ?')->execute([$code]);
             audit_me($db, 'lang.delete', $code, (string)$row['name']);
-            flash('ok', 'A(z) <b>' . h((string)$row['name']) . '</b> nyelv törölve.');
+            flash('ok', t('flash.lang.delete.kesz', ['nev' => h((string)$row['name'])]));
             back(['p' => 'settings']);
         }
 
         case 'changelog.save': {
-            if (!auth_is('admin')) { flash('err', 'Ehhez adminisztrátori jog kell.'); back(['p' => 'releases']); }
+            if (!auth_is('admin')) { flash('err', t('flash.changelog.save.ehhez-adminisztratori-jog')); back(['p' => 'releases']); }
             $cid = (int)post('id');
             $db->prepare('UPDATE help_changelog SET description = ?, is_minor = ? WHERE id = ?')
                ->execute([mb_substr(post('description'), 0, 2000), isset($_POST['is_minor']) ? 1 : 0, $cid]);
             audit_me($db, 'changelog.save', 'changelog:' . $cid);
-            flash('ok', 'A bejegyzés mentve.');
+            flash('ok', t('flash.changelog.save.bejegyzes-mentve'));
             back(['p' => 'releases', 'rel' => (int)post('rel')]);
         }
 
         case 'changelog.delete': {
-            if (!auth_is('admin')) { flash('err', 'Ehhez adminisztrátori jog kell.'); back(['p' => 'releases']); }
+            if (!auth_is('admin')) { flash('err', t('flash.changelog.delete.ehhez-adminisztratori-jog')); back(['p' => 'releases']); }
             $cid = (int)post('id');
             $db->prepare('DELETE FROM help_changelog WHERE id = ?')->execute([$cid]);
             audit_me($db, 'changelog.delete', 'changelog:' . $cid);
-            flash('ok', 'A bejegyzés törölve a változásnaplóból — a fejezet tartalmát nem érintette.');
+            flash('ok', t('flash.changelog.delete.bejegyzes-torolve-valtozasnaplobol-fejezet'));
             back(['p' => 'releases', 'rel' => (int)post('rel')]);
         }
 
         case 'release.close': {
-            if (!auth_is('admin')) { flash('err', 'Ehhez adminisztrátori jog kell.'); back(['p' => 'settings']); }
+            if (!auth_is('admin')) { flash('err', t('flash.release.close.ehhez-adminisztratori-jog')); back(['p' => 'settings']); }
             $version = post('version');
             $next    = post('next');
             if ($version === '' || $next === '') {
-                flash('err', 'A lezárandó és a következő verziószámot is add meg.');
+                flash('err', t('flash.release.close.lezarando-kovetkezo-verzioszamot-is'));
                 back(['p' => 'settings']);
             }
             try {
@@ -1470,15 +1467,16 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                 $st->closeCursor();
                 $n = (int)$db->query('SELECT @help_cnt')->fetchColumn();
                 audit_me($db, 'release.close', $version, "{$n} bejegyzés");
-                flash('ok', "A(z) {$version} kiadás lezárva, {$n} bejegyzéssel. A következő nyitott kiadás: {$next}.");
+                flash('ok', t('flash.release.close.kesz',
+                              ['verzio' => h($version), 'n' => $n, 'kovetkezo' => h($next)]));
             } catch (Throwable $e) {
-                flash('err', 'A kiadás lezárása nem sikerült: ' . h($e->getMessage()));
+                flash('err', t('flash.release.close.hiba', ['reszlet' => h($e->getMessage())]));
             }
             back(['p' => post('from') === 'releases' ? 'releases' : 'settings']);
         }
 
         default:
-            flash('err', 'Ismeretlen művelet.');
+            flash('err', t('flash.release.close.ismeretlen-muvelet'));
             back();
     }
 }
