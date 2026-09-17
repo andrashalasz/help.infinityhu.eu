@@ -76,37 +76,15 @@ body.admin { background: var(--bg); --fs: 1.1; }
    (A nyilvanos sugonak marad a szuk hasabja - ott olvasni kell.) */
 .page { max-width: none; margin: 0; padding: 18px; }
 
-/* A bal lista szelesseget a FELHASZNALO allitja be: a ket hasab kozotti
-   elvalasztot huzva. Amit beallit, azt a bongeszo megjegyzi (--picker-w).
-   Amig nem nyul hozza, az alapertek az ablakkal egyutt no. */
+/* A bal lista szelessege az ablakkal egyutt no. (Volt itt huzhato
+   elvalaszto is, de feleslegesse valt: a valodi gond a kicsi betu volt,
+   arra a fejleci A- / A+ gomb a valasz.) */
 :root { --picker-def: clamp(380px, 32vw, 560px); }
 .page--split {
-  position: relative;
-  display: grid; grid-template-columns: var(--picker-w, var(--picker-def)) minmax(0, 1fr);
+  display: grid; grid-template-columns: var(--picker-def) minmax(0, 1fr);
   gap: 16px; align-items: start;
 }
-/* A fogo NEM sajat racssav, hanem lebego elem a ket hasab hataran. Sajat
-   savban ugyanis harom gyereke lett a racsnak: ha barmiert ket savra
-   csuszott vissza az elrendezes, a fogo egesz szelesseguve nyult, es egy
-   nagy szurke folt allt a lista alatt. Lebegve ez nem tortenhet meg. */
-.splitter {
-  position: absolute; top: 0; bottom: 0; width: 16px; z-index: 5;
-  left: var(--picker-w, var(--picker-def));
-  cursor: col-resize; background: none; border: 0; padding: 0;
-}
-.splitter::before {
-  content: ''; position: absolute; top: 0; bottom: 0; left: 6px;
-  width: 4px; border-radius: 100px; background: var(--line-soft);
-  transition: background .12s;
-}
-.splitter:hover::before, .splitter.drag::before { background: var(--brand-ring); }
-.splitter:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
-/* huzas kozben ne jeloljon ki szoveget a lap */
-body.splitting, body.splitting * { user-select: none !important; cursor: col-resize !important; }
-@media (max-width: 980px) {
-  .page--split { grid-template-columns: minmax(0, 1fr); }
-  .splitter { display: none; }
-}
+@media (max-width: 980px) { .page--split { grid-template-columns: minmax(0, 1fr); } }
 
 .panel {
   background: var(--surface); border: 1px solid var(--line);
@@ -214,9 +192,13 @@ p.lead { margin: 0 0 18px; color: var(--ink-3); font-size: calc(13.4px * var(--f
    szabaly korabban is itt allt, de sosem ervenyesult: a cim <button> volt,
    arra a bongeszo text-transform: none-t tesz. Amikor a cim link lett, a
    link viszont OROKOLTE - igy lett a lista fele nagybetus, fele nem. */
+/* A fofejezet a legnagyobb, alatta a fejezet, meg lejjebb az alfejezet -
+   a meret mutassa a rangsort. (Korabban forditva volt: a fofejezet 12.4px,
+   a fejezetek 13.8px - abbol maradt, amikor a fofejezet meg apro nagybetus
+   cimke volt, nem pedig kattinthato cim.) */
 .picker__m {
-  padding: 10px 10px 5px; font-size: calc(12.4px * var(--fs)); font-weight: 800;
-  color: var(--ink-2); letter-spacing: .2px;
+  padding: 12px 10px 5px; font-size: calc(15px * var(--fs)); font-weight: 700;
+  color: var(--ink); letter-spacing: 0;
 }
 .picker__m { display: flex; align-items: center; gap: 6px; }
 .picker__mt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -278,8 +260,8 @@ a.picker__mt:hover { text-decoration: none; }
 
 /* --- alfejezetek behúzása (1.3 alatt az 1.3.1) ---
    A d1/d2 egy vonalban marad, csak a valódi alfejezet csúszik beljebb. */
-.picker__row--d3 .picker__a { padding-left: 24px; font-size: calc(13.2px * var(--fs)); }
-.picker__row--d4 .picker__a { padding-left: 40px; font-size: calc(13.2px * var(--fs)); }
+.picker__row--d3 .picker__a { padding-left: 24px; font-size: calc(12.9px * var(--fs)); }
+.picker__row--d4 .picker__a { padding-left: 40px; font-size: calc(12.4px * var(--fs)); }
 
 /* a soron levő "+" csak rámutatáskor látszik, hogy ne zajosítsa a listát */
 .picker__radd { opacity: 0; }
@@ -394,6 +376,8 @@ a.picker__mt:hover { text-decoration: none; }
   border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow-3);
 }
 .ed-pop__m.open { display: block; }
+.ed-undo[disabled], .ed-redo[disabled] { opacity: .35; cursor: default; }
+.ed-undo[disabled]:hover, .ed-redo[disabled]:hover { background: none; border-color: transparent; }
 .ed-pop__t { font-size: 11.5px; font-weight: 600; color: var(--ink-3); margin: 0 0 6px; text-transform: uppercase; letter-spacing: .3px; }
 /* A szinpaletta a Wordbol ismeros racs: 10 oszlop, egy oszlopban egy szin
    csaladja (vilagosabb es sotetebb arnyalatok). */

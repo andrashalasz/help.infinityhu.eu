@@ -361,8 +361,6 @@ function page_translate(PDO $db, array $cfg, int $srcId, string $to, array $coun
       </div>
     </div>
 
-    <div class="splitter" role="separator" aria-orientation="vertical" tabindex="0"
-         title="<?= h(t('splitter.cim')) ?>"></div>
 
     <!-- szerkesztő -->
     <div>

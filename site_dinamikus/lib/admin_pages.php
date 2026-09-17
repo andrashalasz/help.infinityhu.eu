@@ -412,8 +412,15 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
         <i>⊟</i><span><?= h(t('eszkoz.osszecsuk')) ?></span></button>
       <button class="btn btn--sm" type="button" id="pick-sort" title="<?= h(t('eszkoz.sorrend.cim')) ?>">
         <i>↕</i><span><?= h(t('eszkoz.sorrend')) ?></span></button>
-      <button class="btn btn--p btn--sm" type="button" data-modal="new-module-a" title="<?= h(t('eszkoz.ujfo.cim')) ?>">
-        <i>+</i><span><?= h(t('eszkoz.ujfo')) ?></span></button>
+      <?php // Egy kattintas: letrejon minden nyelven, es rogton a leirasa
+            // nyilik meg a szerkesztoben - ugy, mint a sima fejezetnel. ?>
+      <form method="post" action="<?= h(admin_url()) ?>" style="display:contents">
+        <?= csrf_input() ?>
+        <input type="hidden" name="a" value="module.quick">
+        <input type="hidden" name="lang" value="<?= h($lang) ?>">
+        <button class="btn btn--p btn--sm" type="submit" title="<?= h(t('eszkoz.ujfo.cim')) ?>">
+          <i>+</i><span><?= h(t('eszkoz.ujfo')) ?></span></button>
+      </form>
     </div>
     <div style="padding:8px 10px 0"><?= lang_switch('articles', $lang) ?></div>
 
@@ -524,9 +531,6 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
           // muveleti sav sosem jott elo. ?>
   </div><?php // .picker ?>
 
-  <!-- huzhato elvalaszto: a lista szelesseget a felhasznalo allitja be -->
-  <div class="splitter" id="split-articles" role="separator" aria-orientation="vertical"
-       tabindex="0" title="<?= h(t('splitter.cim')) ?>"></div>
 
   <!-- jobb: szerkesztő -->
   <div>
@@ -925,31 +929,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
 </div>
 
 <!-- Új FŐFEJEZET (modul) közvetlenül a Fejezetek fülről -->
-<div class="modal" id="modal-new-module-a">
-  <div class="modal__box">
-    <form method="post" action="<?= h(admin_url()) ?>">
-      <?= csrf_input() ?>
-      <input type="hidden" name="a" value="module.save">
-      <input type="hidden" name="lang" value="<?= h($lang) ?>">
-      <input type="hidden" name="from" value="articles">
-      <div class="modal__h">Új főfejezet (<?= h(admin_langs()[$lang]) ?>)</div>
-      <div class="modal__b">
-        <div class="row">
-          <div class="field" style="flex:0 1 110px"><label><?= h(t('Szám')) ?></label>
-            <input class="inp" name="chapter_no" value="<?= (int)$nextModuleNo ?>"></div>
-          <div class="field" style="flex:3 1 240px"><label><?= h(t('Név')) ?></label>
-            <input class="inp" name="title" placeholder="pl. Első lépések" required></div>
-        </div>
-        <div class="hint">A főfejezet a bal oldali lista vastag csoportcíme — ez alá kerülnek
-          a fejezetek. A sorrendet utólag húzással is állíthatod.</div>
-      </div>
-      <div class="modal__f">
-        <button class="btn btn--ghost" type="button" data-close><?= h(t('Mégsem')) ?></button>
-        <button class="btn btn--p" type="submit"><?= h(t('Létrehozás')) ?></button>
-      </div>
-    </form>
-  </div>
-</div>
+<?php // Az "Uj fofejezet" ablak kivezetve: a gomb rogton letrehozza. ?>
 
 <?php // Az "Uj fejezet" ablak kivezetve: minden sorban ott a "+", ami
       // rogton letrehozza a fejezetet a kovetkezo szabad szammal. A felso

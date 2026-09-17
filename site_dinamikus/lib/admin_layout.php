@@ -515,6 +515,32 @@ function renumber_module(PDO $db, int $moduleId, string $lang): int
     return $changed;
 }
 
+/**
+ * A fofejezet neve = a LEIRAS fejezetenek cime.
+ *
+ * A fejezetlistaban (es a nyilvanos menuben) a fofejezet cimere kattintva a
+ * leirasa nyilik meg - ezert ott egyetlen sor all, egyetlen nevvel. Ha a
+ * szerkesztoben atirjak a leiras cimet, a fofejezet neve is kovesse, hogy
+ * ne allhasson ket kulonbozo nev ugyanarra a dologra.
+ *
+ * Csak az adott NYELV fofejezetet erinti: a nevek nyelvenkent kulon allnak.
+ * Ha a fejezet nem a leiras (a szama nem egyezik), nem csinal semmit.
+ */
+function module_title_sync(PDO $db, int $articleId, string $title): bool
+{
+    if ($title === '') { return false; }
+    $st = $db->prepare('SELECT a.module_id, a.chapter_no, a.lang, m.chapter_no AS module_no
+                          FROM help_article a JOIN help_module m ON m.id = a.module_id
+                         WHERE a.id = ?');
+    $st->execute([$articleId]);
+    $r = $st->fetch();
+    if (!$r || trim((string)$r['chapter_no']) !== trim((string)$r['module_no'])) { return false; }
+
+    $db->prepare('UPDATE help_module SET title = ? WHERE id = ?')
+       ->execute([$title, (int)$r['module_id']]);
+    return true;
+}
+
 function admin_setting(PDO $db, string $key, string $default = ''): string
 {
     static $cache = null;

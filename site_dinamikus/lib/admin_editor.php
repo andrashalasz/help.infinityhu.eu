@@ -84,6 +84,19 @@ function editor_block(string $chapter, string $body): void
         <div class="ed" data-chapter="<?= h($chapter) ?>">
           <div class="ed-toolbar">
             <div class="ed-grp">
+              <button type="button" class="ed-undo" disabled
+                      title="<?= h(t('ed.undo')) ?>">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-4"/></svg>
+              </button>
+              <button type="button" class="ed-redo" disabled
+                      title="<?= h(t('ed.redo')) ?>">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 14 5-5-5-5"/><path d="M20 9H9a5 5 0 0 0 0 10h4"/></svg>
+              </button>
+            </div>
+
+            <div class="ed-grp">
               <select class="ed-sel ed-level" title="Bekezdés szintje">
                 <option value="p">Bekezdés</option>
                 <option value="h2">1. szint — címsor</option>

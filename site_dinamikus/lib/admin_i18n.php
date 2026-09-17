@@ -151,6 +151,16 @@ function ui_default(string $key = ''): string|array
                            . 'tetején írod, a <b>főfejezetet</b> pedig húzással változtatod a bal '
                            . 'oldali listában.',
 
+        // --- uj fofejezet egy kattintassal ---
+        'ujfofejezet.nev'         => 'Névtelen főfejezet',
+        'flash.module.quick.kesz' => 'Létrehoztam a(z) <b>{szam}.</b> főfejezetet minden nyelven. '
+                                     . '<b>Írd be a nevét</b> a szerkesztő tetején — az lesz a '
+                                     . 'főfejezet neve is —, és írd meg, mire való ez a menüpont.',
+
+        // --- szerkeszto ---
+        'ed.undo' => 'Visszavonás (Ctrl+Z)',
+        'ed.redo' => 'Újra (Ctrl+Shift+Z)',
+
         // --- torles a listaban ---
         'torles.cim'    => 'A fejezet törlése (a Kukába kerül)',
         'torles.kerdes' => 'Törlöd ezt a fejezetet: „{nev}”? A Kukába kerül a korábbi '
@@ -307,7 +317,6 @@ function ui_default(string $key = ''): string|array
         'lathato.mind'      => 'Minden nyelven',
 
         // --- fofejezet-leiras ---
-        'splitter.cim' => 'Húzd a lista szélességének állításához (dupla kattintás: alaphelyzet)',
         'fofejezet.leiras.kerdes' => 'Létrehozzam a(z) „{nev}” főfejezet leírását? Üres fejezetként jön létre, a címét és a szövegét a szerkesztőben írod meg.',
         'fofejezet.leiras.nincs' => 'Ehhez a főfejezethez még nincs leírás — kattints, és megírhatod, mire való',
         'fofejezet.leiras.nyit'  => 'A főfejezet leírása: mire való ez a menüpont',

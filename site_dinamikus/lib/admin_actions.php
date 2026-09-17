@@ -159,6 +159,11 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                 }
             }
 
+            // Ha ez a fejezet a FOFEJEZET LEIRASA (a szama megegyezik a
+            // fofejezeteevel), akkor a cime egyben a fofejezet neve is - a
+            // listaban is az latszik. Ezert a ketto egyutt mozog.
+            if ($title !== '') { module_title_sync($db, $id, mb_substr($title, 0, 255)); }
+
             audit_me($db, 'article.draft', 'article:' . $id);
 
             if ($wantsJson) { help_json(['ok' => true, 'saved_at' => date('H:i:s'), 'renamed' => $renamed]); }
@@ -685,6 +690,55 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
         }
 
         // ================================================== modulok
+        // Uj fofejezet EGY kattintassal, ugy mint a sima fejezetnel: letrejon
+        // minden nyelven, kap egy LEIRAS fejezetet (a szama = a fofejezet
+        // szama), es rogton a szerkeszto nyilik meg rajta. Igy nem kell elobb
+        // egy ablakban nevet adni, aztan megkeresni, hova irhatnank, hogy
+        // mire valo az a menupont.
+        case 'module.quick': {
+            $lang = array_key_exists(post('lang'), admin_langs()) ? post('lang') : admin_source_lang();
+            $name = t('ujfofejezet.nev');
+
+            $no = (string)((int)$db->query(
+                "SELECT COALESCE(MAX(CAST(chapter_no AS UNSIGNED)), 0) FROM help_module"
+            )->fetchColumn() + 1);
+            $sort = (int)$db->query('SELECT COALESCE(MAX(sort_order), 0) FROM help_module')->fetchColumn() + 10;
+            $slug = help_slug($no, $name);
+
+            $db->beginTransaction();
+            try {
+                $ins = $db->prepare('INSERT INTO help_module (chapter_no, slug, title, lang, sort_order) VALUES (?,?,?,?,?)');
+                $mineId = 0;
+                foreach (array_keys(admin_langs()) as $l) {
+                    $ins->execute([$no, mb_substr($slug, 0, 120), $name, $l, $sort]);
+                    if ($l === $lang) { $mineId = (int)$db->lastInsertId(); }
+                }
+                if ($mineId === 0) {
+                    $q = $db->prepare('SELECT id FROM help_module WHERE chapter_no = ? AND lang = ?');
+                    $q->execute([$no, $lang]);
+                    $mineId = (int)$q->fetchColumn();
+                }
+
+                // a leiras fejezet: a szama MEGEGYEZIK a fofejezetevel
+                $ver = (string)$db->query("SELECT COALESCE(MAX(doc_version), 'v1') FROM help_article")->fetchColumn();
+                $db->prepare("INSERT INTO help_article
+                        (module_id, chapter_no, slug, title, lang, body_html, plain_text, doc_version,
+                         updated_at, content_hash, sort_order, is_published, draft_html, draft_by, draft_at, source)
+                        VALUES (?,?,?,?,?,'','',?, CURRENT_DATE, MD5(?), 10, 0, '', ?, NOW(), 'editor')")
+                   ->execute([$mineId, $no, mb_substr($slug, 0, 160), $name, $lang, $ver, $slug, auth_user()['id']]);
+                $newId = (int)$db->lastInsertId();
+                $db->commit();
+            } catch (Throwable $e) {
+                if ($db->inTransaction()) { $db->rollBack(); }
+                flash('err', t('flash.letrehozasi.hiba', ['reszlet' => h($e->getMessage())]));
+                back(['p' => 'articles', 'lang' => $lang]);
+            }
+
+            audit_me($db, 'module.quick', 'module:' . $mineId, $no);
+            flash('ok', t('flash.module.quick.kesz', ['szam' => h($no)]));
+            back(['p' => 'articles', 'lang' => $lang, 'id' => $newId]);
+        }
+
         case 'module.save': {
             $id    = (int)post('id');
             $lang  = array_key_exists(post('lang'), admin_langs()) ? post('lang') : 'hu';

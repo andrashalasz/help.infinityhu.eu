@@ -161,84 +161,6 @@
     }, true);
   }
 
-  /* ------------------------------------------- huzhato oszlop-elvalaszto
-     A bal lista szelessege izles es feladat kerdese: aki forditast olvas
-     ossze, annak szeles lista kell; aki hosszu fejezetet ir, annak keskeny.
-     Ezert nem mi talalgatunk meretet - a felhasznalo huzza be, es a
-     bongeszo megjegyzi. Dupla kattintas: vissza az alapertekre. */
-  function wireSplitter() {
-    var KEY = 'help.picker.w';
-    var sp  = document.querySelector('.splitter');
-    if (!sp) { return; }
-    var grid = sp.parentElement;
-
-    function apply(px) {
-      if (px === null) { grid.style.removeProperty('--picker-w'); return; }
-      grid.style.setProperty('--picker-w', px + 'px');
-    }
-    function bounds() {
-      // a lista legalabb 260px, de a tartalomnak is maradjon 380px
-      return { min: 260, max: Math.max(300, grid.clientWidth - 380) };
-    }
-
-    var saved = parseInt(LSget(KEY, ''), 10);
-    if (saved > 0) {
-      var b = bounds();
-      apply(Math.min(Math.max(saved, b.min), b.max));
-    }
-
-    function startDrag(startX) {
-      var b = bounds();
-      var left = grid.getBoundingClientRect().left;
-      document.body.classList.add('splitting');
-      sp.classList.add('drag');
-
-      function move(e) {
-        var x = (e.touches ? e.touches[0].clientX : e.clientX) - left;
-        x = Math.min(Math.max(Math.round(x), b.min), b.max);
-        apply(x);
-        LSset(KEY, String(x));
-      }
-      function end() {
-        document.body.classList.remove('splitting');
-        sp.classList.remove('drag');
-        document.removeEventListener('mousemove', move);
-        document.removeEventListener('mouseup', end);
-        document.removeEventListener('touchmove', move);
-        document.removeEventListener('touchend', end);
-      }
-      document.addEventListener('mousemove', move);
-      document.addEventListener('mouseup', end);
-      document.addEventListener('touchmove', move, { passive: true });
-      document.addEventListener('touchend', end);
-      if (startX !== undefined) { move({ clientX: startX }); }
-    }
-
-    sp.addEventListener('mousedown', function (e) { e.preventDefault(); startDrag(); });
-    sp.addEventListener('touchstart', function () { startDrag(); }, { passive: true });
-
-    // dupla kattintas: alaphelyzet
-    sp.addEventListener('dblclick', function () { apply(null); LSset(KEY, ''); });
-
-    // billentyuvel is allithato (a fogo fokuszalhato)
-    sp.addEventListener('keydown', function (e) {
-      var step = e.shiftKey ? 40 : 10;
-      var cur = parseInt(getComputedStyle(grid).gridTemplateColumns, 10) || 400;
-      var b = bounds();
-      if (e.key === 'ArrowLeft')  { e.preventDefault(); cur -= step; }
-      else if (e.key === 'ArrowRight') { e.preventDefault(); cur += step; }
-      else if (e.key === 'Home') { e.preventDefault(); apply(null); LSset(KEY, ''); return; }
-      else { return; }
-      cur = Math.min(Math.max(cur, b.min), b.max);
-      apply(cur);
-      LSset(KEY, String(cur));
-    });
-  }
-
-  /* ----------------------------------------- a kezelofelulet meretezese
-     Az admin 13px-es alapra epul (a nyilvanos oldal 15px-re), ami nagy
-     felbontasu kepernyon aprora sikerul - ezert allithato. A --fs szorzot
-     a body-n allitjuk, mert minden meret calc(...px * var(--fs)). */
   function wireFontSize() {
     var KEY = 'help.admin.fs', MIN = 0.85, MAX = 1.6, STEP = 0.05, DEF = 1.1;
 
@@ -422,6 +344,98 @@
     }
     function syncToArea() { area.innerHTML = src.value; }
     syncToSource();
+
+    /* --- visszavonas / ujra ---------------------------------------------
+       Sajat elozmenytar, nem a bongeszoe. A szerkeszto sok mindent
+       KOZVETLENUL a DOM-ban csinal (szinezes, kep beszurasa, tablazat), azt
+       pedig a bongeszo natv visszavonasa nem latja - a Ctrl+Z ilyenkor vagy
+       nem csinalt semmit, vagy a korabbi gepelest szedte szet. Ezert a
+       tartalom allapotait magunk taroljuk. */
+    var HIST_MAX = 60;
+    var hist = [area.innerHTML], hi = 0, histTimer = null, restoring = false;
+
+    function caretOffset() {
+      var sel = window.getSelection();
+      if (!sel || !sel.rangeCount || !area.contains(sel.anchorNode)) { return null; }
+      var r = sel.getRangeAt(0).cloneRange();
+      r.selectNodeContents(area);
+      r.setEnd(sel.getRangeAt(0).endContainer, sel.getRangeAt(0).endOffset);
+      return r.toString().length;
+    }
+    function setCaret(offset) {
+      if (offset === null) { return; }
+      var walker = document.createTreeWalker(area, NodeFilter.SHOW_TEXT);
+      var seen = 0, node;
+      while ((node = walker.nextNode())) {
+        if (seen + node.length >= offset) {
+          var sel = window.getSelection();
+          var r = document.createRange();
+          r.setStart(node, Math.max(0, offset - seen));
+          r.collapse(true);
+          sel.removeAllRanges();
+          sel.addRange(r);
+          return;
+        }
+        seen += node.length;
+      }
+    }
+
+    function snapshot() {
+      if (restoring) { return; }
+      var html = area.innerHTML;
+      if (hist[hi] === html) { return; }
+      hist = hist.slice(0, hi + 1);
+      hist.push(html);
+      if (hist.length > HIST_MAX) { hist.shift(); }
+      hi = hist.length - 1;
+      updateHistButtons();
+    }
+    function snapshotSoon() {
+      clearTimeout(histTimer);
+      histTimer = setTimeout(snapshot, 400);
+    }
+    function travel(step) {
+      var next = hi + step;
+      if (next < 0 || next >= hist.length) { return; }
+      clearTimeout(histTimer);
+      snapshot();                       // a most beirt szoveg se vesszen el
+      next = hi + step;
+      if (next < 0 || next >= hist.length) { return; }
+      var caret = caretOffset();
+      restoring = true;
+      hi = next;
+      area.innerHTML = hist[hi];
+      restoring = false;
+      setCaret(caret);
+      syncToSource();
+      markDirty();
+      updateHistButtons();
+    }
+    function updateHistButtons() {
+      var u = $('.ed-undo', ed), r = $('.ed-redo', ed);
+      if (u) { u.disabled = hi <= 0; }
+      if (r) { r.disabled = hi >= hist.length - 1; }
+    }
+
+    var undoBtn = $('.ed-undo', ed), redoBtn = $('.ed-redo', ed);
+    if (undoBtn) { undoBtn.addEventListener('click', function () { area.focus(); travel(-1); }); }
+    if (redoBtn) { redoBtn.addEventListener('click', function () { area.focus(); travel(1); }); }
+
+    // Minden eszkoztar-gomb ELOTT rogzitjuk az allapotot, hogy a
+    // visszavonas a formazasokat es a beszurasokat is fogja.
+    ed.addEventListener('mousedown', function (e) {
+      if (e.target.closest('.ed-undo, .ed-redo')) { return; }
+      if (e.target.closest('.ed-toolbar button, .ed-toolbar .sw, .ed-toolbar select')) { snapshot(); }
+    }, true);
+
+    area.addEventListener('input', snapshotSoon);
+    area.addEventListener('keydown', function (e) {
+      var meta = e.metaKey || e.ctrlKey;
+      if (!meta || e.key.toLowerCase() !== 'z' && e.key.toLowerCase() !== 'y') { return; }
+      e.preventDefault();
+      var redo = e.key.toLowerCase() === 'y' || e.shiftKey;
+      travel(redo ? 1 : -1);
+    });
 
     var form = area.closest('form');
     if (form) {
@@ -699,6 +713,8 @@
           toast('Előbb jelöld ki a szöveget, amit színezni szeretnél.', 'warn');
           return;
         }
+        snapshot();                      // hogy a visszavonas ezt is fogja
+
         // execCommand foreColor <font> elemet gyártana, azt a mentés kidobná
         var range = sel.getRangeAt(0);
         var span = document.createElement('span');
@@ -711,7 +727,47 @@
           span.appendChild(frag);
           range.insertNode(span);
         }
+
+        // AZ UJ SZIN CSAK AKKOR LATSZIK, HA a belsejeben nincs regi szin.
+        // Ujraszinezeskor ugyanis a regi span BENT marad, es CSS-ben a
+        // belso nyer - ezert tunt ugy, hogy a masodik szinezes nem fog.
+        var attr = prop === 'color' ? 'color' : 'background-color';
+
+        /** Kibontja az elemet, ha mar semmit nem csinal. */
+        function tidy(el) {
+          if (el.getAttribute('style') === '') { el.removeAttribute('style'); }
+          if ((el.tagName === 'SPAN' || el.tagName === 'FONT') && el.attributes.length === 0) {
+            while (el.firstChild) { el.parentNode.insertBefore(el.firstChild, el); }
+            el.remove();
+            return true;
+          }
+          return false;
+        }
+
+        Array.prototype.forEach.call(span.querySelectorAll('[style],font'), function (el) {
+          el.style.removeProperty(attr);
+          if (el.tagName === 'FONT') { el.removeAttribute('color'); }
+          tidy(el);
+        });
+
+        // ...es felfele is: ha a szulo egy span, aminek EGYEDUL mi vagyunk a
+        // gyereke, akkor az o szine ugyis lathatatlan - szedjuk le rola,
+        // kulonben minden ujraszinezes egy reteggel melyebbre agyaz.
+        var up = span.parentNode;
+        while (up && up !== area && up.tagName === 'SPAN' && up.childNodes.length === 1) {
+          up.style.removeProperty(attr);
+          var next = up.parentNode;
+          tidy(up);
+          up = next;
+        }
+
+        // A kijelolest megtartjuk: igy egybol at lehet szinezni masikra,
+        // nem kell ujra kijelolni.
+        var r2 = document.createRange();
+        r2.selectNodeContents(span);
         sel.removeAllRanges();
+        sel.addRange(r2);
+
         syncToSource();
         markDirty();
       }
@@ -2069,7 +2125,6 @@
     wireFontSize();
     wireConfirmForms();
     wireScopeForms();
-    wireSplitter();
     wirePickerFold();
     wireModals();
     wireToggles();
