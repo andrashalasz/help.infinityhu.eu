@@ -293,7 +293,11 @@
     if (mode === 'auto') { root.removeAttribute('data-theme'); } else { root.setAttribute('data-theme', mode); }
     LSset('help.theme', mode);
     var b = $('#theme-toggle');
-    if (b) { b.innerHTML = isDark() ? ICON.sun : ICON.moon; b.title = isDark() ? 'Világos téma' : 'Sötét téma'; }
+    // A feliratot a PHP adja (ott van a forditas), a JS csak valaszt kozuluk.
+    if (b) {
+      b.innerHTML = isDark() ? ICON.sun : ICON.moon;
+      b.title = (isDark() ? b.getAttribute('data-t-light') : b.getAttribute('data-t-dark')) || b.title;
+    }
   }
 
   /* ---------------------------------------------------------- üzenetbuborék */

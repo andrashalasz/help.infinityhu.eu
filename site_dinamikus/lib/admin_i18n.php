@@ -79,14 +79,20 @@ function ui_keys_in_use(): array
     static $keys = null;
     if ($keys !== null) { return $keys; }
 
+    // A jegyzekbe MINDIG bekerul a sajat szotarunk osszes kulcsa. Enelkul
+    // kimaradnanak azok, amiket a kod OSSZEFUZESSEL allit elo - a fulek
+    // felirata peldaul t('tab.' . $k) alakban keszul, amibol a forras
+    // beolvasasa csak a "tab." toredeket latja.
     $known = ui_default();
-    $found = [];
+    $found = $known;
     foreach (glob(__DIR__ . '/*.php') ?: [] as $file) {
         if (basename($file) === 'admin_i18n.php') { continue; }   // sajat magat ne olvassa
         $src = (string)@file_get_contents($file);
         if (preg_match_all("/\bt\(\s*'((?:[^'\\\\]|\\\\.)*)'/", $src, $m)) {
             foreach ($m[1] as $k) {
                 $k = str_replace(["\\'", '\\\\'], ["'", '\\'], $k);
+                // az osszefuzes toredeke ("tab.", "flash.") nem kulcs
+                if ($k === '' || str_ends_with($k, '.')) { continue; }
                 $found[$k] = $known[$k] ?? $k;
             }
         }

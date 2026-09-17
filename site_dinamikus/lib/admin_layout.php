@@ -129,7 +129,8 @@ function admin_head(string $title, string $page = '', array $counts = []): void
   <a class="sbtn" id="site-open" href="/hu/" target="_blank" rel="noopener" title="<?= h(t('A súgó megnyitása új lapon')) ?>">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6M10 14 21 3"/></svg>
   </a>
-  <button class="sbtn" id="theme-toggle" title="<?= h(t('head.theme')) ?>"></button>
+  <button class="sbtn" id="theme-toggle" title="<?= h(t('head.theme')) ?>"
+          data-t-light="<?= h(t('Világos téma')) ?>" data-t-dark="<?= h(t('Sötét téma')) ?>"></button>
 
   <?php // A kezelofelulet merete: az admin 13px-es alapra epul, ami nagy
         // felbontasu kepernyon aprora sikerul. Itt allithato, es megjegyzi. ?>
