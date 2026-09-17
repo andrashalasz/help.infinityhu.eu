@@ -27,6 +27,7 @@ require __DIR__ . '/lib/media.php';
 require __DIR__ . '/lib/docx_export.php';
 require __DIR__ . '/lib/trash.php';
 require __DIR__ . '/lib/admin_layout.php';
+require __DIR__ . '/lib/admin_editor.php';
 require __DIR__ . '/lib/admin_actions.php';
 require __DIR__ . '/lib/admin_pages.php';
 require __DIR__ . '/lib/admin_pages2.php';
@@ -169,7 +170,8 @@ switch ($page) {
         break;
     case 'translate':
         page_translate($db, $cfg, (int)($_GET['src'] ?? 0), (string)($_GET['to'] ?? 'en'), $counts,
-                       (string)($_GET['st'] ?? 'all'));
+                       (string)($_GET['st'] ?? 'all'),
+                       (string)($_GET['l'] ?? ''), (string)($_GET['r'] ?? ''));
         break;
     case 'screens':
         page_screens($db, $counts);

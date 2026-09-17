@@ -393,7 +393,7 @@ p.lead { margin: 0 0 18px; color: var(--ink-3); font-size: calc(13.4px * var(--f
    Minden hasáb UGYANOLYAN magas, és belül görget. E nélkül a hosszú forrás
    felnyújtotta az egészet, a rövid fordítás mellett pedig üres sáv maradt. */
 .tr-grid--multi {
-  grid-template-columns: repeat(var(--tr-cols, 3), minmax(300px, 1fr));
+  grid-template-columns: repeat(var(--tr-cols, 2), minmax(420px, 1fr));
   align-items: stretch;
   overflow-x: auto;
   padding-bottom: 6px;
@@ -405,8 +405,10 @@ p.lead { margin: 0 0 18px; color: var(--ink-3); font-size: calc(13.4px * var(--f
   max-height: calc(100vh - 210px); min-height: 420px;
 }
 .tr-col > .panel__b { display: flex; flex-direction: column; flex: 1; min-height: 0; }
-.tr-col .tred { display: flex; flex-direction: column; flex: 1; min-height: 0; }
-.tr-col .tred-area { flex: 1; overflow: auto; }
+.tr-col .ed { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.tr-col .ed-area { flex: 1; overflow: auto; min-height: 220px; }
+/* a hasábon belül a ragadós eszköztár a hasábhoz igazodjon */
+.tr-col .ed-toolbar, .tr-col .ed-tbl { position: static; }
 /* a forrás marad szem előtt, miközben a fordítást írod */
 .tr-col--src { position: sticky; left: 0; z-index: 2; }
 

@@ -275,9 +275,10 @@
   }
 
   /* ---------------------------------------------------------- szerkesztő */
-  function wireEditor() {
-    var ed = $('#ed'), area = $('#ed-area'), src = $('#ed-src');
-    if (!ed || !area || !src) { return; }
+  function wireEditor(ed) {
+    if (!ed) { return; }
+    var area = $('.ed-area', ed), src = $('.ed-src', ed);
+    if (!area || !src) { return; }
 
     // a HTML forrás mindig a szerkesztő aktuális tartalma legyen beküldéskor
     function syncToSource() {
@@ -297,7 +298,7 @@
       });
     }
 
-    var srcBtn = $('#ed-source');
+    var srcBtn = $('.ed-source', ed);
     if (srcBtn) {
       srcBtn.addEventListener('click', function () {
         if (ed.classList.contains('ed--source')) {
@@ -313,7 +314,7 @@
       });
     }
 
-    $$('.ed-toolbar [data-cmd]').forEach(function (b) {
+    $$('.ed-toolbar [data-cmd]', ed).forEach(function (b) {
       b.addEventListener('click', function () {
         area.focus();
         document.execCommand(b.getAttribute('data-cmd'), false, undefined);
@@ -326,8 +327,8 @@
        help_anchorize() változatlanul ki tudja belőle olvasni a fejezetszámot. */
 
     var HEADS = 'h2,h3,h4,h5,h6';
-    var levelSel = $('#ed-level');
-    var autoNum  = $('#ed-autonum');
+    var levelSel = $('.ed-level', ed);
+    var autoNum  = $('.ed-autonum', ed);
 
     function chapterPrefix() { return (ed.getAttribute('data-chapter') || '').trim(); }
 
@@ -423,6 +424,12 @@
       });
     }
 
+    // Az alabbi ket blokk kizarolag a FEJEZET-szerkesztore vonatkozik
+    // (a=article.draft). A forditas lapon tobb szerkeszto is fut, ott ezek
+    // rossz urlapot kuldenenek be.
+    var isArticleEditor = !!(form && form.querySelector('[name=a]')
+                             && form.querySelector('[name=a]').value === 'article.draft');
+
     /* ---------- elnavigálás mentetlen szöveggel ----------
        Ha a szerkesztőben van el nem mentett változás, és a szerkesztő
        elkattint (pl. a Fordítás fülre), megkérdezzük, mentsük-e. Enélkül a
@@ -433,7 +440,7 @@
     }
 
     document.addEventListener('click', function (e) {
-      if (!isDirty()) { return; }
+      if (!isArticleEditor || !isDirty()) { return; }
       var a = e.target.closest ? e.target.closest('a[href]') : null;
       if (!a) { return; }
 
@@ -470,7 +477,7 @@
     }, true);
 
     /* ---------- a fejezet címe: azonnal látszik, magától mentődik ---------- */
-    var titleIn = $('#ed-title-in');
+    var titleIn = isArticleEditor ? $('#ed-title-in') : null;
     if (titleIn) {
       var echo = $('#ed-title-echo');
       var rowLink = document.querySelector('.picker__a.on span');
@@ -519,7 +526,7 @@
         .catch(function () { /* halozati hiba eseten marad a kezi mentes */ });
     }
 
-    var renumBtn = $('#ed-renumber');
+    var renumBtn = $('.ed-renumber', ed);
     if (renumBtn) {
       renumBtn.addEventListener('click', function () {
         adoptInlineNumbers();
@@ -544,7 +551,7 @@
     area.addEventListener('mouseup', refreshLevel);
 
     /* ---------- betűszín és kiemelés ---------- */
-    var pop = $('#pop-color'), popBtn = $('.ed-pop__b[data-pop="color"]');
+    var pop = $('[data-pop-menu="color"]', ed), popBtn = $('.ed-pop__b[data-pop="color"]', ed);
     if (pop && popBtn) {
       popBtn.addEventListener('click', function (e) {
         e.stopPropagation();
@@ -581,7 +588,7 @@
         b.addEventListener('click', function () {
           var c = b.getAttribute('data-color');
           applyColor('color', c);
-          var bar = $('#ed-color-bar');
+          var bar = $('.ed-color-bar', ed);
           if (bar) { bar.style.background = c; }
           pop.classList.remove('open');
         });
@@ -599,11 +606,11 @@
           pop.classList.remove('open');
         });
       });
-      var custom = $('#ed-color-custom');
+      var custom = $('.ed-color-custom', ed);
       if (custom) {
         custom.addEventListener('change', function () {
           applyColor('color', custom.value);
-          var bar = $('#ed-color-bar');
+          var bar = $('.ed-color-bar', ed);
           if (bar) { bar.style.background = custom.value; }
           pop.classList.remove('open');
         });
@@ -612,7 +619,7 @@
 
     /* ---------- szöveg igazítása ---------- */
     var ALIGN = { left: 'justifyLeft', center: 'justifyCenter', right: 'justifyRight', justify: 'justifyFull' };
-    $$('.ed-toolbar [data-align]').forEach(function (b) {
+    $$('.ed-toolbar [data-align]', ed).forEach(function (b) {
       b.addEventListener('click', function () {
         area.focus();
         document.execCommand(ALIGN[b.getAttribute('data-align')], false, undefined);
@@ -623,12 +630,12 @@
 
     /* ---------- előugró ablakok közös kezelése ---------- */
     function wirePop(name) {
-      var btn = $('.ed-pop__b[data-pop="' + name + '"]');
-      var menu = $('#pop-' + name);
+      var btn = $('.ed-pop__b[data-pop="' + name + '"]', ed);
+      var menu = $('[data-pop-menu="' + name + '"]', ed);
       if (!btn || !menu) { return null; }
       btn.addEventListener('click', function (e) {
         e.stopPropagation();
-        $$('.ed-pop__m.open').forEach(function (m) { if (m !== menu) { m.classList.remove('open'); } });
+        $$('.ed-pop__m.open', ed).forEach(function (m) { if (m !== menu) { m.classList.remove('open'); } });
         menu.classList.toggle('open');
       });
       menu.addEventListener('click', function (e) { e.stopPropagation(); });
@@ -641,7 +648,7 @@
     if (popTable) {
       var GRID_R = 8, GRID_C = 8;
       var pickR = 3, pickC = 3;
-      var grid = $('#tblgrid'), lbl = $('#tblgrid-lbl');
+      var grid = $('.tblgrid', ed), lbl = $('.tblgrid__lbl', ed);
 
       for (var r = 1; r <= GRID_R; r++) {
         for (var c = 1; c <= GRID_C; c++) {
@@ -673,10 +680,10 @@
       });
       paintGrid();
 
-      $('#tbl-insert').addEventListener('click', insertTable);
+      $('.tbl-insert', ed).addEventListener('click', insertTable);
 
       function insertTable() {
-        var withHead = $('#tbl-new-head').checked;
+        var withHead = $('.tbl-new-head', ed).checked;
         var rows = withHead ? Math.max(1, pickR - 1) : pickR;
         var html = '<table class="erp-table tbl--grid">';
         if (withHead) {
@@ -717,7 +724,7 @@
     }
 
     /* ---------- táblázat-eszközök (a kurzor alatti táblára hatnak) ---------- */
-    var tblBar = $('#ed-tbl');
+    var tblBar = $('.ed-tbl', ed);
 
     function currentCell() {
       var sel = window.getSelection();
@@ -743,9 +750,9 @@
       tblBar.hidden = !t;
       if (!t) { return; }
       var b = BORDERS.find(function (k) { return t.classList.contains(k); }) || 'tbl--grid';
-      var selB = $('#tbl-border');
+      var selB = $('.tbl-border', ed);
       if (selB) { selB.value = b.replace('tbl--', ''); }
-      var z = $('#tbl-zebra');
+      var z = $('.tbl-zebra', ed);
       if (z) { z.checked = t.classList.contains('tbl--zebra'); }
     }
     area.addEventListener('keyup', refreshTableBar);
@@ -814,7 +821,7 @@
         });
       });
 
-      var borderSel = $('#tbl-border');
+      var borderSel = $('.tbl-border', ed);
       if (borderSel) {
         borderSel.addEventListener('change', function () {
           var t = currentTable();
@@ -824,7 +831,7 @@
           afterTableChange();
         });
       }
-      var zebra = $('#tbl-zebra');
+      var zebra = $('.tbl-zebra', ed);
       if (zebra) {
         zebra.addEventListener('change', function () {
           var t = currentTable();
@@ -873,7 +880,7 @@
         $$('[data-cfg]', popCell).forEach(function (b) {
           b.addEventListener('click', function () { paintCells('color', b.getAttribute('data-cfg')); });
         });
-        var cbgC = $('#tbl-cbg-custom'), cfgC = $('#tbl-cfg-custom');
+        var cbgC = $('.tbl-cbg-custom', ed), cfgC = $('.tbl-cfg-custom', ed);
         if (cbgC) { cbgC.addEventListener('change', function () { paintCells('background-color', cbgC.value); }); }
         if (cfgC) { cfgC.addEventListener('change', function () { paintCells('color', cfgC.value); }); }
       }
@@ -895,13 +902,13 @@
         $$('[data-hfg]', popHead).forEach(function (b) {
           b.addEventListener('click', function () { paintHeader('color', b.getAttribute('data-hfg')); });
         });
-        var hbgC = $('#tbl-hbg-custom'), hfgC = $('#tbl-hfg-custom');
+        var hbgC = $('.tbl-hbg-custom', ed), hfgC = $('.tbl-hfg-custom', ed);
         if (hbgC) { hbgC.addEventListener('change', function () { paintHeader('background-color', hbgC.value); }); }
         if (hfgC) { hfgC.addEventListener('change', function () { paintHeader('color', hfgC.value); }); }
       }
     }
 
-    var linkBtn = $('.ed-toolbar [data-act="link"]');
+    var linkBtn = $('.ed-toolbar [data-act="link"]', ed);
     if (linkBtn) {
       linkBtn.addEventListener('click', function () {
         var url = window.prompt('Hivatkozás címe (URL):', 'https://');
@@ -997,9 +1004,9 @@
       inp.click();
     }
 
-    var upImg = $('.ed-toolbar [data-act="upload-image"]');
+    var upImg = $('.ed-toolbar [data-act="upload-image"]', ed);
     if (upImg) { upImg.addEventListener('click', function () { pickAndUpload('image/*'); }); }
-    var upVid = $('.ed-toolbar [data-act="upload-video"]');
+    var upVid = $('.ed-toolbar [data-act="upload-video"]', ed);
     if (upVid) { upVid.addEventListener('click', function () { pickAndUpload('video/mp4,video/webm,video/quicktime'); }); }
 
     // fogd-és-vidd a szerkesztore
@@ -1403,6 +1410,19 @@
 
   /* ---------------------------------------------------------- gépi nyersfordítás */
   function wireTranslate() {
+    // nyelvválasztó a két hasáb fölött
+    $$('.tr-lang').forEach(function (sel) {
+      sel.addEventListener('change', function () {
+        var all = $$('.tr-lang');
+        var l = all[0] ? all[0].value : '';
+        var r = all[1] ? all[1].value : '';
+        var u = new URL(window.location.href);
+        u.searchParams.set('l', l);
+        u.searchParams.set('r', r);
+        window.location.href = u.toString();
+      });
+    });
+
     // Minden celnyelv sajat urlap + sajat szerkeszto. Korabban egyetlen,
     // id-vel cimzett szerkeszto volt (#ed-area, #tr-machine); tobb nyelvnel
     // ez csak az elsot kotötte volna be, a tobbi urlap pedig URES body-t
@@ -1411,50 +1431,14 @@
     if (!forms.length) { return; }
 
     forms.forEach(function (form) {
-      var area  = $('.tred-area', form);
-      var src   = $('.tred-src', form);
+      // A teljes szerkesztot a kozos wireEditor() koti be (kepfeltoltes,
+      // tablazat, szinek, cimsorszintek) - itt csak a gepi forditas gombja
+      // es a cim marad.
+      var area  = $('.ed-area', form);
+      var src   = $('.ed-src', form);
       var title = $('.tr-title', form);
       var how   = $('.tr-how', form);
-      var wrap  = $('.tred', form);
       if (!area || !src) { return; }
-
-      function sync() { src.value = area.innerHTML; }
-      sync();
-      area.addEventListener('input', sync);
-      form.addEventListener('submit', function () {
-        if (!wrap.classList.contains('ed--source')) { sync(); }
-      });
-
-      $$('.ed-toolbar [data-cmd]', form).forEach(function (b) {
-        b.addEventListener('click', function () {
-          area.focus();
-          document.execCommand(b.getAttribute('data-cmd'), false, undefined);
-          sync();
-        });
-      });
-      $$('.ed-toolbar [data-block]', form).forEach(function (b) {
-        b.addEventListener('click', function () {
-          area.focus();
-          document.execCommand('formatBlock', false, b.getAttribute('data-block'));
-          sync();
-        });
-      });
-
-      var srcBtn = $('.tred-source', form);
-      if (srcBtn) {
-        srcBtn.addEventListener('click', function () {
-          if (wrap.classList.contains('ed--source')) {
-            area.innerHTML = src.value;
-            wrap.classList.remove('ed--source');
-            srcBtn.classList.remove('on');
-          } else {
-            sync();
-            src.value = prettyHtml(src.value);
-            wrap.classList.add('ed--source');
-            srcBtn.classList.add('on');
-          }
-        });
-      }
 
       /* --- gepi nyersforditas erre a nyelvre --- */
       var btn = $('.tr-machine', form);
@@ -1927,7 +1911,7 @@
     wireToggles();
     wirePicker();
     wireNewArticleChapter();
-    wireEditor();
+    $$('.ed').forEach(wireEditor);
     wireImport();
     wireTranslate();
     wireBulk();

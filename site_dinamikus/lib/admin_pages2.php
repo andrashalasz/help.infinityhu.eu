@@ -91,11 +91,11 @@ function page_import(PDO $db, array $cfg, string $lang, int $importId, array $co
 
     <div class="panel__b">
       <div class="stats" style="margin-bottom:0">
-        <div class="stat"><div class="stat__n"><?= count($items) ?></div><div class="stat__l">fejezet a dokumentumban</div></div>
-        <div class="stat stat--warn"><div class="stat__n"><?= $nMod ?></div><div class="stat__l">eltér a mostanitól</div></div>
-        <div class="stat"><div class="stat__n"><?= $nSame ?></div><div class="stat__l">változatlan</div></div>
-        <div class="stat"><div class="stat__n"><?= $nNew ?></div><div class="stat__l">új fejezet</div></div>
-        <div class="stat"><div class="stat__n"><?= (int)($stats['images'] ?? 0) ?></div><div class="stat__l">új kép kibontva</div></div>
+ <div class="stat stat__n stat__l"><div ><?= count($items) ?></div><div >fejezet a dokumentumban</div></div>
+ <div class="stat stat--warn stat__n stat__l"><div ><?= $nMod ?></div><div >eltér a mostanitól</div></div>
+ <div class="stat stat__n stat__l"><div ><?= $nSame ?></div><div >változatlan</div></div>
+ <div class="stat stat__n stat__l"><div ><?= $nNew ?></div><div >új fejezet</div></div>
+ <div class="stat stat__n stat__l"><div ><?= (int)($stats['images'] ?? 0) ?></div><div >új kép kibontva</div></div>
       </div>
     </div>
 
@@ -151,7 +151,7 @@ function page_import(PDO $db, array $cfg, string $lang, int $importId, array $co
                         ? ' · a cím is változik: „' . h((string)$it['cur_title']) . '” → „' . h((string)$it['title']) . '”'
                         : '')
                      . '</div>';
-                  echo '<div class="diff">' . ($d['changed'] ? $d['html'] : '<span class="muted">A szöveg szó szerint megegyezik a mostanival.</span>') . '</div>';
+ echo '<div class="diff muted">' . ($d['changed'] ? $d['html'] : '<span >A szöveg szó szerint megegyezik a mostanival.</span>') . '</div>';
               }
               ?>
             </div>
@@ -201,8 +201,18 @@ function page_import(PDO $db, array $cfg, string $lang, int $importId, array $co
 
 // ============================================================ FORDÍTÁS
 function page_translate(PDO $db, array $cfg, int $srcId, string $to, array $counts,
-                        string $state = 'all'): void
+                        string $state = 'all', string $left = '', string $right = ''): void
 {
+    // Ket nyelv latszik egymas mellett, es a SZERKESZTO valasztja meg, melyik
+    // ketto. Alapertelmezes: a forras (magyar) es az elso celnyelv.
+    $langCodes = array_keys(ADMIN_LANGS);
+    if (!in_array($left, $langCodes, true))  { $left  = admin_source_lang(); }
+    if (!in_array($right, $langCodes, true)) { $right = (string)array_key_first(admin_target_langs()); }
+    if ($left === $right) {
+        $right = $left === admin_source_lang()
+               ? (string)array_key_first(admin_target_langs())
+               : admin_source_lang();
+    }
     $STATES = ['all' => 'Mind', 'missing' => 'Hiányzik', 'stale' => 'Elavult',
                'draft' => 'Vázlat', 'ok' => 'Naprakész'];
     if (!isset($STATES[$state])) { $state = 'all'; }
@@ -276,7 +286,7 @@ function page_translate(PDO $db, array $cfg, int $srcId, string $to, array $coun
   </p>
   <?= flash_render() ?>
 
-  <div class="panel" style="margin-bottom:14px"><div class="panel__b" style="display:flex;gap:14px;flex-wrap:wrap;align-items:center">
+ <div class="panel panel__b" style="margin-bottom:14px"><div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center">
     <div>
       <span class="lbl" style="display:inline">A lista állapota eszerint:</span>
       <?php foreach (array_keys(admin_target_langs()) as $code): ?>
@@ -307,7 +317,7 @@ function page_translate(PDO $db, array $cfg, int $srcId, string $to, array $coun
   <div class="page--split" style="padding:0">
     <!-- fejezetlista -->
     <div class="panel picker">
-      <div class="picker__f"><input class="inp" id="pick-filter" placeholder="Szűrés…" autocomplete="off"></div>
+ <div class="picker__f inp"><input id="pick-filter" placeholder="Szűrés…" autocomplete="off"></div>
       <div class="picker__l" id="pick-list">
         <?php
         $curModule = null;
@@ -333,7 +343,7 @@ function page_translate(PDO $db, array $cfg, int $srcId, string $to, array $coun
     <!-- szerkesztő -->
     <div>
       <?php if (!$src): ?>
-        <div class="panel"><div class="empty">Válassz egy fejezetet a bal oldali listából.</div></div>
+ <div class="panel empty"><div >Válassz egy fejezetet a bal oldali listából.</div></div>
       <?php else: ?>
         <?php
         // MINDEN celnyelv egy oldalon. Uj nyelv felvetele az ADMIN_LANGS-ban
@@ -355,93 +365,91 @@ function page_translate(PDO $db, array $cfg, int $srcId, string $to, array $coun
         }
         ?>
 
-        <div class="tr-grid tr-grid--multi" style="--tr-cols: <?= count($targets) + 1 ?>">
-          <!-- forrás -->
-          <?php
-          $srcDraft  = $src['draft_html'] !== null && trim(help_plain((string)$src['draft_html'])) !== '';
-          $srcBody   = $srcDraft ? (string)$src['draft_html'] : (string)$src['body_html'];
-          $srcTitle  = $srcDraft && (string)($src['draft_title'] ?? '') !== ''
-                     ? (string)$src['draft_title'] : (string)$src['title'];
-          $srcEmpty  = trim(help_plain($srcBody)) === '';
-          ?>
-          <div class="panel tr-col tr-col--src">
-            <div class="panel__h"><h2><?= h(ADMIN_LANGS[admin_source_lang()]) ?> (forrás)</h2><span class="sp"></span>
-              <?php if ($srcDraft): ?><span class="badge badge--warn">vázlat</span><?php endif; ?>
-              <span class="badge"><?= h($src['chapter_no']) ?></span></div>
-            <div class="panel__b">
-              <?php if ($srcDraft): ?>
-                <div class="msg msg--warn" style="margin:0 0 10px">
-                  A magyar fejezeten <b>közzétételre váró vázlat</b> van — itt ezt látod, mert ez a
-                  legfrissebb szöveg.
-                </div>
-              <?php elseif ($srcEmpty): ?>
-                <div class="msg msg--info" style="margin:0 0 10px">
-                  Ennek a fejezetnek <b>még nincs tartalma</b> magyarul — előbb írd meg a
-                  <a href="<?= h(admin_url(['p' => 'articles', 'lang' => admin_source_lang(), 'id' => $src['id']])) ?>">Fejezetek</a>
-                  fülön.
-                </div>
-              <?php endif; ?>
-              <div class="field"><label>Cím</label>
-                <input class="inp" value="<?= h($srcTitle) ?>" readonly></div>
-              <div class="tr-src body"><?= fix_img_url($srcBody) ?></div>
-            </div>
-          </div>
+        <?php
+        /** Egy nyelv adatlapja: a forras csak olvashato, a celnyelv szerkesztheto. */
+        $pane = function (string $code) use ($db, $src, $targets, $tr) {
+            $isSource = $code === admin_source_lang();
+            $row = $isSource ? $src : ($targets[$code] ?? null);
 
-          <!-- célnyelvek -->
-          <?php foreach ($targets as $code => $row):
-              $tBody  = $row ? (string)($row['draft_html'] ?? $row['body_html']) : '';
-              $tTitle = $row ? (string)($row['draft_title'] ?? $row['title']) : '';
-              $stale  = $row && $row['translated_from_hash'] !== $src['content_hash'];
-          ?>
-            <form class="panel tr-col" method="post" action="<?= h(admin_url()) ?>"
-                  data-tr-lang="<?= h($code) ?>">
-              <?= csrf_input() ?>
-              <input type="hidden" name="a" value="translate.save">
-              <input type="hidden" name="src_id" value="<?= (int)$src['id'] ?>">
-              <input type="hidden" name="to" value="<?= h($code) ?>">
-              <input type="hidden" name="how" class="tr-how" value="manual">
+            $draft  = $row && $row['draft_html'] !== null
+                      && trim(help_plain((string)$row['draft_html'])) !== '';
+            $body   = $row ? (string)($draft ? $row['draft_html'] : $row['body_html']) : '';
+            $title  = $row ? (string)($draft && (string)($row['draft_title'] ?? '') !== ''
+                                      ? $row['draft_title'] : $row['title']) : '';
+            $stale  = !$isSource && $row && $row['translated_from_hash'] !== $src['content_hash'];
+            return compact('isSource', 'row', 'draft', 'body', 'title', 'stale');
+        };
+        ?>
 
-              <div class="panel__h"><h2><?= h(ADMIN_LANGS[$code]) ?></h2><span class="sp"></span>
-                <?php if (!$row): ?><span class="badge badge--err">hiányzik</span>
-                <?php elseif ($stale): ?><span class="badge badge--warn">elavult</span>
-                <?php elseif ($row['draft_html'] !== null): ?><span class="badge badge--info">vázlat</span>
-                <?php else: ?><span class="badge badge--ok">naprakész</span><?php endif; ?>
-                <button class="btn btn--sm tr-machine" type="button" data-to="<?= h($code) ?>"
-                        <?= $tr->isConfigured() ? '' : 'disabled title="Nincs beállítva gépi fordító"' ?>>
-                  Gépi nyersfordítás
-                </button>
+        <div class="tr-grid tr-grid--multi" style="--tr-cols: 2">
+          <?php foreach ([$left, $right] as $slot => $code):
+              $d = $pane($code);
+              $other = $slot === 0 ? $right : $left;
+          ?>
+            <?php if ($d['isSource']): ?>
+              <div class="panel tr-col">
+                <div class="panel__h">
+                  <select class="ed-sel tr-lang" data-slot="<?= (int)$slot ?>">
+                    <?php foreach (ADMIN_LANGS as $c => $lbl): ?>
+                      <option value="<?= h($c) ?>" <?= $c === $code ? 'selected' : '' ?>
+                              <?= $c === $other ? 'disabled' : '' ?>><?= h($lbl) ?></option>
+                    <?php endforeach; ?>
+                  </select>
+                  <span class="badge">forrás</span>
+                  <span class="sp"></span>
+                  <?php if ($d['draft']): ?><span class="badge badge--warn">vázlat</span><?php endif; ?>
+                  <span class="badge"><?= h($src['chapter_no']) ?></span>
+                </div>
+                <div class="panel__b">
+                  <div class="field"><label>Cím</label>
+                    <input class="inp" value="<?= h($d['title']) ?>" readonly></div>
+                  <div class="tr-src body"><?= fix_img_url($d['body']) ?></div>
+                </div>
               </div>
 
-              <div class="panel__b">
-                <div class="field"><label>Cím</label>
-                  <input class="inp tr-title" name="title" value="<?= h($tTitle) ?>"></div>
-                <div class="tred">
-                  <div class="ed-toolbar">
-                    <button type="button" data-cmd="bold"><b>F</b></button>
-                    <button type="button" data-cmd="italic"><i>D</i></button>
-                    <button type="button" data-block="h2">H2</button>
-                    <button type="button" data-block="h3">H3</button>
-                    <button type="button" data-block="p">¶</button>
-                    <button type="button" data-cmd="insertUnorderedList">•</button>
-                    <button type="button" data-cmd="insertOrderedList">1.</button>
-                    <span class="sp"></span>
-                    <button type="button" class="tred-source">&lt;/&gt; HTML</button>
+            <?php else: ?>
+              <form class="panel tr-col" method="post" action="<?= h(admin_url()) ?>"
+                    data-tr-lang="<?= h($code) ?>">
+                <?= csrf_input() ?>
+                <input type="hidden" name="a" value="translate.save">
+                <input type="hidden" name="src_id" value="<?= (int)$src['id'] ?>">
+                <input type="hidden" name="to" value="<?= h($code) ?>">
+                <input type="hidden" name="how" class="tr-how" value="manual">
+
+                <div class="panel__h">
+                  <select class="ed-sel tr-lang" data-slot="<?= (int)$slot ?>">
+                    <?php foreach (ADMIN_LANGS as $c => $lbl): ?>
+                      <option value="<?= h($c) ?>" <?= $c === $code ? 'selected' : '' ?>
+                              <?= $c === $other ? 'disabled' : '' ?>><?= h($lbl) ?></option>
+                    <?php endforeach; ?>
+                  </select>
+                  <span class="sp"></span>
+                  <?php if (!$d['row']): ?><span class="badge badge--err">hiányzik</span>
+                  <?php elseif ($d['stale']): ?><span class="badge badge--warn">elavult</span>
+                  <?php elseif ($d['draft']): ?><span class="badge badge--info">vázlat</span>
+                  <?php else: ?><span class="badge badge--ok">naprakész</span><?php endif; ?>
+                  <button class="btn btn--sm tr-machine" type="button"
+                          <?= $tr->isConfigured() ? '' : 'disabled title="Nincs beállítva gépi fordító"' ?>>
+                    Gépi nyersfordítás
+                  </button>
+                </div>
+
+                <div class="panel__b">
+                  <div class="field"><label>Cím</label>
+                    <input class="inp tr-title" name="title" value="<?= h($d['title']) ?>"></div>
+                  <?php editor_block((string)$src['chapter_no'], $d['body']); ?>
+                  <div class="btnbar" style="margin-top:10px">
+                    <button class="btn btn--p btn--sm" type="submit">Mentés vázlatként</button>
+                    <label class="check"><input type="checkbox" name="publish_now"> közzététel is</label>
+                    <span style="flex:1"></span>
+                    <?php if ($d['row']): ?>
+                      <a class="btn btn--sm btn--ghost"
+                         href="<?= h(admin_url(['p' => 'articles', 'lang' => $code, 'id' => $d['row']['id']])) ?>">Megnyitás</a>
+                    <?php endif; ?>
                   </div>
-                  <div class="ed-area body tred-area" contenteditable="true"><?= fix_img_url($tBody) ?></div>
-                  <textarea class="ta ed-src tred-src" name="body"></textarea>
                 </div>
-
-                <div class="btnbar" style="margin-top:10px">
-                  <button class="btn btn--p btn--sm" type="submit">Mentés vázlatként</button>
-                  <label class="check"><input type="checkbox" name="publish_now"> közzététel is</label>
-                  <span style="flex:1"></span>
-                  <?php if ($row): ?>
-                    <a class="btn btn--sm btn--ghost"
-                       href="<?= h(admin_url(['p' => 'articles', 'lang' => $code, 'id' => $row['id']])) ?>">Megnyitás</a>
-                  <?php endif; ?>
-                </div>
-              </div>
-            </form>
+              </form>
+            <?php endif; ?>
           <?php endforeach; ?>
         </div>
 
@@ -509,7 +517,7 @@ function page_screens(PDO $db, array $counts): void
   </div>
 
   <div class="panel">
-    <div class="panel__h"><h2>Meglévő hozzárendelések</h2><span class="sp"></span><span class="badge"><?= count($rows) ?></span></div>
+ <div class="panel__h sp badge"><h2>Meglévő hozzárendelések</h2><span ></span><span ><?= count($rows) ?></span></div>
     <div class="panel__b panel__b--flush">
       <?php if (!$rows): ?>
         <div class="empty">Még nincs egyetlen hozzárendelés sem.</div>
@@ -523,7 +531,7 @@ function page_screens(PDO $db, array $counts): void
               <td><a href="<?= h(admin_url(['p' => 'articles', 'lang' => $r['lang'], 'id' => $r['article_id']])) ?>">
                 <?= h($r['chapter_no'] . ' ' . $r['title']) ?></a></td>
               <td class="mono muted" data-label="Horgony"><?= h((string)$r['anchor']) ?></td>
-              <td data-label="Ellenőrzött"><?= $r['is_verified'] ? '<span class="badge badge--ok">igen</span>' : '<span class="badge">nem</span>' ?></td>
+ <td data-label="Ellenőrzött"><?= $r['is_verified'] ? '<span class="badge badge--ok">igen</span>' : '<span >nem</span>' ?></td>
               <td class="nowrap">
                 <form method="post" action="<?= h(admin_url()) ?>" data-confirm="Törlöd ezt a hozzárendelést?">
                   <?= csrf_input() ?>
@@ -580,12 +588,12 @@ function page_media(PDO $db, array $cfg, int $page, array $counts): void
   <?= flash_render() ?>
 
   <?php if (!$writable): ?>
-    <div class="msg msg--warn"><b>A fájlok mappája nem írható</b> (<span class="mono"><?= h($dir) ?></span>).
+ <div class="msg msg--warn mono"><b>A fájlok mappája nem írható</b> (<span ><?= h($dir) ?></span>).
       Feltöltés és Word-import képkibontás nem fog működni.</div>
   <?php endif; ?>
 
   <div class="panel" style="margin-bottom:16px">
-    <div class="panel__h"><h2>Feltöltés</h2><span class="sp"></span>
+ <div class="panel__h sp"><h2>Feltöltés</h2><span ></span>
       <span class="badge"><?= $total ?> fájl</span></div>
     <div class="panel__b">
       <form method="post" action="<?= h(admin_url()) ?>" enctype="multipart/form-data">
@@ -692,11 +700,11 @@ function page_export(PDO $db, array $cfg, string $lang, array $counts): void
   <?= flash_render() ?>
 
   <div class="panel">
-    <div class="panel__h"><h2>Letöltés</h2><span class="sp"></span>
+ <div class="panel__h sp"><h2>Letöltés</h2><span ></span>
       <?php if ($version !== ''): ?><span class="badge badge--info"><?= h($version) ?></span><?php endif; ?></div>
     <div class="panel__b panel__b--flush">
       <table class="tbl">
-        <thead><tr><th>Nyelv</th><th class="num">Közzétett fejezet</th><th class="num">Kikapcsolt</th>
+ <thead><tr><th>Nyelv</th><th class="num">Közzétett fejezet</th><th >Kikapcsolt</th>
           <th class="num">Kép</th><th>Letöltés</th></tr></thead>
         <tbody>
         <?php foreach (ADMIN_LANGS as $code => $label):
@@ -704,7 +712,7 @@ function page_export(PDO $db, array $cfg, string $lang, array $counts): void
           <tr>
             <td><b><?= h($label) ?></b> <span class="badge"><?= h($code) ?></span></td>
             <td class="num" data-label="Közzétett"><?= (int)$s['published'] ?></td>
-            <td class="num" data-label="Kikapcsolt"><?= (int)$s['hidden'] ? '<span class="badge badge--warn">' . (int)$s['hidden'] . '</span>' : '0' ?></td>
+ <td class="num badge badge--warn" data-label="Kikapcsolt"><?= (int)$s['hidden'] ? '<span >' . (int)$s['hidden'] . '</span>' : '0' ?></td>
             <td class="num" data-label="Kép"><?= (int)$s['images'] ?></td>
             <td class="nowrap">
               <form method="post" action="<?= h(admin_url()) ?>" style="display:inline">
@@ -804,17 +812,17 @@ function page_users(PDO $db, array $counts): void
         <?= csrf_input() ?>
         <input type="hidden" name="a" value="user.save">
         <div class="row">
-          <div class="field"><label>Felhasználónév</label><input class="inp" name="username" required></div>
-          <div class="field"><label>Név</label><input class="inp" name="display_name"></div>
-          <div class="field"><label>E-mail</label><input class="inp" name="email" type="email"></div>
+ <div class="field inp"><label>Felhasználónév</label><input name="username" required></div>
+ <div class="field inp"><label>Név</label><input name="display_name"></div>
+ <div class="field inp"><label>E-mail</label><input name="email" type="email"></div>
           <div class="field" style="flex:0 1 160px"><label>Szerepkör</label>
             <select class="sel" name="role">
               <option value="editor">editor</option>
               <option value="translator">translator</option>
               <option value="admin">admin</option>
             </select></div>
-          <div class="field"><label>Kezdeti jelszó</label><input class="inp" name="password" type="password" required minlength="8"></div>
-          <div class="field" style="flex:0 1 auto;align-self:flex-end"><button class="btn btn--p" type="submit">Létrehozás</button></div>
+ <div class="field inp"><label>Kezdeti jelszó</label><input name="password" type="password" required minlength="8"></div>
+ <div class="field btn btn--p" style="flex:0 1 auto;align-self:flex-end"><button type="submit">Létrehozás</button></div>
         </div>
         <div class="hint">Legalább 8 karakter, betű és szám is legyen benne.</div>
       </form>
@@ -822,7 +830,7 @@ function page_users(PDO $db, array $counts): void
   </div>
 
   <div class="panel">
-    <div class="panel__h"><h2>Meglévő felhasználók</h2><span class="sp"></span><span class="badge"><?= count($users) ?></span></div>
+ <div class="panel__h sp badge"><h2>Meglévő felhasználók</h2><span ></span><span ><?= count($users) ?></span></div>
     <div class="panel__b panel__b--flush">
       <?php foreach ($users as $us): ?>
         <form method="post" action="<?= h(admin_url()) ?>" id="uf<?= (int)$us['id'] ?>">
@@ -936,7 +944,7 @@ function page_settings(PDO $db, array $cfg, array $counts): void
   </div>
 
   <div class="panel" style="margin-bottom:16px" id="jelszo">
-    <div class="panel__h"><h2>Saját jelszó</h2><span class="sp"></span>
+ <div class="panel__h sp"><h2>Saját jelszó</h2><span ></span>
       <span class="muted"><?= h(auth_user()['username']) ?></span></div>
     <div class="panel__b">
       <p class="lead" style="margin-bottom:14px">
@@ -961,7 +969,7 @@ function page_settings(PDO $db, array $cfg, array $counts): void
   </div>
 
   <div class="panel" style="margin-bottom:16px">
-    <div class="panel__h"><h2>Gépi fordítás</h2><span class="sp"></span>
+ <div class="panel__h sp"><h2>Gépi fordítás</h2><span ></span>
       <span class="badge <?= $tr->isConfigured() ? 'badge--ok' : '' ?>"><?= h($tr->label()) ?></span></div>
     <div class="panel__b">
       <?php if ($envMt): ?>
@@ -1099,7 +1107,7 @@ function page_trash(PDO $db, array $counts): void
   <?= flash_render() ?>
 
   <div class="panel">
-    <div class="panel__h"><h2>Törölt elemek</h2><span class="sp"></span>
+ <div class="panel__h sp"><h2>Törölt elemek</h2><span ></span>
       <span class="badge <?= $open ? 'badge--warn' : '' ?>"><?= count($open) ?> visszaállítható</span>
       <?php if ($open): ?>
         <form method="post" action="<?= h(admin_url()) ?>"

@@ -81,7 +81,7 @@ function page_chpw(bool $forced): void
     <a href="<?= h(admin_url(['p' => 'settings'])) ?>#jelszo">Beállítások</a> fülön is bármikor elvégezhető.
   </p>
   <?= flash_render() ?>
-  <div class="panel"><div class="panel__b">
+ <div class="panel panel__b"><div >
     <form method="post" action="<?= h(admin_url()) ?>" autocomplete="off">
       <?= csrf_input() ?>
       <input type="hidden" name="a" value="chpw">
@@ -130,7 +130,7 @@ function page_account(PDO $db): void
       <table class="tbl">
         <tr><td style="width:180px" class="muted">Felhasználónév</td><td><b><?= h($me['username']) ?></b></td></tr>
         <tr><td class="muted">Név</td><td><?= h($me['display_name']) ?></td></tr>
-        <tr><td class="muted">Szerepkör</td><td><span class="badge badge--info"><?= h($me['role']) ?></span></td></tr>
+ <tr><td class="muted badge badge--info">Szerepkör</td><td><span ><?= h($me['role']) ?></span></td></tr>
         <tr><td class="muted">Utolsó belépés</td><td><?= h((string)($me['last_login_at'] ?? '—')) ?></td></tr>
       </table>
     </div>
@@ -217,23 +217,23 @@ function page_dashboard(PDO $db, array $cfg, array $counts): void
   <!-- A csempék kattinthatók: mindegyik a hozzá tartozó, MÁR LESZŰRT listára visz. -->
   <div class="stats">
     <a class="stat" href="<?= h(admin_url(['p' => 'articles'])) ?>">
-      <div class="stat__n"><?= (int)$stats['articles'] ?></div><div class="stat__l">fejezet (3 nyelven)</div></a>
+ <div class="stat__n stat__l"><?= (int)$stats['articles'] ?></div><div >fejezet (3 nyelven)</div></a>
     <a class="stat <?= (int)$stats['drafts'] ? 'stat--warn' : '' ?>" href="#drafts">
-      <div class="stat__n"><?= (int)$stats['drafts'] ?></div><div class="stat__l">közzétételre váró vázlat</div></a>
+ <div class="stat__n stat__l"><?= (int)$stats['drafts'] ?></div><div >közzétételre váró vázlat</div></a>
     <a class="stat <?= $stale ? 'stat--warn' : '' ?>" href="<?= h(admin_url(['p' => 'translate', 'to' => 'en', 'st' => 'stale'])) ?>">
-      <div class="stat__n"><?= $stale ?></div><div class="stat__l">elavult fordítás</div></a>
+ <div class="stat__n stat__l"><?= $stale ?></div><div >elavult fordítás</div></a>
     <a class="stat <?= $missing ? 'stat--err' : '' ?>" href="<?= h(admin_url(['p' => 'translate', 'to' => 'en', 'st' => 'missing'])) ?>">
-      <div class="stat__n"><?= $missing ?></div><div class="stat__l">hiányzó fordítás</div></a>
+ <div class="stat__n stat__l"><?= $missing ?></div><div >hiányzó fordítás</div></a>
     <a class="stat" href="<?= h(admin_url(['p' => 'modules'])) ?>">
-      <div class="stat__n"><?= (int)$stats['modules'] ?></div><div class="stat__l">modul</div></a>
+ <div class="stat__n stat__l"><?= (int)$stats['modules'] ?></div><div >modul</div></a>
     <a class="stat" href="<?= h(admin_url(['p' => 'screens'])) ?>">
-      <div class="stat__n"><?= (int)$stats['screens'] ?></div><div class="stat__l">képernyő-hozzárendelés</div></a>
+ <div class="stat__n stat__l"><?= (int)$stats['screens'] ?></div><div >képernyő-hozzárendelés</div></a>
   </div>
 
   <div class="page--split" style="padding:0">
     <div>
       <div class="panel" id="drafts" style="margin-bottom:16px">
-        <div class="panel__h"><h2>Közzétételre vár</h2><span class="sp"></span>
+ <div class="panel__h sp"><h2>Közzétételre vár</h2><span ></span>
           <span class="badge"><?= count($drafts) ?></span></div>
         <div class="panel__b panel__b--flush">
           <?php if (!$drafts): ?>
@@ -278,7 +278,7 @@ function page_dashboard(PDO $db, array $cfg, array $counts): void
                 <tr>
                   <td data-label="Fájl"><a href="<?= h(admin_url(['p' => 'import', 'import' => $i['id']])) ?>"><?= h($i['filename']) ?></a></td>
                   <td class="nowrap muted" data-label="Tartalom"><?= (int)($s['chapters'] ?? 0) ?> fejezet · <?= (int)($s['images'] ?? 0) ?> kép</td>
-                  <td class="nowrap" data-label="Állapot"><span class="badge <?= $i['status'] === 'applied' ? 'badge--ok' : '' ?>"><?= h($i['status']) ?></span></td>
+ <td class="nowrap badge <?= $i['status'] === 'applied' ? 'badge--ok' : '' ?>" data-label="Állapot"><span ><?= h($i['status']) ?></span></td>
                   <td class="nowrap muted" data-label="Mikor"><?= h(substr((string)$i['uploaded_at'], 0, 16)) ?></td>
                 </tr>
               <?php endforeach; ?>
@@ -405,7 +405,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
       <?php foreach ($tree as $m): ?>
         <div class="picker__mod" data-id="<?= (int)$m['id'] ?>">
         <div class="picker__m" data-module="<?= (int)$m['id'] ?>">
-          <label class="picker__mchk"><input type="checkbox" class="pick-mod-all" tabindex="-1"></label>
+ <label class="picker__mchk pick-mod-all"><input type="checkbox" tabindex="-1"></label>
           <span class="picker__grip picker__mgrip" title="Húzd a főfejezetek sorrendjének átrendezéséhez" aria-hidden="true">⠿</span>
           <button type="button" class="picker__mt" data-fold="<?= (int)$m['id'] ?>"
                   title="Kattints a ki- és összecsukáshoz">
@@ -432,7 +432,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
         <div class="picker__group" data-module="<?= (int)$m['id'] ?>">
         <?php foreach ($m['articles'] as $a): ?>
           <div class="picker__row picker__row--d<?= (int)$a['depth'] ?>" data-id="<?= (int)$a['id'] ?>">
-            <label class="picker__chk"><input type="checkbox" class="pick-one" value="<?= (int)$a['id'] ?>" tabindex="-1"></label>
+ <label class="picker__chk pick-one"><input type="checkbox" value="<?= (int)$a['id'] ?>" tabindex="-1"></label>
             <span class="picker__grip" title="Húzd a sorrend átrendezéséhez" aria-hidden="true">⠿</span>
             <a class="picker__a<?= $article && (int)$a['id'] === (int)$article['id'] ? ' on' : '' ?>"
                href="<?= h(admin_url(['p' => 'articles', 'lang' => $lang, 'id' => $a['id']])) ?>">
@@ -530,7 +530,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
       </div>
 
     <?php elseif (!$article): ?>
-      <div class="panel"><div class="empty">
+ <div class="panel empty"><div >
         Válassz egy fejezetet a bal oldali listából — vagy hozz létre újat a <b>+</b> gombbal.
         A <b>✎</b> gombbal a főfejezet nevét, számát és URL-jét szerkesztheted, mindhárom nyelven.
       </div></div>
@@ -579,7 +579,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
           <?php foreach (ADMIN_LANGS as $code => $label):
               $r = $siblings[$code] ?? null; ?>
             <div class="langcard<?= $r && $r['is_published'] ? ' on' : '' ?>">
-              <div class="langcard__t"><?= h($label) ?> <span class="mono muted"><?= h($code) ?></span></div>
+ <div class="langcard__t mono muted"><?= h($label) ?> <span ><?= h($code) ?></span></div>
               <?php if (!$r): ?>
                 <div class="muted" style="font-size:calc(12px * var(--fs))">nincs ilyen nyelvű változat</div>
                 <a class="btn btn--sm" href="<?= h(admin_url(['p' => 'translate', 'to' => $code === 'hu' ? 'en' : $code,
@@ -689,191 +689,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
         ];
         $edMarks = ['#fff3a3' => 'Sárga', '#d6f2e0' => 'Zöld', '#fde2e2' => 'Piros', '#dceafd' => 'Kék'];
         ?>
-        <div class="ed" id="ed" data-chapter="<?= h($article['chapter_no']) ?>">
-          <div class="ed-toolbar">
-            <div class="ed-grp">
-              <select class="ed-sel" id="ed-level" title="Bekezdés szintje">
-                <option value="p">Bekezdés</option>
-                <option value="h2">1. szint — címsor</option>
-                <option value="h3">2. szint</option>
-                <option value="h4">3. szint</option>
-                <option value="h5">4. szint</option>
-                <option value="h6">5. szint</option>
-              </select>
-            </div>
-
-            <div class="ed-grp">
-              <button type="button" data-cmd="bold" title="Félkövér (Ctrl+B)"><b>F</b></button>
-              <button type="button" data-cmd="italic" title="Dőlt (Ctrl+I)"><i>D</i></button>
-              <button type="button" data-cmd="underline" title="Aláhúzott (Ctrl+U)"><u>A</u></button>
-              <button type="button" data-cmd="strikeThrough" title="Áthúzott"><s>Á</s></button>
-            </div>
-
-            <div class="ed-grp">
-              <div class="ed-pop">
-                <button type="button" class="ed-pop__b" data-pop="color" title="Betűszín">
-                  <span class="ed-ink">A</span><span class="ed-bar" id="ed-color-bar"></span><span class="ed-car">▾</span>
-                </button>
-                <div class="ed-pop__m" id="pop-color">
-                  <div class="ed-pop__t">Betűszín</div>
-                  <div class="ed-sw">
-                    <?php foreach ($edColors as $hex => $name): ?>
-                      <button type="button" class="sw" data-color="<?= h($hex) ?>"
-                              style="background:<?= h($hex) ?>" title="<?= h($name) ?>"></button>
-                    <?php endforeach; ?>
-                  </div>
-                  <div class="ed-pop__t">Kiemelés</div>
-                  <div class="ed-sw">
-                    <?php foreach ($edMarks as $hex => $name): ?>
-                      <button type="button" class="sw" data-mark="<?= h($hex) ?>"
-                              style="background:<?= h($hex) ?>" title="<?= h($name) ?>"></button>
-                    <?php endforeach; ?>
-                    <button type="button" class="sw sw--none" data-mark="none" title="Kiemelés törlése"></button>
-                  </div>
-                  <label class="ed-pop__c">Egyéni szín
-                    <input type="color" id="ed-color-custom" value="#0a6ed1"></label>
-                </div>
-              </div>
-            </div>
-
-            <div class="ed-grp">
-              <button type="button" data-cmd="insertUnorderedList" title="Felsorolás">•&nbsp;lista</button>
-              <button type="button" data-cmd="insertOrderedList" title="Számozott lista">1.&nbsp;lista</button>
-              <button type="button" data-cmd="outdent" title="Behúzás csökkentése">⇤</button>
-              <button type="button" data-cmd="indent" title="Behúzás növelése">⇥</button>
-            </div>
-
-            <div class="ed-grp">
-              <button type="button" data-align="left"    title="Balra igazítás">≡<sub>◀</sub></button>
-              <button type="button" data-align="center"  title="Középre igazítás">≡<sub>◆</sub></button>
-              <button type="button" data-align="right"   title="Jobbra igazítás">≡<sub>▶</sub></button>
-              <button type="button" data-align="justify" title="Sorkizárt">≡<sub>■</sub></button>
-            </div>
-
-            <div class="ed-grp">
-              <button type="button" data-act="link" title="Hivatkozás (Ctrl+K)">🔗</button>
-              <button type="button" data-act="upload-image" title="Kép feltöltése és beszúrása">🖼&nbsp;Kép</button>
-              <button type="button" data-act="upload-video" title="Videó feltöltése és beszúrása">🎬&nbsp;Videó</button>
-              <div class="ed-pop">
-                <button type="button" class="ed-pop__b ed-pop__b--wide" data-pop="table" title="Táblázat beszúrása">▦&nbsp;Tábla<span class="ed-car">▾</span></button>
-                <div class="ed-pop__m ed-pop__m--tbl" id="pop-table">
-                  <div class="ed-pop__t">Új táblázat</div>
-                  <div class="tblgrid" id="tblgrid" aria-label="Méret választása"></div>
-                  <div class="tblgrid__lbl" id="tblgrid-lbl">3 × 3</div>
-                  <label class="ed-pop__c">Fejlécsor <input type="checkbox" id="tbl-new-head" checked></label>
-                  <button type="button" class="btn btn--p btn--sm" id="tbl-insert" style="width:100%;margin-top:8px">Beszúrás</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="ed-grp">
-              <button type="button" data-act="callout-tip" class="ed-b--tip" title="Tipp doboz">Tipp</button>
-              <button type="button" data-act="callout-warn" class="ed-b--warn" title="Figyelmeztetés doboz">Figyelem</button>
-              <button type="button" data-act="callout-crit" class="ed-b--crit" title="Piros, erős kiemelés — amit semmiképp nem szabad elnézni">Fontos</button>
-            </div>
-
-            <div class="ed-grp">
-              <button type="button" data-cmd="removeFormat" title="Formázás törlése">Tiszta</button>
-              <button type="button" id="ed-renumber" title="Címsorok újraszámozása most">1.2.3 Számozás</button>
-            </div>
-
-            <span class="sp"></span>
-            <div class="ed-grp ed-grp--end">
-              <label class="ed-chk" title="A címsorok számozása gépeléskor magától frissül">
-                <input type="checkbox" id="ed-autonum" checked> Automatikus számozás
-              </label>
-              <button type="button" id="ed-source" title="HTML forrás mutatása">&lt;/&gt;&nbsp;HTML</button>
-            </div>
-          </div>
-          <!-- Táblázat-eszközök: csak akkor látszik, ha a kurzor táblázatban áll.
-               A Word „Táblázateszközök" fülének megfelelője. -->
-          <div class="ed-tbl" id="ed-tbl" hidden>
-            <span class="ed-tbl__t">Táblázat</span>
-
-            <div class="ed-grp">
-              <button type="button" data-tbl="row-above"  title="Sor beszúrása fölé">↑ sor</button>
-              <button type="button" data-tbl="row-below"  title="Sor beszúrása alá">↓ sor</button>
-              <button type="button" data-tbl="row-del"    title="Sor törlése">✕ sor</button>
-            </div>
-            <div class="ed-grp">
-              <button type="button" data-tbl="col-left"   title="Oszlop beszúrása balra">← oszlop</button>
-              <button type="button" data-tbl="col-right"  title="Oszlop beszúrása jobbra">→ oszlop</button>
-              <button type="button" data-tbl="col-del"    title="Oszlop törlése">✕ oszlop</button>
-            </div>
-
-            <div class="ed-grp">
-              <select class="ed-sel" id="tbl-border" title="Keret és cellavonalak">
-                <option value="grid">Teljes rács</option>
-                <option value="rows">Csak vízszintes vonalak</option>
-                <option value="frame">Csak külső keret</option>
-                <option value="plain">Nincs vonal</option>
-              </select>
-              <label class="ed-chk" title="Váltakozó sorháttér"><input type="checkbox" id="tbl-zebra"> Sávozott</label>
-            </div>
-
-            <div class="ed-grp">
-              <div class="ed-pop">
-                <button type="button" class="ed-pop__b" data-pop="tblhead" title="Fejléc színei">
-                  <span class="ed-ink">Fejléc</span><span class="ed-car">▾</span>
-                </button>
-                <div class="ed-pop__m" id="pop-tblhead">
-                  <div class="ed-pop__t">Fejléc háttere</div>
-                  <div class="ed-sw">
-                    <?php foreach (['#eceff3' => 'Szürke', '#0a6ed1' => 'Kék', '#0854a0' => 'Sötétkék',
-                                    '#107e3e' => 'Zöld', '#b8681a' => 'Narancs', '#bb0000' => 'Piros',
-                                    '#1c2a3a' => 'Sötét'] as $hex => $name): ?>
-                      <button type="button" class="sw" data-hbg="<?= h($hex) ?>"
-                              style="background:<?= h($hex) ?>" title="<?= h($name) ?>"></button>
-                    <?php endforeach; ?>
-                    <button type="button" class="sw sw--none" data-hbg="none" title="Nincs kitöltés"></button>
-                  </div>
-                  <div class="ed-pop__t">Fejléc betűszíne</div>
-                  <div class="ed-sw">
-                    <?php foreach (['#1f2a36' => 'Sötét', '#ffffff' => 'Fehér', '#0854a0' => 'Kék'] as $hex => $name): ?>
-                      <button type="button" class="sw" data-hfg="<?= h($hex) ?>"
-                              style="background:<?= h($hex) ?>" title="<?= h($name) ?>"></button>
-                    <?php endforeach; ?>
-                  </div>
-                  <label class="ed-pop__c">Egyéni háttér <input type="color" id="tbl-hbg-custom" value="#0a6ed1"></label>
-                  <label class="ed-pop__c">Egyéni betűszín <input type="color" id="tbl-hfg-custom" value="#ffffff"></label>
-                </div>
-              </div>
-
-              <div class="ed-pop">
-                <button type="button" class="ed-pop__b" data-pop="tblcell" title="A kijelölt cellák színei">
-                  <span class="ed-ink">Cella</span><span class="ed-car">▾</span>
-                </button>
-                <div class="ed-pop__m" id="pop-tblcell">
-                  <div class="ed-pop__t">Cella háttere</div>
-                  <div class="ed-sw">
-                    <?php foreach (['#eceff3' => 'Szürke', '#e8f1fb' => 'Kék', '#e6f3ec' => 'Zöld',
-                                    '#fdf3e7' => 'Narancs', '#fbecec' => 'Piros', '#fff3a3' => 'Sárga'] as $hex => $name): ?>
-                      <button type="button" class="sw" data-cbg="<?= h($hex) ?>"
-                              style="background:<?= h($hex) ?>" title="<?= h($name) ?>"></button>
-                    <?php endforeach; ?>
-                    <button type="button" class="sw sw--none" data-cbg="none" title="Kitöltés törlése"></button>
-                  </div>
-                  <div class="ed-pop__t">Cella betűszíne</div>
-                  <div class="ed-sw">
-                    <?php foreach (['#1f2a36' => 'Alap', '#0854a0' => 'Kék', '#107e3e' => 'Zöld',
-                                    '#bb0000' => 'Piros', '#ffffff' => 'Fehér'] as $hex => $name): ?>
-                      <button type="button" class="sw" data-cfg="<?= h($hex) ?>"
-                              style="background:<?= h($hex) ?>" title="<?= h($name) ?>"></button>
-                    <?php endforeach; ?>
-                  </div>
-                  <label class="ed-pop__c">Egyéni háttér <input type="color" id="tbl-cbg-custom" value="#e8f1fb"></label>
-                  <label class="ed-pop__c">Egyéni betűszín <input type="color" id="tbl-cfg-custom" value="#1f2a36"></label>
-                  <div class="hint" style="margin-top:6px">Több cellát is színezhetsz: húzd át rajtuk a kijelölést.</div>
-                </div>
-              </div>
-            </div>
-
-            <span class="sp"></span>
-            <button type="button" data-tbl="delete" class="ed-b--warn" title="A teljes táblázat törlése">Táblázat törlése</button>
-          </div>
-
-          <div class="ed-area body" id="ed-area" contenteditable="true" spellcheck="true"><?= fix_img_url($body) ?></div>
-          <textarea class="ta ed-src" id="ed-src" name="body"></textarea>
+        <?php editor_block((string)$article['chapter_no'], $body); ?>
         </div>
 
         <div class="hint" style="margin-top:6px">
@@ -903,7 +719,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
 
       <!-- korábbi változatok -->
       <div class="panel" style="margin-top:16px">
-        <div class="panel__h"><h2>Korábbi változatok</h2><span class="sp"></span>
+ <div class="panel__h sp"><h2>Korábbi változatok</h2><span ></span>
           <span class="badge"><?= count($revisions) ?></span></div>
         <div class="panel__b panel__b--flush">
           <?php if (!$revisions): ?>
@@ -1060,14 +876,14 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
             <?php endforeach; ?>
           </select></div>
         <div class="row">
-          <div class="field"><label>Fejezetszám <span class="muted">(üresen hagyva automatikus)</span></label>
+ <div class="field muted"><label>Fejezetszám <span >(üresen hagyva automatikus)</span></label>
             <input class="inp" name="chapter_no" id="new-chapter"
                    placeholder="<?= h((string)($modules[0]['next_no'] ?? '')) ?>"></div>
-          <div class="field" style="flex:3 1 260px"><label>Cím</label><input class="inp" name="title" required></div>
+ <div class="field inp" style="flex:3 1 260px"><label>Cím</label><input name="title" required></div>
         </div>
         <div class="row">
-          <div class="field"><label>URL-azonosító (üresen hagyva automatikus)</label><input class="inp mono" name="slug"></div>
-          <div class="field" style="flex:0 1 120px"><label>Sorrend</label><input class="inp" name="sort_order" type="number" value="0"></div>
+ <div class="field inp mono"><label>URL-azonosító (üresen hagyva automatikus)</label><input name="slug"></div>
+ <div class="field inp" style="flex:0 1 120px"><label>Sorrend</label><input name="sort_order" type="number" value="0"></div>
         </div>
       </div>
       <div class="modal__f">
@@ -1099,7 +915,7 @@ function page_modules(PDO $db, string $lang, array $counts): void
   <div style="margin-bottom:14px"><?= lang_switch('modules', $lang) ?></div>
 
   <div class="panel">
-    <div class="panel__h"><h2><?= h(ADMIN_LANGS[$lang]) ?> modulok</h2><span class="sp"></span>
+ <div class="panel__h sp"><h2><?= h(ADMIN_LANGS[$lang]) ?> modulok</h2><span ></span>
       <button class="btn btn--p btn--sm" type="button" data-modal="new-module">+ Új modul</button></div>
     <div class="panel__b panel__b--flush">
       <div class="hint" style="padding:10px 16px 0">
@@ -1118,7 +934,7 @@ function page_modules(PDO $db, string $lang, array $counts): void
         <tbody id="mod-sort">
         <?php foreach ($modules as $m): ?>
           <tr data-id="<?= (int)$m['id'] ?>">
-            <td class="grip" data-label=""><span class="picker__grip" title="Húzd az átrendezéshez">⠿</span></td>
+ <td class="grip picker__grip" data-label=""><span title="Húzd az átrendezéshez">⠿</span></td>
             <td data-label="Sorrend"><input class="inp" form="mf<?= (int)$m['id'] ?>" name="sort_order" type="number" value="<?= (int)$m['sort_order'] ?>" style="width:74px"></td>
             <td data-label="Szám"><input class="inp" form="mf<?= (int)$m['id'] ?>" name="chapter_no" value="<?= h($m['chapter_no']) ?>" style="width:74px"></td>
             <td data-label="Név"><input class="inp" form="mf<?= (int)$m['id'] ?>" name="title" value="<?= h($m['title']) ?>"></td>
@@ -1155,12 +971,12 @@ function page_modules(PDO $db, string $lang, array $counts): void
       <div class="modal__h">Új modul (<?= h(ADMIN_LANGS[$lang]) ?>)</div>
       <div class="modal__b">
         <div class="row">
-          <div class="field"><label>Szám</label><input class="inp" name="chapter_no" placeholder="18"></div>
-          <div class="field" style="flex:3 1 240px"><label>Név</label><input class="inp" name="title" required></div>
+ <div class="field inp"><label>Szám</label><input name="chapter_no" placeholder="18"></div>
+ <div class="field inp" style="flex:3 1 240px"><label>Név</label><input name="title" required></div>
         </div>
         <div class="row">
-          <div class="field"><label>URL-azonosító (automatikus, ha üres)</label><input class="inp mono" name="slug"></div>
-          <div class="field" style="flex:0 1 120px"><label>Sorrend</label><input class="inp" name="sort_order" type="number" value="0"></div>
+ <div class="field inp mono"><label>URL-azonosító (automatikus, ha üres)</label><input name="slug"></div>
+ <div class="field inp" style="flex:0 1 120px"><label>Sorrend</label><input name="sort_order" type="number" value="0"></div>
         </div>
       </div>
       <div class="modal__f">
