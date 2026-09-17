@@ -29,6 +29,45 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
         back($action === 'login' ? ['p' => 'login'] : []);
     }
 
+    // Egy fejezet nyelvi valtozatai. A magyar a forras, ezert ha azt toroljuk,
+
+    // az angol/nemet parjanak sincs tobbe ertelme - kulonben arvan ottmaradnak
+
+    // a listaban, es ugy tunik, hogy "nem torol". A parositas a fejezetszam,
+
+    // tartalekban a slug alapjan megy.
+
+    $siblings = static function (PDO $db, array $a): array {
+
+        if ((string)$a['lang'] !== 'hu') { return [$a]; }
+
+        $out = [$a];
+
+        $seen = [(int)$a['id'] => true];
+
+        $q = $db->prepare("SELECT * FROM help_article
+
+                            WHERE lang <> 'hu' AND (chapter_no = ? OR slug = ?)");
+
+        $q->execute([(string)$a['chapter_no'], (string)$a['slug']]);
+
+        foreach ($q->fetchAll() as $r) {
+
+            if (isset($seen[(int)$r['id']])) { continue; }
+
+            if ((string)$a['chapter_no'] === '' && (string)$r['slug'] !== (string)$a['slug']) { continue; }
+
+            $seen[(int)$r['id']] = true;
+
+            $out[] = $r;
+
+        }
+
+        return $out;
+
+    };
+
+
     switch ($action) {
 
         // ================================================== fiók
@@ -86,9 +125,43 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                                    SET draft_html = ?, draft_title = ?, draft_by = ?, draft_at = now()
                                  WHERE id = ?');
             $st->execute([$html, $title !== '' ? mb_substr($title, 0, 255) : null, auth_user()['id'], $id]);
+
+            // MEG SOSEM KOZZETETT fejezetnel a cim azonnal ervenybe lep - es
+            // vele az URL is. Kulonben a "Nevtelen fejezet" maradna kint a
+            // fejlecben es a listaban egeszen a kozzetetelig, holott a
+            // fejezetnek meg nincs nyilvanos valtozata, amit vedeni kellene.
+            $renamed = false;
+            if ($title !== '') {
+                $q = $db->prepare("SELECT a.chapter_no, a.slug, a.title, a.lang, a.is_published,
+                                          (SELECT COUNT(*) FROM help_article_revision r
+                                            WHERE r.article_id = a.id) AS revs
+                                     FROM help_article a WHERE a.id = ?");
+                $q->execute([$id]);
+                $a = $q->fetch();
+
+                if ($a && (int)$a['is_published'] === 0 && (int)$a['revs'] === 0) {
+                    $newTitle = mb_substr($title, 0, 255);
+                    $newSlug  = (string)$a['slug'];
+
+                    // a slugot csak akkor irjuk at, ha meg a regi cimbol keszult
+                    if ($a['slug'] === help_slug((string)$a['chapter_no'], (string)$a['title'])) {
+                        $cand = help_slug((string)$a['chapter_no'], $newTitle);
+                        if ($cand !== '') {
+                            $free = $db->prepare('SELECT COUNT(*) FROM help_article WHERE slug = ? AND lang = ? AND id <> ?');
+                            $free->execute([$cand, $a['lang'], $id]);
+                            if ((int)$free->fetchColumn() === 0) { $newSlug = $cand; }
+                        }
+                    }
+
+                    $db->prepare('UPDATE help_article SET title = ?, slug = ?, draft_title = NULL WHERE id = ?')
+                       ->execute([$newTitle, $newSlug, $id]);
+                    $renamed = true;
+                }
+            }
+
             audit_me($db, 'article.draft', 'article:' . $id);
 
-            if ($wantsJson) { help_json(['ok' => true, 'saved_at' => date('H:i:s')]); }
+            if ($wantsJson) { help_json(['ok' => true, 'saved_at' => date('H:i:s'), 'renamed' => $renamed]); }
             flash('ok', 'Vázlat mentve.');
             back(['p' => 'articles', 'id' => $id]);
         }
@@ -294,11 +367,17 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                 flash('err', 'Nincs ilyen fejezet.');
                 back(['p' => 'articles']);
             }
-            $trashId = trash_article($db, $a, auth_user()['id']);
-            audit_me($db, 'article.delete', 'article:' . $id, $a['title']);
+            $family = $siblings($db, $a);
+            $tids = [];
+            foreach ($family as $one) { $tids[] = trash_article($db, $one, auth_user()['id']); }
+            audit_me($db, 'article.delete', 'article:' . $id, $a['title'] . ' (' . count($family) . ' nyelv)');
 
+            $extra = count($family) > 1
+                ? ' A(z) ' . (count($family) - 1) . ' idegen nyelvű változatával együtt.'
+                : '';
             flash('ok', 'A fejezet a <b>Kukába</b> került: ' . h($a['chapter_no'] . ' ' . $a['title'])
-                . '. ' . undo_button($db, 'trash.restore', ['id' => $trashId], 'Visszaállítom'));
+                . '.' . $extra . ' '
+                . undo_button($db, 'trash.restore-many', ['ids' => $tids], 'Visszaállítom'));
             back(['p' => 'articles', 'lang' => $a['lang']]);
         }
 
@@ -448,9 +527,14 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                     $st = $db->prepare("SELECT * FROM help_article WHERE id IN ($in)");
                     $st->execute($ids);
                     $tids = [];
+                    $done = [];
                     foreach ($st->fetchAll() as $a) {
-                        $tids[] = trash_article($db, $a, auth_user()['id']);
-                        $n++;
+                        foreach ($siblings($db, $a) as $one) {
+                            if (isset($done[(int)$one['id']])) { continue; }
+                            $done[(int)$one['id']] = true;
+                            $tids[] = trash_article($db, $one, auth_user()['id']);
+                            $n++;
+                        }
                     }
                     audit_me($db, 'articles.bulk', 'delete', (string)$n);
                     flash('ok', "<b>{$n} fejezet</b> a Kukába került. "
@@ -594,7 +678,10 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             $m = $db->prepare('SELECT * FROM help_module WHERE id = ?');
             $m->execute([$id]);
             $row = $m->fetch();
-            if (!$row) { flash('err', 'Nincs ilyen főfejezet.'); back(['p' => 'modules', 'lang' => $lang]); }
+            if (!$row) {
+                flash('err', 'Nincs ilyen főfejezet.');
+                back(['p' => post('from') === 'articles' ? 'articles' : 'modules', 'lang' => $lang]);
+            }
 
             // A fofejezet mindharom nyelven letezik ugyanazzal a szammal, es
             // egyben mozog: kulonben az egyik nyelven torolt fofejezet a
@@ -616,8 +703,9 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                     static fn(array $r): string => strtoupper((string)$r['lang']) . ': ' . (int)$r['n'],
                     $byLang);
                 flash('err', 'Ez a főfejezet még tartalmaz fejezeteket (' . h(implode(', ', $parts))
-                    . ') — előbb helyezd át vagy töröld őket. A többi nyelven is nézd meg.');
-                back(['p' => 'modules', 'lang' => $lang]);
+                    . ') — előbb helyezd át vagy töröld őket. Figyelj rá, hogy a magyar mellett az '
+                    . 'angol és német változatban is lehetnek fejezetek.');
+                back(['p' => post('from') === 'articles' ? 'articles' : 'modules', 'lang' => $lang]);
             }
 
             $tids = [];
@@ -625,7 +713,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             audit_me($db, 'module.delete', 'module:' . $id, $row['title'] . ' (' . count($family) . ' nyelv)');
             flash('ok', 'A főfejezet mind a(z) <b>' . count($family) . ' nyelven</b> a <b>Kukába</b> került. '
                 . undo_button($db, 'trash.restore-many', ['ids' => $tids, 'back' => 'modules'], 'Visszaállítom'));
-            back(['p' => 'modules', 'lang' => $lang]);
+            back(['p' => post('from') === 'articles' ? 'articles' : 'modules', 'lang' => $lang]);
         }
 
         // ================================================== Word import
@@ -844,10 +932,21 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             $to    = post('to');
             if (!array_key_exists($to, ADMIN_LANGS)) { help_json(['ok' => false, 'error' => 'Ismeretlen célnyelv.'], 400); }
 
-            $st = $db->prepare('SELECT lang, body_html, title FROM help_article WHERE id = ?');
+            $st = $db->prepare('SELECT lang, body_html, draft_html, title, draft_title
+                                  FROM help_article WHERE id = ?');
             $st->execute([$srcId]);
             $src = $st->fetch();
             if (!$src) { help_json(['ok' => false, 'error' => 'Nincs ilyen forrásfejezet.'], 404); }
+
+            // A meg kozze nem tett vazlatot is forditjuk - kulonben egy frissen
+            // megirt fejezetbol ures forditas keszult volna.
+            if ($src['draft_html'] !== null && trim(help_plain((string)$src['draft_html'])) !== '') {
+                $src['body_html'] = $src['draft_html'];
+                if ((string)($src['draft_title'] ?? '') !== '') { $src['title'] = $src['draft_title']; }
+            }
+            if (trim(help_plain((string)$src['body_html'])) === '') {
+                help_json(['ok' => false, 'error' => 'A magyar fejezetnek még nincs tartalma — nincs mit fordítani.'], 400);
+            }
 
             try {
                 $tr = Translator::fromConfig($cfg, $db);

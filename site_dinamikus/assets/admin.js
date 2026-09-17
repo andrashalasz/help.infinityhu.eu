@@ -733,6 +733,50 @@
         });
       }
 
+      /* --- a kijelolt cellak szinezese --- */
+      var popCell = wirePop('tblcell');
+      if (popCell) {
+        function selectedCells() {
+          var t = currentTable();
+          if (!t) { return []; }
+          var sel = window.getSelection();
+          var cells = [].slice.call(t.querySelectorAll('td, th'));
+
+          // ha a kijeloles tobb cellat erint, mindet szinezzuk
+          if (sel && sel.rangeCount && !sel.isCollapsed) {
+            var range = sel.getRangeAt(0);
+            var hit = cells.filter(function (c) { return range.intersectsNode(c); });
+            if (hit.length) { return hit; }
+          }
+          var one = currentCell();
+          return one ? [one] : [];
+        }
+
+        function paintCells(prop, value) {
+          var cells = selectedCells();
+          if (!cells.length) {
+            toast('Állj bele abba a cellába, amit színezni szeretnél.', 'warn');
+            return;
+          }
+          cells.forEach(function (c) {
+            if (value === 'none') { c.style.removeProperty(prop); }
+            else { c.style[prop === 'background-color' ? 'backgroundColor' : 'color'] = value; }
+          });
+          afterTableChange();
+          toast(cells.length + ' cella színezve.', 'ok');
+        }
+
+        $$('[data-cbg]', popCell).forEach(function (b) {
+          b.addEventListener('click', function () { paintCells('background-color', b.getAttribute('data-cbg')); });
+        });
+        $$('[data-cfg]', popCell).forEach(function (b) {
+          b.addEventListener('click', function () { paintCells('color', b.getAttribute('data-cfg')); });
+        });
+        var cbgC = $('#tbl-cbg-custom'), cfgC = $('#tbl-cfg-custom');
+        if (cbgC) { cbgC.addEventListener('change', function () { paintCells('background-color', cbgC.value); }); }
+        if (cfgC) { cfgC.addEventListener('change', function () { paintCells('color', cfgC.value); }); }
+      }
+
       var popHead = wirePop('tblhead');
       if (popHead) {
         function paintHeader(prop, value) {

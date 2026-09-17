@@ -345,13 +345,36 @@ function page_translate(PDO $db, array $cfg, int $srcId, string $to, array $coun
 
           <div class="tr-grid">
             <!-- forrás -->
+            <?php
+            // A forrast a LEGFRISSEBB allapotaban mutatjuk: ha van meg kozze
+            // nem tett vazlat, azt - kulonben egy frissen megirt, de meg nem
+            // publikalt fejezet uresen latszott itt, es nem volt mit forditani.
+            $srcDraft  = $src['draft_html'] !== null && trim(help_plain((string)$src['draft_html'])) !== '';
+            $srcBody   = $srcDraft ? (string)$src['draft_html'] : (string)$src['body_html'];
+            $srcTitle  = $srcDraft && (string)($src['draft_title'] ?? '') !== ''
+                       ? (string)$src['draft_title'] : (string)$src['title'];
+            $srcEmpty  = trim(help_plain($srcBody)) === '';
+            ?>
             <div class="panel">
               <div class="panel__h"><h2>Magyar (forrás)</h2><span class="sp"></span>
+                <?php if ($srcDraft): ?><span class="badge badge--warn">vázlat</span><?php endif; ?>
                 <span class="badge"><?= h($src['chapter_no']) ?></span></div>
               <div class="panel__b">
+                <?php if ($srcDraft): ?>
+                  <div class="msg msg--warn" style="margin:0 0 10px">
+                    A magyar fejezeten <b>közzétételre váró vázlat</b> van — itt ezt látod, mert ez a
+                    legfrissebb szöveg. A fordítást is erről érdemes készíteni.
+                  </div>
+                <?php elseif ($srcEmpty): ?>
+                  <div class="msg msg--info" style="margin:0 0 10px">
+                    Ennek a fejezetnek <b>még nincs tartalma</b> magyarul — előbb írd meg a
+                    <a href="<?= h(admin_url(['p' => 'articles', 'lang' => 'hu', 'id' => $src['id']])) ?>">Fejezetek</a>
+                    fülön.
+                  </div>
+                <?php endif; ?>
                 <div class="field"><label>Cím</label>
-                  <input class="inp" value="<?= h($src['title']) ?>" readonly></div>
-                <div class="tr-src body"><?= fix_img_url((string)$src['body_html']) ?></div>
+                  <input class="inp" value="<?= h($srcTitle) ?>" readonly></div>
+                <div class="tr-src body"><?= fix_img_url($srcBody) ?></div>
               </div>
             </div>
 

@@ -390,7 +390,17 @@ function page_articles(PDO $db, string $lang, int $id, array $counts): void
             <span><?= h($m['chapter_no']) ?> <?= h($m['title']) ?></span>
           </button>
           <button type="button" class="picker__madd" data-new-in="<?= (int)$m['id'] ?>"
-                  title="Új fejezet ebbe a modulba">+</button>
+                  title="Új fejezet ebbe a főfejezetbe">+</button>
+          <form method="post" action="<?= h(admin_url()) ?>" style="display:inline"
+                data-confirm="Törlöd a(z) &quot;<?= h($m['chapter_no'] . ' ' . $m['title']) ?>&quot; főfejezetet? Mind a három nyelven a Kukába kerül, ahonnan visszaállítható. Csak akkor sikerül, ha egyetlen nyelven sincs benne fejezet.">
+            <?= csrf_input() ?>
+            <input type="hidden" name="a" value="module.delete">
+            <input type="hidden" name="id" value="<?= (int)$m['id'] ?>">
+            <input type="hidden" name="lang" value="<?= h($lang) ?>">
+            <input type="hidden" name="from" value="articles">
+            <button type="submit" class="picker__madd picker__mdel"
+                    title="Főfejezet törlése">✕</button>
+          </form>
         </div>
         <div class="picker__group" data-module="<?= (int)$m['id'] ?>">
         <?php foreach ($m['articles'] as $a): ?>
@@ -750,6 +760,34 @@ function page_articles(PDO $db, string $lang, int $id, array $counts): void
                   </div>
                   <label class="ed-pop__c">Egyéni háttér <input type="color" id="tbl-hbg-custom" value="#0a6ed1"></label>
                   <label class="ed-pop__c">Egyéni betűszín <input type="color" id="tbl-hfg-custom" value="#ffffff"></label>
+                </div>
+              </div>
+
+              <div class="ed-pop">
+                <button type="button" class="ed-pop__b" data-pop="tblcell" title="A kijelölt cellák színei">
+                  <span class="ed-ink">Cella</span><span class="ed-car">▾</span>
+                </button>
+                <div class="ed-pop__m" id="pop-tblcell">
+                  <div class="ed-pop__t">Cella háttere</div>
+                  <div class="ed-sw">
+                    <?php foreach (['#eceff3' => 'Szürke', '#e8f1fb' => 'Kék', '#e6f3ec' => 'Zöld',
+                                    '#fdf3e7' => 'Narancs', '#fbecec' => 'Piros', '#fff3a3' => 'Sárga'] as $hex => $name): ?>
+                      <button type="button" class="sw" data-cbg="<?= h($hex) ?>"
+                              style="background:<?= h($hex) ?>" title="<?= h($name) ?>"></button>
+                    <?php endforeach; ?>
+                    <button type="button" class="sw sw--none" data-cbg="none" title="Kitöltés törlése"></button>
+                  </div>
+                  <div class="ed-pop__t">Cella betűszíne</div>
+                  <div class="ed-sw">
+                    <?php foreach (['#1f2a36' => 'Alap', '#0854a0' => 'Kék', '#107e3e' => 'Zöld',
+                                    '#bb0000' => 'Piros', '#ffffff' => 'Fehér'] as $hex => $name): ?>
+                      <button type="button" class="sw" data-cfg="<?= h($hex) ?>"
+                              style="background:<?= h($hex) ?>" title="<?= h($name) ?>"></button>
+                    <?php endforeach; ?>
+                  </div>
+                  <label class="ed-pop__c">Egyéni háttér <input type="color" id="tbl-cbg-custom" value="#e8f1fb"></label>
+                  <label class="ed-pop__c">Egyéni betűszín <input type="color" id="tbl-cfg-custom" value="#1f2a36"></label>
+                  <div class="hint" style="margin-top:6px">Több cellát is színezhetsz: húzd át rajtuk a kijelölést.</div>
                 </div>
               </div>
             </div>

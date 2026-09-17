@@ -393,6 +393,9 @@ function mt_auto_translate(PDO $db, array $cfg, int $srcId, ?int $userId, array 
     $st->execute([$srcId]);
     $src = $st->fetch();
     if (!$src || $src['lang'] !== 'hu') { return ['done' => [], 'failed' => []]; }
+    if (trim(help_plain((string)$src['body_html'])) === '') {
+        return ['done' => [], 'failed' => []];   // ures fejezetbol nincs mit forditani
+    }
 
     foreach ($targets as $to) {
         try {
