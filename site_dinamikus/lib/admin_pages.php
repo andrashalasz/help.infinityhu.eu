@@ -633,6 +633,12 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
           </form>
           <a class="btn btn--sm" href="/<?= h($article['lang']) ?>/<?= h($article['slug']) ?>" target="_blank" rel="noopener">Megnyitás a súgóban ↗</a>
           <button class="btn btn--sm" type="button" data-toggle="#meta-form">Adatok</button>
+          <a class="btn btn--sm<?= $revisions ? '' : ' btn--ghost' ?>" href="#revisions"
+             title="<?= $revisions
+                 ? 'Korábbi változatok — összehasonlítás és visszatöltés'
+                 : 'Még nem volt közzététel ezen a fejezeten, ezért nincs korábbi változat' ?>">
+            Verziók<?php if ($revisions): ?> <span class="badge"><?= count($revisions) ?></span><?php endif; ?>
+          </a>
           <button class="btn btn--sm btn--danger" type="button" data-modal="del-article"
                   title="A fejezet a Kukába kerül, ahonnan visszaállítható">Törlés</button>
         </div>
@@ -779,12 +785,17 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
       <?php endif; ?>
 
       <!-- korábbi változatok -->
-      <div class="panel" style="margin-top:16px">
+      <div class="panel" id="revisions" style="margin-top:16px;scroll-margin-top:110px">
  <div class="panel__h"><h2>Korábbi változatok</h2><span class="sp"></span>
           <span class="badge"><?= count($revisions) ?></span></div>
         <div class="panel__b panel__b--flush">
           <?php if (!$revisions): ?>
-            <div class="empty">Még nem volt közzététel ezen a fejezeten.</div>
+            <div class="empty">
+              Még nem volt közzététel ezen a fejezeten, ezért nincs mivel összehasonlítani.<br>
+              <span class="muted">A rendszer minden közzétételkor elmenti az előző állapotot —
+              az első közzétételtől kezdve itt fognak sorakozni a változatok,
+              <b>Összehasonlítás</b> és <b>Visszatöltés</b> gombbal.</span>
+            </div>
           <?php else: ?>
             <table class="tbl">
               <thead><tr><th>#</th><th>Cím</th><th>Összefoglaló</th><th>Mikor</th><th>Ki</th><th></th></tr></thead>
