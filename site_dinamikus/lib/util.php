@@ -104,21 +104,22 @@ function help_clean_html(string $html): string
     if (trim($html) === '') { return ''; }
 
     $allowed = [
-        'p' => ['class'], 'br' => [], 'strong' => [], 'b' => [], 'em' => [], 'i' => [], 'u' => [],
+        'p' => ['class','style'], 'br' => [], 'strong' => ['style'], 'b' => ['style'],
+        'em' => ['style'], 'i' => ['style'], 'u' => [],
         's' => [], 'sub' => [], 'sup' => [], 'mark' => [],
-        'h1' => ['id','class'], 'h2' => ['id','class'], 'h3' => ['id','class'],
-        'h4' => ['id','class'], 'h5' => ['id','class'], 'h6' => ['id','class'],
-        'ul' => ['class'], 'ol' => ['class','start'], 'li' => ['class'],
+        'h1' => ['id','class','style'], 'h2' => ['id','class','style'], 'h3' => ['id','class','style'],
+        'h4' => ['id','class','style'], 'h5' => ['id','class','style'], 'h6' => ['id','class','style'],
+        'ul' => ['class'], 'ol' => ['class','start'], 'li' => ['class','style'],
         'blockquote' => ['class'], 'pre' => ['class'], 'code' => ['class'], 'hr' => [],
-        'table' => ['class'], 'thead' => [], 'tbody' => [], 'tfoot' => [],
-        'tr' => ['class'], 'th' => ['class','colspan','rowspan','scope'], 'td' => ['class','colspan','rowspan'],
+        'table' => ['class','style'], 'thead' => ['class','style'], 'tbody' => ['class'], 'tfoot' => ['class'],
+        'tr' => ['class','style'], 'th' => ['class','colspan','rowspan','scope','style'], 'td' => ['class','colspan','rowspan','style'],
         'a' => ['href','title','target','rel'],
         'img' => ['src','alt','title','width','height','class','loading','style'],
         'video' => ['src','controls','preload','poster','width','height','class','muted','loop','playsinline','style'],
         'source' => ['src','type'],
         'track' => ['src','kind','srclang','label','default'],
         'figure' => ['class','style'], 'figcaption' => ['class'],
-        'div' => ['class','id'], 'span' => ['class'],
+        'div' => ['class','id'], 'span' => ['class','style'],
         'section' => ['class','id'],
     ];
 
@@ -209,7 +210,8 @@ function help_clean_html(string $html): string
  */
 function help_clean_style(string $style): string
 {
-    $allowed = ['width', 'height', 'max-width', 'max-height', 'object-fit'];
+    $allowed = ['width', 'height', 'max-width', 'max-height', 'object-fit',
+                'color', 'background-color', 'text-align'];
     $out = [];
 
     foreach (explode(';', $style) as $decl) {
@@ -219,6 +221,22 @@ function help_clean_style(string $style): string
         $val  = trim($val);
 
         if (!in_array($prop, $allowed, true)) { continue; }
+
+        // Betu- es kiemeloszin. Csak onallo szinertek megy at - se url(),
+        // se var(), se calc(), igy nem lehet vele kiszivarogtatni vagy betolteni.
+        if ($prop === 'color' || $prop === 'background-color') {
+            $c = help_clean_color($val);
+            if ($c !== '') { $out[] = $prop . ':' . $c; }
+            continue;
+        }
+
+        // szoveg igazitasa: balra / kozepre / jobbra / sorkizart
+        if ($prop === 'text-align') {
+            if (in_array($val, ['left', 'center', 'right', 'justify'], true)) {
+                $out[] = $prop . ':' . $val;
+            }
+            continue;
+        }
 
         if ($prop === 'object-fit') {
             if (in_array($val, ['fill', 'contain', 'cover', 'none', 'scale-down'], true)) {
@@ -235,6 +253,33 @@ function help_clean_style(string $style): string
 }
 
 /**
+ * Egyetlen szinertek ellenorzese. Elfogadja a #rgb / #rrggbb alakot, az
+ * rgb()/rgba() fuggvenyt es a szokasos nevesitett szineket. Minden mas
+ * (url(), var(), calc(), expression()) kiesik.
+ */
+function help_clean_color(string $v): string
+{
+    $v = strtolower(trim($v));
+    if ($v === '') { return ''; }
+
+    if (preg_match('/^#([0-9a-f]{3}|[0-9a-f]{6})$/', $v)) { return $v; }
+
+    if (preg_match('/^rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(?:,\s*(0|1|0?\.\d{1,3})\s*)?\)$/', $v, $m)) {
+        foreach ([1, 2, 3] as $i) {
+            if ((int)$m[$i] > 255) { return ''; }
+        }
+        return $v;
+    }
+
+    $named = [
+        'black', 'white', 'red', 'green', 'blue', 'yellow', 'orange', 'purple',
+        'gray', 'grey', 'silver', 'maroon', 'olive', 'lime', 'teal', 'navy',
+        'fuchsia', 'aqua', 'inherit', 'currentcolor', 'transparent',
+    ];
+    return in_array($v, $named, true) ? $v : '';
+}
+
+/**
  * Horgonyok (id) pótlása a cikk címsoraira, hogy az oldalon belüli
  * tartalomjegyzék és a "hivatkozás másolása" működjön.
  * Visszaadja a [html, szakaszok] parost.
@@ -244,7 +289,7 @@ function help_anchorize(string $html): array
     $sections = [];
     $used = [];
     $html = preg_replace_callback(
-        '/<h([2-4])([^>]*)>(.*?)<\/h\1>/is',
+        '/<h([2-6])([^>]*)>(.*?)<\/h\1>/is',
         function (array $m) use (&$sections, &$used): string {
             $level = (int)$m[1];
             $attrs = $m[2];
@@ -276,6 +321,136 @@ function help_anchorize(string $html): array
     ) ?? $html;
 
     return [$html, $sections];
+}
+
+/**
+ * A cikkben levo "Tipp" es "Figyelem" dobozok kigyujtese a jobb savhoz.
+ *
+ * Minden dobozhoz eltesszuk a legkozelebbi elotte allo cimsor horgonyat is,
+ * igy a jobb savban levo hivatkozas oda ugrik, ahol a doboz all.
+ *
+ * @return list<array{kind:string,title:string,text:string,anchor:string}>
+ */
+function help_extract_callouts(string $html): array
+{
+    if (trim($html) === '') { return []; }
+
+    $prev = libxml_use_internal_errors(true);
+    $doc = new DOMDocument('1.0', 'UTF-8');
+    $doc->loadHTML(
+        '<?xml encoding="UTF-8"><!DOCTYPE html><html><body>' . $html . '</body></html>',
+        LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NONET
+    );
+    libxml_clear_errors();
+    libxml_use_internal_errors($prev);
+
+    $body = $doc->getElementsByTagName('body')->item(0);
+    if (!$body) { return []; }
+
+    $out = [];
+    $lastAnchor = '';
+
+    $walk = function (DOMNode $node) use (&$walk, &$out, &$lastAnchor): void {
+        foreach (iterator_to_array($node->childNodes) as $child) {
+            if ($child->nodeType !== XML_ELEMENT_NODE) { continue; }
+            /** @var DOMElement $child */
+            $tag = strtolower($child->nodeName);
+
+            if (preg_match('/^h[1-6]$/', $tag)) {
+                $id = $child->getAttribute('id');
+                if ($id !== '') { $lastAnchor = $id; }
+                continue;
+            }
+
+            $class = ' ' . $child->getAttribute('class') . ' ';
+            if ($tag === 'div' && str_contains($class, ' call ')) {
+                $kind = str_contains($class, ' crit ') ? 'crit'
+                      : (str_contains($class, ' warn ') ? 'warn' : 'tip');
+
+                $title = '';
+                $strong = $child->getElementsByTagName('strong')->item(0);
+                if ($strong) {
+                    $title = trim($strong->textContent);
+                    $strong->parentNode?->removeChild($strong);
+                }
+
+                $text = help_plain($child->textContent);
+                if ($text !== '' || $title !== '') {
+                    $out[] = [
+                        'kind'   => $kind,
+                        'title'  => $title,
+                        'text'   => $text,
+                        'anchor' => $lastAnchor,
+                    ];
+                }
+                continue;
+            }
+            $walk($child);
+        }
+    };
+    $walk($body);
+
+    return $out;
+}
+
+/**
+ * Statikus fajl hivatkozasa a fajl modositasi idejevel, hogy a bongeszo
+ * ne a regi, gyorsitotarazott valtozatot hozza (a kiszolgalo egy hetre
+ * cache-eli a css/js fajlokat).
+ */
+function asset_url(string $path): string
+{
+    static $cache = [];
+    if (!isset($cache[$path])) {
+        $file = __DIR__ . '/..' . $path;
+        $t = @filemtime($file);
+        $cache[$path] = $path . ($t ? '?v=' . $t : '');
+    }
+    return $cache[$path];
+}
+
+/**
+ * Egy fejezetszam merulesi melysege a modulon belul.
+ *
+ * A modul "1", akkor az "1.3" az elso szint, az "1.3.1" a masodik, es igy
+ * tovabb. Ebbol lesz a behuzas a bal oldali listakban, hogy az alfejezet
+ * lathatoan a szulője ala tartozzon.
+ */
+function help_chapter_depth(string $moduleNo, string $chapterNo): int
+{
+    $chapterNo = trim($chapterNo);
+    if ($chapterNo === '') { return 1; }
+
+    $moduleParts  = $moduleNo === '' ? 1 : count(explode('.', trim($moduleNo)));
+    $chapterParts = count(explode('.', $chapterNo));
+
+    return max(1, min(4, $chapterParts - $moduleParts + 1));
+}
+
+/**
+ * Verziocimke nemzetkozi, "kicsitol a nagyig" sorrendben.
+ *
+ *   v2026.09      ->  v.09.2026
+ *   v2026.08.26   ->  v.26.08.2026
+ *
+ * A tarolt ertek NEM valtozik - csak a megjelenitest forditjuk meg, hogy
+ * ne kelljen ev-ho sorrendet olvasni.
+ */
+function help_version_label(string $version): string
+{
+    $v = trim($version);
+    if ($v === '') { return ''; }
+
+    $body = ltrim($v, 'vV.');
+    $parts = explode('.', $body);
+
+    // csak akkor rendezzuk at, ha az elso tag evszamnak latszik
+    if (count($parts) < 2 || !preg_match('/^\d{4}$/', $parts[0])) { return $v; }
+    foreach ($parts as $p) {
+        if (!preg_match('/^\d+$/', $p)) { return $v; }
+    }
+
+    return 'v.' . implode('.', array_reverse($parts));
 }
 
 function help_json(array $data, int $code = 200): void
