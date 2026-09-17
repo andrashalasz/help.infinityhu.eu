@@ -541,6 +541,62 @@ function module_title_sync(PDO $db, int $articleId, string $title): bool
     return true;
 }
 
+/**
+ * A FOFEJEZET atszamozasa a leirasa fejezetszamabol.
+ *
+ * A fofejezet szamat ott lehet atirni, ahol a leirasat szerkesztik: a leiras
+ * szama ES a fofejezet szama ugyanaz. Ha ez megvaltozik, kovetnie kell:
+ *   - a fofejezetnek minden nyelven (a nyelvi valtozatokat a szam koti ossze)
+ *   - az alatta levo osszes fejezetnek (5.2 -> 6.2, 5.3.1 -> 6.3.1)
+ *
+ * Ha a fejezet nem a leiras, vagy a szam nem valtozott, nem csinal semmit.
+ * A slugokhoz nem nyul: azok a nyilvanos URL-ek.
+ *
+ * @return int ahany sort atirt (fofejezetek + fejezetek, minden nyelven)
+ */
+function module_number_cascade(PDO $db, int $articleId, string $newNo): int
+{
+    $newNo = trim($newNo);
+    if ($newNo === '') { return 0; }
+
+    $st = $db->prepare('SELECT a.chapter_no, m.chapter_no AS module_no
+                          FROM help_article a JOIN help_module m ON m.id = a.module_id
+                         WHERE a.id = ?');
+    $st->execute([$articleId]);
+    $r = $st->fetch();
+    if (!$r) { return 0; }
+
+    $oldNo = trim((string)$r['module_no']);
+    // csak a LEIRAS fejezetszama vezerli a fofejezetet
+    if (trim((string)$r['chapter_no']) !== $oldNo || $newNo === $oldNo) { return 0; }
+
+    // ne irjunk ra egy letezo fofejezetre
+    $busy = $db->prepare('SELECT COUNT(*) FROM help_module WHERE chapter_no = ?');
+    $busy->execute([$newNo]);
+    if ((int)$busy->fetchColumn() > 0) { return 0; }
+
+    $ids = $db->prepare('SELECT id FROM help_module WHERE chapter_no = ?');
+    $ids->execute([$oldNo]);
+    $moduleIds = array_map('intval', $ids->fetchAll(PDO::FETCH_COLUMN));
+    if (!$moduleIds) { return 0; }
+    $in = implode(',', $moduleIds);
+
+    $n = 0;
+    $u = $db->prepare('UPDATE help_module SET chapter_no = ? WHERE chapter_no = ?');
+    $u->execute([$newNo, $oldNo]);
+    $n += $u->rowCount();
+
+    // a fejezetek szama a fofejezet szamabol epul: az elotagot csereljuk
+    $a = $db->prepare("UPDATE help_article
+                          SET chapter_no = CONCAT(?, SUBSTRING(chapter_no, CHAR_LENGTH(?) + 1))
+                        WHERE module_id IN ($in)
+                          AND (chapter_no = ? OR chapter_no LIKE CONCAT(?, '.%'))");
+    $a->execute([$newNo, $oldNo, $oldNo, $oldNo]);
+    $n += $a->rowCount();
+
+    return $n;
+}
+
 function admin_setting(PDO $db, string $key, string $default = ''): string
 {
     static $cache = null;

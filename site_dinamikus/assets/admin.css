@@ -150,7 +150,11 @@ p.lead { margin: 0 0 18px; color: var(--ink-3); font-size: calc(13.4px * var(--f
 .msg--err  { background: var(--err-soft);  color: var(--err);  border-color: color-mix(in srgb, var(--err) 30%, transparent); }
 .msg--warn { background: var(--warn-soft); color: var(--warn); border-color: color-mix(in srgb, var(--warn) 30%, transparent); }
 .msg--info { background: var(--info-soft); color: var(--brand-strong); border-color: color-mix(in srgb, var(--brand) 26%, transparent); }
-.msg b { display: block; margin-bottom: 2px; }
+/* A <b> az uzenetben MARAD A SORBAN. Korabban minden <b> kulon sorba
+   kerult, ezert a "Ez a fejezet nincs kozzeteve, a nyilvanos oldalon nem
+   jelenik meg." harom sorba tort szet. Ahol tenyleg cimsor kell, ott a
+   jelolesben all .msg__h - nem a bongeszo talalgat. */
+.msg__h { display: block; font-weight: 700; margin-bottom: 2px; }
 
 /* ---------- listák, táblák ---------- */
 .tbl { width: 100%; border-collapse: collapse; font-size: calc(13.1px * var(--fs)); }

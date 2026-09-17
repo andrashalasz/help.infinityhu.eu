@@ -608,7 +608,7 @@ function page_media(PDO $db, array $cfg, int $page, array $counts): void
   <?= flash_render() ?>
 
   <?php if (!$writable): ?>
- <div class="msg msg--warn"><b>A fájlok mappája nem írható</b> (<span class="mono"><?= h($dir) ?></span>).
+ <div class="msg msg--warn"><span class="msg__h">A fájlok mappája nem írható</span> (<span class="mono"><?= h($dir) ?></span>).
       Feltöltés és Word-import képkibontás nem fog működni.</div>
   <?php endif; ?>
 

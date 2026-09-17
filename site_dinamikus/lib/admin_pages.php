@@ -475,9 +475,6 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
           <button type="button" class="picker__madd" data-new-in="<?= (int)$m['id'] ?>"
                   data-new-no="<?= h((string)($nextNoByModule[(int)$m['id']] ?? '')) ?>"
                   title="Új fejezet ebbe a főfejezetbe">+</button>
-          <a class="picker__madd picker__medit"
-             href="<?= h(admin_url(['p' => 'articles', 'lang' => $lang, 'mod' => $m['id']])) ?>"
-             title="A főfejezet neve, száma, URL-je — minden nyelven">✎</a>
           <?= visibility_form('module', (int)$m['id'], (bool)$m['is_published'], $lang,
                               $m['chapter_no'] . ' ' . $m['title']) ?>
           <form method="post" action="<?= h(admin_url()) ?>" style="display:inline"
@@ -537,57 +534,13 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
   <div>
     <?= flash_render() ?>
 
-    <?php if ($module): ?>
-      <div class="panel">
-        <div class="panel__h"><h2>Főfejezet: <?= h($module['chapter_no'] . ' ' . $module['title']) ?></h2>
-          <span class="sp"></span>
-          <a class="btn btn--sm btn--ghost" href="<?= h(admin_url(['p' => 'articles', 'lang' => $lang])) ?>">Bezárás</a>
-        </div>
-        <div class="panel__b">
-          <form method="post" action="<?= h(admin_url()) ?>">
-            <?= csrf_input() ?>
-            <input type="hidden" name="a" value="module.save">
-            <input type="hidden" name="id" value="<?= (int)$module['id'] ?>">
-            <input type="hidden" name="lang" value="<?= h($lang) ?>">
-            <input type="hidden" name="from" value="articles">
-
-            <div class="row">
-              <div class="field" style="flex:0 1 120px"><label><?= h(t('Szám')) ?></label>
-                <input class="inp" name="chapter_no" value="<?= h($module['chapter_no']) ?>"></div>
-              <div class="field"><label><?= h(t('URL-azonosító')) ?></label>
-                <input class="inp mono" name="slug" value="<?= h($module['slug']) ?>"></div>
-              <div class="field" style="flex:0 1 120px"><label><?= h(t('Sorrend')) ?></label>
-                <input class="inp" name="sort_order" type="number" value="<?= (int)$module['sort_order'] ?>"></div>
-            </div>
-
-            <div class="lbl" style="margin-top:6px">A főfejezet neve nyelvenként</div>
-            <div class="row">
-              <?php foreach (admin_langs() as $code => $label):
-                  $one = $moduleFamily[$code] ?? null; ?>
-                <div class="field">
-                  <label><?= h($label) ?> <span class="mono muted"><?= h($code) ?></span></label>
-                  <input class="inp" name="title_<?= h($code) ?>"
-                         value="<?= h($one ? (string)$one['title'] : '') ?>"
-                         <?= $one ? '' : 'placeholder="ezen a nyelven még nincs"' ?>>
-                </div>
-              <?php endforeach; ?>
-            </div>
-            <div class="hint">A számot és az URL-t mindhárom nyelven együtt állítjuk — ez köti össze
-              a nyelvi változatokat. A nevet nyelvenként külön írhatod.</div>
-
-            <div class="btnbar" style="margin-top:12px">
-              <button class="btn btn--p" type="submit"><?= h(t('Mentés')) ?></button>
-              <span style="flex:1"></span>
-              <span class="muted"><?= (int)$db->query('SELECT COUNT(*) FROM help_article WHERE module_id = ' . (int)$module['id'])->fetchColumn() ?> fejezet ezen a nyelven</span>
-            </div>
-          </form>
-        </div>
-      </div>
-
-    <?php elseif (!$article): ?>
+    <?php // A fofejezet kulon szerkeszto-panelje kivezetve: a NEVET a leiras
+          // cime adja (nyelvenkent), a modul URL-jet sehol nem hasznaljuk, a
+          // SZAMOT pedig a leiras Adatok panelje allitja. ?>
+    <?php if (!$article): ?>
  <div class="panel"><div class="panel__b">
         Válassz egy fejezetet a bal oldali listából — vagy hozz létre újat a <b>+</b> gombbal.
-        A <b>✎</b> gombbal a főfejezet nevét, számát és URL-jét szerkesztheted, mindhárom nyelven.
+        A főfejezet címére kattintva a leírása nyílik meg: ott írod meg, mire való az a menüpont.
       </div></div>
 
     <?php else:
@@ -596,7 +549,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
       ?>
       <?php if ($hasDraft): ?>
         <div class="msg msg--warn">
-          <b>Ezen a fejezeten van közzétételre váró vázlat.</b>
+          <span class="msg__h">Ezen a fejezeten van közzétételre váró vázlat.</span>
           Az alábbi szerkesztő a vázlatot mutatja — a nyilvános oldalon még a korábbi változat látszik.
           Mentve: <?= h(substr((string)$article['draft_at'], 0, 16)) ?>
         </div>
@@ -893,7 +846,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
             <div class="modal__h">Fejezet törlése</div>
             <div class="modal__b">
               <div class="msg msg--err" style="margin:0">
-                <b><?= h(trim($article['chapter_no'] . ' ' . $article['title'])) ?></b>
+                <span class="msg__h"><?= h(trim($article['chapter_no'] . ' ' . $article['title'])) ?></span>
                 A fejezet a <b>Kukába</b> kerül a korábbi változataival együtt — onnan
                 egy kattintással visszaállítható, amíg ki nem üríted.
               </div>

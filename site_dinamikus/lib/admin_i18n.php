@@ -153,6 +153,7 @@ function ui_default(string $key = ''): string|array
 
         // --- uj fofejezet egy kattintassal ---
         'ujfofejezet.nev'         => 'Névtelen főfejezet',
+        'ujfejezet.nev'           => 'Névtelen fejezet',
         'flash.module.quick.kesz' => 'Létrehoztam a(z) <b>{szam}.</b> főfejezetet minden nyelven. '
                                      . '<b>Írd be a nevét</b> a szerkesztő tetején — az lesz a '
                                      . 'főfejezet neve is —, és írd meg, mire való ez a menüpont.',
@@ -194,6 +195,7 @@ function ui_default(string $key = ''): string|array
         'flash.article.discard.vazlat-eldobva-kozzetett-tartalom'           => 'A vázlat eldobva, a közzétett tartalom változatlan.',
         'flash.article.draft.vazlat-mentve'                                 => 'Vázlat mentve.',
         'flash.article.meta.cim-ures'                                       => 'A cím nem lehet üres.',
+        'flash.article.meta.atszamozva' => 'Mentve. A főfejezet új számot kapott, és vele <b>{n} sor</b> — az alatta levő fejezetek is, minden nyelven.',
         'flash.article.meta.fejezet-adatai-mentve'                          => 'A fejezet adatai mentve.',
         'flash.article.publish.hiba'                                        => 'A közzététel nem sikerült: {reszlet}',
         'flash.article.publish.kesz'                                        => 'A fejezet közzétéve — a nyilvános oldalon már ez látszik.',

@@ -326,12 +326,25 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             $id = (int)post('id');
             $slug = post('slug');
             $chapter = post('chapter_no');
+            // A cim mar NEM ezen az urlapon van (a szerkeszto tetejen irod),
+            // ezert ha nem erkezik, a meglevo marad. Enelkul az "Adatok
+            // mentese" mindig azzal szallt el, hogy a cim ures.
             $title = post('title');
+            if ($title === '') {
+                $q = $db->prepare('SELECT title FROM help_article WHERE id = ?');
+                $q->execute([$id]);
+                $title = (string)$q->fetchColumn();
+            }
             if ($title === '') {
                 flash('err', t('flash.article.meta.cim-ures'));
                 back(['p' => 'articles', 'id' => $id]);
             }
             if ($slug === '') { $slug = help_slug($chapter, $title); }
+
+            // Ha ez a fejezet a FOFEJEZET LEIRASA, akkor a szama egyben a
+            // fofejezet szama is. Ilyenkor az atirasa a fofejezetet es az
+            // osszes alatta levo fejezetet is atszamozza, minden nyelven.
+            $cascaded = module_number_cascade($db, $id, mb_substr($chapter, 0, 16));
 
             // Az urlap csak azt allitja, ami valoban ide tartozik. A
             // sorrendet huzassal rendezed, a lathatosagot a szem ikonnal -
@@ -352,8 +365,10 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                     : t('flash.mentesi.hiba', ['reszlet' => h($e->getMessage())]));
                 back(['p' => 'articles', 'id' => $id]);
             }
-            audit_me($db, 'article.meta', 'article:' . $id);
-            flash('ok', t('flash.article.meta.fejezet-adatai-mentve'));
+            audit_me($db, 'article.meta', 'article:' . $id, $cascaded > 0 ? $cascaded . ' atszamozva' : null);
+            flash('ok', $cascaded > 0
+                ? t('flash.article.meta.atszamozva', ['n' => $cascaded])
+                : t('flash.article.meta.fejezet-adatai-mentve'));
             back(['p' => 'articles', 'id' => $id]);
         }
 
@@ -369,11 +384,23 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             // A "+" gomb cim nelkul hozza letre a fejezetet: a cimet a
             // szerkesztoben irja be a szerkeszto, ez az elso mezo ott.
             $untitled = $title === '';
-            if ($untitled) { $title = 'Névtelen fejezet'; }
             // Ha nincs megadva fejezetszam, a modul alatti kovetkezo szabad
             // szamot kapja (pl. az "1 Elso lepesek" modulban 1.4 utan 1.5-ot),
             // es a lista vegere kerul. Igy nem marad szam nelkuli fejezet.
             [$chapter, $sortOrder] = article_next_slot($db, $module, $lang, $chapter, post('sort_order'));
+
+            if ($untitled) {
+                // A fofejezet LEIRASA orokli a fofejezet nevet - annak mar van
+                // neve, felesleges "Nevtelen fejezet"-kent letrehozni, aztan
+                // kezzel beirni ugyanazt. (A leirast a szama arulja el: az
+                // megegyezik a fofejezetevel.)
+                $mq = $db->prepare('SELECT chapter_no, title FROM help_module WHERE id = ?');
+                $mq->execute([$module]);
+                $mrow = $mq->fetch();
+                $title = ($mrow && trim((string)$mrow['chapter_no']) === trim($chapter))
+                    ? (string)$mrow['title']
+                    : t('ujfejezet.nev');
+            }
 
             $slug = post('slug') !== '' ? post('slug') : help_slug($chapter, $title);
 
