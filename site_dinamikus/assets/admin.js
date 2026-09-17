@@ -131,6 +131,36 @@
     modal.classList.add('on');
   }
 
+  /* A szem ikon (lathatosag) urlapjai: mielott elkuldjuk, megkerdezzuk, hogy
+     minden nyelven vagy csak az eppen szerkesztett nyelven kapcsoljunk-e.
+     A valasz a rejtett "scope" mezobe kerul. */
+  function wireScopeForms() {
+    document.addEventListener('submit', function (e) {
+      var f = e.target;
+      if (!f || !f.getAttribute) { return; }
+      var ask = f.getAttribute('data-scope-ask');
+      if (!ask || f.dataset.confirmed === '1') { return; }
+      e.preventDefault();
+
+      var scope = f.querySelector('input[name="scope"]');
+      var lang  = (f.querySelector('input[name="lang"]') || {}).value || '';
+      function go(which) {
+        if (scope) { scope.value = which; }
+        f.dataset.confirmed = '1';
+        if (f.requestSubmit) { f.requestSubmit(); } else { f.submit(); }
+      }
+      // A feliratok a PHP-bol jonnek (ott van a forditas), nem a JS-bol.
+      askConfirm(ask, function () { go('all'); },
+                 f.getAttribute('data-scope-title') || 'Megjelenés a súgóban', {
+        danger: false,
+        okLabel:  f.getAttribute('data-scope-all') || 'Minden nyelven',
+        altLabel: (f.getAttribute('data-scope-one') || 'Csak ezen a nyelven')
+                  + (lang ? ' (' + lang.toUpperCase() + ')' : ''),
+        onAlt: function () { go('one'); }
+      });
+    }, true);
+  }
+
   function wireConfirmForms() {
     document.addEventListener('submit', function (e) {
       var f = e.target;
@@ -1906,6 +1936,7 @@
 
     wireFlash();
     wireConfirmForms();
+    wireScopeForms();
     wirePickerFold();
     wireModals();
     wireToggles();

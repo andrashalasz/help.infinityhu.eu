@@ -241,40 +241,79 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             back(['p' => 'articles', 'id' => $id]);
         }
 
-        // Gyors ki-/bekapcsolas: amig egy fejezet nincs kesz, ne latszodjon
-        // a nyilvanos oldalon. A tartalom es a vazlat erintetlen marad.
+        // Gyors ki-/bekapcsolas a szem ikonnal: amig egy fejezet nincs kesz, ne
+        // latszodjon a nyilvanos oldalon. A tartalom es a vazlat erintetlen marad.
+        //
+        // scope=one  - csak az adott nyelven
+        // scope=all  - minden nyelven (a nyelvi parokat a fejezetszam koti
+        //              ossze, mert a slug nyelvenkent mas)
         case 'article.toggle': {
-            $id = (int)post('id');
-            // a MariaDB nem ismer UPDATE ... RETURNING-et, ezert utana kerdezunk ra
-            $db->prepare('UPDATE help_article SET is_published = 1 - is_published WHERE id = ?')->execute([$id]);
-            $st = $db->prepare('SELECT is_published, title FROM help_article WHERE id = ?');
+            $id    = (int)post('id');
+            $scope = post('scope') === 'all' ? 'all' : 'one';
+
+            $st = $db->prepare('SELECT chapter_no, title, lang, is_published FROM help_article WHERE id = ?');
             $st->execute([$id]);
-            $r = $st->fetch();
-            if (!$r) {
-                flash('err', 'Nincs ilyen fejezet.');
+            $a = $st->fetch();
+            if (!$a) {
+                flash('err', t('flash.fejezet.nincs', [], 'Nincs ilyen fejezet.'));
                 back(['p' => 'articles']);
             }
-            audit_me($db, 'article.toggle', 'article:' . $id, $r['is_published'] ? 'kozzeteve' : 'kikapcsolva');
-            flash('ok', $r['is_published']
-                ? 'A fejezet <b>közzétéve</b> — mostantól látszik a nyilvános oldalon.'
-                : 'A fejezet <b>kikapcsolva</b> — a nyilvános oldalon nem jelenik meg, a tartalma megmarad.');
-            back(['p' => 'articles', 'id' => $id]);
+            // Alapesetben a kattintas atbillenti az allapotot; ha a hivo
+            // megmondja (on=0/1), akkor azt allitjuk be.
+            $on   = post('on') !== '' ? post('on') === '1' : (int)$a['is_published'] === 0;
+            $name = trim($a['chapter_no'] . ' ' . $a['title']);
+
+            if ($scope === 'all') {
+                $c = $db->prepare('SELECT count(*) FROM help_article WHERE chapter_no = ?');
+                $c->execute([$a['chapter_no']]);
+                $n = (int)$c->fetchColumn();
+                $db->prepare('UPDATE help_article SET is_published = ? WHERE chapter_no = ?')
+                   ->execute([$on ? 1 : 0, $a['chapter_no']]);
+            } else {
+                $n = 1;
+                $db->prepare('UPDATE help_article SET is_published = ? WHERE id = ?')
+                   ->execute([$on ? 1 : 0, $id]);
+            }
+
+            audit_me($db, 'article.toggle', 'article:' . $id,
+                     ($on ? 'lathato' : 'elrejtve') . ', ' . $scope . ', ' . $n . ' nyelv');
+            flash('ok', visibility_flash($on, $name, $scope, $n, (string)$a['lang']));
+            back(['p' => 'articles', 'lang' => (string)$a['lang'], 'id' => $id]);
         }
 
-        // Egy fejezet OSSZES nyelvi valtozatanak egyszerre valo ki-/bekapcsolasa.
-        case 'article.toggle-all': {
-            $id = (int)post('id');
-            $st = $db->prepare('SELECT slug FROM help_article WHERE id = ?');
+        // Ugyanez egy FOFEJEZETRE. Egy elrejtett fofejezet a nyilvanos oldalon
+        // ugy viselkedik, mintha nem letezne: a benne levo fejezetek sem
+        // nyithatok meg, akkor sem, ha azok kulon be vannak kapcsolva.
+        case 'module.toggle': {
+            $id    = (int)post('id');
+            $scope = post('scope') === 'all' ? 'all' : 'one';
+
+            $st = $db->prepare('SELECT chapter_no, title, lang, is_published FROM help_module WHERE id = ?');
             $st->execute([$id]);
-            $slug = (string)$st->fetchColumn();
-            $on   = post('on') === '1';
-            $n = $db->prepare('UPDATE help_article SET is_published = ? WHERE slug = ?');
-            $n->execute([$on ? 1 : 0, $slug]);
-            audit_me($db, 'article.toggle-all', 'slug:' . $slug, $on ? 'be' : 'ki');
-            flash('ok', $on
-                ? 'A fejezet <b>mindhárom nyelven</b> közzétéve.'
-                : 'A fejezet <b>mindhárom nyelven</b> kikapcsolva.');
-            back(['p' => 'articles', 'id' => $id]);
+            $m = $st->fetch();
+            if (!$m) {
+                flash('err', t('flash.fofejezet.nincs', [], 'Nincs ilyen főfejezet.'));
+                back(['p' => 'articles']);
+            }
+            $on   = post('on') !== '' ? post('on') === '1' : (int)$m['is_published'] === 0;
+            $name = trim($m['chapter_no'] . ' ' . $m['title']);
+
+            if ($scope === 'all') {
+                $c = $db->prepare('SELECT count(*) FROM help_module WHERE chapter_no = ?');
+                $c->execute([$m['chapter_no']]);
+                $n = (int)$c->fetchColumn();
+                $db->prepare('UPDATE help_module SET is_published = ? WHERE chapter_no = ?')
+                   ->execute([$on ? 1 : 0, $m['chapter_no']]);
+            } else {
+                $n = 1;
+                $db->prepare('UPDATE help_module SET is_published = ? WHERE id = ?')
+                   ->execute([$on ? 1 : 0, $id]);
+            }
+
+            audit_me($db, 'module.toggle', 'module:' . $id,
+                     ($on ? 'lathato' : 'elrejtve') . ', ' . $scope . ', ' . $n . ' nyelv');
+            flash('ok', visibility_flash($on, $name, $scope, $n, (string)$m['lang']));
+            back(['p' => 'articles', 'lang' => (string)$m['lang']]);
         }
 
         case 'article.meta': {

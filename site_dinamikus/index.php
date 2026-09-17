@@ -119,7 +119,10 @@ $UI = [
 // -------------------------------------------------------------- adatlekerdezesek
 function getModules(PDO $pdo, string $lang): array
 {
-    $st = $pdo->prepare('SELECT id, chapter_no, title, slug FROM help_module WHERE lang = ? ORDER BY sort_order, id');
+    // Csak a bekapcsolt fofejezetek: a szem ikonnal elrejtett fofejezet ugy
+    // viselkedik, mintha nem letezne (menu, kereses, megnyitas).
+    $st = $pdo->prepare('SELECT id, chapter_no, title, slug FROM help_module
+                          WHERE lang = ? AND is_published = 1 ORDER BY sort_order, id');
     $st->execute([$lang]);
     $modules = $st->fetchAll();
     if (!$modules) { return []; }
@@ -143,7 +146,8 @@ function getArticle(PDO $pdo, string $slug, string $lang): ?array
 {
     $st = $pdo->prepare('SELECT a.*, m.title AS module_title, m.chapter_no AS module_no, m.slug AS module_slug
                            FROM help_article a JOIN help_module m ON m.id = a.module_id
-                          WHERE a.slug = ? AND a.lang = ? AND a.is_published = 1 LIMIT 1');
+                          WHERE a.slug = ? AND a.lang = ? AND a.is_published = 1
+                            AND m.is_published = 1 LIMIT 1');
     $st->execute([$slug, $lang]);
     $a = $st->fetch();
     if (!$a) { return null; }
@@ -175,7 +179,7 @@ function searchArticles(PDO $pdo, string $lang, string $q): array
     $s = help_search_sql($q);
     $sql = "SELECT a.slug, a.chapter_no, a.title, a.plain_text, m.title AS module
               FROM help_article a JOIN help_module m ON m.id = a.module_id
-             WHERE a.lang = :lang AND a.is_published = 1
+             WHERE a.lang = :lang AND a.is_published = 1 AND m.is_published = 1
                AND {$s['where']}
           ORDER BY {$s['order']}
              LIMIT 20";

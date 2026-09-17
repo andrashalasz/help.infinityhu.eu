@@ -352,7 +352,8 @@ function sections_rebuild(PDO $db, int $articleId, string $html): int
 /** Modulok + cikkeik egy nyelven, az admin listakhoz. */
 function admin_tree(PDO $db, string $lang): array
 {
-    $mods = $db->prepare('SELECT id, chapter_no, title, slug, sort_order FROM help_module WHERE lang = ? ORDER BY sort_order, id');
+    $mods = $db->prepare('SELECT id, chapter_no, title, slug, sort_order, is_published
+                            FROM help_module WHERE lang = ? ORDER BY sort_order, id');
     $mods->execute([$lang]);
     $modules = $mods->fetchAll();
     if (!$modules) { return []; }
@@ -367,6 +368,69 @@ function admin_tree(PDO $db, string $lang): array
     foreach ($modules as &$m) { $m['articles'] = $by[(int)$m['id']] ?? []; }
     unset($m);
     return $modules;
+}
+
+/**
+ * A szem ikon egy fejezethez vagy fofejezethez: ki- es bekapcsolja a
+ * lathatosagot a nyilvanos oldalon.
+ *
+ * A gomb sajat urlapot kap (data-scope-ask), amit az admin.js fog el: elobb
+ * megkerdezi, hogy minden nyelven vagy csak ezen az egyen kapcsoljunk-e.
+ *
+ * @param string $what 'article' vagy 'module'
+ */
+function visibility_form(string $what, int $id, bool $on, string $lang, string $label, string $from = 'articles'): string
+{
+    $eye = $on
+        ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"'
+          . ' stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z"/>'
+          . '<circle cx="12" cy="12" r="2.6"/></svg>'
+        : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"'
+          . ' stroke-linecap="round" stroke-linejoin="round"><path d="M10.6 6.1A10 10 0 0 1 12 6c6.4 0 10 6 10 6a17 17 0 0 1-3 3.6"/>'
+          . '<path d="M6.3 7.6A17 17 0 0 0 2 12s3.6 6.5 10 6.5a10 10 0 0 0 3.7-.7"/>'
+          . '<path d="m3 3 18 18"/><path d="M9.7 9.8a2.6 2.6 0 0 0 3.5 3.6"/></svg>';
+
+    $title = $on
+        ? t('lathato.ki', ['nev' => $label], '„{nev}” látszik a nyilvános oldalon — kattints az elrejtéshez')
+        : t('lathato.be', ['nev' => $label], '„{nev}” el van rejtve — kattints a megjelenítéshez');
+
+    $ask = $on
+        ? t('lathato.kerdes.ki', ['nev' => $label], 'Elrejted a nyilvános oldalról: „{nev}”?')
+        : t('lathato.kerdes.be', ['nev' => $label], 'Megjelenik a nyilvános oldalon: „{nev}”?');
+
+    ob_start(); ?>
+<form method="post" action="<?= h(admin_url()) ?>" class="picker__eyef" data-scope-ask="<?= h($ask) ?>"
+      data-scope-title="<?= h(t('lathato.cim', [], 'Megjelenés a súgóban')) ?>"
+      data-scope-all="<?= h(t('lathato.mind', [], 'Minden nyelven')) ?>"
+      data-scope-one="<?= h(t('lathato.egy', [], 'Csak ezen a nyelven')) ?>">
+  <?= csrf_input() ?>
+  <input type="hidden" name="a" value="<?= h($what) ?>.toggle">
+  <input type="hidden" name="id" value="<?= (int)$id ?>">
+  <input type="hidden" name="lang" value="<?= h($lang) ?>">
+  <input type="hidden" name="from" value="<?= h($from) ?>">
+  <input type="hidden" name="scope" value="one">
+  <button type="submit" class="picker__madd picker__eye<?= $on ? '' : ' picker__eye--off' ?>"
+          title="<?= h($title) ?>"><?= $eye ?></button>
+</form>
+<?php
+    return (string)ob_get_clean();
+}
+
+/**
+ * A szem ikon utani visszajelzes. Mindig megmondja, hany nyelvre hatott -
+ * ez a kulonbseg a ket valasz kozott, es ezt keresi a felhasznalo.
+ */
+function visibility_flash(bool $on, string $name, string $scope, int $langs, string $lang): string
+{
+    $hol = $scope === 'all'
+        ? t('lathato.hol.mind', ['n' => $langs], '<b>{n} nyelven</b>')
+        : t('lathato.hol.egy', ['ny' => mb_strtoupper($lang)], 'csak <b>{ny}</b> nyelven');
+
+    return $on
+        ? t('lathato.kesz.be', ['nev' => $name, 'hol' => $hol],
+            '„{nev}” mostantól <b>látszik</b> a nyilvános oldalon — {hol}.')
+        : t('lathato.kesz.ki', ['nev' => $name, 'hol' => $hol],
+            '„{nev}” <b>elrejtve</b> a nyilvános oldalról — {hol}. A tartalma megmarad.');
 }
 
 function admin_setting(PDO $db, string $key, string $default = ''): string

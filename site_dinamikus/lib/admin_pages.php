@@ -414,16 +414,48 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
 
     <div class="picker__l" id="pick-list">
       <?php foreach ($tree as $m): ?>
+        <?php
+          // A fofejezet BEVEZETO fejezete az, aminek ugyanaz a szama, mint a
+          // fofejezetnek (pl. "5" az "5 Penzugy" alatt). Ez a fofejezet
+          // leirasa: mire valo az a menupont. Kulon sorban felsorolva
+          // ugyanugy nezett ki, mint maga a fofejezet - ezert itt kiemeljuk
+          // a listabol, es MAGA A FOFEJEZET CIME nyitja meg.
+          $intro = null;
+          foreach ($m['articles'] as $k => $ia) {
+              if (trim((string)$ia['chapter_no']) === trim((string)$m['chapter_no'])) {
+                  $intro = $ia;
+                  unset($m['articles'][$k]);
+                  break;
+              }
+          }
+        ?>
         <div class="picker__mod" data-id="<?= (int)$m['id'] ?>">
-        <div class="picker__m" data-module="<?= (int)$m['id'] ?>">
+        <div class="picker__m<?= $m['is_published'] ? '' : ' picker__m--off' ?>" data-module="<?= (int)$m['id'] ?>">
  <label class="picker__mchk pick-mod-all"><input type="checkbox" tabindex="-1"></label>
           <span class="picker__grip picker__mgrip" title="Húzd a főfejezetek sorrendjének átrendezéséhez" aria-hidden="true">⠿</span>
-          <button type="button" class="picker__mt" data-fold="<?= (int)$m['id'] ?>"
-                  title="Kattints a ki- és összecsukáshoz">
+          <button type="button" class="picker__mfold" data-fold="<?= (int)$m['id'] ?>"
+                  title="Ki- és összecsukás" aria-label="Ki- és összecsukás">
             <svg class="picker__caret" width="12" height="12" viewBox="0 0 24 24" fill="none"
                  stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-            <span><?= h($m['chapter_no']) ?> <?= h($m['title']) ?></span>
           </button>
+          <?php if ($intro !== null): ?>
+            <a class="picker__mt<?= $article && (int)$intro['id'] === (int)$article['id'] ? ' on' : '' ?>"
+               href="<?= h(admin_url(['p' => 'articles', 'lang' => $lang, 'id' => $intro['id']])) ?>"
+               title="<?= h(t('fofejezet.leiras.nyit', [], 'A főfejezet leírása: mire való ez a menüpont')) ?>">
+              <span><?= h($m['chapter_no']) ?> <?= h($m['title']) ?></span>
+              <?php if (!$intro['is_published']): ?><span class="dot dot--hidden" title="Kikapcsolva – nem látszik a nyilvános oldalon"></span><?php endif; ?>
+              <?php if ($intro['has_draft']): ?><span class="dot dot--draft" title="Van közzétételre váró vázlat"></span><?php endif; ?>
+            </a>
+          <?php else: ?>
+            <button type="button" class="picker__mt picker__mt--miss"
+                    data-new-in="<?= (int)$m['id'] ?>" data-new-no="<?= h($m['chapter_no']) ?>"
+                    title="<?= h(t('fofejezet.leiras.nincs', [], 'Ehhez a főfejezethez még nincs leírás — kattints, és megírhatod, mire való')) ?>">
+              <span><?= h($m['chapter_no']) ?> <?= h($m['title']) ?></span>
+              <span class="picker__miss"><?= h(t('nincs leírás')) ?></span>
+            </button>
+          <?php endif; ?>
+          <?= visibility_form('module', (int)$m['id'], (bool)$m['is_published'], $lang,
+                              $m['chapter_no'] . ' ' . $m['title']) ?>
           <a class="picker__madd picker__medit"
              href="<?= h(admin_url(['p' => 'articles', 'lang' => $lang, 'mod' => $m['id']])) ?>"
              title="A főfejezet neve, száma, URL-je — mindhárom nyelven">✎</a>
@@ -451,6 +483,8 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
               <?php if (!$a['is_published']): ?><span class="dot dot--hidden" title="Kikapcsolva – nem látszik a nyilvános oldalon"></span><?php endif; ?>
               <?php if ($a['has_draft']): ?><span class="dot dot--draft" title="Van közzétételre váró vázlat"></span><?php endif; ?>
             </a>
+            <?= visibility_form('article', (int)$a['id'], (bool)$a['is_published'], $lang,
+                                $a['chapter_no'] . ' ' . $a['title']) ?>
             <?php if ($a['next_sub'] !== ''): ?>
               <button type="button" class="picker__madd picker__radd"
                       data-new-in="<?= (int)$m['id'] ?>" data-new-no="<?= h($a['next_sub']) ?>"
@@ -578,7 +612,8 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
           <span class="sp"></span>
           <form method="post" action="<?= h(admin_url()) ?>" style="display:inline">
             <?= csrf_input() ?>
-            <input type="hidden" name="a" value="article.toggle-all">
+            <input type="hidden" name="a" value="article.toggle">
+            <input type="hidden" name="scope" value="all">
             <input type="hidden" name="id" value="<?= (int)$article['id'] ?>">
             <input type="hidden" name="on" value="<?= $onCount === count($siblings) ? '0' : '1' ?>">
             <button class="btn btn--sm" type="submit">

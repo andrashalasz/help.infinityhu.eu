@@ -183,12 +183,39 @@ p.lead { margin: 0 0 18px; color: var(--ink-3); font-size: calc(13.4px * var(--f
 .picker__mdel { font-size: 12px; }
 .picker__mdel:hover { color: var(--err); border-color: color-mix(in srgb, var(--err) 40%, transparent); }
 
+/* --- szem ikon: latszik-e a nyilvanos oldalon --- */
+.picker__eyef { display: inline-flex; flex: none; }
+.picker__eye { display: inline-flex; align-items: center; justify-content: center; }
+/* A kikapcsolt allapot akkor is latszik, ha nem jarunk a sor felett -
+   kulonben eszre sem venni, hogy egy fejezet hianyzik a sugobol. */
+.picker__eye--off { color: var(--err); opacity: 1; }
+.picker__eye--off:hover { color: var(--err); border-color: color-mix(in srgb, var(--err) 40%, transparent); }
+/* Elrejtett fofejezet: az egesz fejlec halvany, es athuzva a cime. */
+.picker__m--off .picker__mt { opacity: .55; text-decoration: line-through; }
+
 /* --- a modul fejléce összecsukható --- */
 .picker__mt {
   flex: 1; min-width: 0; display: flex; align-items: center; gap: 5px;
   background: none; border: 0; padding: 0; font: inherit; color: inherit;
   text-align: left; cursor: pointer;
 }
+/* A nyilat kulon gomb nyitja/csukja; a CIM magat a fofejezet leirasat nyitja
+   meg (azt a fejezetet, aminek ugyanaz a szama). Igy nem all ott ketszer
+   ugyanaz a sor: "5 Penzugy" fofejezet + "5 Penzugy" fejezet. */
+.picker__mfold {
+  flex: none; display: inline-flex; align-items: center; justify-content: center;
+  width: 16px; height: 16px; padding: 0; background: none; border: 0;
+  color: inherit; cursor: pointer;
+}
+.picker__mt:hover, .picker__mt.on { color: var(--brand-strong); text-decoration: none; }
+a.picker__mt:hover { text-decoration: none; }
+/* Aminek meg nincs leirasa: halvany jelzes, kattintasra letrejon. */
+.picker__miss {
+  flex: none; font-size: 9.5px; font-weight: 700; letter-spacing: .4px;
+  padding: 1px 5px; border-radius: 100px; text-transform: none;
+  background: var(--warn-soft, var(--surface-3)); color: var(--ink-3);
+}
+.picker__mt--miss { color: var(--ink-3); }
 .picker__mt span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .picker__caret { flex: none; color: var(--ink-3); transition: transform .16s; }
 .picker__m.folded .picker__caret { transform: rotate(-90deg); }
@@ -201,6 +228,12 @@ p.lead { margin: 0 0 18px; color: var(--ink-3); font-size: calc(13.4px * var(--f
 /* a soron levő "+" csak rámutatáskor látszik, hogy ne zajosítsa a listát */
 .picker__radd { opacity: 0; }
 .picker__row:hover .picker__radd, .picker__radd:focus-visible { opacity: 1; }
+/* A szem a cikksorokban ugyanugy csak rajtahuzasra bukkan elo - kiveve, ha
+   a fejezet EL VAN REJTVE: azt latni kell anelkul is, hogy keresni kellene. */
+.picker__row .picker__eye { opacity: 0; }
+.picker__row:hover .picker__eye,
+.picker__row .picker__eye--off,
+.picker__eye:focus-visible { opacity: 1; }
 
 /* --- helyben létrehozott új fejezet sora --- */
 .picker__new { display: flex; align-items: center; gap: 6px; padding: 3px 10px 3px 30px; }
