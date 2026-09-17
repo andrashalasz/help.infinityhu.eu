@@ -166,7 +166,8 @@ switch ($page) {
         page_import($db, $cfg, $lang, (int)($_GET['import'] ?? 0), $counts);
         break;
     case 'translate':
-        page_translate($db, $cfg, (int)($_GET['src'] ?? 0), (string)($_GET['to'] ?? 'en'), $counts);
+        page_translate($db, $cfg, (int)($_GET['src'] ?? 0), (string)($_GET['to'] ?? 'en'), $counts,
+                       (string)($_GET['st'] ?? 'all'));
         break;
     case 'screens':
         page_screens($db, $counts);

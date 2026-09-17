@@ -2,10 +2,18 @@
 /**
  * mt.php - gepi forditas (machine translation).
  *
- * Harom szolgaltatot ismer, mindegyik opcionalis:
+ * Negy szolgaltatot ismer, mindegyik opcionalis:
+ *   claude  - Anthropic Claude (Messages API)                          (kulcs kell)
  *   deepl   - https://api-free.deepl.com  vagy  https://api.deepl.com   (kulcs kell)
  *   libre   - LibreTranslate, sajat szerveren is futtathato             (kulcs nem mindig kell)
  *   google  - Google Cloud Translation v2                              (kulcs kell)
+ *
+ * A Claude annyiban mas a tobbinel, hogy nem szotarazo fordito, hanem
+ * utasithato: kap egy szakszotarat es a megtartando jelolesek listajat,
+ * ezert az ERP-szakkifejezeseket is helyesen forditja. Ezt a kulonbseget
+ * a LibreTranslate-tel osszehasonlitva latni a legjobban:
+ *   "Kintlevoseg kezeles" -> LibreTranslate: "Capacity management" (hibas)
+ *                          -> Claude:         "Receivables management"
  *
  * Beallitas: kornyezeti valtozoval (HELP_MT_PROVIDER / HELP_MT_ENDPOINT /
  * HELP_MT_KEY), vagy az admin felulet Beallitasok fulen (help_setting tabla).
@@ -21,9 +29,13 @@ declare(strict_types=1);
 
 final class Translator
 {
+    /** A hasznalt Claude modell. Arak (2026): 5 USD / 1M bemeneti, 25 USD / 1M kimeneti token. */
+    private const CLAUDE_MODEL = 'claude-opus-5';
+
     public string $provider;
     private string $endpoint;
     private string $key;
+    private string $glossary = '';
 
     public function __construct(string $provider, string $endpoint, string $key)
     {
@@ -39,19 +51,24 @@ final class Translator
         $endpoint = $cfg['mt_endpoint'] ?? '';
         $key      = $cfg['mt_key'] ?? '';
 
-        if ($db !== null && ($provider === '' || $key === '')) {
+        $glossary = '';
+        if ($db !== null) {
             try {
-                $rows = $db->query("SELECT `key`, value FROM help_setting WHERE `key` IN ('mt_provider','mt_endpoint','mt_key')")->fetchAll();
+                $rows = $db->query("SELECT `key`, value FROM help_setting
+                                     WHERE `key` IN ('mt_provider','mt_endpoint','mt_key','mt_glossary')")->fetchAll();
                 $s = [];
                 foreach ($rows as $r) { $s[$r['key']] = (string)$r['value']; }
                 if ($provider === '') { $provider = $s['mt_provider'] ?? 'none'; }
                 if ($endpoint === '') { $endpoint = $s['mt_endpoint'] ?? ''; }
                 if ($key === '')      { $key      = $s['mt_key'] ?? ''; }
+                $glossary = $s['mt_glossary'] ?? '';
             } catch (Throwable $e) {
                 // beallitas-tabla nelkul is mukodjon
             }
         }
-        return new self($provider ?: 'none', $endpoint, $key);
+        $t = new self($provider ?: 'none', $endpoint, $key);
+        $t->setGlossary($glossary);
+        return $t;
     }
 
     public function isConfigured(): bool
@@ -64,11 +81,18 @@ final class Translator
     public function label(): string
     {
         return match ($this->provider) {
+            'claude' => 'Claude (Anthropic)',
             'deepl'  => 'DeepL',
             'libre'  => 'LibreTranslate',
             'google' => 'Google Translate',
             default  => 'nincs beállítva',
         };
+    }
+
+    /** Sajat szakszotar - a Claude ezt kapja meg utasitaskent. */
+    public function setGlossary(string $text): void
+    {
+        $this->glossary = trim($text);
     }
 
     /**
@@ -81,11 +105,103 @@ final class Translator
             throw new RuntimeException('Nincs beállítva gépi fordító. Beállítások → Gépi fordítás.');
         }
         return match ($this->provider) {
+            'claude' => $this->claude($html, $from, $to),
             'deepl'  => $this->deepl($html, $from, $to),
             'libre'  => $this->libre($html, $from, $to),
             'google' => $this->google($html, $from, $to),
             default  => throw new RuntimeException('Ismeretlen fordító: ' . $this->provider),
         };
+    }
+
+    /**
+     * Forditas Claude-dal (Anthropic Messages API).
+     *
+     * A tobbi szolgaltatotol elteroen itt UTASITAST adunk, nem csak szoveget:
+     * a rendszeruzenet leirja, mit KELL valtozatlanul hagyni (HTML-jeloles,
+     * kepek utvonala, a cimsorok sorszama), es atadja a sajat szakszotarat is.
+     */
+    private function claude(string $html, string $from, string $to): string
+    {
+        $langName = ['hu' => 'Hungarian', 'en' => 'English', 'de' => 'German'];
+        $src = $langName[$from] ?? $from;
+        $dst = $langName[$to] ?? $to;
+
+        $system = <<<TXT
+        You translate technical documentation for "Infinity", a Hungarian business
+        management (ERP) system. Translate from {$src} to {$dst}.
+
+        Rules you must follow exactly:
+        1. The input is an HTML fragment. Return the SAME HTML structure, with only
+           the human-readable text translated. Do not add, remove or reorder tags.
+        2. Never change any attribute value: keep every src, href, class, id, style
+           and colspan exactly as given. Image paths such as media/img_1a2b3c.png
+           must stay byte-for-byte identical.
+        3. <span class="hno">5.4.1</span> holds a chapter number - keep the digits
+           unchanged, never translate or renumber them.
+        4. Keep the user-interface labels of the Infinity system recognisable: these
+           are menu items and button captions the reader sees on screen. Prefer the
+           established accounting/ERP term in {$dst} over a literal word-by-word
+           rendering.
+        5. Do not translate proper nouns, product names, file names or code.
+        6. Output ONLY the translated HTML fragment. No explanation, no markdown
+           code fence, no surrounding prose.
+        TXT;
+
+        if ($this->glossary !== '') {
+            $system .= "\n\nUse this glossary. The left side is the Hungarian term, "
+                     . "the right side is how it must be translated:\n" . $this->glossary;
+        }
+
+        $base = $this->endpoint !== '' ? $this->endpoint : 'https://api.anthropic.com';
+
+        $res = $this->post($base . '/v1/messages', [
+            'model'      => self::CLAUDE_MODEL,
+            'max_tokens' => 32000,
+            // A forditas szoveg-atalakitas, nem gondolkodtato feladat: kozepes
+            // rafordital jo minoseget ad, es toredeke a koltsege a magasnak.
+            'output_config' => ['effort' => 'medium'],
+            'system'     => $system,
+            'messages'   => [
+                ['role' => 'user', 'content' => $html],
+            ],
+        ], [
+            'Content-Type: application/json',
+            'x-api-key: ' . $this->key,
+            'anthropic-version: 2023-06-01',
+        ], true, 300);
+
+        $j = json_decode($res, true);
+        if (!is_array($j)) {
+            throw new RuntimeException('A Claude váratlan választ adott: ' . mb_substr($res, 0, 200));
+        }
+        if (($j['stop_reason'] ?? '') === 'refusal') {
+            throw new RuntimeException('A Claude elutasította a kérést: '
+                . (string)($j['stop_details']['explanation'] ?? 'nincs indoklás'));
+        }
+        if (!isset($j['content']) || !is_array($j['content'])) {
+            throw new RuntimeException('A Claude váratlan választ adott: ' . mb_substr($res, 0, 200));
+        }
+
+        // A valasz tobb blokkbol allhat (pl. gondolkodas + szoveg) - minket
+        // csak a szoveges reszek erdekelnek.
+        $out = '';
+        foreach ($j['content'] as $block) {
+            if (($block['type'] ?? '') === 'text') { $out .= (string)($block['text'] ?? ''); }
+        }
+        $out = trim($out);
+
+        if (($j['stop_reason'] ?? '') === 'max_tokens') {
+            throw new RuntimeException('A fejezet túl hosszú volt egy menetben — '
+                . 'a fordítás félbeszakadt. Bontsd rövidebb fejezetekre.');
+        }
+        if ($out === '') {
+            throw new RuntimeException('A Claude üres választ adott.');
+        }
+
+        // Ha megis kodblokkba tette volna, lehantjuk
+        if (preg_match('/^```(?:html)?\s*(.*?)\s*```$/is', $out, $m)) { $out = $m[1]; }
+
+        return $out;
     }
 
     private function deepl(string $html, string $from, string $to): string
@@ -137,7 +253,8 @@ final class Translator
         return html_entity_decode((string)$j['data']['translations'][0]['translatedText'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
     }
 
-    private function post(string $url, array $fields, array $headers = [], bool $json = false): string
+    private function post(string $url, array $fields, array $headers = [], bool $json = false,
+                         int $timeout = 60): string
     {
         if (!function_exists('curl_init')) {
             throw new RuntimeException('A PHP cURL kiterjesztés hiányzik, enélkül nincs gépi fordítás.');
@@ -148,7 +265,7 @@ final class Translator
             CURLOPT_POSTFIELDS     => $json ? json_encode($fields, JSON_UNESCAPED_UNICODE) : http_build_query($fields),
             CURLOPT_HTTPHEADER     => $headers,
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT        => 60,
+            CURLOPT_TIMEOUT        => $timeout,
             CURLOPT_CONNECTTIMEOUT => 10,
         ]);
         $body = curl_exec($ch);
@@ -183,9 +300,28 @@ function translate_store(
         throw new RuntimeException('Nincs ilyen forrásfejezet: ' . $srcId);
     }
 
-    $t = $db->prepare('SELECT id FROM help_article WHERE slug = ? AND lang = ?');
-    $t->execute([$src['slug'], $to]);
-    $targetId = (int)($t->fetchColumn() ?: 0);
+    // A nyelvi valtozatot elsosorban a FEJEZETSZAM koti a forrashoz, mert a
+    // slug mostantol nyelvenkent elter (az angol oldal angol cimet kap).
+    // A regi, kozos slugra epulo parokat a masodik keres talalja meg.
+    $targetId = 0;
+    if ((string)$src['chapter_no'] !== '') {
+        $t = $db->prepare('SELECT id FROM help_article WHERE chapter_no = ? AND lang = ? LIMIT 1');
+        $t->execute([$src['chapter_no'], $to]);
+        $targetId = (int)($t->fetchColumn() ?: 0);
+    }
+    if ($targetId === 0) {
+        $t = $db->prepare('SELECT id FROM help_article WHERE slug = ? AND lang = ? LIMIT 1');
+        $t->execute([$src['slug'], $to]);
+        $targetId = (int)($t->fetchColumn() ?: 0);
+    }
+
+    // Az uj celnyelvi cikk a SAJAT, leforditott cimebol kapja az URL-jet.
+    // Ha nincs forditott cim, marad a forras slugja.
+    $newSlug = $title !== '' ? help_slug((string)$src['chapter_no'], $title) : (string)$src['slug'];
+    if ($newSlug === '') { $newSlug = (string)$src['slug']; }
+    $probe = $db->prepare('SELECT 1 FROM help_article WHERE slug = ? AND lang = ?');
+    $probe->execute([$newSlug, $to]);
+    if ($probe->fetchColumn()) { $newSlug = (string)$src['slug']; }
 
     if ($targetId === 0) {
         // celnyelvi modul: ugyanaz a chapter_no; ha nincs, atmasoljuk
@@ -206,7 +342,7 @@ function translate_store(
                  draft_by, draft_at, source)
                 VALUES (?,?,?,?,?,'','',?, CURRENT_DATE, MD5(?), ?, 0, ?, ?, ?, NOW(), 'editor')");
         $ai->execute([
-            $moduleId, $src['chapter_no'], $src['slug'], $title !== '' ? $title : $src['title'], $to,
+            $moduleId, $src['chapter_no'], $newSlug, $title !== '' ? $title : $src['title'], $to,
             $src['doc_version'], $src['slug'] . $to, (int)$src['sort_order'],
             $html, $title !== '' ? $title : null, $userId,
         ]);
