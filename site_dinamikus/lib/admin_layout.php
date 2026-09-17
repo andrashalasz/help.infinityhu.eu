@@ -61,8 +61,8 @@ function admin_head(string $title, string $page = '', array $counts = []): void
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/app.css">
-<link rel="stylesheet" href="/assets/admin.css">
+<link rel="stylesheet" href="<?= h(asset_url('/assets/app.css')) ?>">
+<link rel="stylesheet" href="<?= h(asset_url('/assets/admin.css')) ?>">
 </head>
 <body class="admin">
 <?php if ($u !== null): ?>
@@ -136,7 +136,26 @@ function admin_foot(): void
   </div>
 </div>
 <?php endif; ?>
-<script src="/assets/admin.js" defer></script>
+<!-- Altalanos megerosito ablak.
+     Korabban minden veszelyes muvelet a bongeszo window.confirm() ablakat
+     hasznalta. Azt tobb bongeszo es minden beagyazott nezet letiltja, es
+     olyankor a muvelet NEMAN elmaradt - a gomb latszolag nem csinalt semmit.
+     Ez a sajat ablak mindenhol mukodik. Barmelyik urlapra rairhato:
+     <form data-confirm="Biztosan?"> -->
+<div class="modal" id="modal-confirm">
+  <div class="modal__box">
+    <div class="modal__h" id="confirm-title">Megerősítés</div>
+    <div class="modal__b">
+      <div class="msg msg--warn" style="margin:0" id="confirm-text"></div>
+    </div>
+    <div class="modal__f">
+      <button class="btn btn--ghost" type="button" data-close>Mégsem</button>
+      <button class="btn btn--danger" type="button" id="confirm-ok">Igen, folytatom</button>
+    </div>
+  </div>
+</div>
+
+<script src="<?= h(asset_url('/assets/admin.js')) ?>" defer></script>
 </body>
 </html>
     <?php
@@ -147,6 +166,93 @@ function admin_foot(): void
  * Ezt hasznalja az olvasoi oldal jobb oldali tartalomjegyzeke, ezert minden
  * kozzetetel utan frissiteni kell.
  */
+/**
+ * Uj fejezet helye a modulon belul.
+ *
+ * Ha a szerkeszto nem adott meg fejezetszamot, a modul szama ala kepezzuk a
+ * kovetkezo szabad sorszamot: az "1 Elso lepesek" modulban 1.1 ... 1.4 utan
+ * 1.5-ot. A sorrend ugyanigy a lista vegere kerul, tizesevel lepve, hogy
+ * kesobb kezzel is legyen hova beszurni.
+ *
+ * @return array{0:string,1:int} [fejezetszam, sorrend]
+ */
+/**
+ * A fanak megadja fejezetenkent a merulesi melyseget es a kovetkezo szabad
+ * ALFEJEZET-szamot, hogy a bal oldali listaban behuzva lassanak, es minden
+ * sor melle kikerulhessen a "+" gomb.
+ *
+ * Az "1.3" ala az "1.3.1" jon, ha az mar letezik, akkor az "1.3.2".
+ */
+function tree_annotate(array $tree): array
+{
+    foreach ($tree as &$m) {
+        $moduleNo = trim((string)$m['chapter_no']);
+        $numbers  = array_map(static fn(array $a): string => trim((string)$a['chapter_no']), $m['articles']);
+
+        foreach ($m['articles'] as &$a) {
+            $no = trim((string)$a['chapter_no']);
+            $a['depth'] = help_chapter_depth($moduleNo, $no);
+
+            $maxSub = 0;
+            if ($no !== '') {
+                foreach ($numbers as $other) {
+                    if (preg_match('/^' . preg_quote($no, '/') . '\.(\d+)$/', $other, $mm)) {
+                        $maxSub = max($maxSub, (int)$mm[1]);
+                    }
+                }
+            }
+            $a['next_sub'] = $no !== '' ? $no . '.' . ($maxSub + 1) : '';
+        }
+        unset($a);
+    }
+    unset($m);
+    return $tree;
+}
+
+function article_next_slot(PDO $db, int $moduleId, string $lang, string $chapter, string $sortOrder): array
+{
+    $st = $db->prepare('SELECT chapter_no FROM help_module WHERE id = ?');
+    $st->execute([$moduleId]);
+    $moduleNo = trim((string)$st->fetchColumn());
+
+    $st = $db->prepare('SELECT chapter_no, sort_order FROM help_article WHERE module_id = ? AND lang = ?');
+    $st->execute([$moduleId, $lang]);
+    $rows = $st->fetchAll();
+
+    $maxSort = 0;
+    $maxOrd  = 0;
+    foreach ($rows as $r) {
+        $maxSort = max($maxSort, (int)$r['sort_order']);
+        if ($moduleNo !== ''
+            && preg_match('/^' . preg_quote($moduleNo, '/') . '\.(\d+)$/', trim((string)$r['chapter_no']), $m)) {
+            $maxOrd = max($maxOrd, (int)$m[1]);
+        }
+    }
+
+    if ($chapter === '' && $moduleNo !== '') {
+        $chapter = $moduleNo . '.' . ($maxOrd + 1);
+    }
+
+    $sort = $sortOrder !== '' ? (int)$sortOrder : 0;
+    if ($sort !== 0) { return [$chapter, $sort]; }
+
+    // Alfejezet (pl. 1.3.1) rogton a szuloje (1.3) moge kerul, ne a modul
+    // vegere. A sorrend tizesevel lep, ezert van hely kozottuk.
+    if (substr_count($chapter, '.') > substr_count($moduleNo, '.') + 1) {
+        $parentNo = substr($chapter, 0, (int)strrpos($chapter, '.'));
+        $after = null;
+        foreach ($rows as $r) {
+            $no = trim((string)$r['chapter_no']);
+            if ($no === $parentNo || str_starts_with($no, $parentNo . '.')) {
+                $after = max((int)$after, (int)$r['sort_order']);
+            }
+        }
+        if ($after !== null) { return [$chapter, $after + 1]; }
+    }
+
+    return [$chapter, $maxSort + 10];
+}
+
 function sections_rebuild(PDO $db, int $articleId, string $html): int
 {
     [, $sections] = help_anchorize($html);

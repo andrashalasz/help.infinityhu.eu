@@ -126,8 +126,23 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             }
             audit_me($db, 'article.publish', 'article:' . $id, $summary);
 
+            // Automatikus forditas: ha a Beallitasokban be van kapcsolva, a most
+            // kozzetett MAGYAR fejezetbol rogton keszul angol es nemet vazlat is.
+            // (Kozzetenni tovabbra is ember dont - ez csak vazlatot ir.)
+            $mtMsg = '';
+            if ($before['lang'] === 'hu' && mt_auto_on($db, $cfg)) {
+                $r = mt_auto_translate($db, $cfg, $id, auth_user()['id']);
+                if ($r['done']) {
+                    $mtMsg = ' Gépi fordítás: <b>' . implode(', ', array_map('strtoupper', $r['done']))
+                           . '</b> vázlat elkészült.';
+                }
+                foreach ($r['failed'] as $l => $err) {
+                    flash('err', 'Gépi fordítás (' . strtoupper($l) . '): ' . h($err));
+                }
+            }
+
             if ($wantsJson) { help_json(['ok' => true]); }
-            flash('ok', 'A fejezet közzétéve — a nyilvános oldalon már ez látszik. '
+            flash('ok', 'A fejezet közzétéve — a nyilvános oldalon már ez látszik.' . $mtMsg . ' '
                 . undo_button($db, 'article.unpublish', ['id' => $id], 'Közzététel visszavonása'));
             back(['p' => 'articles', 'id' => $id]);
         }
@@ -220,6 +235,11 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                 flash('err', 'Modult és címet is meg kell adni.');
                 back(['p' => 'articles', 'lang' => $lang]);
             }
+            // Ha nincs megadva fejezetszam, a modul alatti kovetkezo szabad
+            // szamot kapja (pl. az "1 Elso lepesek" modulban 1.4 utan 1.5-ot),
+            // es a lista vegere kerul. Igy nem marad szam nelkuli fejezet.
+            [$chapter, $sortOrder] = article_next_slot($db, $module, $lang, $chapter, post('sort_order'));
+
             $slug = post('slug') !== '' ? post('slug') : help_slug($chapter, $title);
 
             $ver = (string)$db->query("SELECT COALESCE(MAX(doc_version), 'v1') FROM help_article")->fetchColumn();
@@ -230,7 +250,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                         VALUES (?,?,?,?,?,'','',?, CURRENT_DATE, MD5(?), ?, 0, '', ?, NOW(), 'editor')");
                 $st->execute([
                     $module, mb_substr($chapter, 0, 16), mb_substr($slug, 0, 160), mb_substr($title, 0, 255),
-                    $lang, $ver, $slug . $title, (int)post('sort_order'), auth_user()['id'],
+                    $lang, $ver, $slug . $title, $sortOrder, auth_user()['id'],
                 ]);
                 $newId = (int)$db->lastInsertId();
             } catch (PDOException $e) {
@@ -476,8 +496,8 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             $lang  = array_key_exists(post('lang'), ADMIN_LANGS) ? post('lang') : 'hu';
             $title = post('title');
             if ($title === '') {
-                flash('err', 'A modul neve nem lehet üres.');
-                back(['p' => 'modules', 'lang' => $lang]);
+                flash('err', 'A főfejezet neve nem lehet üres.');
+                back(['p' => post('from') === 'articles' ? 'articles' : 'modules', 'lang' => $lang]);
             }
             $slug = post('slug') !== '' ? post('slug') : help_slug(post('chapter_no'), $title);
 
@@ -494,8 +514,9 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                 back(['p' => 'modules', 'lang' => $lang]);
             }
             audit_me($db, 'module.save', 'module:' . ($id ?: 'new'), $title);
-            flash('ok', 'Modul mentve.');
-            back(['p' => 'modules', 'lang' => $lang]);
+            flash('ok', 'Főfejezet mentve.');
+            // ha a Fejezetek fulrol nyitottak, oda terjunk vissza
+            back(['p' => post('from') === 'articles' ? 'articles' : 'modules', 'lang' => $lang]);
         }
 
         case 'module.delete': {
@@ -1009,7 +1030,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
         case 'setting.save': {
             if (!auth_is('admin')) { flash('err', 'Ehhez adminisztrátori jog kell.'); back(['p' => 'settings']); }
             $keys = ['site_title_hu', 'site_title_en', 'site_title_de',
-                     'mt_provider', 'mt_endpoint', 'mt_key', 'mt_auto',
+                     'mt_provider', 'mt_endpoint', 'mt_key', 'mt_auto', 'mt_glossary',
                      'highlight_days', 'export_company', 'export_footer'];
             // a kipipalatlan jelolonegyzet nem kerul be a POST-ba
             if (isset($_POST['mt_provider'])) { $_POST['mt_auto'] = isset($_POST['mt_auto']) ? '1' : '0'; }

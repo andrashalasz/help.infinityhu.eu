@@ -164,6 +164,52 @@ p.lead { margin: 0 0 18px; color: var(--ink-3); font-size: calc(13.4px * var(--f
   padding: 8px 10px 4px; font-size: calc(11.4px * var(--fs)); font-weight: 800;
   color: var(--ink-3); text-transform: uppercase; letter-spacing: .6px;
 }
+.picker__m { display: flex; align-items: center; gap: 6px; }
+.picker__mt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.picker__madd {
+  flex: none; width: 20px; height: 20px; padding: 0; line-height: 1;
+  font-size: 15px; font-weight: 700; color: var(--ink-3); cursor: pointer;
+  background: none; border: 1px solid transparent; border-radius: var(--r-sm);
+}
+.picker__m:hover .picker__madd { border-color: var(--line); background: var(--surface); }
+.picker__madd:hover { color: var(--brand-strong); border-color: var(--brand-ring); }
+
+/* --- a modul fejléce összecsukható --- */
+.picker__mt {
+  flex: 1; min-width: 0; display: flex; align-items: center; gap: 5px;
+  background: none; border: 0; padding: 0; font: inherit; color: inherit;
+  text-align: left; cursor: pointer;
+}
+.picker__mt span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.picker__caret { flex: none; color: var(--ink-3); transition: transform .16s; }
+.picker__m.folded .picker__caret { transform: rotate(-90deg); }
+
+/* --- alfejezetek behúzása (1.3 alatt az 1.3.1) ---
+   A d1/d2 egy vonalban marad, csak a valódi alfejezet csúszik beljebb. */
+.picker__row--d3 .picker__a { padding-left: 22px; font-size: calc(12.4px * var(--fs)); }
+.picker__row--d4 .picker__a { padding-left: 36px; font-size: calc(12.4px * var(--fs)); }
+
+/* a soron levő "+" csak rámutatáskor látszik, hogy ne zajosítsa a listát */
+.picker__radd { opacity: 0; }
+.picker__row:hover .picker__radd, .picker__radd:focus-visible { opacity: 1; }
+
+/* --- helyben létrehozott új fejezet sora --- */
+.picker__new { display: flex; align-items: center; gap: 6px; padding: 3px 10px 3px 30px; }
+.picker__newno {
+  flex: none; font-size: calc(12.4px * var(--fs)); color: var(--ink-3);
+  font-variant-numeric: tabular-nums; min-width: 34px;
+}
+.picker__newin {
+  flex: 1; min-width: 0; height: 26px; padding: 0 8px; font: inherit;
+  font-size: calc(12.8px * var(--fs)); color: var(--ink);
+  background: var(--surface); border: 1px solid var(--brand); border-radius: var(--r-sm);
+}
+.picker__newin:focus { outline: none; box-shadow: 0 0 0 3px var(--brand-ring); }
+.picker__newx {
+  flex: none; width: 22px; height: 22px; padding: 0; line-height: 1; cursor: pointer;
+  background: none; border: 0; color: var(--ink-3); font-size: 13px;
+}
+.picker__newx:hover { color: var(--err); }
 .picker__a {
   display: flex; align-items: baseline; gap: 7px; padding: 6px 10px; border-radius: var(--r-sm);
   color: var(--ink-2); font-size: calc(12.9px * var(--fs)); line-height: 1.4;
@@ -178,18 +224,102 @@ p.lead { margin: 0 0 18px; color: var(--ink-3); font-size: calc(13.4px * var(--f
 
 /* ---------- szerkesztő ---------- */
 .ed-toolbar {
-  display: flex; flex-wrap: wrap; gap: 3px; padding: 7px 9px;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 6px 8px;
   background: var(--surface-2); border: 1px solid var(--line); border-bottom: 0;
   border-radius: var(--r) var(--r) 0 0; position: sticky; top: 96px; z-index: 20;
 }
+/* a gombok csoportokban ülnek, a csoportok között halvány elválasztó */
+.ed-grp {
+  display: flex; align-items: center; gap: 2px; padding: 2px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-sm);
+}
+.ed-grp--end { background: none; border-color: transparent; }
 .ed-toolbar button {
-  min-width: 30px; height: 30px; padding: 0 8px; font: inherit; font-size: 13px;
+  min-width: 30px; height: 28px; padding: 0 8px; font: inherit; font-size: 13px;
   background: none; border: 1px solid transparent; border-radius: var(--r-sm);
-  color: var(--ink-2); cursor: pointer;
+  color: var(--ink-2); cursor: pointer; white-space: nowrap;
+  display: inline-flex; align-items: center; justify-content: center; gap: 4px;
 }
 .ed-toolbar button:hover { background: var(--surface-3); color: var(--ink); border-color: var(--line); }
+.ed-toolbar button.on { background: var(--brand-soft); color: var(--brand-strong); border-color: var(--brand-ring); }
 .ed-toolbar .divider { width: 1px; height: 22px; background: var(--line); margin: 4px 5px; }
 .ed-toolbar .sp { flex: 1; }
+.ed-toolbar .ed-b--tip  { color: var(--brand-strong); }
+.ed-toolbar .ed-b--warn { color: var(--warn); }
+.ed-toolbar .ed-b--crit { color: var(--err); font-weight: 700; }
+
+.ed-sel {
+  height: 28px; padding: 0 26px 0 9px; font: inherit; font-size: 13px;
+  color: var(--ink); background: none; border: 0; border-radius: var(--r-sm);
+  cursor: pointer; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7a8d' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 8px center;
+}
+.ed-sel:hover { background-color: var(--surface-3); }
+
+.ed-chk {
+  display: inline-flex; align-items: center; gap: 5px; height: 28px; padding: 0 8px;
+  font-size: 12.4px; color: var(--ink-3); cursor: pointer; white-space: nowrap;
+}
+.ed-chk input { margin: 0; }
+
+/* --- betűszín-választó --- */
+.ed-pop { position: relative; }
+.ed-pop__b { flex-direction: column !important; gap: 0 !important; padding: 0 7px !important; }
+.ed-pop__b .ed-ink { font-weight: 700; font-size: 12px; line-height: 1.1; }
+.ed-pop__b .ed-bar { display: block; width: 15px; height: 3px; border-radius: 2px; background: #0a6ed1; }
+.ed-pop__b .ed-car { position: absolute; right: 1px; bottom: 1px; font-size: 8px; color: var(--ink-3); }
+.ed-pop__m {
+  display: none; position: absolute; top: calc(100% + 6px); left: 0; z-index: 40;
+  min-width: 194px; padding: 10px; background: var(--surface);
+  border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow-3);
+}
+.ed-pop__m.open { display: block; }
+.ed-pop__t { font-size: 11.5px; font-weight: 600; color: var(--ink-3); margin: 0 0 6px; text-transform: uppercase; letter-spacing: .3px; }
+.ed-sw { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+.ed-sw .sw {
+  width: 22px !important; min-width: 22px !important; height: 22px !important; padding: 0 !important;
+  border: 1px solid var(--line) !important; border-radius: 5px; cursor: pointer;
+}
+.ed-sw .sw:hover { transform: scale(1.12); border-color: var(--ink-3) !important; }
+.ed-sw .sw--none {
+  background: linear-gradient(135deg, transparent 45%, var(--err) 45%, var(--err) 55%, transparent 55%) var(--surface);
+}
+.ed-pop__c { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12.4px; color: var(--ink-2); }
+.ed-pop__c input { width: 40px; height: 26px; padding: 0; border: 1px solid var(--line); border-radius: 5px; background: none; cursor: pointer; }
+
+/* --- táblázat beszúrása: rácsválasztó --- */
+.ed-pop__b--wide { flex-direction: row !important; padding: 0 8px !important; }
+.ed-pop__m--tbl { min-width: 210px; }
+/* a jobb szélhez közeli előugrók ne lógjanak ki a képernyőből */
+.ed-pop__m--tbl, #pop-tblhead { left: auto; right: 0; }
+.tblgrid { display: grid; grid-template-columns: repeat(8, 20px); gap: 3px; margin-bottom: 7px; }
+.tblgrid i {
+  display: block; width: 20px; height: 18px; border: 1px solid var(--line);
+  border-radius: 3px; background: var(--surface-2); cursor: pointer;
+}
+.tblgrid i.on { background: var(--brand-soft); border-color: var(--brand); }
+.tblgrid__lbl { font-size: 12.4px; color: var(--ink-3); margin-bottom: 8px; font-variant-numeric: tabular-nums; }
+
+/* --- táblázat-eszközök sávja (a Word „Táblázateszközök” fülének megfelelője) --- */
+.ed-tbl {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 6px 8px;
+  background: var(--brand-soft); border: 1px solid var(--brand-ring); border-bottom: 0;
+  position: sticky; top: 132px; z-index: 19;
+}
+.ed-tbl[hidden] { display: none; }
+.ed-tbl__t {
+  font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px;
+  color: var(--brand-strong); margin-right: 4px;
+}
+.ed-tbl button {
+  min-width: 30px; height: 28px; padding: 0 8px; font: inherit; font-size: 12.6px;
+  background: none; border: 1px solid transparent; border-radius: var(--r-sm);
+  color: var(--ink-2); cursor: pointer; white-space: nowrap;
+}
+.ed-tbl button:hover { background: var(--surface); color: var(--ink); border-color: var(--line); }
+.ed-tbl .ed-grp { background: var(--surface); border-color: var(--brand-ring); }
+.ed-tbl .sp { flex: 1; }
 
 .ed-area {
   border: 1px solid var(--line); border-radius: 0 0 var(--r) var(--r);
@@ -251,7 +381,18 @@ p.lead { margin: 0 0 18px; color: var(--ink-3); font-size: calc(13.4px * var(--f
 
 /* ---------- statisztika-csempék ---------- */
 .stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-bottom: 18px; }
-.stat { padding: 15px 17px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow-1); }
+/* keskeny ablakban a panelbe zsufolt tablazat inkabb gorduljon, mint levagodjon */
+.panel__b--flush { overflow-x: auto; }
+.stat {
+  display: block; padding: 15px 17px; background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--r-lg); box-shadow: var(--shadow-1); color: inherit;
+  transition: border-color .14s, box-shadow .14s, transform .14s;
+}
+a.stat:hover {
+  text-decoration: none; border-color: var(--brand-ring);
+  box-shadow: var(--shadow-2); transform: translateY(-1px);
+}
+a.stat:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 .stat__n { font-size: calc(26px * var(--fs)); font-weight: 700; line-height: 1.1; letter-spacing: -.5px; }
 .stat__l { font-size: calc(12.2px * var(--fs)); color: var(--ink-3); margin-top: 3px; }
 .stat--warn .stat__n { color: var(--warn); }

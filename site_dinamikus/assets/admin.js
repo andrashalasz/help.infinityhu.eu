@@ -15,6 +15,93 @@
   function LSget(k, d) { try { var v = localStorage.getItem(k); return v === null ? d : v; } catch (e) { return d; } }
   function LSset(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
 
+  /* --- a bal lista moduljainak ki-/összecsukása (állapot megjegyezve) --- */
+  function wirePickerFold() {
+    var list = document.querySelector('#pick-list');
+    if (!list) { return; }
+
+    var KEY = 'help.admin.folded';
+    var folded = {};
+    try { folded = JSON.parse(LSget(KEY, '{}')) || {}; } catch (e) { folded = {}; }
+
+    function apply(id, on) {
+      var head = list.querySelector('.picker__m[data-module="' + id + '"]');
+      var group = list.querySelector('.picker__group[data-module="' + id + '"]');
+      if (head) { head.classList.toggle('folded', on); }
+      if (group) { group.hidden = on; }
+    }
+
+    Array.prototype.forEach.call(list.querySelectorAll('.picker__m'), function (h) {
+      var id = h.getAttribute('data-module');
+      // a nyitott fejezet modulja mindig latszik, barmit mond a mentett allapot
+      var hasActive = !!list.querySelector('.picker__group[data-module="' + id + '"] .picker__a.on');
+      if (folded[id] && !hasActive) { apply(id, true); }
+    });
+
+    list.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-fold]');
+      if (!b) { return; }
+      var id = b.getAttribute('data-fold');
+      var head = b.closest('.picker__m');
+      var on = !head.classList.contains('folded');
+      apply(id, on);
+      if (on) { folded[id] = 1; } else { delete folded[id]; }
+      LSset(KEY, JSON.stringify(folded));
+    });
+
+    // "mindent összecsuk / mindent kinyit" a lista feletti gombbal
+    var allBtn = document.querySelector('#pick-foldall');
+    if (allBtn) {
+      allBtn.addEventListener('click', function () {
+        var heads = Array.prototype.slice.call(list.querySelectorAll('.picker__m'));
+        var anyOpen = heads.some(function (h) { return !h.classList.contains('folded'); });
+        heads.forEach(function (h) {
+          var id = h.getAttribute('data-module');
+          apply(id, anyOpen);
+          if (anyOpen) { folded[id] = 1; } else { delete folded[id]; }
+        });
+        LSset(KEY, JSON.stringify(folded));
+        allBtn.classList.toggle('on', anyOpen);
+      });
+    }
+  }
+
+  /* ---------------------------------------------------------- megerősítés
+     A böngésző window.confirm() ablakát több környezet letiltja, és olyankor
+     a művelet némán elmarad. Ezért minden megerősítés a saját ablakunkkal
+     megy: <form data-confirm="..."> vagy askConfirm(szöveg, callback). */
+  function askConfirm(text, onYes, title) {
+    var modal = document.querySelector('#modal-confirm');
+    if (!modal) { if (window.confirm(text)) { onYes(); } return; }
+
+    modal.querySelector('#confirm-text').textContent = text;
+    modal.querySelector('#confirm-title').textContent = title || 'Megerősítés';
+    var ok = modal.querySelector('#confirm-ok');
+
+    // friss gomb, hogy ne maradjon rajta korabbi esemenykezelo
+    var fresh = ok.cloneNode(true);
+    ok.parentNode.replaceChild(fresh, ok);
+    fresh.addEventListener('click', function () {
+      modal.classList.remove('on');
+      onYes();
+    });
+    modal.classList.add('on');
+  }
+
+  function wireConfirmForms() {
+    document.addEventListener('submit', function (e) {
+      var f = e.target;
+      if (!f || !f.getAttribute) { return; }
+      var msg = f.getAttribute('data-confirm');
+      if (!msg || f.dataset.confirmed === '1') { return; }
+      e.preventDefault();
+      askConfirm(msg, function () {
+        f.dataset.confirmed = '1';
+        if (f.requestSubmit) { f.requestSubmit(); } else { f.submit(); }
+      });
+    }, true);
+  }
+
   /* ---------------------------------------------------------- téma */
   var ICON = {
     sun: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
@@ -96,6 +183,42 @@
     });
   }
 
+  /* --- Új fejezet: a Fejezetszám mező a kiválasztott modul következő számát ajánlja --- */
+  function wireNewArticleChapter() {
+    var sel = $('#new-module'), inp = $('#new-chapter');
+    if (!sel || !inp) { return; }
+
+    function syncPlaceholder() {
+      var opt = sel.options[sel.selectedIndex];
+      inp.placeholder = (opt && opt.getAttribute('data-next')) || '';
+    }
+    sel.addEventListener('change', syncPlaceholder);
+
+    // A modul fejlécén levő "+" gomb: megnyitja az Új fejezet ablakot,
+    // ERRE a modulra állítva, hogy ne kelljen a legördülőben keresgélni.
+    // A "+" gombok a teljes "Új fejezet" ablakot nyitjak meg, eleve kitoltve:
+    // a modul be van allitva, a fejezetszam pedig a kovetkezo szabad szam
+    // (egy fejezet sora melletti "+" eseten a konkret alfejezet-szam).
+    $$('[data-new-in]').forEach(function (b) {
+      b.addEventListener('click', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+
+        sel.value = b.getAttribute('data-new-in');
+        syncPlaceholder();
+
+        var no = b.getAttribute('data-new-no');
+        inp.value = no || (sel.options[sel.selectedIndex]
+                    ? sel.options[sel.selectedIndex].getAttribute('data-next') : '') || '';
+
+        var modal = $('#modal-new-article');
+        if (modal) { modal.classList.add('on'); }
+        var t = modal && modal.querySelector('[name=title]');
+        if (t) { t.value = ''; t.focus(); }
+      });
+    });
+  }
+
   /* ---------------------------------------------------------- szerkesztő */
   function wireEditor() {
     var ed = $('#ed'), area = $('#ed-area'), src = $('#ed-src');
@@ -136,13 +259,440 @@
         syncToSource();
       });
     });
-    $$('.ed-toolbar [data-block]').forEach(function (b) {
+    /* ---------- címsorszintek + automatikus számozás ----------
+       A szám a címsor elején álló <span class="hno"> elemben él (ugyanaz a
+       jelölés, amit a Word-import is használ), így a mentéskor futó
+       help_anchorize() változatlanul ki tudja belőle olvasni a fejezetszámot. */
+
+    var HEADS = 'h2,h3,h4,h5,h6';
+    var levelSel = $('#ed-level');
+    var autoNum  = $('#ed-autonum');
+
+    function chapterPrefix() { return (ed.getAttribute('data-chapter') || '').trim(); }
+
+    /** A címsor elejére került kézi számot betesszük a hno spanba. */
+    function adoptInlineNumbers() {
+      area.querySelectorAll(HEADS).forEach(function (h) {
+        if (h.querySelector('.hno')) { return; }
+        var first = h.firstChild;
+        if (!first || first.nodeType !== 3) { return; }
+        var m = /^\s*(\d+(?:\.\d+)*)\.?\s+/.exec(first.nodeValue || '');
+        if (!m) { return; }
+        first.nodeValue = first.nodeValue.slice(m[0].length);
+        var sp = document.createElement('span');
+        sp.className = 'hno';
+        sp.textContent = m[1];
+        h.insertBefore(sp, h.firstChild);
+      });
+    }
+
+    /**
+     * Újraszámozza a címsorokat a cikk fejezetszáma alá (pl. 5.4 -> 5.4.1,
+     * 5.4.1.1 ...). A kurzort nem mozdítja: csak a meglévő span szövegét
+     * írja át, illetve hiányzó spant szúr be a címsor elejére.
+     */
+    function renumber() {
+      var prefix = chapterPrefix();
+      var counters = [0, 0, 0, 0, 0];
+      var changed = false;
+
+      area.querySelectorAll(HEADS).forEach(function (h) {
+        var depth = parseInt(h.tagName.substring(1), 10) - 1;   // h2 -> 1 ... h6 -> 5
+        if (depth < 1 || depth > 5) { return; }
+
+        counters[depth - 1]++;
+        for (var i = depth; i < 5; i++) { counters[i] = 0; }
+
+        var parts = counters.slice(0, depth);
+        var num = (prefix ? prefix + '.' : '') + parts.join('.');
+
+        var sp = h.querySelector('.hno');
+        if (!sp) {
+          sp = document.createElement('span');
+          sp.className = 'hno';
+          sp.textContent = num;
+          h.insertBefore(sp, h.firstChild);
+          changed = true;
+        } else if (sp.textContent !== num) {
+          sp.textContent = num;
+          changed = true;
+        }
+        sp.setAttribute('contenteditable', 'false');
+      });
+
+      if (changed) { syncToSource(); }
+      return changed;
+    }
+
+    /** A kurzor alatti blokk szintje a legördülőben. */
+    function refreshLevel() {
+      if (!levelSel) { return; }
+      var sel = window.getSelection();
+      if (!sel || !sel.anchorNode) { return; }
+      var n = sel.anchorNode.nodeType === 1 ? sel.anchorNode : sel.anchorNode.parentNode;
+      var tag = 'p';
+      while (n && n !== area) {
+        var t = (n.tagName || '').toLowerCase();
+        if (/^h[1-6]$/.test(t) || t === 'p' || t === 'li') { tag = t === 'li' ? 'p' : t; break; }
+        n = n.parentNode;
+      }
+      levelSel.value = /^h[2-6]$/.test(tag) ? tag : 'p';
+    }
+
+    if (levelSel) {
+      levelSel.addEventListener('change', function () {
+        area.focus();
+        document.execCommand('formatBlock', false, levelSel.value);
+        // bekezdéssé alakításkor a régi sorszám már nem érvényes
+        if (levelSel.value === 'p') {
+          var sel = window.getSelection();
+          var n = sel && sel.anchorNode ? (sel.anchorNode.nodeType === 1 ? sel.anchorNode : sel.anchorNode.parentNode) : null;
+          while (n && n !== area) {
+            if ((n.tagName || '').toLowerCase() === 'p') {
+              var old = n.querySelector('.hno');
+              if (old) { old.remove(); }
+              break;
+            }
+            n = n.parentNode;
+          }
+        }
+        if (!autoNum || autoNum.checked) { renumber(); }
+        syncToSource();
+        markDirty();
+      });
+    }
+
+    var renumBtn = $('#ed-renumber');
+    if (renumBtn) {
+      renumBtn.addEventListener('click', function () {
+        adoptInlineNumbers();
+        renumber();
+        markDirty();
+        toast('A címsorok újraszámozva.', 'ok');
+      });
+    }
+
+    // induláskor a meglévő tartalmat is rendbe tesszük (szám a spanba),
+    // de a számokat nem írjuk át, amíg a szerkesztő hozzá nem nyúl
+    adoptInlineNumbers();
+    area.querySelectorAll('.hno').forEach(function (n) { n.setAttribute('contenteditable', 'false'); });
+
+    var numTimer = null;
+    area.addEventListener('input', function () {
+      if (!autoNum || !autoNum.checked) { return; }
+      clearTimeout(numTimer);
+      numTimer = setTimeout(renumber, 350);
+    });
+    area.addEventListener('keyup', refreshLevel);
+    area.addEventListener('mouseup', refreshLevel);
+
+    /* ---------- betűszín és kiemelés ---------- */
+    var pop = $('#pop-color'), popBtn = $('.ed-pop__b[data-pop="color"]');
+    if (pop && popBtn) {
+      popBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        pop.classList.toggle('open');
+      });
+      document.addEventListener('click', function () { pop.classList.remove('open'); });
+      pop.addEventListener('click', function (e) { e.stopPropagation(); });
+
+      function applyColor(prop, value) {
+        area.focus();
+        var sel = window.getSelection();
+        if (!sel || sel.isCollapsed) {
+          toast('Előbb jelöld ki a szöveget, amit színezni szeretnél.', 'warn');
+          return;
+        }
+        // execCommand foreColor <font> elemet gyártana, azt a mentés kidobná
+        var range = sel.getRangeAt(0);
+        var span = document.createElement('span');
+        span.style[prop] = value;
+        try {
+          range.surroundContents(span);
+        } catch (err) {
+          // több elemre átnyúló kijelölés: darabonként
+          var frag = range.extractContents();
+          span.appendChild(frag);
+          range.insertNode(span);
+        }
+        sel.removeAllRanges();
+        syncToSource();
+        markDirty();
+      }
+
+      pop.querySelectorAll('[data-color]').forEach(function (b) {
+        b.addEventListener('click', function () {
+          var c = b.getAttribute('data-color');
+          applyColor('color', c);
+          var bar = $('#ed-color-bar');
+          if (bar) { bar.style.background = c; }
+          pop.classList.remove('open');
+        });
+      });
+      pop.querySelectorAll('[data-mark]').forEach(function (b) {
+        b.addEventListener('click', function () {
+          var c = b.getAttribute('data-mark');
+          if (c === 'none') {
+            area.focus();
+            document.execCommand('removeFormat', false, undefined);
+            syncToSource();
+          } else {
+            applyColor('backgroundColor', c);
+          }
+          pop.classList.remove('open');
+        });
+      });
+      var custom = $('#ed-color-custom');
+      if (custom) {
+        custom.addEventListener('change', function () {
+          applyColor('color', custom.value);
+          var bar = $('#ed-color-bar');
+          if (bar) { bar.style.background = custom.value; }
+          pop.classList.remove('open');
+        });
+      }
+    }
+
+    /* ---------- szöveg igazítása ---------- */
+    var ALIGN = { left: 'justifyLeft', center: 'justifyCenter', right: 'justifyRight', justify: 'justifyFull' };
+    $$('.ed-toolbar [data-align]').forEach(function (b) {
       b.addEventListener('click', function () {
         area.focus();
-        document.execCommand('formatBlock', false, b.getAttribute('data-block'));
+        document.execCommand(ALIGN[b.getAttribute('data-align')], false, undefined);
         syncToSource();
+        markDirty();
       });
     });
+
+    /* ---------- előugró ablakok közös kezelése ---------- */
+    function wirePop(name) {
+      var btn = $('.ed-pop__b[data-pop="' + name + '"]');
+      var menu = $('#pop-' + name);
+      if (!btn || !menu) { return null; }
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        $$('.ed-pop__m.open').forEach(function (m) { if (m !== menu) { m.classList.remove('open'); } });
+        menu.classList.toggle('open');
+      });
+      menu.addEventListener('click', function (e) { e.stopPropagation(); });
+      document.addEventListener('click', function () { menu.classList.remove('open'); });
+      return menu;
+    }
+
+    /* ---------- új táblázat: rácsválasztó ---------- */
+    var popTable = wirePop('table');
+    if (popTable) {
+      var GRID_R = 8, GRID_C = 8;
+      var pickR = 3, pickC = 3;
+      var grid = $('#tblgrid'), lbl = $('#tblgrid-lbl');
+
+      for (var r = 1; r <= GRID_R; r++) {
+        for (var c = 1; c <= GRID_C; c++) {
+          var cell = document.createElement('i');
+          cell.dataset.r = String(r);
+          cell.dataset.c = String(c);
+          grid.appendChild(cell);
+        }
+      }
+      function paintGrid() {
+        $$('i', grid).forEach(function (n) {
+          n.classList.toggle('on', +n.dataset.r <= pickR && +n.dataset.c <= pickC);
+        });
+        lbl.textContent = pickR + ' × ' + pickC;
+      }
+      grid.addEventListener('mouseover', function (e) {
+        if (e.target.tagName !== 'I') { return; }
+        pickR = +e.target.dataset.r; pickC = +e.target.dataset.c;
+        paintGrid();
+      });
+      grid.addEventListener('click', function (e) {
+        if (e.target.tagName !== 'I') { return; }
+        pickR = +e.target.dataset.r; pickC = +e.target.dataset.c;
+        paintGrid();
+      });
+      paintGrid();
+
+      $('#tbl-insert').addEventListener('click', function () {
+        var withHead = $('#tbl-new-head').checked;
+        var rows = withHead ? Math.max(1, pickR - 1) : pickR;
+        var html = '<table class="erp-table tbl--grid">';
+        if (withHead) {
+          html += '<thead><tr>';
+          for (var c = 0; c < pickC; c++) { html += '<th>Fejléc ' + (c + 1) + '</th>'; }
+          html += '</tr></thead>';
+        }
+        html += '<tbody>';
+        for (var i = 0; i < rows; i++) {
+          html += '<tr>';
+          for (var c2 = 0; c2 < pickC; c2++) { html += '<td>&nbsp;</td>'; }
+          html += '</tr>';
+        }
+        html += '</tbody></table><p><br></p>';
+        area.focus();
+        document.execCommand('insertHTML', false, html);
+        popTable.classList.remove('open');
+
+        // a kurzor kerüljön rögtön az első cellába, hogy a táblázat-eszközök
+        // sávja azonnal megjelenjen és lehessen gépelni
+        var fresh = area.querySelectorAll('table');
+        var last = fresh[fresh.length - 1];
+        if (last) {
+          var cell = last.querySelector('th, td');
+          if (cell) {
+            var rg = document.createRange();
+            rg.selectNodeContents(cell);
+            rg.collapse(true);
+            var sl = window.getSelection();
+            sl.removeAllRanges();
+            sl.addRange(rg);
+          }
+        }
+        syncToSource();
+        markDirty();
+        refreshTableBar();
+      });
+    }
+
+    /* ---------- táblázat-eszközök (a kurzor alatti táblára hatnak) ---------- */
+    var tblBar = $('#ed-tbl');
+
+    function currentCell() {
+      var sel = window.getSelection();
+      if (!sel || !sel.anchorNode) { return null; }
+      var n = sel.anchorNode.nodeType === 1 ? sel.anchorNode : sel.anchorNode.parentNode;
+      while (n && n !== area) {
+        var t = (n.tagName || '').toLowerCase();
+        if (t === 'td' || t === 'th') { return n; }
+        n = n.parentNode;
+      }
+      return null;
+    }
+    function currentTable() {
+      var c = currentCell();
+      return c ? c.closest('table') : null;
+    }
+
+    var BORDERS = ['tbl--grid', 'tbl--rows', 'tbl--frame', 'tbl--plain'];
+
+    function refreshTableBar() {
+      if (!tblBar) { return; }
+      var t = currentTable();
+      tblBar.hidden = !t;
+      if (!t) { return; }
+      var b = BORDERS.find(function (k) { return t.classList.contains(k); }) || 'tbl--grid';
+      var selB = $('#tbl-border');
+      if (selB) { selB.value = b.replace('tbl--', ''); }
+      var z = $('#tbl-zebra');
+      if (z) { z.checked = t.classList.contains('tbl--zebra'); }
+    }
+    area.addEventListener('keyup', refreshTableBar);
+    area.addEventListener('mouseup', refreshTableBar);
+    refreshTableBar();
+
+    /** A fejlécsor cellái: a <thead> sorai, vagy a Wordből jött tr.header. */
+    function headerCells(t) {
+      var cells = [].slice.call(t.querySelectorAll('thead th, thead td, tr.header th, tr.header td'));
+      if (!cells.length) {
+        var first = t.rows[0];
+        if (first) { cells = [].slice.call(first.cells); }
+      }
+      return cells;
+    }
+
+    function afterTableChange() { syncToSource(); markDirty(); refreshTableBar(); }
+
+    if (tblBar) {
+      $$('[data-tbl]', tblBar).forEach(function (b) {
+        b.addEventListener('click', function () {
+          var t = currentTable(), cell = currentCell();
+          if (!t || !cell) { return; }
+          var row = cell.parentNode;
+          var idx = cell.cellIndex;
+          var op = b.getAttribute('data-tbl');
+
+          function newRowLike(ref) {
+            var tr = document.createElement('tr');
+            for (var i = 0; i < ref.cells.length; i++) {
+              var td = document.createElement('td');
+              td.innerHTML = '&nbsp;';
+              tr.appendChild(td);
+            }
+            return tr;
+          }
+
+          if (op === 'row-above') { row.parentNode.insertBefore(newRowLike(row), row); }
+          else if (op === 'row-below') { row.parentNode.insertBefore(newRowLike(row), row.nextSibling); }
+          else if (op === 'row-del') {
+            if (t.rows.length <= 1) { toast('Az utolsó sort nem törlöm — töröld inkább a táblázatot.', 'warn'); return; }
+            row.parentNode.removeChild(row);
+          }
+          else if (op === 'col-left' || op === 'col-right') {
+            var at = op === 'col-left' ? idx : idx + 1;
+            [].slice.call(t.rows).forEach(function (tr) {
+              var isHead = tr.cells[0] && tr.cells[0].tagName === 'TH';
+              var c = document.createElement(isHead ? 'th' : 'td');
+              c.innerHTML = isHead ? 'Fejléc' : '&nbsp;';
+              tr.insertBefore(c, tr.cells[at] || null);
+            });
+          }
+          else if (op === 'col-del') {
+            if (t.rows[0] && t.rows[0].cells.length <= 1) { toast('Az utolsó oszlopot nem törlöm.', 'warn'); return; }
+            [].slice.call(t.rows).forEach(function (tr) { if (tr.cells[idx]) { tr.deleteCell(idx); } });
+          }
+          else if (op === 'delete') {
+            askConfirm('Biztosan törlöd az egész táblázatot?', function () {
+              t.parentNode.removeChild(t);
+              tblBar.hidden = true;
+              afterTableChange();
+            });
+            return;
+          }
+          afterTableChange();
+        });
+      });
+
+      var borderSel = $('#tbl-border');
+      if (borderSel) {
+        borderSel.addEventListener('change', function () {
+          var t = currentTable();
+          if (!t) { return; }
+          BORDERS.forEach(function (k) { t.classList.remove(k); });
+          t.classList.add('tbl--' + borderSel.value);
+          afterTableChange();
+        });
+      }
+      var zebra = $('#tbl-zebra');
+      if (zebra) {
+        zebra.addEventListener('change', function () {
+          var t = currentTable();
+          if (!t) { return; }
+          t.classList.toggle('tbl--zebra', zebra.checked);
+          afterTableChange();
+        });
+      }
+
+      var popHead = wirePop('tblhead');
+      if (popHead) {
+        function paintHeader(prop, value) {
+          var t = currentTable();
+          if (!t) { toast('Állj bele a táblázatba, aminek a fejlécét színezni szeretnéd.', 'warn'); return; }
+          headerCells(t).forEach(function (c) {
+            if (value === 'none') { c.style.removeProperty(prop); }
+            else { c.style[prop === 'background-color' ? 'backgroundColor' : 'color'] = value; }
+          });
+          afterTableChange();
+        }
+        $$('[data-hbg]', popHead).forEach(function (b) {
+          b.addEventListener('click', function () { paintHeader('background-color', b.getAttribute('data-hbg')); });
+        });
+        $$('[data-hfg]', popHead).forEach(function (b) {
+          b.addEventListener('click', function () { paintHeader('color', b.getAttribute('data-hfg')); });
+        });
+        var hbgC = $('#tbl-hbg-custom'), hfgC = $('#tbl-hfg-custom');
+        if (hbgC) { hbgC.addEventListener('change', function () { paintHeader('background-color', hbgC.value); }); }
+        if (hfgC) { hfgC.addEventListener('change', function () { paintHeader('color', hfgC.value); }); }
+      }
+    }
 
     var linkBtn = $('.ed-toolbar [data-act="link"]');
     if (linkBtn) {
@@ -245,15 +795,51 @@
       }, Promise.resolve());
     });
 
-    [['callout-tip', 'tip', 'Tipp'], ['callout-warn', 'warn', 'Figyelem']].forEach(function (c) {
+    /**
+     * Tipp / Figyelem / Fontos doboz beszúrása.
+     *
+     * Nem execCommand('insertHTML')-lel, mert az a kurzornál nyitja ki a
+     * bekezdést, és a doboz élére szánt <strong> címke kint ragad a fölötte
+     * levő bekezdésben. Helyette megkeressük az aktuális BLOKKOT, és a doboz
+     * a testvéreként kerül be.
+     */
+    [['callout-tip', 'tip', 'Tipp'], ['callout-warn', 'warn', 'Figyelem'],
+     ['callout-crit', 'crit', 'Fontos']].forEach(function (c) {
       var b = $('.ed-toolbar [data-act="' + c[0] + '"]');
       if (!b) { return; }
       b.addEventListener('click', function () {
         area.focus();
-        var sel = String(window.getSelection());
-        document.execCommand('insertHTML', false,
-          '<div class="call ' + c[1] + '"><strong>' + c[2] + '</strong><p>' + (sel || '…') + '</p></div><p><br></p>');
+        var sel = window.getSelection();
+        var text = String(sel || '').trim();
+
+        // az a legfelső elem a szerkesztőn belül, amiben a kurzor áll
+        var block = null;
+        if (sel && sel.anchorNode) {
+          var n = sel.anchorNode.nodeType === 1 ? sel.anchorNode : sel.anchorNode.parentNode;
+          while (n && n.parentNode !== area) { n = n.parentNode; }
+          if (n && n.parentNode === area) { block = n; }
+        }
+
+        var box = document.createElement('div');
+        box.className = 'call ' + c[1];
+        var title = document.createElement('strong');
+        title.textContent = c[2];
+        var body = document.createElement('p');
+        body.textContent = text || '…';
+        box.appendChild(title);
+        box.appendChild(body);
+
+        if (block) { block.parentNode.insertBefore(box, block.nextSibling); }
+        else { area.appendChild(box); }
+
+        // a doboz szövegét rögtön lehessen gépelni
+        var rg = document.createRange();
+        rg.selectNodeContents(body);
+        sel.removeAllRanges();
+        sel.addRange(rg);
+
         syncToSource();
+        markDirty();
       });
     });
 
@@ -286,7 +872,7 @@
       tmp.querySelectorAll('script,style,meta,link').forEach(function (n) { n.remove(); });
       tmp.querySelectorAll('*').forEach(function (n) {
         Array.prototype.slice.call(n.attributes).forEach(function (a) {
-          if (['href', 'src', 'alt', 'title', 'colspan', 'rowspan'].indexOf(a.name) < 0) { n.removeAttribute(a.name); }
+          if (['href', 'src', 'alt', 'title', 'colspan', 'rowspan', 'style', 'class'].indexOf(a.name) < 0) { n.removeAttribute(a.name); }
         });
       });
       document.execCommand('insertHTML', false, tmp.innerHTML);
@@ -577,7 +1163,12 @@
       form.addEventListener('submit', function (e) {
         var n = $$('.imp-item input[type=checkbox]:checked').length;
         if (n === 0) { e.preventDefault(); toast('Nem jelöltél ki egyetlen fejezetet sem.', 'err'); return; }
-        if (!window.confirm(n + ' fejezet átvétele. Folytatod?')) { e.preventDefault(); }
+        if (form.dataset.confirmed === '1') { return; }
+        e.preventDefault();
+        askConfirm(n + ' fejezet átvétele. Folytatod?', function () {
+          form.dataset.confirmed = '1';
+          if (form.requestSubmit) { form.requestSubmit(); } else { form.submit(); }
+        }, 'Word-import átvétele');
       });
     }
   }
@@ -589,8 +1180,14 @@
     btn.addEventListener('click', function () {
       var form = $('#tr-form'), area = $('#ed-area'), src = $('#ed-src'), title = $('#tr-title');
       if (!form) { return; }
-      if (area && area.textContent.trim() !== '' &&
-          !window.confirm('A jelenlegi fordítás felülíródik a gépi nyersfordítással. Folytatod?')) { return; }
+      if (area && area.textContent.trim() !== '' && btn.dataset.confirmed !== '1') {
+        askConfirm('A jelenlegi fordítás felülíródik a gépi nyersfordítással. Folytatod?', function () {
+          btn.dataset.confirmed = '1';
+          btn.click();
+          delete btn.dataset.confirmed;
+        }, 'Gépi nyersfordítás');
+        return;
+      }
 
       var body = new FormData();
       body.append('a', 'translate.machine');
@@ -684,12 +1281,46 @@
       lastIdx = idx;
     });
 
+    // Melyik gombbal küldték be? Az e.submitter a szabványos válasz erre;
+    // a document.activeElement NEM megbízható (Safariban a gomb kattintásra
+    // nem kap fókuszt, így a művelet üres maradt és a törlés némán elmaradt).
+    var lastOpBtn = null;
+    bar.addEventListener('mousedown', function (e) {
+      var b = e.target.closest('[data-op]');
+      if (b) { lastOpBtn = b; }
+    });
+    bar.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter' && e.key !== ' ') { return; }
+      var b = e.target.closest('[data-op]');
+      if (b) { lastOpBtn = b; }
+    });
+
     // a kijelölt azonosítók beküldése + a művelet gombjának rögzítése
     bar.addEventListener('submit', function (e) {
-      var op = (document.activeElement && document.activeElement.getAttribute('data-op')) || '';
-      if (!op) { e.preventDefault(); return; }
-      var conf = document.activeElement.getAttribute('data-confirm');
-      if (conf && !window.confirm(conf)) { e.preventDefault(); return; }
+      var btnEl = e.submitter
+               || lastOpBtn
+               || (document.activeElement && document.activeElement.closest
+                   ? document.activeElement.closest('[data-op]') : null);
+      var op = (btnEl && btnEl.getAttribute('data-op')) || '';
+      if (!op) {
+        e.preventDefault();
+        toast('Nem sikerült megállapítani a műveletet — próbáld újra a gombbal.', 'err');
+        return;
+      }
+
+      // A törlés megerősítése a saját modálisunkkal megy, nem window.confirm()-mal:
+      // azt több böngésző letiltja, és akkor a törlés némán elmaradt.
+      if (op === 'delete' && !bar.dataset.delOk) {
+        e.preventDefault();
+        var n = selected().length;
+        var c = $('#bulk-del-count');
+        if (c) { c.textContent = String(n); }
+        var dm = $('#modal-bulk-delete');
+        if (dm) { dm.classList.add('on'); }
+        return;
+      }
+      delete bar.dataset.delOk;
+
       if (op === 'move' && !$('#bulk-module').value) {
         e.preventDefault();
         toast('Válaszd ki, melyik modulba kerüljenek.', 'err');
@@ -703,6 +1334,18 @@
         bar.appendChild(i);
       });
     });
+
+    var delOk = $('#bulk-del-ok');
+    if (delOk) {
+      delOk.addEventListener('click', function () {
+        var dm = $('#modal-bulk-delete');
+        if (dm) { dm.classList.remove('on'); }
+        bar.dataset.delOk = '1';
+        lastOpBtn = bar.querySelector('[data-op="delete"]');
+        if (bar.requestSubmit) { bar.requestSubmit(lastOpBtn); }
+        else { bar.submit(); }
+      });
+    }
 
     refresh();
   }
@@ -975,9 +1618,12 @@
     var tb = $('#theme-toggle');
     if (tb) { tb.addEventListener('click', function () { applyTheme(isDark() ? 'light' : 'dark'); }); }
 
+    wireConfirmForms();
+    wirePickerFold();
     wireModals();
     wireToggles();
     wirePicker();
+    wireNewArticleChapter();
     wireEditor();
     wireImport();
     wireTranslate();
