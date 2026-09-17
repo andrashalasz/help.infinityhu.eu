@@ -218,10 +218,12 @@ final class DocxExport
 
         $tag = strtolower($n->nodeName);
         switch ($tag) {
-            case 'h1': case 'h2':
-                return $this->heading(3, help_plain($this->innerHtml($n)));
-            case 'h3': case 'h4': case 'h5': case 'h6':
-                return $this->heading(4, help_plain($this->innerHtml($n)));
+            // A cikk cime a Heading2, a torzsben levo ot szint ez ala kerul:
+            // h2 -> Heading3 ... h6 -> Heading7. Igy a Word tartalomjegyzeke
+            // es a vazlat nezet is a valodi szerkezetet mutatja.
+            case 'h1': case 'h2': case 'h3': case 'h4': case 'h5': case 'h6':
+                $lvl = $tag === 'h1' ? 3 : (int)substr($tag, 1) + 1;
+                return $this->heading($lvl, help_plain($this->innerHtml($n)));
 
             case 'p':
                 $runs = $this->runs($n, []);
@@ -582,6 +584,7 @@ final class DocxExport
              . '</w:docDefaults>'
              . '<w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/><w:qFormat/></w:style>'
              . $h(1, 40, '1B3A6B', 480) . $h(2, 32, '0854A0', 360) . $h(3, 26, '1F2A36', 280) . $h(4, 23, '475467', 220)
+             . $h(5, 22, '475467', 200) . $h(6, 21, '6B7A8D', 180) . $h(7, 21, '6B7A8D', 160)
              . '<w:style w:type="paragraph" w:styleId="ListParagraph"><w:name w:val="List Paragraph"/>'
              . '<w:basedOn w:val="Normal"/><w:qFormat/><w:pPr><w:ind w:left="720"/>'
              . '<w:spacing w:after="60"/><w:contextualSpacing/></w:pPr></w:style>'
@@ -841,12 +844,16 @@ article{page-break-inside:auto}
 article+article{margin-top:2mm}
 .body h2,h3{font-size:11.5pt;margin:5mm 0 2mm;page-break-after:avoid}
 h4{font-size:11pt;margin:4mm 0 1.5mm;page-break-after:avoid}
+h5{font-size:10.5pt;margin:3.5mm 0 1.5mm;color:#475467;page-break-after:avoid}
+h6{font-size:10pt;margin:3mm 0 1.5mm;color:#6b7a8d;page-break-after:avoid}
 p{margin:0 0 2.6mm;orphans:2;widows:2}
 ul,ol{margin:0 0 3mm;padding-left:7mm}
 li{margin-bottom:1mm}
 strong{font-weight:600}
 
 img{max-width:100%;height:auto;border:.3mm solid #d9dee5;border-radius:1.5mm;page-break-inside:avoid;margin:2mm 0}
+/* A logo nem kepernyokep: keret es lekerekites nelkul illeszkedjen. */
+img.logo,.runhead img,.cover__logo img{border:0;border-radius:0;margin:0;padding:0;box-shadow:none}
 video{display:none}
 
 table{border-collapse:collapse;width:100%;font-size:9pt;margin:0 0 4mm;page-break-inside:avoid}
@@ -857,6 +864,7 @@ th,tr.header td{background:#f1f3f6;font-weight:600}
 .hno{color:#0a6ed1;font-weight:700;margin-right:2mm}
 .call{padding:3mm 4mm;border-left:1mm solid #0a6ed1;background:#e8f1fb;border-radius:0 1.5mm 1.5mm 0;margin:0 0 3.5mm;page-break-inside:avoid}
 .call.warn{border-left-color:#b8681a;background:#fdf3e7}
+.call.crit{border-left-color:#bb0000;background:#fbecec}
 .call strong{display:block;font-size:8.5pt;text-transform:uppercase;letter-spacing:.3pt;color:#0854a0;margin-bottom:1mm}
 .call.warn strong{color:#b8681a}
 
