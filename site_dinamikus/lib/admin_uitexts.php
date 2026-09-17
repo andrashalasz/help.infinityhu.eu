@@ -137,7 +137,10 @@ function page_uitexts(PDO $db, array $cfg, array $counts): void
                placeholder="<?= h(t('uitext.kereses')) ?>" autocomplete="off">
         <select class="sel" id="uit-filter" style="width:auto">
           <option value="all"><?= h(t('uitext.szuro.mind')) ?></option>
-          <option value="missing"><?= h(t('uitext.szuro.hianyzo')) ?></option>
+          <?php foreach ($targets as $code => $label): ?>
+            <option value="miss:<?= h((string)$code) ?>">
+              <?= h(t('uitext.szuro.hianyzo.nyelv', ['nyelv' => $label])) ?></option>
+          <?php endforeach; ?>
           <option value="done"><?= h(t('uitext.szuro.kesz')) ?></option>
         </select>
         <span class="sp"></span>
@@ -152,15 +155,18 @@ function page_uitexts(PDO $db, array $cfg, array $counts): void
             </h3>
             <?php foreach ($gkeys as $key => $src): ?>
               <?php
-                $ures = false;
+                // melyik nyelveken hianyzik? (a szurohoz es a kiemeleshez)
+                $miss = [];
                 foreach ($targets as $code => $l) {
-                    if (trim((string)($text[$code][$key] ?? '')) === '') { $ures = true; break; }
+                    if (trim((string)($text[$code][$key] ?? '')) === '') { $miss[] = (string)$code; }
                 }
               ?>
-              <div class="uit-row<?= $ures ? ' uit-row--missing' : '' ?>">
+              <div class="uit-row<?= $miss ? ' uit-row--missing' : '' ?>"
+                   data-miss="<?= h(implode(',', $miss)) ?>">
                 <div class="uit-src" title="<?= h($key) ?>"><?= h((string)$src) ?></div>
                 <?php foreach ($targets as $code => $label): ?>
-                  <label class="uit-cell">
+                  <?php $ures = trim((string)($text[$code][$key] ?? '')) === ''; ?>
+                  <label class="uit-cell<?= $ures ? ' uit-cell--missing' : '' ?>">
                     <span class="uit-cell__l"><?= h(strtoupper((string)$code)) ?></span>
                     <input class="inp" name="ui[<?= h((string)$code) ?>][<?= h($key) ?>]"
                            value="<?= h($text[$code][$key] ?? '') ?>"

@@ -201,8 +201,12 @@
       var mode = filter ? filter.value : 'all';
       var shown = 0;
       rows.forEach(function (r) {
-        var missing = r.classList.contains('uit-row--missing');
-        var okMode = mode === 'all' || (mode === 'missing' ? missing : !missing);
+        var miss = (r.getAttribute('data-miss') || '').split(',').filter(Boolean);
+        var okMode;
+        if (mode === 'all')            { okMode = true; }
+        else if (mode === 'done')      { okMode = miss.length === 0; }
+        else if (mode.indexOf('miss:') === 0) { okMode = miss.indexOf(mode.slice(5)) >= 0; }
+        else                           { okMode = miss.length > 0; }
         var hay = norm(r.textContent) + ' ' +
                   $$('input', r).map(function (i) { return norm(i.value); }).join(' ');
         var okQ = !q || hay.indexOf(q) >= 0;

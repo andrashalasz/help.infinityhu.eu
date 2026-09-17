@@ -186,7 +186,15 @@ final class Translator
         if (($j['stop_reason'] ?? '') === 'max_tokens') {
             throw new RuntimeException(t('mt.ui.tul.hosszu'));
         }
-        $txt = trim((string)($j['content'][0]['text'] ?? ''));
+        // A valasz TOBB BLOKKBOL allhat (gondolkodas + szoveg), ezert nem a
+        // nulladikat vesszuk, hanem osszefuzzuk a szoveges blokkokat. Enelkul
+        // minden olyan koteg "ures valaszt" adott, ahol a modell elobb
+        // gondolkodott.
+        $txt = '';
+        foreach ((array)($j['content'] ?? []) as $block) {
+            if (($block['type'] ?? '') === 'text') { $txt .= (string)($block['text'] ?? ''); }
+        }
+        $txt = trim($txt);
         if ($txt === '') { throw new RuntimeException(t('A Claude üres választ adott.')); }
 
         // ha kodkeretbe tette volna, leszedjuk
