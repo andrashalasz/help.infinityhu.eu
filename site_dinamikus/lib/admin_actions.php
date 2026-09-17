@@ -216,11 +216,36 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             }
             audit_me($db, 'article.publish', 'article:' . $id, $summary);
 
+            // "A forditasok maradjanak naprakeszek": egy forditas attol lesz
+            // elavult, hogy a forrasszoveg ujjlenyomata (content_hash) mar nem
+            // egyezik azzal, amibol a forditas keszult. Egy elutes javitasa
+            // ugyanugy elavultta tenne mindent, mint egy teljes atiras - ezert
+            // ilyenkor az UJ ujjlenyomatot atvezetjuk a nyelvi valtozatokra.
+            $keptTr = 0;
+            if (isset($_POST['keep_tr'])) {
+                $h = $db->prepare('SELECT chapter_no, content_hash FROM help_article WHERE id = ?');
+                $h->execute([$id]);
+                $hr = $h->fetch();
+                if ($hr) {
+                    // Minden olyan nyelvi valtozat, aminek VAN tartalma. (A
+                    // Wordbol importalt forditasoknal nincs forras-ujjlenyomat,
+                    // ezert azok alapbol elavultnak latszanak - ezt a pipat
+                    // hasznalva azok is naprakeszre allnak.)
+                    $u = $db->prepare("UPDATE help_article SET translated_from_hash = ?
+                                        WHERE chapter_no = ? AND id <> ? AND body_html <> ''");
+                    $u->execute([$hr['content_hash'], $hr['chapter_no'], $id]);
+                    $keptTr = $u->rowCount();
+                }
+                audit_me($db, 'article.publish.keep-tr', 'article:' . $id, $keptTr . ' nyelv');
+            }
+
             // Automatikus forditas: ha a Beallitasokban be van kapcsolva, a most
             // kozzetett MAGYAR fejezetbol rogton keszul angol es nemet vazlat is.
             // (Kozzetenni tovabbra is ember dont - ez csak vazlatot ir.)
+            // Apro javitasnal nem indul: a felhasznalo eppen azt mondta, hogy a
+            // meglevo forditasok jok.
             $mtMsg = '';
-            if ($before['lang'] === 'hu' && mt_auto_on($db, $cfg)) {
+            if ($before['lang'] === 'hu' && !isset($_POST['keep_tr']) && mt_auto_on($db, $cfg)) {
                 $r = mt_auto_translate($db, $cfg, $id, auth_user()['id']);
                 if ($r['done']) {
                     $mtMsg = ' ' . t('flash.article.publish.mt',
@@ -233,6 +258,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             }
 
             if ($wantsJson) { help_json(['ok' => true]); }
+            if ($keptTr > 0) { $mtMsg .= ' ' . t('flash.article.publish.keep-tr', ['n' => $keptTr]); }
             flash('ok', t('flash.article.publish.kesz') . $mtMsg . ' '
                 . undo_button($db, 'article.unpublish', ['id' => $id], t('undo.publish')));
             back(['p' => 'articles', 'id' => $id]);

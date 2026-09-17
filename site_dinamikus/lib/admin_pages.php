@@ -823,6 +823,8 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
                   </select></div>
                 <div class="field" style="align-self:center">
                   <label class="check"><input type="checkbox" name="minor"> <?= h(t('Apró javítás (ne jelenjen meg a Mi újságban)')) ?></label>
+                  <label class="check"><input type="checkbox" name="keep_tr"> <?= h(t('kozzetetel.forditas.marad')) ?></label>
+                  <div class="hint"><?= t('kozzetetel.forditas.sugo') ?></div>
                 </div>
               </div>
             </div>

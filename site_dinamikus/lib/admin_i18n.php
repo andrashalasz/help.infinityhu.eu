@@ -158,6 +158,13 @@ function ui_default(string $key = ''): string|array
                                      . '<b>Írd be a nevét</b> a szerkesztő tetején — az lesz a '
                                      . 'főfejezet neve is —, és írd meg, mire való ez a menüpont.',
 
+        // --- kozzetetel ---
+        'kozzetetel.forditas.marad' => 'A fordítások maradjanak naprakészek',
+        'kozzetetel.forditas.sugo'  => 'Egy fordítás attól lesz <b>elavult</b>, hogy a magyar '
+            . 'szöveget közzétetted egy módosítás után — akkor is, ha csak egy elütést '
+            . 'javítottál. Ezt bepipálva a fordítások naprakészek maradnak, és a gépi '
+            . 'fordítás sem indul el újra.',
+
         // --- szerkeszto ---
         'ed.undo' => 'Visszavonás (Ctrl+Z)',
         'ed.redo' => 'Újra (Ctrl+Shift+Z)',
@@ -198,6 +205,7 @@ function ui_default(string $key = ''): string|array
         'flash.article.meta.atszamozva' => 'Mentve. A főfejezet új számot kapott, és vele <b>{n} sor</b> — az alatta levő fejezetek is, minden nyelven.',
         'flash.article.meta.fejezet-adatai-mentve'                          => 'A fejezet adatai mentve.',
         'flash.article.publish.hiba'                                        => 'A közzététel nem sikerült: {reszlet}',
+        'flash.article.publish.keep-tr' => 'A fordítások <b>{n} nyelven</b> naprakészek maradtak.',
         'flash.article.publish.kesz'                                        => 'A fejezet közzétéve — a nyilvános oldalon már ez látszik.',
         'flash.article.publish.mt'                                          => 'Gépi fordítás: <b>{nyelvek}</b> vázlat elkészült.',
         'flash.article.publish.mt.hiba'                                     => 'Gépi fordítás ({nyelv}): {reszlet}',
