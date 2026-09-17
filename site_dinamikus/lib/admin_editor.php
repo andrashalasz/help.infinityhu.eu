@@ -37,7 +37,7 @@ function editor_block(string $chapter, string $body): void
             <div class="ed-grp">
               <div class="ed-pop">
                 <button type="button" class="ed-pop__b" data-pop="color" title="Betűszín">
- <span class="ed-ink ed-bar ed-color-bar ed-car">A</span><span ></span><span >▾</span>
+ <span class="ed-ink">A</span><span class="ed-bar ed-color-bar"></span><span class="ed-car">▾</span>
                 </button>
                 <div class="ed-pop__m" data-pop-menu="color">
                   <div class="ed-pop__t">Betűszín</div>
@@ -80,7 +80,7 @@ function editor_block(string $chapter, string $body): void
               <button type="button" data-act="upload-image" title="Kép feltöltése és beszúrása">🖼&nbsp;Kép</button>
               <button type="button" data-act="upload-video" title="Videó feltöltése és beszúrása">🎬&nbsp;Videó</button>
               <div class="ed-pop">
- <button type="button" class="ed-pop__b ed-pop__b--wide ed-car" data-pop="table" title="Táblázat beszúrása">▦&nbsp;Tábla<span >▾</span></button>
+ <button type="button" class="ed-pop__b ed-pop__b--wide" data-pop="table" title="Táblázat beszúrása">▦&nbsp;Tábla<span class="ed-car">▾</span></button>
                 <div class="ed-pop__m ed-pop__m--tbl" data-pop-menu="table">
                   <div class="ed-pop__t">Új táblázat</div>
                   <div class="tblgrid" aria-label="Méret választása"></div>
@@ -139,7 +139,7 @@ function editor_block(string $chapter, string $body): void
             <div class="ed-grp">
               <div class="ed-pop">
                 <button type="button" class="ed-pop__b" data-pop="tblhead" title="Fejléc színei">
- <span class="ed-ink ed-car">Fejléc</span><span >▾</span>
+ <span class="ed-ink">Fejléc</span><span class="ed-car">▾</span>
                 </button>
                 <div class="ed-pop__m" data-pop-menu="tblhead">
                   <div class="ed-pop__t">Fejléc háttere</div>
@@ -166,7 +166,7 @@ function editor_block(string $chapter, string $body): void
 
               <div class="ed-pop">
                 <button type="button" class="ed-pop__b" data-pop="tblcell" title="A kijelölt cellák színei">
- <span class="ed-ink ed-car">Cella</span><span >▾</span>
+ <span class="ed-ink">Cella</span><span class="ed-car">▾</span>
                 </button>
                 <div class="ed-pop__m" data-pop-menu="tblcell">
                   <div class="ed-pop__t">Cella háttere</div>

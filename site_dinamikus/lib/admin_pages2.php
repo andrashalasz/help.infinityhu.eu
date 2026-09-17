@@ -91,11 +91,11 @@ function page_import(PDO $db, array $cfg, string $lang, int $importId, array $co
 
     <div class="panel__b">
       <div class="stats" style="margin-bottom:0">
- <div class="stat stat__n stat__l"><div ><?= count($items) ?></div><div >fejezet a dokumentumban</div></div>
- <div class="stat stat--warn stat__n stat__l"><div ><?= $nMod ?></div><div >eltér a mostanitól</div></div>
- <div class="stat stat__n stat__l"><div ><?= $nSame ?></div><div >változatlan</div></div>
- <div class="stat stat__n stat__l"><div ><?= $nNew ?></div><div >új fejezet</div></div>
- <div class="stat stat__n stat__l"><div ><?= (int)($stats['images'] ?? 0) ?></div><div >új kép kibontva</div></div>
+ <div class="stat"><div class="stat__n"><?= count($items) ?></div><div class="stat__l">fejezet a dokumentumban</div></div>
+ <div class="stat stat--warn"><div class="stat__n"><?= $nMod ?></div><div class="stat__l">eltér a mostanitól</div></div>
+ <div class="stat"><div class="stat__n"><?= $nSame ?></div><div class="stat__l">változatlan</div></div>
+ <div class="stat"><div class="stat__n"><?= $nNew ?></div><div class="stat__l">új fejezet</div></div>
+ <div class="stat"><div class="stat__n"><?= (int)($stats['images'] ?? 0) ?></div><div class="stat__l">új kép kibontva</div></div>
       </div>
     </div>
 
@@ -151,7 +151,7 @@ function page_import(PDO $db, array $cfg, string $lang, int $importId, array $co
                         ? ' · a cím is változik: „' . h((string)$it['cur_title']) . '” → „' . h((string)$it['title']) . '”'
                         : '')
                      . '</div>';
- echo '<div class="diff muted">' . ($d['changed'] ? $d['html'] : '<span >A szöveg szó szerint megegyezik a mostanival.</span>') . '</div>';
+ echo '<div class="diff">' . ($d['changed'] ? $d['html'] : '<span class="muted">A szöveg szó szerint megegyezik a mostanival.</span>') . '</div>';
               }
               ?>
             </div>
@@ -364,7 +364,7 @@ function page_translate(PDO $db, array $cfg, int $srcId, string $to, array $coun
     <!-- szerkesztő -->
     <div>
       <?php if (!$src): ?>
- <div class="panel empty"><div >Válassz egy fejezetet a bal oldali listából.</div></div>
+ <div class="panel"><div class="empty">Válassz egy fejezetet a bal oldali listából.</div></div>
       <?php else: ?>
         <?php
         // MINDEN celnyelv egy oldalon. Uj nyelv felvetele az ADMIN_LANGS-ban
@@ -538,7 +538,7 @@ function page_screens(PDO $db, array $counts): void
   </div>
 
   <div class="panel">
- <div class="panel__h sp badge"><h2>Meglévő hozzárendelések</h2><span ></span><span ><?= count($rows) ?></span></div>
+ <div class="panel__h"><h2>Meglévő hozzárendelések</h2><span class="sp"></span><span class="badge"><?= count($rows) ?></span></div>
     <div class="panel__b panel__b--flush">
       <?php if (!$rows): ?>
         <div class="empty">Még nincs egyetlen hozzárendelés sem.</div>
@@ -552,7 +552,7 @@ function page_screens(PDO $db, array $counts): void
               <td><a href="<?= h(admin_url(['p' => 'articles', 'lang' => $r['lang'], 'id' => $r['article_id']])) ?>">
                 <?= h($r['chapter_no'] . ' ' . $r['title']) ?></a></td>
               <td class="mono muted" data-label="Horgony"><?= h((string)$r['anchor']) ?></td>
- <td data-label="Ellenőrzött"><?= $r['is_verified'] ? '<span class="badge badge--ok">igen</span>' : '<span >nem</span>' ?></td>
+ <td data-label="Ellenőrzött"><?= $r['is_verified'] ? '<span class="badge badge--ok">igen</span>' : '<span class="badge">nem</span>' ?></td>
               <td class="nowrap">
                 <form method="post" action="<?= h(admin_url()) ?>" data-confirm="Törlöd ezt a hozzárendelést?">
                   <?= csrf_input() ?>
@@ -609,12 +609,12 @@ function page_media(PDO $db, array $cfg, int $page, array $counts): void
   <?= flash_render() ?>
 
   <?php if (!$writable): ?>
- <div class="msg msg--warn mono"><b>A fájlok mappája nem írható</b> (<span ><?= h($dir) ?></span>).
+ <div class="msg msg--warn"><b>A fájlok mappája nem írható</b> (<span class="mono"><?= h($dir) ?></span>).
       Feltöltés és Word-import képkibontás nem fog működni.</div>
   <?php endif; ?>
 
   <div class="panel" style="margin-bottom:16px">
- <div class="panel__h sp"><h2>Feltöltés</h2><span ></span>
+ <div class="panel__h"><h2>Feltöltés</h2><span class="sp"></span>
       <span class="badge"><?= $total ?> fájl</span></div>
     <div class="panel__b">
       <form method="post" action="<?= h(admin_url()) ?>" enctype="multipart/form-data">
@@ -721,11 +721,11 @@ function page_export(PDO $db, array $cfg, string $lang, array $counts): void
   <?= flash_render() ?>
 
   <div class="panel">
- <div class="panel__h sp"><h2>Letöltés</h2><span ></span>
+ <div class="panel__h"><h2>Letöltés</h2><span class="sp"></span>
       <?php if ($version !== ''): ?><span class="badge badge--info"><?= h($version) ?></span><?php endif; ?></div>
     <div class="panel__b panel__b--flush">
       <table class="tbl">
- <thead><tr><th>Nyelv</th><th class="num">Közzétett fejezet</th><th >Kikapcsolt</th>
+ <thead><tr><th>Nyelv</th><th class="num">Közzétett fejezet</th><th class="num">Kikapcsolt</th>
           <th class="num">Kép</th><th>Letöltés</th></tr></thead>
         <tbody>
         <?php foreach (ADMIN_LANGS as $code => $label):
@@ -733,7 +733,7 @@ function page_export(PDO $db, array $cfg, string $lang, array $counts): void
           <tr>
             <td><b><?= h($label) ?></b> <span class="badge"><?= h($code) ?></span></td>
             <td class="num" data-label="Közzétett"><?= (int)$s['published'] ?></td>
- <td class="num badge badge--warn" data-label="Kikapcsolt"><?= (int)$s['hidden'] ? '<span >' . (int)$s['hidden'] . '</span>' : '0' ?></td>
+ <td class="num" data-label="Kikapcsolt"><?= (int)$s['hidden'] ? '<span class="badge badge--warn">' . (int)$s['hidden'] . '</span>' : '0' ?></td>
             <td class="num" data-label="Kép"><?= (int)$s['images'] ?></td>
             <td class="nowrap">
               <form method="post" action="<?= h(admin_url()) ?>" style="display:inline">
@@ -851,7 +851,7 @@ function page_users(PDO $db, array $counts): void
   </div>
 
   <div class="panel">
- <div class="panel__h sp badge"><h2>Meglévő felhasználók</h2><span ></span><span ><?= count($users) ?></span></div>
+ <div class="panel__h"><h2>Meglévő felhasználók</h2><span class="sp"></span><span class="badge"><?= count($users) ?></span></div>
     <div class="panel__b panel__b--flush">
       <?php foreach ($users as $us): ?>
         <form method="post" action="<?= h(admin_url()) ?>" id="uf<?= (int)$us['id'] ?>">
@@ -965,7 +965,7 @@ function page_settings(PDO $db, array $cfg, array $counts): void
   </div>
 
   <div class="panel" style="margin-bottom:16px" id="jelszo">
- <div class="panel__h sp"><h2>Saját jelszó</h2><span ></span>
+ <div class="panel__h"><h2>Saját jelszó</h2><span class="sp"></span>
       <span class="muted"><?= h(auth_user()['username']) ?></span></div>
     <div class="panel__b">
       <p class="lead" style="margin-bottom:14px">
@@ -990,7 +990,7 @@ function page_settings(PDO $db, array $cfg, array $counts): void
   </div>
 
   <div class="panel" style="margin-bottom:16px">
- <div class="panel__h sp"><h2>Gépi fordítás</h2><span ></span>
+ <div class="panel__h"><h2>Gépi fordítás</h2><span class="sp"></span>
       <span class="badge <?= $tr->isConfigured() ? 'badge--ok' : '' ?>"><?= h($tr->label()) ?></span></div>
     <div class="panel__b">
       <?php if ($envMt): ?>
@@ -1128,7 +1128,7 @@ function page_trash(PDO $db, array $counts): void
   <?= flash_render() ?>
 
   <div class="panel">
- <div class="panel__h sp"><h2>Törölt elemek</h2><span ></span>
+ <div class="panel__h"><h2>Törölt elemek</h2><span class="sp"></span>
       <span class="badge <?= $open ? 'badge--warn' : '' ?>"><?= count($open) ?> visszaállítható</span>
       <?php if ($open): ?>
         <form method="post" action="<?= h(admin_url()) ?>"

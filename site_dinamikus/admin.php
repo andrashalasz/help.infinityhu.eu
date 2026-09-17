@@ -174,6 +174,9 @@ switch ($page) {
                        (string)($_GET['l'] ?? ''), (string)($_GET['r'] ?? ''));
         break;
     case 'screens':
+        // A "?" gomb kepernyo -> fejezet hozzarendelese. A sugo kulon oldalkent
+        // mukodik, nincs beepitve az Infinitybe, ezert a ful nem latszik; a lap
+        // maga megmaradt, ha kesobb megis kell.
         page_screens($db, $counts);
         break;
     case 'media':

@@ -81,7 +81,7 @@ function page_chpw(bool $forced): void
     <a href="<?= h(admin_url(['p' => 'settings'])) ?>#jelszo">Beállítások</a> fülön is bármikor elvégezhető.
   </p>
   <?= flash_render() ?>
- <div class="panel panel__b"><div >
+ <div class="panel"><div class="panel__b">
     <form method="post" action="<?= h(admin_url()) ?>" autocomplete="off">
       <?= csrf_input() ?>
       <input type="hidden" name="a" value="chpw">
@@ -130,7 +130,7 @@ function page_account(PDO $db): void
       <table class="tbl">
         <tr><td style="width:180px" class="muted">Felhasználónév</td><td><b><?= h($me['username']) ?></b></td></tr>
         <tr><td class="muted">Név</td><td><?= h($me['display_name']) ?></td></tr>
- <tr><td class="muted badge badge--info">Szerepkör</td><td><span ><?= h($me['role']) ?></span></td></tr>
+ <tr><td class="muted">Szerepkör</td><td><span class="badge badge--info"><?= h($me['role']) ?></span></td></tr>
         <tr><td class="muted">Utolsó belépés</td><td><?= h((string)($me['last_login_at'] ?? '—')) ?></td></tr>
       </table>
     </div>
@@ -217,23 +217,23 @@ function page_dashboard(PDO $db, array $cfg, array $counts): void
   <!-- A csempék kattinthatók: mindegyik a hozzá tartozó, MÁR LESZŰRT listára visz. -->
   <div class="stats">
     <a class="stat" href="<?= h(admin_url(['p' => 'articles'])) ?>">
- <div class="stat__n stat__l"><?= (int)$stats['articles'] ?></div><div >fejezet (3 nyelven)</div></a>
+ <div class="stat__n"><?= (int)$stats['articles'] ?></div><div class="stat__l">fejezet (3 nyelven)</div></a>
     <a class="stat <?= (int)$stats['drafts'] ? 'stat--warn' : '' ?>" href="#drafts">
- <div class="stat__n stat__l"><?= (int)$stats['drafts'] ?></div><div >közzétételre váró vázlat</div></a>
+ <div class="stat__n"><?= (int)$stats['drafts'] ?></div><div class="stat__l">közzétételre váró vázlat</div></a>
     <a class="stat <?= $stale ? 'stat--warn' : '' ?>" href="<?= h(admin_url(['p' => 'translate', 'to' => 'en', 'st' => 'stale'])) ?>">
- <div class="stat__n stat__l"><?= $stale ?></div><div >elavult fordítás</div></a>
+ <div class="stat__n"><?= $stale ?></div><div class="stat__l">elavult fordítás</div></a>
     <a class="stat <?= $missing ? 'stat--err' : '' ?>" href="<?= h(admin_url(['p' => 'translate', 'to' => 'en', 'st' => 'missing'])) ?>">
- <div class="stat__n stat__l"><?= $missing ?></div><div >hiányzó fordítás</div></a>
+ <div class="stat__n"><?= $missing ?></div><div class="stat__l">hiányzó fordítás</div></a>
     <a class="stat" href="<?= h(admin_url(['p' => 'modules'])) ?>">
- <div class="stat__n stat__l"><?= (int)$stats['modules'] ?></div><div >modul</div></a>
+ <div class="stat__n"><?= (int)$stats['modules'] ?></div><div class="stat__l">modul</div></a>
     <a class="stat" href="<?= h(admin_url(['p' => 'screens'])) ?>">
- <div class="stat__n stat__l"><?= (int)$stats['screens'] ?></div><div >képernyő-hozzárendelés</div></a>
+ <div class="stat__n"><?= (int)$stats['screens'] ?></div><div class="stat__l">képernyő-hozzárendelés</div></a>
   </div>
 
   <div class="page--split" style="padding:0">
     <div>
       <div class="panel" id="drafts" style="margin-bottom:16px">
- <div class="panel__h sp"><h2>Közzétételre vár</h2><span ></span>
+ <div class="panel__h"><h2>Közzétételre vár</h2><span class="sp"></span>
           <span class="badge"><?= count($drafts) ?></span></div>
         <div class="panel__b panel__b--flush">
           <?php if (!$drafts): ?>
@@ -278,7 +278,7 @@ function page_dashboard(PDO $db, array $cfg, array $counts): void
                 <tr>
                   <td data-label="Fájl"><a href="<?= h(admin_url(['p' => 'import', 'import' => $i['id']])) ?>"><?= h($i['filename']) ?></a></td>
                   <td class="nowrap muted" data-label="Tartalom"><?= (int)($s['chapters'] ?? 0) ?> fejezet · <?= (int)($s['images'] ?? 0) ?> kép</td>
- <td class="nowrap badge <?= $i['status'] === 'applied' ? 'badge--ok' : '' ?>" data-label="Állapot"><span ><?= h($i['status']) ?></span></td>
+ <td class="nowrap" data-label="Állapot"><span class="badge <?= $i['status'] === 'applied' ? 'badge--ok' : '' ?>"><?= h($i['status']) ?></span></td>
                   <td class="nowrap muted" data-label="Mikor"><?= h(substr((string)$i['uploaded_at'], 0, 16)) ?></td>
                 </tr>
               <?php endforeach; ?>
@@ -530,7 +530,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
       </div>
 
     <?php elseif (!$article): ?>
- <div class="panel empty"><div >
+ <div class="panel"><div class="panel__b">
         Válassz egy fejezetet a bal oldali listából — vagy hozz létre újat a <b>+</b> gombbal.
         A <b>✎</b> gombbal a főfejezet nevét, számát és URL-jét szerkesztheted, mindhárom nyelven.
       </div></div>
@@ -579,7 +579,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
           <?php foreach (ADMIN_LANGS as $code => $label):
               $r = $siblings[$code] ?? null; ?>
             <div class="langcard<?= $r && $r['is_published'] ? ' on' : '' ?>">
- <div class="langcard__t mono muted"><?= h($label) ?> <span ><?= h($code) ?></span></div>
+ <div class="langcard__t"><?= h($label) ?> <span class="mono muted"><?= h($code) ?></span></div>
               <?php if (!$r): ?>
                 <div class="muted" style="font-size:calc(12px * var(--fs))">nincs ilyen nyelvű változat</div>
                 <a class="btn btn--sm" href="<?= h(admin_url(['p' => 'translate', 'to' => $code === 'hu' ? 'en' : $code,
@@ -718,7 +718,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
 
       <!-- korábbi változatok -->
       <div class="panel" style="margin-top:16px">
- <div class="panel__h sp"><h2>Korábbi változatok</h2><span ></span>
+ <div class="panel__h"><h2>Korábbi változatok</h2><span class="sp"></span>
           <span class="badge"><?= count($revisions) ?></span></div>
         <div class="panel__b panel__b--flush">
           <?php if (!$revisions): ?>
@@ -875,7 +875,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
             <?php endforeach; ?>
           </select></div>
         <div class="row">
- <div class="field muted"><label>Fejezetszám <span >(üresen hagyva automatikus)</span></label>
+ <div class="field"><label>Fejezetszám <span class="muted">(üresen hagyva automatikus)</span></label>
             <input class="inp" name="chapter_no" id="new-chapter"
                    placeholder="<?= h((string)($modules[0]['next_no'] ?? '')) ?>"></div>
  <div class="field inp" style="flex:3 1 260px"><label>Cím</label><input name="title" required></div>
@@ -914,7 +914,7 @@ function page_modules(PDO $db, string $lang, array $counts): void
   <div style="margin-bottom:14px"><?= lang_switch('modules', $lang) ?></div>
 
   <div class="panel">
- <div class="panel__h sp"><h2><?= h(ADMIN_LANGS[$lang]) ?> modulok</h2><span ></span>
+ <div class="panel__h"><h2><?= h(ADMIN_LANGS[$lang]) ?> modulok</h2><span class="sp"></span>
       <button class="btn btn--p btn--sm" type="button" data-modal="new-module">+ Új modul</button></div>
     <div class="panel__b panel__b--flush">
       <div class="hint" style="padding:10px 16px 0">

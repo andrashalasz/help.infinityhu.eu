@@ -9,7 +9,6 @@ const ADMIN_TABS = [
     'articles'  => 'Fejezetek',
     'import'    => 'Word import',
     'translate' => 'Fordítás',
-    'screens'   => 'Képernyők',
     'media'     => 'Képek, videók',
     'export'    => 'Export',
     'users'     => 'Felhasználók',
