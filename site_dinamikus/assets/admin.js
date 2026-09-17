@@ -1826,6 +1826,18 @@
       var t = nearest(list, e.clientY);
       if (t.el && t.el !== dragged) {
         if (t.after) { t.el.after(dragged); } else { t.el.before(dragged); }
+      } else if (!t.el && dragged.classList.contains('picker__row')) {
+        // Ures fofejezetbe is lehessen behuzni: ott nincs mihez igazodni,
+        // ezert a legkozelebbi fofejezet-fejlec csoportjaba tesszuk.
+        var best = null, bd = Infinity;
+        $$('.picker__m', container).forEach(function (h) {
+          var r = h.getBoundingClientRect();
+          var d = Math.abs(e.clientY - (r.top + r.height / 2));
+          if (d < bd) { bd = d; best = h; }
+        });
+        var g = best && container.querySelector('.picker__group[data-module="'
+                + best.getAttribute('data-module') + '"]');
+        if (g) { g.appendChild(dragged); }
       }
       $$('.drop-before,.drop-after', container).forEach(function (n) {
         n.classList.remove('drop-before', 'drop-after');
@@ -1863,17 +1875,34 @@
         });
       }
 
-      $$('.picker__group', picker).forEach(function (group) {
-        makeSortable(group, '.picker__row', '.picker__grip', function (item, cont) {
-          var ids = $$('.picker__row', cont).map(function (r) { return r.dataset.id; });
-          post('articles.reorder', { order: ids, module_id: cont.dataset.module })
+      // A fejezetsorok EGY rendezheto teruletet alkotnak (a teljes lista),
+      // nem csoportonkent kulon-kulon. Csoportonkent ugyanis minden
+      // makeSortable-nek sajat "dragged" valtozoja van, ezert a masik
+      // csoport ejtest egyszeruen nem vette eszre - a sugoszoveg viszont
+      // mar akkor is azt igerte, hogy masik fofejezet ala vihetok.
+      var rowList = $('#pick-list', picker);
+      if (rowList) {
+        makeSortable(rowList, '.picker__row', '.picker__grip', function (item) {
+          var group = item.closest('.picker__group');
+          if (!group) { return; }
+          var ids = $$('.picker__row', group).map(function (r) { return r.dataset.id; });
+          var from  = item.getAttribute('data-from-module');
+          var moved = group.getAttribute('data-module') !== from;
+          post('articles.reorder', {
+            order: ids, module_id: group.dataset.module, from_module: from || ''
+          })
             .then(function (d) {
-              if (d.ok) { toast('Sorrend mentve (' + d.count + ' fejezet).'); }
-              else { toast('Nem sikerült: ' + (d.error || ''), 'err'); }
+              if (!d.ok) { toast('Nem sikerült: ' + (d.error || ''), 'err'); return; }
+              item.setAttribute('data-from-module', group.dataset.module);
+              // A szamozas a szerveren all helyre, ezert ujratoltunk - igy a
+              // listaban rogton a VALODI szamok latszanak.
+              toast(moved ? 'Áthelyezve, a számozás frissítve.'
+                          : 'Sorrend mentve (' + d.count + ' fejezet).');
+              if (d.renamed > 0) { setTimeout(function () { location.reload(); }, 700); }
             })
             .catch(function () { toast('A sorrend mentése nem sikerült.', 'err'); });
         });
-      });
+      }
     }
 
     // 2. modulok táblázata

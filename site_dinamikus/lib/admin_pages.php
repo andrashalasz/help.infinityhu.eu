@@ -410,8 +410,6 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
     <div class="picker__tools">
       <button class="btn btn--sm" type="button" id="pick-foldall" title="<?= h(t('eszkoz.osszecsuk.cim')) ?>">
         <i>⊟</i><span><?= h(t('eszkoz.osszecsuk')) ?></span></button>
-      <button class="btn btn--sm" type="button" id="pick-select" title="<?= h(t('eszkoz.kijelol.cim')) ?>">
-        <i>☑</i><span><?= h(t('eszkoz.kijelol')) ?></span></button>
       <button class="btn btn--sm" type="button" id="pick-sort" title="<?= h(t('eszkoz.sorrend.cim')) ?>">
         <i>↕</i><span><?= h(t('eszkoz.sorrend')) ?></span></button>
       <button class="btn btn--p btn--sm" type="button" data-modal="new-module-a" title="<?= h(t('eszkoz.ujfo.cim')) ?>">
@@ -440,7 +438,6 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
         ?>
         <div class="picker__mod" data-id="<?= (int)$m['id'] ?>">
         <div class="picker__m<?= $m['is_published'] ? '' : ' picker__m--off' ?>" data-module="<?= (int)$m['id'] ?>">
- <label class="picker__mchk pick-mod-all"><input type="checkbox" tabindex="-1"></label>
           <span class="picker__grip picker__mgrip" title="Húzd a főfejezetek sorrendjének átrendezéséhez" aria-hidden="true">⠿</span>
           <button type="button" class="picker__mfold" data-fold="<?= (int)$m['id'] ?>"
                   title="Ki- és összecsukás" aria-label="Ki- és összecsukás">
@@ -488,8 +485,8 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
         </div>
         <div class="picker__group" data-module="<?= (int)$m['id'] ?>">
         <?php foreach ($m['articles'] as $a): ?>
-          <div class="picker__row picker__row--d<?= (int)$a['depth'] ?>" data-id="<?= (int)$a['id'] ?>">
- <label class="picker__chk pick-one"><input type="checkbox" value="<?= (int)$a['id'] ?>" tabindex="-1"></label>
+          <div class="picker__row picker__row--d<?= (int)$a['depth'] ?>" data-id="<?= (int)$a['id'] ?>"
+               data-from-module="<?= (int)$m['id'] ?>">
             <span class="picker__grip" title="Húzd a sorrend átrendezéséhez" aria-hidden="true">⠿</span>
             <a class="picker__a<?= $article && (int)$a['id'] === (int)$article['id'] ? ' on' : '' ?>"
                href="<?= h(admin_url(['p' => 'articles', 'lang' => $lang, 'id' => $a['id']])) ?>">
@@ -499,6 +496,14 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
             </a>
             <?= visibility_form('article', (int)$a['id'], (bool)$a['is_published'], $lang,
                                 $a['chapter_no'] . ' ' . $a['title']) ?>
+            <form method="post" action="<?= h(admin_url()) ?>" class="picker__delf"
+                  data-confirm="<?= h(t('torles.kerdes', ['nev' => trim($a['chapter_no'] . ' ' . $a['title'])])) ?>">
+              <?= csrf_input() ?>
+              <input type="hidden" name="a" value="article.delete">
+              <input type="hidden" name="id" value="<?= (int)$a['id'] ?>">
+              <button type="submit" class="picker__madd picker__rdel"
+                      title="<?= h(t('torles.cim')) ?>">✕</button>
+            </form>
             <?php if ($a['next_sub'] !== ''): ?>
               <button type="button" class="picker__madd picker__radd"
                       data-new-in="<?= (int)$m['id'] ?>" data-new-no="<?= h($a['next_sub']) ?>"
@@ -512,30 +517,12 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
       <?php if (!$tree): ?><div class="empty">Ezen a nyelven még nincs főfejezet.</div><?php endif; ?>
     </div>
 
-    <!-- tömeges műveletek sávja -->
-    <form class="bulkbar" id="bulkbar" method="post" action="<?= h(admin_url()) ?>" hidden>
-      <?= csrf_input() ?>
-      <input type="hidden" name="a" value="articles.bulk">
-      <input type="hidden" name="lang" value="<?= h($lang) ?>">
-      <input type="hidden" name="op" id="bulk-op" value="">
-      <div class="bulkbar__n"><b id="bulk-count">0</b> kijelölve</div>
-      <div class="bulkbar__b">
-        <button class="btn btn--sm btn--ok" type="submit" data-op="publish-on" title="Megjelenik a nyilvános oldalon"><?= h(t('● Bekapcsol')) ?></button>
-        <button class="btn btn--sm btn--danger" type="submit" data-op="publish-off" title="Eltűnik a nyilvános oldalról"><?= h(t('○ Kikapcsol')) ?></button>
-        <button class="btn btn--sm" type="submit" data-op="publish-drafts" title="A kijelöltek vázlatainak közzététele"><?= h(t('Vázlatok közzététele')) ?></button>
-        <select class="sel" name="module_id" id="bulk-module" style="width:auto;min-width:140px">
-          <option value="">Áthelyezés ide…</option>
-          <?php foreach ($modules as $m): ?>
-            <option value="<?= (int)$m['id'] ?>"><?= h($m['chapter_no'] . ' ' . $m['title']) ?></option>
-          <?php endforeach; ?>
-        </select>
-        <button class="btn btn--sm" type="submit" data-op="move"><?= h(t('Áthelyez')) ?></button>
-        <span style="flex:1"></span>
-        <button class="btn btn--sm btn--danger" type="submit" data-op="delete"><?= h(t('Törlés')) ?></button>
-        <button class="btn btn--sm btn--ghost" type="button" id="bulk-cancel"><?= h(t('Mégsem')) ?></button>
-      </div>
-    </form>
-  </div>
+    <?php // A tomeges kijeloles kivezetve: minden soron ott a sajat ✕
+          // gombja, ami rakerdez. A kijelolo negyzetek ugysem mukodtek -
+          // egy korabbi javito szkriptem a pick-one osztalyt az INPUT-rol a
+          // LABEL-re tette, igy a label.checked mindig undefined volt, es a
+          // muveleti sav sosem jott elo. ?>
+
 
   <!-- huzhato elvalaszto: a lista szelesseget a felhasznalo allitja be -->
   <div class="splitter" id="split-articles" role="separator" aria-orientation="vertical"
@@ -700,24 +687,16 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
             <?= csrf_input() ?>
             <input type="hidden" name="a" value="article.meta">
             <input type="hidden" name="id" value="<?= (int)$article['id'] ?>">
+            <?php // Ami magatol all be, az itt csak AZERT van, hogy felul
+                  // lehessen irni. A cimet a szerkeszto tetejen irod, a
+                  // fofejezetet huzassal valtoztatod - azok nincsenek itt. ?>
+            <div class="hint" style="margin-bottom:10px"><?= t('meta.mire') ?></div>
             <div class="row">
-              <div class="field"><label><?= h(t('Fejezetszám')) ?></label>
+              <div class="field" style="flex:0 1 160px"><label><?= h(t('Fejezetszám')) ?></label>
                 <input class="inp" name="chapter_no" value="<?= h($article['chapter_no']) ?>"></div>
-              <div class="field" style="flex:3 1 300px"><label><?= h(t('meta.cim')) ?></label>
-                <input class="inp" name="title" value="<?= h($article['title']) ?>" required>
-                <div class="hint"><?= h(t('meta.cim.sugo')) ?></div></div>
-            </div>
-            <div class="row">
               <div class="field" style="flex:2 1 260px"><label><?= h(t('URL-azonosító (slug)')) ?></label>
                 <input class="inp mono" name="slug" value="<?= h($article['slug']) ?>">
                 <div class="hint">Ez lesz az URL: /<?= h($article['lang']) ?>/<b><?= h($article['slug']) ?></b></div></div>
-              <div class="field"><label><?= h(t('Modul')) ?></label>
-                <select class="sel" name="module_id">
-                  <?php foreach ($modules as $m): ?>
-                    <option value="<?= (int)$m['id'] ?>" <?= (int)$m['id'] === (int)$article['module_id'] ? 'selected' : '' ?>>
-                      <?= h($m['chapter_no'] . ' ' . $m['title']) ?></option>
-                  <?php endforeach; ?>
-                </select></div>
             </div>
             <?php // Innen kikerult: Sorrend (huzassal rendezel), Jogosultsag
                   // (sehol nem olvasta a rendszer, csak igerte), "Kozzeteve"

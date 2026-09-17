@@ -607,8 +607,28 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                 if ($db->inTransaction()) { $db->rollBack(); }
                 help_json(['ok' => false, 'error' => $e->getMessage()], 500);
             }
-            audit_me($db, 'articles.reorder', $moduleId > 0 ? 'module:' . $moduleId : null, count($ids) . ' elem');
-            help_json(['ok' => true, 'count' => count($ids)]);
+            // Ujraszamozas: a szam kovesse a sorrendet. Enelkul egy athuzott
+            // fejezet a regi szamat vitte magaval (5.2 a 6-os fofejezetben),
+            // es a fofejezeten belul is osszekeveredtek a szamok.
+            $renamed = 0;
+            $from    = (int)post('from_module');
+            try {
+                $lang = (string)post('lang');
+                if ($lang === '') {
+                    $q = $db->prepare('SELECT lang FROM help_article WHERE id = ?');
+                    $q->execute([$ids[0]]);
+                    $lang = (string)$q->fetchColumn();
+                }
+                if ($moduleId > 0) { $renamed += renumber_module($db, $moduleId, $lang); }
+                if ($from > 0 && $from !== $moduleId) { $renamed += renumber_module($db, $from, $lang); }
+            } catch (Throwable $e) {
+                // az ujraszamozas sosem akaszthatja meg a sorrend mentest
+                $renamed = 0;
+            }
+
+            audit_me($db, 'articles.reorder', $moduleId > 0 ? 'module:' . $moduleId : null,
+                     count($ids) . ' elem, ' . $renamed . ' ujraszamozva');
+            help_json(['ok' => true, 'count' => count($ids), 'renamed' => $renamed]);
         }
 
         case 'modules.reorder': {

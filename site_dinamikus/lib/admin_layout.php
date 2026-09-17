@@ -438,6 +438,83 @@ function visibility_flash(bool $on, string $name, string $scope, int $langs, str
         : t('lathato.kesz.ki', ['nev' => $name, 'hol' => $hol]);
 }
 
+/**
+ * Egy fofejezet fejezeteinek UJRASZAMOZASA a lista sorrendje szerint.
+ *
+ * Ha athuzol egy fejezetet masik fofejezet ala, a szama nem maradhat a regi
+ * (5.2 nem allhat a 6-os fofejezetben), es a fofejezeten belul sem lehet
+ * lyukas vagy osszekevert a szamozas.
+ *
+ * A melyseget a REGI szambol olvassuk ki (hany pontozott resze van a
+ * fofejezet szamahoz kepest), igy az alfejezetek alfejezetek maradnak:
+ *
+ *      6      Keszletezes        (bevezeto - a fofejezet szama, marad)
+ *      6.1    Beallitasok
+ *      6.1.1  Torzsadatok
+ *      6.2    Arucikkek
+ *
+ * A szamozas NYELVFUGGETLEN: a nyelvi valtozatokat a regi fejezetszam koti
+ * ossze (a slug nyelvenkent mas), ezert mindet egyszerre irjuk at. A slughoz
+ * NEM nyulunk: az a fejezet URL-je, es a mar kiadott hivatkozasok eltornenek.
+ *
+ * @return int ahany fejezet szama valoban megvaltozott (minden nyelvvel egyutt)
+ */
+function renumber_module(PDO $db, int $moduleId, string $lang): int
+{
+    $st = $db->prepare('SELECT chapter_no FROM help_module WHERE id = ?');
+    $st->execute([$moduleId]);
+    $moduleNo = trim((string)$st->fetchColumn());
+    if ($moduleNo === '') { return 0; }
+
+    $st = $db->prepare('SELECT id, chapter_no FROM help_article
+                         WHERE module_id = ? AND lang = ? ORDER BY sort_order, id');
+    $st->execute([$moduleId, $lang]);
+    $rows = $st->fetchAll();
+    if (!$rows) { return 0; }
+
+    $counters = [0, 0, 0, 0];      // a 2..5. szint szamlaloi
+    $plan = [];                    // regi szam => uj szam
+
+    foreach ($rows as $r) {
+        $old = trim((string)$r['chapter_no']);
+        // Hany szinttel van a fofejezet alatt? A bevezeto (a fofejezet sajat
+        // szama) 1, az "5.2" 2, az "5.3.1" 3.
+        $depth = $old === '' ? 2 : count(explode('.', $old));
+        $depth = max(1, min(5, $depth));
+
+        if ($depth === 1) { $new = $moduleNo; }      // a bevezeto szama a fofejezete
+        else {
+            $i = $depth - 2;                          // 0 = elso alszint
+            $counters[$i]++;
+            for ($j = $i + 1; $j < 4; $j++) { $counters[$j] = 0; }
+            $new = $moduleNo;
+            for ($j = 0; $j <= $i; $j++) { $new .= '.' . $counters[$j]; }
+        }
+        if ($new !== $old && $old !== '') { $plan[$old] = $new; }
+    }
+    if (!$plan) { return 0; }
+
+    // KET MENETBEN. Egy menetben az uj szam raallhatna egy olyan sorra, ami
+    // meg a regi szamat viseli (5.3 -> 5.2, mikozben az 5.2 meg letezik), es
+    // onnantol ket fejezet vinne ugyanazt a szamot. Ezert eloszor mindegyik
+    // egy egyedi ideiglenes jelolest kap (~1, ~2, ...), es csak utana kapja
+    // meg a vegleges szamat.
+    $changed = 0;
+    $toTmp   = $db->prepare('UPDATE help_article SET chapter_no = ? WHERE chapter_no = ?');
+    $i = 0;
+    $tmpMap = [];
+    foreach ($plan as $old => $new) {
+        $tmp = '~' . (++$i);
+        $tmpMap[$tmp] = $new;
+        $toTmp->execute([$tmp, $old]);
+    }
+    foreach ($tmpMap as $tmp => $new) {
+        $toTmp->execute([$new, $tmp]);
+        $changed += $toTmp->rowCount();
+    }
+    return $changed;
+}
+
 function admin_setting(PDO $db, string $key, string $default = ''): string
 {
     static $cache = null;

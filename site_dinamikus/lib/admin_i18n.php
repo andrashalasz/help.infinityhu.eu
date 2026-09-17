@@ -146,14 +146,20 @@ function ui_default(string $key = ''): string|array
         'state.all'     => 'Mind',
 
         // --- fejezet adatai ---
-        'meta.cim'      => 'Cím (a közzétett)',
-        'meta.cim.sugo' => 'A szerkesztő tetején a VÁZLAT címét írod; ez itt az, ami most kint van.',
+        'meta.mire'     => 'Mindkettő magától áll be a fejezet létrehozásakor — csak akkor '
+                           . 'nyúlj hozzájuk, ha felül akarod írni. A <b>címet</b> a szerkesztő '
+                           . 'tetején írod, a <b>főfejezetet</b> pedig húzással változtatod a bal '
+                           . 'oldali listában.',
+
+        // --- torles a listaban ---
+        'torles.cim'    => 'A fejezet törlése (a Kukába kerül)',
+        'torles.kerdes' => 'Törlöd ezt a fejezetet: „{nev}”? A Kukába kerül a korábbi '
+                           . 'változataival együtt — onnan egy kattintással visszaállítható, '
+                           . 'amíg ki nem üríted.',
 
         // --- a fejezetlista eszkozsora ---
         'eszkoz.osszecsuk'     => 'Összecsuk',
         'eszkoz.osszecsuk.cim' => 'Mindent összecsuk / kinyit',
-        'eszkoz.kijelol'       => 'Kijelölés',
-        'eszkoz.kijelol.cim'   => 'Több fejezet kijelölése egyszerre',
         'eszkoz.sorrend'       => 'Sorrend',
         'eszkoz.sorrend.cim'   => 'Sorrend átrendezése húzással',
         'eszkoz.ujfo'          => 'Új főfejezet',

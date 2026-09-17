@@ -285,6 +285,12 @@ a.picker__mt:hover { text-decoration: none; }
 .picker__row:hover .picker__radd, .picker__radd:focus-visible { opacity: 1; }
 /* A szem a cikksorokban ugyanugy csak rajtahuzasra bukkan elo - kiveve, ha
    a fejezet EL VAN REJTVE: azt latni kell anelkul is, hogy keresni kellene. */
+/* Torles gomb a soron: ugyanugy csak rajtahuzasra bukkan elo, mint a "+".
+   A tomeges kijeloles helyett all itt - rakattintva rakerdez. */
+.picker__delf { display: inline-flex; flex: none; }
+.picker__rdel { opacity: 0; font-size: 12px; }
+.picker__row:hover .picker__rdel, .picker__rdel:focus-visible { opacity: 1; }
+.picker__rdel:hover { color: var(--err); border-color: color-mix(in srgb, var(--err) 40%, transparent); }
 .picker__row .picker__eye { opacity: 0; }
 .picker__row:hover .picker__eye,
 .picker__row .picker__eye--off,
