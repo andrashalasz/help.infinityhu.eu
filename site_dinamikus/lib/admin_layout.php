@@ -120,13 +120,13 @@ function admin_head(string $title, string $page = '', array $counts = []): void
   <span class="ashell__tag">admin</span>
   <span class="ashell__spacer"></span>
 
-  <button class="sbtn" id="palette-open" title="Ugrás / keresés (Ctrl+K)">
+  <button class="sbtn" id="palette-open" title="<?= h(t('Ugrás / keresés (Ctrl+K)')) ?>">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
     <span class="sbtn__kbd">Ctrl K</span>
   </button>
-  <button class="sbtn" id="keys-open" title="Billentyűparancsok (?)">?</button>
+  <button class="sbtn" id="keys-open" title="<?= h(t('Billentyűparancsok (?)')) ?>">?</button>
 
-  <a class="sbtn" id="site-open" href="/hu/" target="_blank" rel="noopener" title="A súgó megnyitása új lapon">
+  <a class="sbtn" id="site-open" href="/hu/" target="_blank" rel="noopener" title="<?= h(t('A súgó megnyitása új lapon')) ?>">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6M10 14 21 3"/></svg>
   </a>
   <button class="sbtn" id="theme-toggle" title="<?= h(t('head.theme')) ?>"></button>
@@ -190,24 +190,24 @@ function admin_foot(): void
     if (auth_user() !== null): ?>
 <div class="modal" id="modal-keys">
   <div class="modal__box" style="max-width:480px">
-    <div class="modal__h">Billentyűparancsok</div>
+    <div class="modal__h"><?= h(t('Billentyűparancsok')) ?></div>
     <div class="modal__b">
       <div class="kbdbox">
-        <kbd>Ctrl</kbd><span>Ugrás / keresés — fejezetek és fülek egyben</span>
-        <kbd>/</kbd><span>A bal oldali fejezetszűrő</span>
-        <kbd>↑</kbd><span>Lépkedés a fejezetlistán</span>
-        <kbd>Enter</kbd><span>A kijelölt elem megnyitása</span>
-        <kbd>Ctrl</kbd><span>Vázlat mentése a szerkesztőben</span>
+        <kbd>Ctrl</kbd><span><?= h(t('Ugrás / keresés — fejezetek és fülek egyben')) ?></span>
+        <kbd>/</kbd><span><?= h(t('A bal oldali fejezetszűrő')) ?></span>
+        <kbd>↑</kbd><span><?= h(t('Lépkedés a fejezetlistán')) ?></span>
+        <kbd>Enter</kbd><span><?= h(t('A kijelölt elem megnyitása')) ?></span>
+        <kbd>Ctrl</kbd><span><?= h(t('Vázlat mentése a szerkesztőben')) ?></span>
         <kbd>A</kbd><span>Fejezetek</span>
         <kbd>M</kbd><span>Modulok</span>
         <kbd>I</kbd><span>Word import</span>
-        <kbd>T</kbd><span>Fordítás</span>
-        <kbd>K</kbd><span>Képek, videók</span>
+        <kbd>T</kbd><span><?= h(t('Fordítás')) ?></span>
+        <kbd>K</kbd><span><?= h(t('Képek, videók')) ?></span>
         <kbd>E</kbd><span>Export</span>
-        <kbd>U</kbd><span>Felhasználók</span>
-        <kbd>B</kbd><span>Beállítások</span>
-        <kbd>D</kbd><span>Áttekintés</span>
-        <kbd>Esc</kbd><span>Ablak bezárása</span>
+        <kbd>U</kbd><span><?= h(t('Felhasználók')) ?></span>
+        <kbd>B</kbd><span><?= h(t('Beállítások')) ?></span>
+        <kbd>D</kbd><span><?= h(t('Áttekintés')) ?></span>
+        <kbd>Esc</kbd><span><?= h(t('Ablak bezárása')) ?></span>
       </div>
     </div>
     <div class="modal__f"><button class="btn btn--p" type="button" data-close>Rendben</button></div>
@@ -222,12 +222,12 @@ function admin_foot(): void
      <form data-confirm="Biztosan?"> -->
 <div class="modal" id="modal-confirm">
   <div class="modal__box">
-    <div class="modal__h" id="confirm-title">Megerősítés</div>
+    <div class="modal__h" id="confirm-title"><?= h(t('Megerősítés')) ?></div>
     <div class="modal__b">
       <div class="msg msg--warn" style="margin:0" id="confirm-text"></div>
     </div>
     <div class="modal__f">
-      <button class="btn btn--ghost" type="button" data-close>Mégsem</button>
+      <button class="btn btn--ghost" type="button" data-close><?= h(t('Mégsem')) ?></button>
       <button class="btn" type="button" id="confirm-alt" hidden></button>
       <button class="btn btn--danger" type="button" id="confirm-ok">Igen, folytatom</button>
     </div>

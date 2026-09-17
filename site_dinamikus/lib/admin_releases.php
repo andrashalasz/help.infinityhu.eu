@@ -42,17 +42,17 @@ function page_releases(PDO $db, array $counts, int $showId = 0): void
 
     $KIND = ['new' => ['badge--ok', t('új')], 'mod' => ['badge--info', t('módosítás')], 'fix' => ['badge--warn', t('javítás')]];
 
-    admin_head('Kiadások', 'releases', $counts);
+    admin_head(t('Kiadások'), 'releases', $counts);
     ?>
 <div class="page">
   <h1 class="pt"><?= h(t('Kiadások')) ?></h1>
   <p class="lead">
-    Minden közzétételkor keletkezik egy <b>változásnapló-bejegyzés</b>, és a <b>nyitott</b>
-    kiadásba gyűlik. Ez az a szöveg, amit az olvasó a <b>Frissítések</b> lapon lát.
+    Minden közzétételkor keletkezik egy <b><?= h(t('változásnapló-bejegyzés')) ?></b>, és a <b>nyitott</b>
+    kiadásba gyűlik. Ez az a szöveg, amit az olvasó a <b><?= h(t('Frissítések')) ?></b> lapon lát.
     A kiadás lezárása dátumot és verziószámot ad nekik, leveszi az újdonságjelzéseket,
     és megnyit egy újat.
-    <br><span class="muted">A fejezetek <b>korábbi állapotai</b> nem itt, hanem a Fejezetek
-    fülön, a <b>Változatok</b> gomb alatt vannak.</span>
+    <br><span class="muted">A fejezetek <b><?= h(t('korábbi állapotai')) ?></b> nem itt, hanem a Fejezetek
+    fülön, a <b><?= h(t('Változatok')) ?></b> gomb alatt vannak.</span>
   </p>
   <?= flash_render() ?>
 
@@ -138,7 +138,7 @@ function page_releases(PDO $db, array $counts, int $showId = 0): void
                         <span class="mono muted"><?= h((string)$c['lang']) ?></span>
                       <?php else: ?><span class="muted">—</span><?php endif; ?>
                     </td>
-                    <td data-label="Amit az olvasó lát">
+                    <td data-label="<?= h(t('Amit az olvasó lát')) ?>">
                       <form method="post" action="<?= h(admin_url()) ?>" class="row" style="gap:6px;align-items:center">
                         <?= csrf_input() ?>
                         <input type="hidden" name="a" value="changelog.save">
@@ -146,13 +146,13 @@ function page_releases(PDO $db, array $counts, int $showId = 0): void
                         <input type="hidden" name="rel" value="<?= (int)$showId ?>">
                         <input class="inp" name="description" value="<?= h((string)$c['description']) ?>"
                                style="flex:1;min-width:200px">
-                        <label class="check" title="Az apró javítás nem jelenik meg a Frissítések lapon">
+                        <label class="check" title="<?= h(t('Az apró javítás nem jelenik meg a Frissítések lapon')) ?>">
                           <input type="checkbox" name="is_minor" value="1" <?= (int)$c['is_minor'] ? 'checked' : '' ?>> <?= h(t('apró')) ?>
                         </label>
                         <button class="btn btn--sm" type="submit"><?= h(t('Mentés')) ?></button>
                       </form>
                     </td>
-                    <td data-label="Típus"><span class="badge <?= h($cls) ?>"><?= h($lbl) ?></span></td>
+                    <td data-label="<?= h(t('Típus')) ?>"><span class="badge <?= h($cls) ?>"><?= h($lbl) ?></span></td>
                     <td class="muted nowrap" data-label="Ki"><?= h((string)$c['display_name']) ?></td>
                     <td class="nowrap" data-label="">
                       <form method="post" action="<?= h(admin_url()) ?>"
