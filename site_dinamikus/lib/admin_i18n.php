@@ -145,6 +145,20 @@ function ui_default(string $key = ''): string|array
         'state.ok'      => 'naprakész',
         'state.all'     => 'Mind',
 
+        // --- fejezet adatai ---
+        'meta.cim'      => 'Cím (a közzétett)',
+        'meta.cim.sugo' => 'A szerkesztő tetején a VÁZLAT címét írod; ez itt az, ami most kint van.',
+
+        // --- a fejezetlista eszkozsora ---
+        'eszkoz.osszecsuk'     => 'Összecsuk',
+        'eszkoz.osszecsuk.cim' => 'Mindent összecsuk / kinyit',
+        'eszkoz.kijelol'       => 'Kijelölés',
+        'eszkoz.kijelol.cim'   => 'Több fejezet kijelölése egyszerre',
+        'eszkoz.sorrend'       => 'Sorrend',
+        'eszkoz.sorrend.cim'   => 'Sorrend átrendezése húzással',
+        'eszkoz.ujfo'          => 'Új főfejezet',
+        'eszkoz.ujfo.cim'      => 'Új főfejezet a lista végén, minden nyelven',
+
         // --- belepes, jelszo (auth.php) ---
         'auth.rossz-jelszo'      => 'Hibás felhasználónév vagy jelszó.',
         'auth.inaktiv'           => 'Ez a fiók inaktív.',

@@ -388,9 +388,11 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
     // Az "Új fejezet" ablakban a Fejezetszám mezo a VALODI kovetkezo szamot
     // ajanlja a kivalasztott modulhoz (korabban egy beegetett "5.5" allt ott,
     // fuggetlenul attol, melyik modult valasztottad).
+    $nextNoByModule = [];
     foreach ($modules as &$m) {
         [$next] = article_next_slot($db, (int)$m['id'], $lang, '', '');
         $m['next_no'] = $next;
+        $nextNoByModule[(int)$m['id']] = $next;
     }
     unset($m);
 
@@ -406,11 +408,14 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
     <?php // A gombok kulon sorban, a szuro ALATT: egy sorban osszeszorulva
           // aprok voltak es nehez volt eltalalni oket. ?>
     <div class="picker__tools">
-      <button class="btn btn--sm" type="button" id="pick-foldall" title="Mindent összecsuk / kinyit">⊟</button>
-      <button class="btn btn--sm" type="button" id="pick-select" title="Több fejezet kijelölése">☑</button>
-      <button class="btn btn--sm" type="button" id="pick-sort" title="Sorrend átrendezése húzással">↕</button>
-      <button class="btn btn--sm" type="button" data-modal="new-module-a" title="Új főfejezet (modul)"><?= h(t('+ fő')) ?></button>
-      <button class="btn btn--p btn--sm" type="button" data-modal="new-article" title="Új fejezet">+</button>
+      <button class="btn btn--sm" type="button" id="pick-foldall" title="<?= h(t('eszkoz.osszecsuk.cim')) ?>">
+        <i>⊟</i><span><?= h(t('eszkoz.osszecsuk')) ?></span></button>
+      <button class="btn btn--sm" type="button" id="pick-select" title="<?= h(t('eszkoz.kijelol.cim')) ?>">
+        <i>☑</i><span><?= h(t('eszkoz.kijelol')) ?></span></button>
+      <button class="btn btn--sm" type="button" id="pick-sort" title="<?= h(t('eszkoz.sorrend.cim')) ?>">
+        <i>↕</i><span><?= h(t('eszkoz.sorrend')) ?></span></button>
+      <button class="btn btn--p btn--sm" type="button" data-modal="new-module-a" title="<?= h(t('eszkoz.ujfo.cim')) ?>">
+        <i>+</i><span><?= h(t('eszkoz.ujfo')) ?></span></button>
     </div>
     <div style="padding:8px 10px 0"><?= lang_switch('articles', $lang) ?></div>
 
@@ -468,6 +473,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
              href="<?= h(admin_url(['p' => 'articles', 'lang' => $lang, 'mod' => $m['id']])) ?>"
              title="A főfejezet neve, száma, URL-je — mindhárom nyelven">✎</a>
           <button type="button" class="picker__madd" data-new-in="<?= (int)$m['id'] ?>"
+                  data-new-no="<?= h((string)($nextNoByModule[(int)$m['id']] ?? '')) ?>"
                   title="Új fejezet ebbe a főfejezetbe">+</button>
           <form method="post" action="<?= h(admin_url()) ?>" style="display:inline"
                 data-confirm="Törlöd a(z) &quot;<?= h($m['chapter_no'] . ' ' . $m['title']) ?>&quot; főfejezetet? Mind a három nyelven a Kukába kerül, ahonnan visszaállítható. Csak akkor sikerül, ha egyetlen nyelven sincs benne fejezet.">
@@ -697,8 +703,9 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
             <div class="row">
               <div class="field"><label><?= h(t('Fejezetszám')) ?></label>
                 <input class="inp" name="chapter_no" value="<?= h($article['chapter_no']) ?>"></div>
-              <div class="field" style="flex:3 1 300px"><label><?= h(t('Cím')) ?></label>
-                <input class="inp" name="title" value="<?= h($article['title']) ?>" required></div>
+              <div class="field" style="flex:3 1 300px"><label><?= h(t('meta.cim')) ?></label>
+                <input class="inp" name="title" value="<?= h($article['title']) ?>" required>
+                <div class="hint"><?= h(t('meta.cim.sugo')) ?></div></div>
             </div>
             <div class="row">
               <div class="field" style="flex:2 1 260px"><label><?= h(t('URL-azonosító (slug)')) ?></label>
@@ -711,21 +718,13 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
                       <?= h($m['chapter_no'] . ' ' . $m['title']) ?></option>
                   <?php endforeach; ?>
                 </select></div>
-              <div class="field" style="flex:0 1 120px"><label><?= h(t('Sorrend')) ?></label>
-                <input class="inp" name="sort_order" type="number" value="<?= (int)$article['sort_order'] ?>"></div>
             </div>
-            <div class="row">
-              <div class="field"><label><?= h(t('Jogosultság (opcionális)')) ?></label>
-                <input class="inp mono" name="permission" value="<?= h((string)$article['permission']) ?>" placeholder="pl. hr.view">
-                <div class="hint">Ha ki van töltve, csak ezzel a joggal látható az Infinity-n belül.</div></div>
-              <div class="field" style="align-self:center">
-                <label class="check"><input type="checkbox" name="is_published" <?= $article['is_published'] ? 'checked' : '' ?>> Közzétéve</label>
-              </div>
-            </div>
+            <?php // Innen kikerult: Sorrend (huzassal rendezel), Jogosultsag
+                  // (sehol nem olvasta a rendszer, csak igerte), "Kozzeteve"
+                  // pipa (a szem ikon es a fejleci gomb ugyanaz) es a masodik
+                  // torles gomb (a fejlecben ott van). ?>
             <div class="btnbar">
               <button class="btn btn--p" type="submit"><?= h(t('Adatok mentése')) ?></button>
-              <span class="sp" style="flex:1"></span>
-              <button class="btn btn--danger btn--sm" type="button" data-modal="del-article"><?= h(t('Fejezet törlése')) ?></button>
             </div>
           </form>
         </div>
@@ -973,38 +972,10 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
   </div>
 </div>
 
-<div class="modal" id="modal-new-article">
-  <div class="modal__box">
-    <form method="post" action="<?= h(admin_url()) ?>">
-      <?= csrf_input() ?>
-      <input type="hidden" name="a" value="article.create">
-      <input type="hidden" name="lang" value="<?= h($lang) ?>">
-      <div class="modal__h">Új fejezet (<?= h(admin_langs()[$lang]) ?>)</div>
-      <div class="modal__b">
-        <div class="field"><label><?= h(t('Modul')) ?></label>
-          <select class="sel" name="module_id" id="new-module" required>
-            <?php foreach ($modules as $m): ?>
-              <option value="<?= (int)$m['id'] ?>" data-next="<?= h((string)$m['next_no']) ?>"><?= h($m['chapter_no'] . ' ' . $m['title']) ?></option>
-            <?php endforeach; ?>
-          </select></div>
-        <div class="row">
- <div class="field"><label>Fejezetszám <span class="muted">(üresen hagyva automatikus)</span></label>
-            <input class="inp" name="chapter_no" id="new-chapter"
-                   placeholder="<?= h((string)($modules[0]['next_no'] ?? '')) ?>"></div>
- <div class="field inp" style="flex:3 1 260px"><label><?= h(t('Cím')) ?></label><input name="title" required></div>
-        </div>
-        <div class="row">
- <div class="field inp mono"><label><?= h(t('URL-azonosító (üresen hagyva automatikus)')) ?></label><input name="slug"></div>
- <div class="field inp" style="flex:0 1 120px"><label><?= h(t('Sorrend')) ?></label><input name="sort_order" type="number" value="0"></div>
-        </div>
-      </div>
-      <div class="modal__f">
-        <button class="btn btn--ghost" type="button" data-close><?= h(t('Mégsem')) ?></button>
-        <button class="btn btn--p" type="submit"><?= h(t('Létrehozás')) ?></button>
-      </div>
-    </form>
-  </div>
-</div>
+<?php // Az "Uj fejezet" ablak kivezetve: minden sorban ott a "+", ami
+      // rogton letrehozza a fejezetet a kovetkezo szabad szammal. A felso
+      // gomb ugyanezt csinalta, csak elobb meg ki kellett valasztani a
+      // modult egy legorduloben. ?>
     <?php
     admin_foot();
 }

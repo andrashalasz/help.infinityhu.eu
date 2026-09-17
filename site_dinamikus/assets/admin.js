@@ -356,16 +356,12 @@
     });
   }
 
-  /* --- Új fejezet: a Fejezetszám mező a kiválasztott modul következő számát ajánlja --- */
+  /* --- A "+" gombok: uj fejezet letrehozasa egy kattintassal ---
+     Korabban ez a fuggveny kilepett, ha nem talalta az "Uj fejezet" ablak
+     legordulojet - az ablak viszont kivezetesre kerult, ezert a "+" gombok
+     mar nem fuggenek tole: a kovetkezo szabad szamot data-new-no-bol
+     olvassak, amit a PHP ir ki. */
   function wireNewArticleChapter() {
-    var sel = $('#new-module'), inp = $('#new-chapter');
-    if (!sel || !inp) { return; }
-
-    function syncPlaceholder() {
-      var opt = sel.options[sel.selectedIndex];
-      inp.placeholder = (opt && opt.getAttribute('data-next')) || '';
-    }
-    sel.addEventListener('change', syncPlaceholder);
 
     // A modul fejlécén levő "+" gomb: megnyitja az Új fejezet ablakot,
     // ERRE a modulra állítva, hogy ne kelljen a legördülőben keresgélni.
@@ -378,11 +374,7 @@
         e.preventDefault();
 
         var moduleId = b.getAttribute('data-new-in');
-        var no = b.getAttribute('data-new-no');
-        if (!no) {
-          var opt = sel.querySelector('option[value="' + moduleId + '"]');
-          no = (opt && opt.getAttribute('data-next')) || '';
-        }
+        var no = b.getAttribute('data-new-no') || '';
 
         // Ahol egy kattintas konnyen elteveszthetö (pl. a fofejezet
         // "nincs leiras" jelzese), ott elobb rakerdezunk - kulonben egy

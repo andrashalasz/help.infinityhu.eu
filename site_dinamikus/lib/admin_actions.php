@@ -328,16 +328,17 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             }
             if ($slug === '') { $slug = help_slug($chapter, $title); }
 
+            // Az urlap csak azt allitja, ami valoban ide tartozik. A
+            // sorrendet huzassal rendezed, a lathatosagot a szem ikonnal -
+            // ezert azokat itt NEM irjuk felul (korabban egy "Adatok
+            // mentese" eleg volt hozza, hogy a sorrend nullazodjon).
             try {
                 $db->prepare('UPDATE help_article
-                                 SET chapter_no = ?, slug = ?, title = ?, module_id = ?, sort_order = ?,
-                                     is_published = ?, permission = ?
+                                 SET chapter_no = ?, slug = ?, title = ?, module_id = ?
                                WHERE id = ?')
                    ->execute([
                        mb_substr($chapter, 0, 16), mb_substr($slug, 0, 160), mb_substr($title, 0, 255),
-                       (int)post('module_id') ?: null, (int)post('sort_order'),
-                       isset($_POST['is_published']) ? 1 : 0,
-                       post('permission') !== '' ? mb_substr(post('permission'), 0, 64) : null,
+                       (int)post('module_id') ?: null,
                        $id,
                    ]);
             } catch (PDOException $e) {
