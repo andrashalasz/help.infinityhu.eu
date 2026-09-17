@@ -452,13 +452,16 @@ p.lead { margin: 0 0 18px; color: var(--ink-3); font-size: calc(13.4px * var(--f
 .tr-src img { max-width: 100%; border: 1px solid var(--line); border-radius: 4px; }
 
 /* ---------- kép-rács (Média fül) ---------- */
-.grid-media { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; }
+.grid-media { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
 .mcard { border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; background: var(--surface-2); }
 .mcard img { width: 100%; height: 110px; object-fit: cover; display: block; background: var(--surface-3); }
 .mcard .c { padding: 7px 9px; font-size: calc(11.3px * var(--fs)); color: var(--ink-3); word-break: break-all; }
 
 /* ---------- statisztika-csempék ---------- */
-.stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-bottom: 18px; }
+/* auto-FIT, nem auto-fill: az ures savok osszecsuknak, igy a csempek
+   kitoltik a szelesseget. Az auto-fill 6 csempehez 11 savot gyartott,
+   ezert maradtak kicsik a nagyra nyitott ablakban. */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 18px; }
 /* keskeny ablakban a panelbe zsufolt tablazat inkabb gorduljon, mint levagodjon */
 .panel__b--flush { overflow-x: auto; }
 .stat {
@@ -643,6 +646,17 @@ a.stat:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
   .page { padding: 12px; }
   .tabs { padding: 0 8px; }
   .ashell__user span:last-child { display: none; }
+
+  /* A fejlecben telefonon csak az fer el, amire tenyleg szukseg van:
+     a logo (marad hazavezeto link), a kereso, a tema, a nyelv es a
+     fiok-gombok. A "Infinity Sugo" felirat, az "admin" cimke es a
+     billentyuparancs-gomb mennek - kulonben a sor 544px szeles marad
+     es az egesz lap oldalra csuszik. */
+  .ashell { gap: 6px; padding: 0 8px; }
+  .ashell__brand { font-size: 0; }
+  .ashell__brand .ashell__logo { font-size: 14px; }
+  .ashell__tag, #keys-open, #site-open { display: none; }
+  .sbtn { padding: 0 8px; }
 
   .tbl thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
   .tbl, .tbl tbody, .tbl tr, .tbl td { display: block; width: 100%; }
