@@ -81,10 +81,23 @@ services:
   #     Szolgaltato = LibreTranslate,  Vegpont = http://libretranslate:5000
   #
   # Igy nem kell fizetos API-kulcs a gepi forditashoz.
+  # A modell-kotet uresen, root tulajdonban jon letre (a kepben nincs meg ez a
+  # konyvtar), a LibreTranslate viszont az 1032-es felhasznalokent fut - ezert
+  # eloszor atadjuk neki a mappat, kulonben indulasi hurokba kerul.
+  libretranslate-init:
+    image: busybox:1.36
+    profiles: ["mt"]
+    command: sh -c "mkdir -p /data/packages && chown -R 1032:65534 /data"
+    volumes:
+      - help_mt_models:/data
+
   libretranslate:
     image: libretranslate/libretranslate:latest
     profiles: ["mt"]
     restart: unless-stopped
+    depends_on:
+      libretranslate-init:
+        condition: service_completed_successfully
     environment:
       LT_LOAD_ONLY: "hu,en,de"
       LT_DISABLE_WEB_UI: "false"
