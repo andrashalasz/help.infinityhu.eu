@@ -165,6 +165,31 @@ function ui_default(string $key = ''): string|array
         'valtozat.mentette' => 'A <b>{n}. változatot</b> {mikor}-kor mentette <b>{ki}</b>',
         'ismeretlen' => 'ismeretlen',
 
+        // --- megerosito kerdesek, amikben nev vagy szam szerepel ---
+        'torles.fofejezet' => 'Törlöd a(z) „{nev}” főfejezetet? Minden nyelven a Kukába kerül, '
+            . 'ahonnan visszaállítható. Csak akkor sikerül, ha egyetlen nyelven sincs benne fejezet.',
+        'valtozat.betoltes.szam' => 'Betöltöd a(z) {n}. változatot vázlatként? A jelenlegi vázlat felülíródik.',
+        'torles.nyelv' => 'Törlöd a(z) „{nev}” nyelvet? Csak akkor sikerül, ha nincs rajta egyetlen fejezet sem.',
+
+        // --- hosszabb magyarazo szovegek (egyben, hogy egesz mondat legyen) ---
+        'ures.fejezetek' => 'Válassz egy fejezetet a bal oldali listából — vagy hozz létre újat a '
+            . '<b>+</b> gombbal. A főfejezet címére kattintva a leírása nyílik meg: ott írod meg, '
+            . 'mire való az a menüpont.',
+        'sugo.kepfeltoltes' => 'Képet és videót a <b>Kép</b> / <b>Videó</b> gombbal tölthetsz fel '
+            . '— vagy egyszerűen <b>húzd rá a fájlt a szövegre</b>, illetve illeszd be vágólapról. '
+            . 'A feltöltés azonnal megtörténik, nem kell előre a Képek fülre menni.',
+        'vazlat.figyelmeztetes' => 'Az alábbi szerkesztő a vázlatot mutatja — a nyilvános oldalon '
+            . 'még a korábbi változat látszik. Mentve: {mikor}',
+
+        // --- osszefuzott hibauzenetek {helyorzokkel} ---
+        'kozzetetel.nincs.forditas' => 'Ez a(z) {nyelv} változat még nincs lefordítva — üresen nem '
+            . 'teszem közzé. Írd meg a fordítást, vagy kérj gépi nyersfordítást a <b>Fordítás</b> fülön.',
+        'valtozat.betoltve' => 'A(z) {n}. változat betöltve vázlatként. Nézd át, és tedd közzé, ha jó.',
+        'mt.nem.erheto'     => 'A fordítószolgáltatás nem érhető el: {reszlet}',
+        'media.mappa.nincs' => 'A képek mappája nem hozható létre: {mappa}',
+        'media.mappa.ro'    => 'A képek mappája nem írható: {mappa}',
+        'kep.formatum.kihagyva' => 'Nem támogatott képformátum kihagyva: .{kit}',
+
         // --- kozzetetel ---
         'kozzetetel.forditas.marad' => 'A fordítások maradjanak naprakészek',
         'kozzetetel.forditas.sugo'  => 'Egy fordítás attól lesz <b>elavult</b>, hogy a magyar '

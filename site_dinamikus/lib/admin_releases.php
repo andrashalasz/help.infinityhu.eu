@@ -100,7 +100,7 @@ function page_releases(PDO $db, array $counts, int $showId = 0): void
               }
               ?>
               <form method="post" action="<?= h(admin_url()) ?>"
-                    data-confirm="Lezárod a kiadást? Ez minden fejezet verziószámát frissíti, és leveszi az újdonságjelzéseket.">
+                    data-confirm="<?= h(t('Lezárod a kiadást? Ez minden fejezet verziószámát frissíti, és leveszi az újdonságjelzéseket.')) ?>">
                 <?= csrf_input() ?>
                 <input type="hidden" name="a" value="release.close">
                 <input type="hidden" name="from" value="releases">
@@ -156,7 +156,7 @@ function page_releases(PDO $db, array $counts, int $showId = 0): void
                     <td class="muted nowrap" data-label="Ki"><?= h((string)$c['display_name']) ?></td>
                     <td class="nowrap" data-label="">
                       <form method="post" action="<?= h(admin_url()) ?>"
-                            data-confirm="Törlöd ezt a bejegyzést a változásnaplóból? A fejezet tartalmát nem érinti.">
+                            data-confirm="<?= h(t('Törlöd ezt a bejegyzést a változásnaplóból? A fejezet tartalmát nem érinti.')) ?>">
                         <?= csrf_input() ?>
                         <input type="hidden" name="a" value="changelog.delete">
                         <input type="hidden" name="id" value="<?= (int)$c['id'] ?>">

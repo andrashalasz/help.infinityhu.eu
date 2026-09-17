@@ -24,7 +24,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
     $wantsJson = ($_POST['fmt'] ?? '') === 'json';
 
     if (!csrf_check($_POST['csrf'] ?? ($_GET['csrf'] ?? null))) {
-        if ($wantsJson) { help_json(['ok' => false, 'error' => 'Lejárt munkamenet – töltsd újra az oldalt.'], 419); }
+        if ($wantsJson) { help_json(['ok' => false, 'error' => t('Lejárt munkamenet – töltsd újra az oldalt.')], 419); }
         flash('err', t('flash.session.lejart-vagy-ervenytelen-munkamenet'));
         back($action === 'login' ? ['p' => 'login'] : []);
     }
@@ -74,7 +74,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
         case 'login': {
             $r = auth_login($db, post('username'), (string)($_POST['password'] ?? ''));
             if (!$r['ok']) {
-                flash('err', h($r['error'] ?? 'Sikertelen bejelentkezés.'));
+                flash('err', h($r['error'] ?? t('Sikertelen bejelentkezés.')));
                 back(['p' => 'login']);
             }
             // belepes utan egyenesen az Attekintesre - jelszocsere nem kotelezo
@@ -177,7 +177,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             $st->execute([$id]);
             $before = $st->fetch();
             if (!$before || $before['draft_html'] === null) {
-                if ($wantsJson) { help_json(['ok' => false, 'error' => 'Nincs közzétételre váró vázlat.'], 400); }
+                if ($wantsJson) { help_json(['ok' => false, 'error' => t('Nincs közzétételre váró vázlat.')], 400); }
                 flash('warn', t('flash.article.publish.nincs-kozzetetelre-varo-vazlat'));
                 back(['p' => 'articles', 'id' => $id]);
             }
@@ -186,9 +186,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             // Ures angol/nemet oldal rosszabb, mint a magyar tartalek, amit a
             // nyilvanos oldal enelkul is megmutat.
             if ($before['lang'] !== 'hu' && trim(help_plain((string)$before['draft_html'])) === '') {
-                $msg = 'Ez a(z) ' . strtoupper($before['lang']) . ' változat még nincs lefordítva — '
-                     . 'üresen nem teszem közzé. Írd meg a fordítást, vagy kérj gépi nyersfordítást '
-                     . 'a <b>Fordítás</b> fülön.';
+                $msg = t('kozzetetel.nincs.forditas', ['nyelv' => strtoupper($before['lang'])]);
                 if ($wantsJson) { help_json(['ok' => false, 'error' => strip_tags($msg)], 400); }
                 flash('err', $msg);
                 back(['p' => 'articles', 'id' => $id]);
@@ -492,7 +490,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             $db->prepare('UPDATE help_article SET draft_html = ?, draft_title = ?, draft_by = ?, draft_at = now() WHERE id = ?')
                ->execute([$r['body_html'], $r['title'], auth_user()['id'], $id]);
             audit_me($db, 'article.restore', 'article:' . $id, 'rev ' . $rev);
-            flash('ok', "A(z) {$rev}. változat betöltve vázlatként. Nézd át, és tedd közzé, ha jó.");
+            flash('ok', t('valtozat.betoltve', ['n' => $rev]));
             back(['p' => 'articles', 'id' => $id]);
         }
 
@@ -614,7 +612,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                     $st->execute([$moduleId, ...$ids]);
                     $n = $st->rowCount();
 
-                    $tid = trash_put($db, 'move', 'Áthelyezés visszavonása', $lang,
+                    $tid = trash_put($db, 'move', t('Áthelyezés visszavonása'), $lang,
                                      ['articles' => $before], auth_user()['id']);
                     audit_me($db, 'articles.bulk', 'move', "{$n} -> module {$moduleId}");
                     flash('ok', t('flash.bulk.athelyezve', ['n' => $n]) . ' '
@@ -651,7 +649,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
         case 'articles.reorder': {
             $ids = array_values(array_filter(array_map('intval', (array)($_POST['order'] ?? []))));
             $moduleId = (int)post('module_id');
-            if (!$ids) { help_json(['ok' => false, 'error' => 'Üres sorrend.'], 400); }
+            if (!$ids) { help_json(['ok' => false, 'error' => t('Üres sorrend.')], 400); }
 
             $db->beginTransaction();
             try {
@@ -691,7 +689,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
 
         case 'modules.reorder': {
             $ids = array_values(array_filter(array_map('intval', (array)($_POST['order'] ?? []))));
-            if (!$ids) { help_json(['ok' => false, 'error' => 'Üres sorrend.'], 400); }
+            if (!$ids) { help_json(['ok' => false, 'error' => t('Üres sorrend.')], 400); }
             $db->beginTransaction();
             try {
                 // a sorrend nyelvfuggetlen: a testvereket is allitjuk
@@ -925,12 +923,12 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
 
             if (!is_array($f) || ($f['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
                 $codes = [
-                    UPLOAD_ERR_INI_SIZE  => 'A fájl nagyobb, mint amennyit a PHP elfogad (upload_max_filesize).',
-                    UPLOAD_ERR_FORM_SIZE => 'A fájl túl nagy.',
-                    UPLOAD_ERR_PARTIAL   => 'A feltöltés félbeszakadt.',
-                    UPLOAD_ERR_NO_FILE   => 'Nem választottál fájlt.',
-                    UPLOAD_ERR_NO_TMP_DIR=> 'Hiányzik az ideiglenes mappa a szerveren.',
-                    UPLOAD_ERR_CANT_WRITE=> 'A szerver nem tudta lemezre írni a fájlt.',
+                    UPLOAD_ERR_INI_SIZE  => t('A fájl nagyobb, mint amennyit a PHP elfogad (upload_max_filesize).'),
+                    UPLOAD_ERR_FORM_SIZE => t('A fájl túl nagy.'),
+                    UPLOAD_ERR_PARTIAL   => t('A feltöltés félbeszakadt.'),
+                    UPLOAD_ERR_NO_FILE   => t('Nem választottál fájlt.'),
+                    UPLOAD_ERR_NO_TMP_DIR=> t('Hiányzik az ideiglenes mappa a szerveren.'),
+                    UPLOAD_ERR_CANT_WRITE=> t('A szerver nem tudta lemezre írni a fájlt.'),
                 ];
                 flash('err', h($codes[$f['error'] ?? UPLOAD_ERR_NO_FILE] ?? t('flash.upload.hiba')));
                 back(['p' => 'import', 'lang' => $lang]);
@@ -1133,13 +1131,13 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
         case 'translate.machine': {
             $srcId = (int)post('src_id');
             $to    = post('to');
-            if (!array_key_exists($to, admin_langs())) { help_json(['ok' => false, 'error' => 'Ismeretlen célnyelv.'], 400); }
+            if (!array_key_exists($to, admin_langs())) { help_json(['ok' => false, 'error' => t('Ismeretlen célnyelv.')], 400); }
 
             $st = $db->prepare('SELECT lang, body_html, draft_html, title, draft_title
                                   FROM help_article WHERE id = ?');
             $st->execute([$srcId]);
             $src = $st->fetch();
-            if (!$src) { help_json(['ok' => false, 'error' => 'Nincs ilyen forrásfejezet.'], 404); }
+            if (!$src) { help_json(['ok' => false, 'error' => t('Nincs ilyen forrásfejezet.')], 404); }
 
             // A meg kozze nem tett vazlatot is forditjuk - kulonben egy frissen
             // megirt fejezetbol ures forditas keszult volna.
@@ -1148,7 +1146,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                 if ((string)($src['draft_title'] ?? '') !== '') { $src['title'] = $src['draft_title']; }
             }
             if (trim(help_plain((string)$src['body_html'])) === '') {
-                help_json(['ok' => false, 'error' => 'A magyar fejezetnek még nincs tartalma — nincs mit fordítani.'], 400);
+                help_json(['ok' => false, 'error' => t('A forrásnyelvi fejezetnek még nincs tartalma — nincs mit fordítani.')], 400);
             }
 
             try {
@@ -1274,7 +1272,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
         // elore feltolteni a Kepek fulon, majd fajlnevet beirni.
         case 'media.inline': {
             $f = $_FILES['file'] ?? null;
-            if (!is_array($f)) { help_json(['ok' => false, 'error' => 'Nem érkezett fájl.'], 400); }
+            if (!is_array($f)) { help_json(['ok' => false, 'error' => t('Nem érkezett fájl.')], 400); }
             if ((int)$f['error'] !== UPLOAD_ERR_OK) {
                 help_json(['ok' => false, 'error' => media_upload_error((int)$f['error'])], 400);
             }

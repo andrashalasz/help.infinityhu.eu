@@ -478,7 +478,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
           <?= visibility_form('module', (int)$m['id'], (bool)$m['is_published'], $lang,
                               $m['chapter_no'] . ' ' . $m['title']) ?>
           <form method="post" action="<?= h(admin_url()) ?>" style="display:inline"
-                data-confirm="Törlöd a(z) &quot;<?= h($m['chapter_no'] . ' ' . $m['title']) ?>&quot; főfejezetet? Mind a három nyelven a Kukába kerül, ahonnan visszaállítható. Csak akkor sikerül, ha egyetlen nyelven sincs benne fejezet.">
+                data-confirm="<?= h(t('torles.fofejezet', ['nev' => $m['chapter_no'] . ' ' . $m['title']])) ?>">
             <?= csrf_input() ?>
             <input type="hidden" name="a" value="module.delete">
             <input type="hidden" name="id" value="<?= (int)$m['id'] ?>">
@@ -539,8 +539,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
           // SZAMOT pedig a leiras Adatok panelje allitja. ?>
     <?php if (!$article): ?>
  <div class="panel"><div class="panel__b">
-        Válassz egy fejezetet a bal oldali listából — vagy hozz létre újat a <b>+</b> gombbal.
-        A főfejezet címére kattintva a leírása nyílik meg: ott írod meg, mire való az a menüpont.
+        <?= t('ures.fejezetek') ?>
       </div></div>
 
     <?php else:
@@ -550,8 +549,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
       <?php if ($hasDraft): ?>
         <div class="msg msg--warn">
           <span class="msg__h"><?= h(t('Ezen a fejezeten van közzétételre váró vázlat.')) ?></span>
-          Az alábbi szerkesztő a vázlatot mutatja — a nyilvános oldalon még a korábbi változat látszik.
-          Mentve: <?= h(substr((string)$article['draft_at'], 0, 16)) ?>
+          <?= t('vazlat.figyelmeztetes', ['mikor' => h(substr((string)$article['draft_at'], 0, 16))]) ?>
         </div>
       <?php endif; ?>
       <?php if (!$article['is_published']): ?>
@@ -680,9 +678,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
         <?php editor_block((string)$article['chapter_no'], $body); ?>
 
         <div class="hint" style="margin-top:6px">
-          Képet és videót a <b><?= h(t('Kép')) ?></b> / <b><?= h(t('Videó')) ?></b> gombbal tölthetsz fel — vagy egyszerűen
-          <b><?= h(t('húzd rá a fájlt a szövegre')) ?></b>, illetve illeszd be vágólapról. A feltöltés azonnal
-          megtörténik, nem kell előre a Képek fülre menni.
+          <?= t('sugo.kepfeltoltes') ?>
         </div>
 
         <div class="savebar">
@@ -744,7 +740,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
 
             <div class="btnbar" style="margin-top:12px">
               <form method="post" action="<?= h(admin_url()) ?>"
-                    data-confirm="Betöltöd a(z) <?= (int)$diffRow['rev_no'] ?>. változatot vázlatként? A jelenlegi vázlat felülíródik.">
+                    data-confirm="<?= h(t('valtozat.betoltes.szam', ['n' => (int)$diffRow['rev_no']])) ?>">
                 <?= csrf_input() ?>
                 <input type="hidden" name="a" value="article.restore">
                 <input type="hidden" name="id" value="<?= (int)$article['id'] ?>">
@@ -781,7 +777,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
                   <td class="nowrap muted" data-label="Mikor"><?= h(substr((string)$r['created_at'], 0, 16)) ?></td>
                   <td class="muted" data-label="Ki"><?= h((string)$r['display_name']) ?></td>
                   <td class="nowrap" data-label="">
-                    <form method="post" action="<?= h(admin_url()) ?>" data-confirm="Betöltöd ezt a változatot vázlatként? A jelenlegi vázlat felülíródik.">
+                    <form method="post" action="<?= h(admin_url()) ?>" data-confirm="<?= h(t('Betöltöd ezt a változatot vázlatként? A jelenlegi vázlat felülíródik.')) ?>">
                       <?= csrf_input() ?>
                       <input type="hidden" name="a" value="article.restore">
                       <input type="hidden" name="id" value="<?= (int)$article['id'] ?>">
@@ -938,7 +934,7 @@ function page_modules(PDO $db, string $lang, array $counts): void
               <button class="btn btn--sm btn--p" form="mf<?= (int)$m['id'] ?>" type="submit"><?= h(t('Mentés')) ?></button>
               <?php if (true): ?>
                 <form method="post" action="<?= h(admin_url()) ?>" style="display:inline"
-                      data-confirm="Törlöd ezt a főfejezetet? Mind a három nyelven a Kukába kerül, ahonnan visszaállítható. Csak akkor sikerül, ha egyetlen nyelven sincs benne fejezet.">
+                      data-confirm="<?= h(t('Törlöd ezt a főfejezetet? Mind a három nyelven a Kukába kerül, ahonnan visszaállítható. Csak akkor sikerül, ha egyetlen nyelven sincs benne fejezet.')) ?>">
                   <?= csrf_input() ?>
                   <input type="hidden" name="a" value="module.delete">
                   <input type="hidden" name="id" value="<?= (int)$m['id'] ?>">

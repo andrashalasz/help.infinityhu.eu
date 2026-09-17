@@ -274,7 +274,7 @@ final class Translator
         curl_close($ch);
 
         if ($body === false) {
-            throw new RuntimeException('A fordítószolgáltatás nem érhető el: ' . $err);
+            throw new RuntimeException(t('mt.nem.erheto', ['reszlet' => $err]));
         }
         if ($code >= 400) {
             throw new RuntimeException('A fordítószolgáltatás hibát adott (HTTP ' . $code . '): ' . mb_substr((string)$body, 0, 200));
@@ -297,7 +297,7 @@ function translate_store(
     $st->execute([$srcId]);
     $src = $st->fetch();
     if (!$src) {
-        throw new RuntimeException('Nincs ilyen forrásfejezet: ' . $srcId);
+        throw new RuntimeException(t('Nincs ilyen forrásfejezet.'));
     }
 
     // A nyelvi valtozatot elsosorban a FEJEZETSZAM koti a forrashoz, mert a

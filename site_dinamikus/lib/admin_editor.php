@@ -64,11 +64,11 @@ function editor_palette(): array
 function editor_marks(): array
 {
     return [
-        '#ffff00' => 'Sárga',      '#00ff00' => 'Élénkzöld',  '#00ffff' => 'Türkiz',
-        '#ff00ff' => 'Rózsaszín',  '#0000ff' => 'Kék',        '#ff0000' => 'Piros',
-        '#000080' => 'Sötétkék',   '#008080' => 'Kékeszöld',  '#008000' => 'Zöld',
-        '#800080' => 'Lila',       '#800000' => 'Sötétvörös', '#808000' => 'Sötétsárga',
-        '#c0c0c0' => 'Szürke',     '#fff3a3' => 'Halvány sárga', '#dceafd' => 'Halvány kék',
+        '#ffff00' => t('Sárga'),      '#00ff00' => t('Élénkzöld'),  '#00ffff' => t('Türkiz'),
+        '#ff00ff' => t('Rózsaszín'),  '#0000ff' => t('Kék'),        '#ff0000' => 'Piros',
+        '#000080' => t('Sötétkék'),   '#008080' => t('Kékeszöld'),  '#008000' => t('Zöld'),
+        '#800080' => 'Lila',       '#800000' => t('Sötétvörös'), '#808000' => t('Sötétsárga'),
+        '#c0c0c0' => t('Szürke'),     '#fff3a3' => t('Halvány sárga'), '#dceafd' => t('Halvány kék'),
     ];
 }
 
@@ -135,8 +135,7 @@ function editor_block(string $chapter, string $body): void
                     <?php endforeach; ?>
                     <button type="button" class="sw sw--none" data-mark="none" title="<?= h(t('Kiemelés törlése')) ?>"></button>
                   </div>
-                  <label class="ed-pop__c">Egyéni szín
-                    <input type="color" class="ed-color-custom" value="#0a6ed1"></label>
+                  <label class="ed-pop__c"><?= h(t('Egyéni szín')) ?><input type="color" class="ed-color-custom" value="#0a6ed1"></label>
                 </div>
               </div>
             </div>
@@ -165,7 +164,7 @@ function editor_block(string $chapter, string $body): void
                   <div class="ed-pop__t"><?= h(t('Új táblázat')) ?></div>
                   <div class="tblgrid" aria-label="<?= h(t('Méret választása')) ?>"></div>
                   <div class="tblgrid__lbl">3 × 3</div>
- <label class="ed-pop__c tbl-new-head">Fejlécsor <input type="checkbox" checked></label>
+ <label class="ed-pop__c tbl-new-head"><?= h(t('Fejlécsor')) ?><input type="checkbox" checked></label>
  <button type="button" class="btn btn--p btn--sm tbl-insert" style="width:100%;margin-top:8px"><?= h(t('Beszúrás')) ?></button>
                 </div>
               </div>
@@ -185,8 +184,7 @@ function editor_block(string $chapter, string $body): void
             <span class="sp"></span>
             <div class="ed-grp ed-grp--end">
               <label class="ed-chk" title="<?= h(t('A címsorok számozása gépeléskor magától frissül')) ?>">
-                <input type="checkbox" class="ed-autonum" checked> Automatikus számozás
-              </label>
+                <input type="checkbox" class="ed-autonum" checked><?= h(t('Automatikus számozás')) ?></label>
               <button type="button" class="ed-source" title="<?= h(t('HTML forrás mutatása')) ?>">&lt;/&gt;&nbsp;HTML</button>
             </div>
           </div>
@@ -224,9 +222,9 @@ function editor_block(string $chapter, string $body): void
                 <div class="ed-pop__m" data-pop-menu="tblhead">
                   <div class="ed-pop__t"><?= h(t('Fejléc háttere')) ?></div>
                   <div class="ed-sw">
-                    <?php foreach (['#eceff3' => 'Szürke', '#0a6ed1' => 'Kék', '#0854a0' => 'Sötétkék',
-                                    '#107e3e' => 'Zöld', '#b8681a' => 'Narancs', '#bb0000' => 'Piros',
-                                    '#1c2a3a' => 'Sötét'] as $hex => $name): ?>
+                    <?php foreach (['#eceff3' => t('Szürke'), '#0a6ed1' => t('Kék'), '#0854a0' => t('Sötétkék'),
+                                    '#107e3e' => t('Zöld'), '#b8681a' => 'Narancs', '#bb0000' => 'Piros',
+                                    '#1c2a3a' => t('Sötét')] as $hex => $name): ?>
                       <button type="button" class="sw" data-hbg="<?= h($hex) ?>"
                               style="background:<?= h($hex) ?>" title="<?= h($name) ?>"></button>
                     <?php endforeach; ?>
@@ -234,13 +232,13 @@ function editor_block(string $chapter, string $body): void
                   </div>
                   <div class="ed-pop__t"><?= h(t('Fejléc betűszíne')) ?></div>
                   <div class="ed-sw">
-                    <?php foreach (['#1f2a36' => 'Sötét', '#ffffff' => 'Fehér', '#0854a0' => 'Kék'] as $hex => $name): ?>
+                    <?php foreach (['#1f2a36' => t('Sötét'), '#ffffff' => t('Fehér'), '#0854a0' => t('Kék')] as $hex => $name): ?>
                       <button type="button" class="sw" data-hfg="<?= h($hex) ?>"
                               style="background:<?= h($hex) ?>" title="<?= h($name) ?>"></button>
                     <?php endforeach; ?>
                   </div>
- <label class="ed-pop__c tbl-hbg-custom">Egyéni háttér <input type="color" value="#0a6ed1"></label>
- <label class="ed-pop__c tbl-hfg-custom">Egyéni betűszín <input type="color" value="#ffffff"></label>
+ <label class="ed-pop__c tbl-hbg-custom"><?= h(t('Egyéni háttér')) ?><input type="color" value="#0a6ed1"></label>
+ <label class="ed-pop__c tbl-hfg-custom"><?= h(t('Egyéni betűszín')) ?><input type="color" value="#ffffff"></label>
                 </div>
               </div>
 
@@ -251,8 +249,8 @@ function editor_block(string $chapter, string $body): void
                 <div class="ed-pop__m" data-pop-menu="tblcell">
                   <div class="ed-pop__t"><?= h(t('Cella háttere')) ?></div>
                   <div class="ed-sw">
-                    <?php foreach (['#eceff3' => 'Szürke', '#e8f1fb' => 'Kék', '#e6f3ec' => 'Zöld',
-                                    '#fdf3e7' => 'Narancs', '#fbecec' => 'Piros', '#fff3a3' => 'Sárga'] as $hex => $name): ?>
+                    <?php foreach (['#eceff3' => t('Szürke'), '#e8f1fb' => t('Kék'), '#e6f3ec' => t('Zöld'),
+                                    '#fdf3e7' => 'Narancs', '#fbecec' => 'Piros', '#fff3a3' => t('Sárga')] as $hex => $name): ?>
                       <button type="button" class="sw" data-cbg="<?= h($hex) ?>"
                               style="background:<?= h($hex) ?>" title="<?= h($name) ?>"></button>
                     <?php endforeach; ?>
@@ -260,14 +258,14 @@ function editor_block(string $chapter, string $body): void
                   </div>
                   <div class="ed-pop__t"><?= h(t('Cella betűszíne')) ?></div>
                   <div class="ed-sw">
-                    <?php foreach (['#1f2a36' => 'Alap', '#0854a0' => 'Kék', '#107e3e' => 'Zöld',
-                                    '#bb0000' => 'Piros', '#ffffff' => 'Fehér'] as $hex => $name): ?>
+                    <?php foreach (['#1f2a36' => 'Alap', '#0854a0' => t('Kék'), '#107e3e' => t('Zöld'),
+                                    '#bb0000' => 'Piros', '#ffffff' => t('Fehér')] as $hex => $name): ?>
                       <button type="button" class="sw" data-cfg="<?= h($hex) ?>"
                               style="background:<?= h($hex) ?>" title="<?= h($name) ?>"></button>
                     <?php endforeach; ?>
                   </div>
- <label class="ed-pop__c tbl-cbg-custom">Egyéni háttér <input type="color" value="#e8f1fb"></label>
- <label class="ed-pop__c tbl-cfg-custom">Egyéni betűszín <input type="color" value="#1f2a36"></label>
+ <label class="ed-pop__c tbl-cbg-custom"><?= h(t('Egyéni háttér')) ?><input type="color" value="#e8f1fb"></label>
+ <label class="ed-pop__c tbl-cfg-custom"><?= h(t('Egyéni betűszín')) ?><input type="color" value="#1f2a36"></label>
                   <div class="hint" style="margin-top:6px"><?= h(t('Több cellát is színezhetsz: húzd át rajtuk a kijelölést.')) ?></div>
                 </div>
               </div>

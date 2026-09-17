@@ -508,7 +508,7 @@ final class DocxParser
 
         $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION) ?: 'png');
         if (!in_array($ext, ['png', 'jpg', 'jpeg', 'gif', 'webp'], true)) {
-            $this->warnings[] = "Nem támogatott képformátum kihagyva: .{$ext}";
+            $this->warnings[] = t('kep.formatum.kihagyva', ['kit' => $ext]);
             return null;
         }
         $name = 'img_' . substr(hash('sha256', $bytes), 0, 12) . '.' . ($ext === 'jpeg' ? 'jpg' : $ext);
@@ -521,11 +521,11 @@ final class DocxParser
     {
         if (!is_dir($this->mediaDir)) {
             if (!@mkdir($this->mediaDir, 0775, true) && !is_dir($this->mediaDir)) {
-                throw new RuntimeException('A képek mappája nem hozható létre: ' . $this->mediaDir);
+                throw new RuntimeException(t('media.mappa.nincs', ['mappa' => $this->mediaDir]));
             }
         }
         if (!is_writable($this->mediaDir)) {
-            throw new RuntimeException('A képek mappája nem írható: ' . $this->mediaDir);
+            throw new RuntimeException(t('media.mappa.ro', ['mappa' => $this->mediaDir]));
         }
         $n = 0;
         foreach ($this->images as $img) {
