@@ -1278,6 +1278,25 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             back(['p' => 'settings']);
         }
 
+        case 'changelog.save': {
+            if (!auth_is('admin')) { flash('err', 'Ehhez adminisztrátori jog kell.'); back(['p' => 'releases']); }
+            $cid = (int)post('id');
+            $db->prepare('UPDATE help_changelog SET description = ?, is_minor = ? WHERE id = ?')
+               ->execute([mb_substr(post('description'), 0, 2000), isset($_POST['is_minor']) ? 1 : 0, $cid]);
+            audit_me($db, 'changelog.save', 'changelog:' . $cid);
+            flash('ok', 'A bejegyzés mentve.');
+            back(['p' => 'releases', 'rel' => (int)post('rel')]);
+        }
+
+        case 'changelog.delete': {
+            if (!auth_is('admin')) { flash('err', 'Ehhez adminisztrátori jog kell.'); back(['p' => 'releases']); }
+            $cid = (int)post('id');
+            $db->prepare('DELETE FROM help_changelog WHERE id = ?')->execute([$cid]);
+            audit_me($db, 'changelog.delete', 'changelog:' . $cid);
+            flash('ok', 'A bejegyzés törölve a változásnaplóból — a fejezet tartalmát nem érintette.');
+            back(['p' => 'releases', 'rel' => (int)post('rel')]);
+        }
+
         case 'release.close': {
             if (!auth_is('admin')) { flash('err', 'Ehhez adminisztrátori jog kell.'); back(['p' => 'settings']); }
             $version = post('version');
@@ -1296,7 +1315,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             } catch (Throwable $e) {
                 flash('err', 'A kiadás lezárása nem sikerült: ' . h($e->getMessage()));
             }
-            back(['p' => 'settings']);
+            back(['p' => post('from') === 'releases' ? 'releases' : 'settings']);
         }
 
         default:

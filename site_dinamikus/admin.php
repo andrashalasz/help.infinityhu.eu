@@ -28,6 +28,7 @@ require __DIR__ . '/lib/docx_export.php';
 require __DIR__ . '/lib/trash.php';
 require __DIR__ . '/lib/admin_layout.php';
 require __DIR__ . '/lib/admin_editor.php';
+require __DIR__ . '/lib/admin_releases.php';
 require __DIR__ . '/lib/admin_actions.php';
 require __DIR__ . '/lib/admin_pages.php';
 require __DIR__ . '/lib/admin_pages2.php';
@@ -185,6 +186,9 @@ switch ($page) {
         break;
     case 'users':
         page_users($db, $counts);
+        break;
+    case 'releases':
+        page_releases($db, $counts, (int)($_GET['rel'] ?? 0));
         break;
     case 'export':
         page_export($db, $cfg, $lang, $counts);

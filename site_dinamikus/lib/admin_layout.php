@@ -10,6 +10,7 @@ const ADMIN_TABS = [
     'import'    => 'Word import',
     'translate' => 'Fordítás',
     'media'     => 'Képek, videók',
+    'releases'  => 'Kiadások',
     'export'    => 'Export',
     'users'     => 'Felhasználók',
     'trash'     => 'Kuka',
