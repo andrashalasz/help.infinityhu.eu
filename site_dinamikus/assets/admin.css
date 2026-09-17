@@ -539,9 +539,32 @@ a.stat:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 .picker--sort .picker__grip { display: block; }
 .picker__m { display: flex; align-items: center; gap: 4px; }
 
-.picker__row.dragging { opacity: .45; }
-.picker__row.drop-before { box-shadow: inset 0 2px 0 var(--brand); }
-.picker__row.drop-after  { box-shadow: inset 0 -2px 0 var(--brand); }
+/* --- huzas kozbeni visszajelzes ---
+   A korabbi 2 px-es belso arnyek alig latszott, a fofejezetekre pedig egyaltalan
+   nem vonatkozott: nem lehetett tudni, hova esik majd az elem. */
+.picker__row.dragging,
+.picker__mod.dragging { opacity: .4; }
+
+.picker__row.drop-before, .picker__row.drop-after,
+.picker__mod.drop-before, .picker__mod.drop-after { position: relative; }
+
+.picker__row.drop-before::after, .picker__row.drop-after::after,
+.picker__mod.drop-before::after, .picker__mod.drop-after::after {
+  content: ''; position: absolute; left: 6px; right: 6px; height: 3px;
+  background: var(--brand); border-radius: 2px; z-index: 5;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 22%, transparent);
+}
+.picker__row.drop-before::after, .picker__mod.drop-before::after { top: -2px; }
+.picker__row.drop-after::after,  .picker__mod.drop-after::after  { bottom: -2px; }
+
+/* a fofejezet egesz doboza kiemelodik, hogy lassd, melyik moge kerul */
+.picker__mod.drop-before, .picker__mod.drop-after {
+  background: color-mix(in srgb, var(--brand) 7%, transparent);
+  border-radius: var(--r-sm);
+}
+
+/* huzas kozben a lista szelei jelzik, hogy epp rendezel */
+.picker--sort .picker__l { outline: 1px dashed var(--brand-ring); outline-offset: -4px; }
 
 .picker__hint {
   padding: 8px 12px; margin: 0 10px 6px; border-radius: var(--r);
@@ -563,9 +586,9 @@ a.stat:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 
 /* ---------- húzható táblasorok ---------- */
 .tbl--sortable td.grip { width: 34px; padding-right: 0; }
-.tbl--sortable tr.dragging { opacity: .45; }
-.tbl--sortable tr.drop-before td { box-shadow: inset 0 2px 0 var(--brand); }
-.tbl--sortable tr.drop-after  td { box-shadow: inset 0 -2px 0 var(--brand); }
+.tbl--sortable tr.dragging { opacity: .4; }
+.tbl--sortable tr.drop-before td { box-shadow: inset 0 3px 0 var(--brand); }
+.tbl--sortable tr.drop-after  td { box-shadow: inset 0 -3px 0 var(--brand); }
 .tbl--sortable .picker__grip { display: block; }
 
 /* ---------- visszavonás gomb az üzenetekben ---------- */
