@@ -18,7 +18,26 @@ const ADMIN_TABS = [
     'settings'  => 'Beállítások',
 ];
 
+/**
+ * A sugo nyelvei. UJ NYELVET ITT kell felvenni - a forrasnyelv az elso elem
+ * (magyar), a tobbi celnyelv. Minden felulet ebbol dolgozik: a Forditas ful
+ * oszlopai, a gepi forditas celnyelvei, a nyelvi kartyak es az export.
+ */
 const ADMIN_LANGS = ['hu' => 'Magyar', 'en' => 'English', 'de' => 'Deutsch'];
+
+/** A forrasnyelv kodja (az ADMIN_LANGS elso eleme). */
+function admin_source_lang(): string
+{
+    return (string)array_key_first(ADMIN_LANGS);
+}
+
+/** A celnyelvek: minden nyelv a forrasnyelv nelkul. */
+function admin_target_langs(): array
+{
+    $l = ADMIN_LANGS;
+    unset($l[admin_source_lang()]);
+    return $l;
+}
 
 function flash(string $type, string $text): void
 {
@@ -29,7 +48,8 @@ function flash_render(): string
 {
     $out = '';
     foreach ($_SESSION['flash'] ?? [] as $f) {
-        $out .= '<div class="msg msg--' . h($f['type']) . '">' . $f['text'] . '</div>';
+        $out .= '<div class="msg msg--' . h($f['type']) . '" data-flash="' . h($f['type']) . '">'
+              . $f['text'] . '</div>';
     }
     unset($_SESSION['flash']);
     return $out;

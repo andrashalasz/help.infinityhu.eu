@@ -66,6 +66,29 @@
     }
   }
 
+  /* --- a visszajelzes ne maradjon eszrevetlen ---
+     Az uzenet a lap tetejen jelenik meg, a szerkeszto viszont gyakran lent
+     gorget a fejezetlistaban - onnan nem latszik, ezert ugy tunt, hogy egy-egy
+     muvelet (pl. a fofejezet torlese) "nem csinal semmit". A hiba- es
+     figyelmeztető uzenetet ezert gorgetjuk is, es felbuborekkent megismereljuk. */
+  function wireFlash() {
+    var msgs = Array.prototype.slice.call(document.querySelectorAll('[data-flash]'));
+    if (!msgs.length) { return; }
+
+    var first = msgs[0];
+    var r = first.getBoundingClientRect();
+    if (r.top < 0 || r.bottom > window.innerHeight) {
+      first.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
+
+    msgs.forEach(function (m) {
+      var kind = m.getAttribute('data-flash');
+      if (kind !== 'err' && kind !== 'warn') { return; }
+      var text = (m.textContent || '').replace(/\s+/g, ' ').trim();
+      if (text) { toast(text.slice(0, 180), kind); }
+    });
+  }
+
   /* ---------------------------------------------------------- megerősítés
      A böngésző window.confirm() ablakát több környezet letiltja, és olyankor
      a művelet némán elmarad. Ezért minden megerősítés a saját ablakunkkal
@@ -86,6 +109,7 @@
       var fresh = b.cloneNode(false);          // friss gomb: nincs rajta regi kezelo
       fresh.textContent = label;
       fresh.hidden = !show;
+      fresh.style.display = show ? '' : 'none';
       b.parentNode.replaceChild(fresh, b);
       if (show && handler) {
         fresh.addEventListener('click', function () {
@@ -256,7 +280,13 @@
     if (!ed || !area || !src) { return; }
 
     // a HTML forrás mindig a szerkesztő aktuális tartalma legyen beküldéskor
-    function syncToSource() { src.value = area.innerHTML; }
+    function syncToSource() {
+      // A feltoltes-jelzo sosem kerulhet a mentett tartalomba (pl. ha a
+      // feltoltes kozben zarodik be a lap).
+      var tmp = area.cloneNode(true);
+      Array.prototype.forEach.call(tmp.querySelectorAll('.uploading'), function (n) { n.remove(); });
+      src.value = tmp.innerHTML;
+    }
     function syncToArea() { area.innerHTML = src.value; }
     syncToSource();
 
@@ -905,26 +935,47 @@
       fd.append('csrf', csrfOf());
       fd.append('file', file);
 
-      var mark = 'up-' + Math.random().toString(36).slice(2);
-      insertAtCursor('<p id="' + mark + '" class="uploading">Feltöltés: ' +
-        file.name.replace(/[<>&]/g, '') + ' …</p>');
+      // A helyorzot DOM-csomopontkent szurjuk be, es a CSOMOPONTRA hivatkozunk.
+      // Korabban execCommand('insertHTML') tette be egy id-vel, de az egy
+      // bekezdesen belul uj bekezdest nyitva eldobta az id-t: a kod nem talalta
+      // meg, amit ki kellett volna cserelnie, igy a "Feltoltes: ..." szoveg
+      // bentmaradt, a kep pedig ala kerult.
+      var ph = document.createElement('p');
+      ph.className = 'uploading';
+      ph.textContent = 'Feltöltés: ' + file.name + ' …';
+
+      var block = null;
+      var sel = window.getSelection();
+      if (sel && sel.anchorNode && area.contains(sel.anchorNode)) {
+        var n = sel.anchorNode.nodeType === 1 ? sel.anchorNode : sel.anchorNode.parentNode;
+        while (n && n.parentNode !== area) { n = n.parentNode; }
+        if (n && n.parentNode === area) { block = n; }
+      }
+      if (block) { block.parentNode.insertBefore(ph, block.nextSibling); }
+      else { area.appendChild(ph); }
+
+      function dropPlaceholder() {
+        if (ph && ph.parentNode) { ph.parentNode.removeChild(ph); }
+      }
 
       return fetch('admin.php', { method: 'POST', body: fd })
         .then(function (r) { return r.json(); })
         .then(function (d) {
-          var ph = document.getElementById(mark);
           if (!d.ok) { throw new Error(d.error || 'Ismeretlen hiba'); }
-          if (ph) {
-            ph.outerHTML = d.html;
+          if (ph && ph.parentNode) {
+            var tmp = document.createElement('div');
+            tmp.innerHTML = d.html;
+            while (tmp.firstChild) { ph.parentNode.insertBefore(tmp.firstChild, ph); }
+            dropPlaceholder();
           } else {
             insertAtCursor(d.html);
           }
           syncToSource();
+          markDirty();
           toast(d.existed ? 'Ez a fájl már fent volt, újra felhasználtam.' : 'Feltöltve: ' + d.name);
         })
         .catch(function (e) {
-          var ph = document.getElementById(mark);
-          if (ph) { ph.remove(); }
+          dropPlaceholder();
           syncToSource();
           toast('Nem sikerült: ' + e.message, 'err');
         });
@@ -1352,46 +1403,99 @@
 
   /* ---------------------------------------------------------- gépi nyersfordítás */
   function wireTranslate() {
-    var btn = $('#tr-machine');
-    if (!btn) { return; }
-    btn.addEventListener('click', function () {
-      var form = $('#tr-form'), area = $('#ed-area'), src = $('#ed-src'), title = $('#tr-title');
-      if (!form) { return; }
-      if (area && area.textContent.trim() !== '' && btn.dataset.confirmed !== '1') {
-        askConfirm('A jelenlegi fordítás felülíródik a gépi nyersfordítással. Folytatod?', function () {
-          btn.dataset.confirmed = '1';
-          btn.click();
-          delete btn.dataset.confirmed;
-        }, 'Gépi nyersfordítás');
-        return;
+    // Minden celnyelv sajat urlap + sajat szerkeszto. Korabban egyetlen,
+    // id-vel cimzett szerkeszto volt (#ed-area, #tr-machine); tobb nyelvnel
+    // ez csak az elsot kotötte volna be, a tobbi urlap pedig URES body-t
+    // kuldott volna mentesre.
+    var forms = $$('form[data-tr-lang]');
+    if (!forms.length) { return; }
+
+    forms.forEach(function (form) {
+      var area  = $('.tred-area', form);
+      var src   = $('.tred-src', form);
+      var title = $('.tr-title', form);
+      var how   = $('.tr-how', form);
+      var wrap  = $('.tred', form);
+      if (!area || !src) { return; }
+
+      function sync() { src.value = area.innerHTML; }
+      sync();
+      area.addEventListener('input', sync);
+      form.addEventListener('submit', function () {
+        if (!wrap.classList.contains('ed--source')) { sync(); }
+      });
+
+      $$('.ed-toolbar [data-cmd]', form).forEach(function (b) {
+        b.addEventListener('click', function () {
+          area.focus();
+          document.execCommand(b.getAttribute('data-cmd'), false, undefined);
+          sync();
+        });
+      });
+      $$('.ed-toolbar [data-block]', form).forEach(function (b) {
+        b.addEventListener('click', function () {
+          area.focus();
+          document.execCommand('formatBlock', false, b.getAttribute('data-block'));
+          sync();
+        });
+      });
+
+      var srcBtn = $('.tred-source', form);
+      if (srcBtn) {
+        srcBtn.addEventListener('click', function () {
+          if (wrap.classList.contains('ed--source')) {
+            area.innerHTML = src.value;
+            wrap.classList.remove('ed--source');
+            srcBtn.classList.remove('on');
+          } else {
+            sync();
+            src.value = prettyHtml(src.value);
+            wrap.classList.add('ed--source');
+            srcBtn.classList.add('on');
+          }
+        });
       }
 
-      var body = new FormData();
-      body.append('a', 'translate.machine');
-      body.append('fmt', 'json');
-      body.append('csrf', form.querySelector('[name=csrf]').value);
-      body.append('src_id', form.querySelector('[name=src_id]').value);
-      body.append('to', form.querySelector('[name=to]').value);
+      /* --- gepi nyersforditas erre a nyelvre --- */
+      var btn = $('.tr-machine', form);
+      if (!btn) { return; }
+      btn.addEventListener('click', function () {
+        function run() {
+          var body = new FormData();
+          body.append('a', 'translate.machine');
+          body.append('fmt', 'json');
+          body.append('csrf', form.querySelector('[name=csrf]').value);
+          body.append('src_id', form.querySelector('[name=src_id]').value);
+          body.append('to', form.querySelector('[name=to]').value);
 
-      var old = btn.textContent;
-      btn.disabled = true;
-      btn.textContent = 'Fordítás folyamatban…';
+          var old = btn.textContent;
+          btn.disabled = true;
+          btn.textContent = 'Fordítás folyamatban…';
 
-      fetch('admin.php', { method: 'POST', body: body })
-        .then(function (r) { return r.json(); })
-        .then(function (d) {
-          if (!d.ok) { throw new Error(d.error || 'Ismeretlen hiba.'); }
-          if (area) { area.innerHTML = d.html; }
-          if (src) { src.value = d.html; }
-          if (title && d.title) { title.value = d.title; }
-          var how = $('#tr-how'); if (how) { how.value = 'machine'; }
-          toast('Kész — ' + d.provider + '. Nézd át, javítsd, majd mentsd.');
-        })
-        .catch(function (e) { toast('Nem sikerült: ' + e.message, 'err'); })
-        .finally(function () { btn.disabled = false; btn.textContent = old; });
+          fetch('admin.php', { method: 'POST', body: body })
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+              if (!d.ok) { throw new Error(d.error || 'Ismeretlen hiba.'); }
+              area.innerHTML = d.html;
+              src.value = d.html;
+              if (title && d.title) { title.value = d.title; }
+              if (how) { how.value = 'machine'; }
+              toast('Kész — ' + d.provider + '. Nézd át, javítsd, majd mentsd.');
+            })
+            .catch(function (e) { toast('Nem sikerült: ' + e.message, 'err'); })
+            .finally(function () { btn.disabled = false; btn.textContent = old; });
+        }
+
+        if (area.textContent.trim() !== '') {
+          askConfirm('A jelenlegi ' + (form.getAttribute('data-tr-lang') || '').toUpperCase()
+                   + ' fordítás felülíródik a gépi nyersfordítással. Folytatod?',
+                     run, 'Gépi nyersfordítás');
+          return;
+        }
+        run();
+      });
     });
   }
-
 
   /* ---------------------------------------------------------- tömeges kijelölés */
   function wireBulk() {
@@ -1802,6 +1906,7 @@
     var tb = $('#theme-toggle');
     if (tb) { tb.addEventListener('click', function () { applyTheme(isDark() ? 'light' : 'dark'); }); }
 
+    wireFlash();
     wireConfirmForms();
     wirePickerFold();
     wireModals();

@@ -278,10 +278,10 @@ function page_translate(PDO $db, array $cfg, int $srcId, string $to, array $coun
 
   <div class="panel" style="margin-bottom:14px"><div class="panel__b" style="display:flex;gap:14px;flex-wrap:wrap;align-items:center">
     <div>
-      <span class="lbl" style="display:inline">Célnyelv:</span>
-      <?php foreach (['en', 'de'] as $code): ?>
+      <span class="lbl" style="display:inline">A lista állapota eszerint:</span>
+      <?php foreach (array_keys(admin_target_langs()) as $code): ?>
         <a class="btn btn--sm <?= $to === $code ? 'btn--p' : '' ?>"
-           href="<?= h(admin_url(['p' => 'translate', 'to' => $code] + ($srcId ? ['src' => $srcId] : []))) ?>">
+           href="<?= h(admin_url(['p' => 'translate', 'to' => $code, 'st' => $state] + ($srcId ? ['src' => $srcId] : []))) ?>">
           <?= h(ADMIN_LANGS[$code]) ?></a>
       <?php endforeach; ?>
     </div>
@@ -334,82 +334,88 @@ function page_translate(PDO $db, array $cfg, int $srcId, string $to, array $coun
     <div>
       <?php if (!$src): ?>
         <div class="panel"><div class="empty">Válassz egy fejezetet a bal oldali listából.</div></div>
-      <?php else:
-        $targetBody = $target
-            ? (string)($target['draft_html'] ?? $target['body_html'])
-            : '';
-        $targetTitle = $target ? (string)($target['draft_title'] ?? $target['title']) : '';
-        $isStale = $target && $target['translated_from_hash'] !== $src['content_hash'];
-      ?>
-        <?php if ($target && $isStale): ?>
-          <div class="msg msg--warn"><b>A magyar változat módosult a fordítás óta.</b>
-            Érdemes átnézni, mi változott, és frissíteni ezt a nyelvet is.</div>
-        <?php elseif (!$target): ?>
-          <div class="msg msg--info"><b>Ehhez a fejezethez még nincs <?= h(ADMIN_LANGS[$to]) ?> változat.</b>
-            Mentéskor létrejön, ugyanazzal az URL-azonosítóval.</div>
-        <?php endif; ?>
+      <?php else: ?>
+        <?php
+        // MINDEN celnyelv egy oldalon. Uj nyelv felvetele az ADMIN_LANGS-ban
+        // eleg - itt magatol megjelenik egy uj oszlop.
+        $targets = [];
+        foreach (array_keys(admin_target_langs()) as $code) {
+            $row = null;
+            if ((string)$src['chapter_no'] !== '') {
+                $q = $db->prepare('SELECT * FROM help_article WHERE chapter_no = ? AND lang = ? LIMIT 1');
+                $q->execute([$src['chapter_no'], $code]);
+                $row = $q->fetch() ?: null;
+            }
+            if (!$row) {
+                $q = $db->prepare('SELECT * FROM help_article WHERE slug = ? AND lang = ? LIMIT 1');
+                $q->execute([$src['slug'], $code]);
+                $row = $q->fetch() ?: null;
+            }
+            $targets[$code] = $row;
+        }
+        ?>
 
-        <form method="post" action="<?= h(admin_url()) ?>" id="tr-form">
-          <?= csrf_input() ?>
-          <input type="hidden" name="a" value="translate.save">
-          <input type="hidden" name="src_id" value="<?= (int)$src['id'] ?>">
-          <input type="hidden" name="to" value="<?= h($to) ?>">
-          <input type="hidden" name="how" id="tr-how" value="manual">
-
-          <div class="tr-grid">
-            <!-- forrás -->
-            <?php
-            // A forrast a LEGFRISSEBB allapotaban mutatjuk: ha van meg kozze
-            // nem tett vazlat, azt - kulonben egy frissen megirt, de meg nem
-            // publikalt fejezet uresen latszott itt, es nem volt mit forditani.
-            $srcDraft  = $src['draft_html'] !== null && trim(help_plain((string)$src['draft_html'])) !== '';
-            $srcBody   = $srcDraft ? (string)$src['draft_html'] : (string)$src['body_html'];
-            $srcTitle  = $srcDraft && (string)($src['draft_title'] ?? '') !== ''
-                       ? (string)$src['draft_title'] : (string)$src['title'];
-            $srcEmpty  = trim(help_plain($srcBody)) === '';
-            ?>
-            <div class="panel">
-              <div class="panel__h"><h2>Magyar (forrás)</h2><span class="sp"></span>
-                <?php if ($srcDraft): ?><span class="badge badge--warn">vázlat</span><?php endif; ?>
-                <span class="badge"><?= h($src['chapter_no']) ?></span></div>
-              <div class="panel__b">
-                <?php if ($srcDraft): ?>
-                  <div class="msg msg--warn" style="margin:0 0 10px">
-                    A magyar fejezeten <b>közzétételre váró vázlat</b> van — itt ezt látod, mert ez a
-                    legfrissebb szöveg. A fordítást is erről érdemes készíteni.
-                  </div>
-                <?php elseif ($srcEmpty): ?>
-                  <div class="msg msg--info" style="margin:0 0 10px">
-                    Ennek a fejezetnek <b>még nincs tartalma</b> magyarul — előbb írd meg a
-                    <a href="<?= h(admin_url(['p' => 'articles', 'lang' => 'hu', 'id' => $src['id']])) ?>">Fejezetek</a>
-                    fülön.
-                  </div>
-                <?php endif; ?>
-                <div class="field"><label>Cím</label>
-                  <input class="inp" value="<?= h($srcTitle) ?>" readonly></div>
-                <div class="tr-src body"><?= fix_img_url($srcBody) ?></div>
-              </div>
+        <div class="tr-grid tr-grid--multi" style="--tr-cols: <?= count($targets) + 1 ?>">
+          <!-- forrás -->
+          <?php
+          $srcDraft  = $src['draft_html'] !== null && trim(help_plain((string)$src['draft_html'])) !== '';
+          $srcBody   = $srcDraft ? (string)$src['draft_html'] : (string)$src['body_html'];
+          $srcTitle  = $srcDraft && (string)($src['draft_title'] ?? '') !== ''
+                     ? (string)$src['draft_title'] : (string)$src['title'];
+          $srcEmpty  = trim(help_plain($srcBody)) === '';
+          ?>
+          <div class="panel tr-col tr-col--src">
+            <div class="panel__h"><h2><?= h(ADMIN_LANGS[admin_source_lang()]) ?> (forrás)</h2><span class="sp"></span>
+              <?php if ($srcDraft): ?><span class="badge badge--warn">vázlat</span><?php endif; ?>
+              <span class="badge"><?= h($src['chapter_no']) ?></span></div>
+            <div class="panel__b">
+              <?php if ($srcDraft): ?>
+                <div class="msg msg--warn" style="margin:0 0 10px">
+                  A magyar fejezeten <b>közzétételre váró vázlat</b> van — itt ezt látod, mert ez a
+                  legfrissebb szöveg.
+                </div>
+              <?php elseif ($srcEmpty): ?>
+                <div class="msg msg--info" style="margin:0 0 10px">
+                  Ennek a fejezetnek <b>még nincs tartalma</b> magyarul — előbb írd meg a
+                  <a href="<?= h(admin_url(['p' => 'articles', 'lang' => admin_source_lang(), 'id' => $src['id']])) ?>">Fejezetek</a>
+                  fülön.
+                </div>
+              <?php endif; ?>
+              <div class="field"><label>Cím</label>
+                <input class="inp" value="<?= h($srcTitle) ?>" readonly></div>
+              <div class="tr-src body"><?= fix_img_url($srcBody) ?></div>
             </div>
+          </div>
 
-            <!-- cél -->
-            <div class="panel">
-              <div class="panel__h"><h2><?= h(ADMIN_LANGS[$to]) ?> (fordítás)</h2><span class="sp"></span>
-                <button class="btn btn--sm" type="button" id="tr-machine"
+          <!-- célnyelvek -->
+          <?php foreach ($targets as $code => $row):
+              $tBody  = $row ? (string)($row['draft_html'] ?? $row['body_html']) : '';
+              $tTitle = $row ? (string)($row['draft_title'] ?? $row['title']) : '';
+              $stale  = $row && $row['translated_from_hash'] !== $src['content_hash'];
+          ?>
+            <form class="panel tr-col" method="post" action="<?= h(admin_url()) ?>"
+                  data-tr-lang="<?= h($code) ?>">
+              <?= csrf_input() ?>
+              <input type="hidden" name="a" value="translate.save">
+              <input type="hidden" name="src_id" value="<?= (int)$src['id'] ?>">
+              <input type="hidden" name="to" value="<?= h($code) ?>">
+              <input type="hidden" name="how" class="tr-how" value="manual">
+
+              <div class="panel__h"><h2><?= h(ADMIN_LANGS[$code]) ?></h2><span class="sp"></span>
+                <?php if (!$row): ?><span class="badge badge--err">hiányzik</span>
+                <?php elseif ($stale): ?><span class="badge badge--warn">elavult</span>
+                <?php elseif ($row['draft_html'] !== null): ?><span class="badge badge--info">vázlat</span>
+                <?php else: ?><span class="badge badge--ok">naprakész</span><?php endif; ?>
+                <button class="btn btn--sm tr-machine" type="button" data-to="<?= h($code) ?>"
                         <?= $tr->isConfigured() ? '' : 'disabled title="Nincs beállítva gépi fordító"' ?>>
                   Gépi nyersfordítás
                 </button>
-                <?php /* Az urlap a lap aljan all: itt egy masik urlapon BELUL
-                         lennenk, az egymasba agyazott form pedig ervenytelen -
-                         a bongeszo eldobja, es a gomb a kulso urlapot kuldi be.
-                         A form attributum koti ossze a kettot. */ ?>
-                <button class="btn btn--sm" type="submit" form="tr-auto-form"
-                        <?= $tr->isConfigured() ? '' : 'disabled title="Nincs beállítva gépi fordító"' ?>
-                        title="Angol és német vázlat egyszerre">EN + DE egyben</button>
               </div>
+
               <div class="panel__b">
                 <div class="field"><label>Cím</label>
-                  <input class="inp" name="title" id="tr-title" value="<?= h($targetTitle) ?>"></div>
-                <div class="ed" id="ed">
+                  <input class="inp tr-title" name="title" value="<?= h($tTitle) ?>"></div>
+                <div class="tred">
                   <div class="ed-toolbar">
                     <button type="button" data-cmd="bold"><b>F</b></button>
                     <button type="button" data-cmd="italic"><i>D</i></button>
@@ -419,24 +425,33 @@ function page_translate(PDO $db, array $cfg, int $srcId, string $to, array $coun
                     <button type="button" data-cmd="insertUnorderedList">•</button>
                     <button type="button" data-cmd="insertOrderedList">1.</button>
                     <span class="sp"></span>
-                    <button type="button" id="ed-source">&lt;/&gt; HTML</button>
+                    <button type="button" class="tred-source">&lt;/&gt; HTML</button>
                   </div>
-                  <div class="ed-area body" id="ed-area" contenteditable="true" style="min-height:340px"><?= fix_img_url($targetBody) ?></div>
-                  <textarea class="ta ed-src" id="ed-src" name="body"></textarea>
+                  <div class="ed-area body tred-area" contenteditable="true"><?= fix_img_url($tBody) ?></div>
+                  <textarea class="ta ed-src tred-src" name="body"></textarea>
+                </div>
+
+                <div class="btnbar" style="margin-top:10px">
+                  <button class="btn btn--p btn--sm" type="submit">Mentés vázlatként</button>
+                  <label class="check"><input type="checkbox" name="publish_now"> közzététel is</label>
+                  <span style="flex:1"></span>
+                  <?php if ($row): ?>
+                    <a class="btn btn--sm btn--ghost"
+                       href="<?= h(admin_url(['p' => 'articles', 'lang' => $code, 'id' => $row['id']])) ?>">Megnyitás</a>
+                  <?php endif; ?>
                 </div>
               </div>
-            </div>
-          </div>
+            </form>
+          <?php endforeach; ?>
+        </div>
 
-          <div class="savebar">
-            <button class="btn btn--p" type="submit">Fordítás mentése vázlatként</button>
-            <label class="check"><input type="checkbox" name="publish_now"> Mentés után közzététel is</label>
-            <span style="flex:1"></span>
-            <?php if ($target): ?>
-              <a class="btn btn--sm" href="<?= h(admin_url(['p' => 'articles', 'lang' => $to, 'id' => $target['id']])) ?>">Megnyitás a Fejezetek fülön</a>
-            <?php endif; ?>
-          </div>
-        </form>
+        <div class="btnbar" style="margin-top:12px">
+          <button class="btn" type="submit" form="tr-auto-form"
+                  <?= $tr->isConfigured() ? '' : 'disabled title="Nincs beállítva gépi fordító"' ?>>
+            Gépi nyersfordítás <b>mindegyik nyelvre</b>
+          </button>
+          <span class="muted">A gépi fordítás mindig vázlatot készít — közzétenni külön kell.</span>
+        </div>
 
 <form method="post" action="<?= h(admin_url()) ?>" id="tr-auto-form">
   <?= csrf_input() ?>

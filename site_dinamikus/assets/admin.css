@@ -236,6 +236,10 @@ p.lead { margin: 0 0 18px; color: var(--ink-3); font-size: calc(13.4px * var(--f
   color: var(--ink);
 }
 
+/* A hidden attributumot a .btn sajat display szabalya felulirna, ezert a
+   rejtett gomb uresen ottmaradt a megerosito ablakban. */
+[hidden] { display: none !important; }
+
 .ed-toolbar {
   display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 6px 8px;
   background: var(--surface-2); border: 1px solid var(--line); border-bottom: 0;
@@ -380,9 +384,37 @@ p.lead { margin: 0 0 18px; color: var(--ink-3); font-size: calc(13.4px * var(--f
 /* ---------- fordítás: két hasáb ---------- */
 .tr-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
 @media (max-width: 1100px) { .tr-grid { grid-template-columns: minmax(0, 1fr); } }
+
+/* --- több célnyelv egymás mellett ---
+   Minden hasáb UGYANOLYAN magas, és belül görget. E nélkül a hosszú forrás
+   felnyújtotta az egészet, a rövid fordítás mellett pedig üres sáv maradt. */
+.tr-grid--multi {
+  grid-template-columns: repeat(var(--tr-cols, 3), minmax(300px, 1fr));
+  align-items: stretch;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+.tr-col {
+  display: flex; flex-direction: column; min-width: 0;
+  /* a hasáb nem nyúlik a tartalommal: belül görget, így a három nyelv
+     egymás mellett marad, és nem kell a lap aljáig tekerni */
+  max-height: calc(100vh - 210px); min-height: 420px;
+}
+.tr-col > .panel__b { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.tr-col .tred { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.tr-col .tred-area { flex: 1; overflow: auto; }
+/* a forrás marad szem előtt, miközben a fordítást írod */
+.tr-col--src { position: sticky; left: 0; z-index: 2; }
+
+@media (max-width: 1200px) {
+  .tr-grid--multi { grid-template-columns: minmax(0, 1fr); }
+  .tr-col--src { position: static; }
+}
+
 .tr-src {
   padding: 18px 20px; background: var(--surface-2); border: 1px solid var(--line);
-  border-radius: var(--r); max-height: 66vh; overflow: auto; font-size: calc(14.4px * var(--fs));
+  border-radius: var(--r); flex: 1; min-height: 200px;
+  overflow: auto; font-size: calc(14.4px * var(--fs));
 }
 .tr-src img { max-width: 100%; border: 1px solid var(--line); border-radius: 4px; }
 
