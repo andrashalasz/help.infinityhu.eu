@@ -285,6 +285,7 @@ function ui_default(string $key = ''): string|array
         'lathato.mind'      => 'Minden nyelven',
 
         // --- fofejezet-leiras ---
+        'fofejezet.leiras.kerdes' => 'Létrehozzam a(z) „{nev}” főfejezet leírását? Üres fejezetként jön létre, a címét és a szövegét a szerkesztőben írod meg.',
         'fofejezet.leiras.nincs' => 'Ehhez a főfejezethez még nincs leírás — kattints, és megírhatod, mire való',
         'fofejezet.leiras.nyit'  => 'A főfejezet leírása: mire való ez a menüpont',
     ];

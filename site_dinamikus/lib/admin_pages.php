@@ -447,12 +447,16 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
               <?php if ($intro['has_draft']): ?><span class="dot dot--draft" title="Van közzétételre váró vázlat"></span><?php endif; ?>
             </a>
           <?php else: ?>
-            <button type="button" class="picker__mt picker__mt--miss"
-                    data-new-in="<?= (int)$m['id'] ?>" data-new-no="<?= h($m['chapter_no']) ?>"
+            <button type="button" class="picker__mt picker__mt--miss" data-fold="<?= (int)$m['id'] ?>"
                     title="<?= h(t('fofejezet.leiras.nincs')) ?>">
               <span><?= h($m['chapter_no']) ?> <?= h($m['title']) ?></span>
-              <span class="picker__miss"><?= h(t('nincs leírás')) ?></span>
             </button>
+            <?php // A cimre kattintas csak nyit/csuk - letrehozni CSAK ezzel a
+                  // jelzessel lehet, hogy velatlenul ne szulessen nevtelen fejezet. ?>
+            <button type="button" class="picker__miss"
+                    data-new-in="<?= (int)$m['id'] ?>" data-new-no="<?= h($m['chapter_no']) ?>"
+                    data-confirm-new="<?= h(t('fofejezet.leiras.kerdes', ['nev' => $m['chapter_no'] . ' ' . $m['title']])) ?>"
+                    title="<?= h(t('fofejezet.leiras.nincs')) ?>"><?= h(t('nincs leírás')) ?></button>
           <?php endif; ?>
           <?= visibility_form('module', (int)$m['id'], (bool)$m['is_published'], $lang,
                               $m['chapter_no'] . ' ' . $m['title']) ?>

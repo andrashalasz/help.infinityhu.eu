@@ -284,6 +284,16 @@
           no = (opt && opt.getAttribute('data-next')) || '';
         }
 
+        // Ahol egy kattintas konnyen elteveszthetö (pl. a fofejezet
+        // "nincs leiras" jelzese), ott elobb rakerdezunk - kulonben egy
+        // felrekattintasbol nevtelen fejezet szuletik.
+        var ask = b.getAttribute('data-confirm-new');
+        if (ask && b.dataset.confirmed !== '1') {
+          askConfirm(ask, function () { b.dataset.confirmed = '1'; b.click(); },
+                     b.getAttribute('title') || '', { danger: false });
+          return;
+        }
+
         b.disabled = true;
         var f = document.createElement('form');
         f.method = 'post';

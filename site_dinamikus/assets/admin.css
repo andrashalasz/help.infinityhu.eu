@@ -66,7 +66,13 @@ body.admin { background: var(--bg); }
    (A nyilvanos sugonak marad a szuk hasabja - ott olvasni kell.) */
 .page { max-width: none; margin: 0; padding: 18px; }
 
-.page--split { display: grid; grid-template-columns: 330px minmax(0, 1fr); gap: 16px; align-items: start; }
+/* A bal lista az ablakkal egyutt no: 340px-tol indul, es a szelesseg
+   30%-aig nyulik. Igy kisebb ablakban marad hely a szerkesztonek, nagyban
+   viszont a hosszu fejezetcimek is kiferjenek. */
+.page--split {
+  display: grid; grid-template-columns: clamp(340px, 30vw, 470px) minmax(0, 1fr);
+  gap: 16px; align-items: start;
+}
 @media (max-width: 980px) { .page--split { grid-template-columns: minmax(0, 1fr); } }
 
 .panel {
@@ -160,12 +166,12 @@ p.lead { margin: 0 0 18px; color: var(--ink-3); font-size: calc(13.4px * var(--f
 .badge--info { background: var(--info-soft); color: var(--brand-strong); }
 
 /* ---------- fejezetválasztó (bal oldali lista) ---------- */
-.picker { display: flex; flex-direction: column; max-height: calc(100vh - 150px); }
+.picker { display: flex; flex-direction: column; max-height: calc(100vh - 118px); }
 .picker__f { padding: 10px; border-bottom: 1px solid var(--line-soft); display: flex; gap: 8px; }
 .picker__l { overflow-y: auto; padding: 6px; }
 .picker__m {
-  padding: 8px 10px 4px; font-size: calc(11.4px * var(--fs)); font-weight: 800;
-  color: var(--ink-3); text-transform: uppercase; letter-spacing: .6px;
+  padding: 10px 10px 5px; font-size: calc(12.2px * var(--fs)); font-weight: 800;
+  color: var(--ink-3); text-transform: uppercase; letter-spacing: .5px;
 }
 .picker__m { display: flex; align-items: center; gap: 6px; }
 .picker__mt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -210,11 +216,16 @@ p.lead { margin: 0 0 18px; color: var(--ink-3); font-size: calc(13.4px * var(--f
 .picker__mt:hover, .picker__mt.on { color: var(--brand-strong); text-decoration: none; }
 a.picker__mt:hover { text-decoration: none; }
 /* Aminek meg nincs leirasa: halvany jelzes, kattintasra letrejon. */
+/* Ez GOMB: ra kattintva jon letre a fofejezet leirasa (elotte megkerdezi).
+   A cimre kattintas csak nyit/csuk, hogy felrekattintasbol ne szulessen
+   nevtelen fejezet. */
 .picker__miss {
   flex: none; font-size: 9.5px; font-weight: 700; letter-spacing: .4px;
-  padding: 1px 5px; border-radius: 100px; text-transform: none;
+  padding: 2px 7px; border-radius: 100px; text-transform: none; cursor: pointer;
   background: var(--warn-soft, var(--surface-3)); color: var(--ink-3);
+  border: 1px dashed var(--line);
 }
+.picker__miss:hover { color: var(--brand-strong); border-color: var(--brand-ring); }
 .picker__mt--miss { color: var(--ink-3); }
 .picker__mt span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .picker__caret { flex: none; color: var(--ink-3); transition: transform .16s; }
@@ -222,8 +233,8 @@ a.picker__mt:hover { text-decoration: none; }
 
 /* --- alfejezetek behúzása (1.3 alatt az 1.3.1) ---
    A d1/d2 egy vonalban marad, csak a valódi alfejezet csúszik beljebb. */
-.picker__row--d3 .picker__a { padding-left: 22px; font-size: calc(12.4px * var(--fs)); }
-.picker__row--d4 .picker__a { padding-left: 36px; font-size: calc(12.4px * var(--fs)); }
+.picker__row--d3 .picker__a { padding-left: 24px; font-size: calc(13.2px * var(--fs)); }
+.picker__row--d4 .picker__a { padding-left: 40px; font-size: calc(13.2px * var(--fs)); }
 
 /* a soron levő "+" csak rámutatáskor látszik, hogy ne zajosítsa a listát */
 .picker__radd { opacity: 0; }
@@ -253,8 +264,8 @@ a.picker__mt:hover { text-decoration: none; }
 }
 .picker__newx:hover { color: var(--err); }
 .picker__a {
-  display: flex; align-items: baseline; gap: 7px; padding: 6px 10px; border-radius: var(--r-sm);
-  color: var(--ink-2); font-size: calc(12.9px * var(--fs)); line-height: 1.4;
+  display: flex; align-items: baseline; gap: 8px; padding: 7px 10px; border-radius: var(--r-sm);
+  color: var(--ink-2); font-size: calc(13.8px * var(--fs)); line-height: 1.45;
 }
 .picker__a:hover { background: var(--surface-2); color: var(--ink); text-decoration: none; }
 .picker__a.on { background: var(--brand-soft); color: var(--brand-strong); font-weight: 600; box-shadow: inset 2px 0 0 var(--brand); }
@@ -782,12 +793,17 @@ a.stat:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 .ed-area img::selection { background: transparent; }
 
 /* Nagy kepernyon a bal lista is szelesebb, hogy a hosszu fejezetcimek
-   kiferjenek, es ne csak a szerkeszto kapja meg a teljes teret. */
+   kiferjenek, es ne csak a szerkeszto kapja meg a teljes teret. A
+   fejezetcim a munka kozben ugyanolyan fontos, mint maga a szoveg:
+   ebben a listaban kell megtalalni, hova irunk. */
+@media (min-width: 1500px) {
+  .page--split { grid-template-columns: 470px minmax(0, 1fr); }
+}
 @media (min-width: 1800px) {
-  .page--split { grid-template-columns: 420px minmax(0, 1fr); }
+  .page--split { grid-template-columns: 540px minmax(0, 1fr); }
 }
 @media (min-width: 2400px) {
-  .page--split { grid-template-columns: 480px minmax(0, 1fr); }
+  .page--split { grid-template-columns: 620px minmax(0, 1fr); }
 }
 
 /* felület-nyelv váltó a fejlécben */
