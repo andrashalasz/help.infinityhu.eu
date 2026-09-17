@@ -40,7 +40,7 @@ body.admin { background: var(--bg); --fs: 1.1; }
   position: sticky; top: 0; z-index: 60; display: flex; align-items: center; gap: 10px;
   height: 52px; padding: 0 14px; background: var(--shell); color: var(--shell-ink);
 }
-.ashell__brand { display: flex; align-items: center; gap: 9px; color: inherit; font-weight: 600; }
+.ashell__brand { display: flex; align-items: center; gap: 9px; color: inherit; font-weight: 600; white-space: nowrap; flex: none; }
 .ashell__brand:hover { text-decoration: none; }
 .ashell__logo { display: grid; place-items: center; flex: none; }
 .ashell__tag {
@@ -79,31 +79,32 @@ body.admin { background: var(--bg); --fs: 1.1; }
 /* A bal lista szelesseget a FELHASZNALO allitja be: a ket hasab kozotti
    elvalasztot huzva. Amit beallit, azt a bongeszo megjegyzi (--picker-w).
    Amig nem nyul hozza, az alapertek az ablakkal egyutt no. */
+:root { --picker-def: clamp(380px, 32vw, 560px); }
 .page--split {
-  display: grid;
-  grid-template-columns: var(--picker-w, clamp(380px, 32vw, 560px)) minmax(0, 1fr);
+  position: relative;
+  display: grid; grid-template-columns: var(--picker-w, var(--picker-def)) minmax(0, 1fr);
   gap: 16px; align-items: start;
 }
-/* Ahol van huzhato elvalaszto, ott harom sav van: lista | fogo | tartalom. */
-.page--split:has(> .splitter) {
-  grid-template-columns: var(--picker-w, clamp(380px, 32vw, 560px)) 10px minmax(0, 1fr);
-  gap: 6px;
-}
+/* A fogo NEM sajat racssav, hanem lebego elem a ket hasab hataran. Sajat
+   savban ugyanis harom gyereke lett a racsnak: ha barmiert ket savra
+   csuszott vissza az elrendezes, a fogo egesz szelesseguve nyult, es egy
+   nagy szurke folt allt a lista alatt. Lebegve ez nem tortenhet meg. */
 .splitter {
-  align-self: stretch; min-height: 240px; position: relative;
-  cursor: col-resize; border-radius: 100px; background: transparent;
-  transition: background .12s;
+  position: absolute; top: 0; bottom: 0; width: 16px; z-index: 5;
+  left: var(--picker-w, var(--picker-def));
+  cursor: col-resize; background: none; border: 0; padding: 0;
 }
 .splitter::before {
-  content: ''; position: absolute; inset: 0 4px; border-radius: 100px;
-  background: var(--line-soft);
+  content: ''; position: absolute; top: 0; bottom: 0; left: 6px;
+  width: 4px; border-radius: 100px; background: var(--line-soft);
+  transition: background .12s;
 }
 .splitter:hover::before, .splitter.drag::before { background: var(--brand-ring); }
 .splitter:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
 /* huzas kozben ne jeloljon ki szoveget a lap */
 body.splitting, body.splitting * { user-select: none !important; cursor: col-resize !important; }
 @media (max-width: 980px) {
-  .page--split, .page--split:has(> .splitter) { grid-template-columns: minmax(0, 1fr); }
+  .page--split { grid-template-columns: minmax(0, 1fr); }
   .splitter { display: none; }
 }
 
@@ -389,14 +390,19 @@ a.picker__mt:hover { text-decoration: none; }
 .ed-pop__b .ed-car { position: absolute; right: 1px; bottom: 1px; font-size: 8px; color: var(--ink-3); }
 .ed-pop__m {
   display: none; position: absolute; top: calc(100% + 6px); left: 0; z-index: 40;
-  min-width: 228px; padding: 10px; background: var(--surface);
+  min-width: 253px; padding: 10px; background: var(--surface);
   border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow-3);
 }
 .ed-pop__m.open { display: block; }
 .ed-pop__t { font-size: 11.5px; font-weight: 600; color: var(--ink-3); margin: 0 0 6px; text-transform: uppercase; letter-spacing: .3px; }
-/* A szinsor egy sorban fer ki (7 kocka), hogy egy pillantassal atlathato
-   legyen - toredezve nehezebb megtalalni a keresett szint. */
+/* A szinpaletta a Wordbol ismeros racs: 10 oszlop, egy oszlopban egy szin
+   csaladja (vilagosabb es sotetebb arnyalatok). */
 .ed-sw { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.ed-sw--grid { display: grid; grid-template-columns: repeat(10, 20px); gap: 3px; }
+.ed-sw--grid .sw {
+  width: 20px !important; min-width: 20px !important; height: 20px !important;
+  border-radius: 3px; box-shadow: none;
+}
 .ed-sw .sw {
   width: 24px !important; min-width: 24px !important; height: 24px !important; padding: 0 !important;
   border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent) !important;
@@ -846,14 +852,11 @@ a.stat:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
    kiferjenek, es ne csak a szerkeszto kapja meg a teljes teret. A
    fejezetcim a munka kozben ugyanolyan fontos, mint maga a szoveg:
    ebben a listaban kell megtalalni, hova irunk. */
+/* Nagy kepernyon az alapszelesseg is nagyobb. A --picker-def-et allitjuk,
+   igy a racs es a fogo helye egyszerre koveti (mindketto ugyanabbol szamol). */
 @media (min-width: 1500px) { :root { --picker-def: 560px; } }
 @media (min-width: 1800px) { :root { --picker-def: 640px; } }
 @media (min-width: 2400px) { :root { --picker-def: 740px; } }
-@media (min-width: 1500px) {
-  .page--split,
-  .page--split:has(> .splitter) { grid-template-columns: var(--picker-w, var(--picker-def)) 10px minmax(0, 1fr); }
-  .page--split:not(:has(> .splitter)) { grid-template-columns: var(--picker-w, var(--picker-def)) minmax(0, 1fr); }
-}
 
 /* felület-nyelv váltó a fejlécben */
 .sbtn--sel {

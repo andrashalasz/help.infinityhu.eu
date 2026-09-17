@@ -12,24 +12,64 @@
 declare(strict_types=1);
 
 /**
- * A szerkesztoben kinalt betuszinek. A kimenetet a help_clean_style() ugyis
- * ellenorzi, ez csak a kinalat.
+ * A betuszin-paletta, a Wordbol ismeros elrendezesben.
  *
- * @return array<string,string> hex => nev
+ * Felso sor: az alapszinek. Alatta negy sor ugyanazokbol vilagosabb es
+ * sotetebb arnyalat (a vilagosabbak feherrel, a sotetebbek feketevel
+ * keverve) - igy egy oszlopban egyutt all egy szin csaladja, es nem kell
+ * hatszamokkal bajlodni. Legalul a Word "standard szinei".
+ *
+ * A kimenetet a help_clean_style() ugyis ellenorzi, ez csak a kinalat.
+ *
+ * @return array<int, array<int, string>> sorok, soronkent 10 hexkod
  */
-function editor_colors(): array
+function editor_palette(): array
 {
-    return [
-        '#1f2a36' => 'Alap',    '#0a6ed1' => 'Kék',   '#107e3e' => 'Zöld',
-        '#b8681a' => 'Narancs', '#bb0000' => 'Piros', '#6b21a8' => 'Lila',
-        '#6b7a8d' => 'Szürke',
-    ];
+    // Az oszlopok alapszinei (Word "theme colors")
+    $base = ['#ffffff', '#000000', '#e7e6e6', '#44546a', '#4472c4',
+             '#ed7d31', '#a5a5a5', '#ffc000', '#5b9bd5', '#70ad47'];
+
+    /** Kever ket szint: $t = 0 -> $hex, 1 -> $with */
+    $mix = static function (string $hex, string $with, float $t): string {
+        $a = sscanf($hex,  '#%02x%02x%02x');
+        $b = sscanf($with, '#%02x%02x%02x');
+        return sprintf('#%02x%02x%02x',
+            (int)round($a[0] + ($b[0] - $a[0]) * $t),
+            (int)round($a[1] + ($b[1] - $a[1]) * $t),
+            (int)round($a[2] + ($b[2] - $a[2]) * $t));
+    };
+
+    $rows = [$base];
+    // A feher oszlopot sotetiteni kell, a feketet vilagositani - kulonben
+    // ket oszlop vegig egyszinu maradna.
+    foreach ([0.8, 0.6, 0.4, 0.15] as $i => $t) {
+        $row = [];
+        foreach ($base as $c) {
+            $light = $c === '#ffffff';
+            $dark  = $c === '#000000';
+            $row[] = $light || (!$dark && $i >= 2)
+                ? $mix($c, '#000000', $light ? [0.05, 0.15, 0.25, 0.35][$i] : (1 - $t) * 0.9)
+                : $mix($c, '#ffffff', $dark ? [0.85, 0.65, 0.5, 0.35][$i] : $t);
+        }
+        $rows[] = $row;
+    }
+
+    // Word "standard colors" - a legtobbszor ezekre van szukseg
+    $rows[] = ['#c00000', '#ff0000', '#ffc000', '#ffff00', '#92d050',
+               '#00b050', '#00b0f0', '#0070c0', '#002060', '#7030a0'];
+    return $rows;
 }
 
-/** A szovegkiemelo (hatterszin) szinei. @return array<string,string> */
+/** A szovegkiemelo (hatterszin) szinei - a Word kiemelo tollai. */
 function editor_marks(): array
 {
-    return ['#fff3a3' => 'Sárga', '#d6f2e0' => 'Zöld', '#fde2e2' => 'Piros', '#dceafd' => 'Kék'];
+    return [
+        '#ffff00' => 'Sárga',      '#00ff00' => 'Élénkzöld',  '#00ffff' => 'Türkiz',
+        '#ff00ff' => 'Rózsaszín',  '#0000ff' => 'Kék',        '#ff0000' => 'Piros',
+        '#000080' => 'Sötétkék',   '#008080' => 'Kékeszöld',  '#008000' => 'Zöld',
+        '#800080' => 'Lila',       '#800000' => 'Sötétvörös', '#808000' => 'Sötétsárga',
+        '#c0c0c0' => 'Szürke',     '#fff3a3' => 'Halvány sárga', '#dceafd' => 'Halvány kék',
+    ];
 }
 
 function editor_block(string $chapter, string $body): void
@@ -38,8 +78,8 @@ function editor_block(string $chapter, string $body): void
     // szerkeszto kikerult sajat fuggvenybe, a $edColors/$edMarks a hivo
     // hatokoreben maradt - a ket szinsor ures lett, es csak a "kiemeles
     // torlese" kocka latszott.
-    $edColors = editor_colors();
-    $edMarks  = editor_marks();
+    $edPalette = editor_palette();
+    $edMarks   = editor_marks();
     ?>
         <div class="ed" data-chapter="<?= h($chapter) ?>">
           <div class="ed-toolbar">
@@ -68,14 +108,14 @@ function editor_block(string $chapter, string $body): void
                 </button>
                 <div class="ed-pop__m" data-pop-menu="color">
                   <div class="ed-pop__t">Betűszín</div>
-                  <div class="ed-sw">
-                    <?php foreach ($edColors as $hex => $name): ?>
+                  <div class="ed-sw ed-sw--grid">
+                    <?php foreach ($edPalette as $row): foreach ($row as $hex): ?>
                       <button type="button" class="sw" data-color="<?= h($hex) ?>"
-                              style="background:<?= h($hex) ?>" title="<?= h($name) ?>"></button>
-                    <?php endforeach; ?>
+                              style="background:<?= h($hex) ?>" title="<?= h($hex) ?>"></button>
+                    <?php endforeach; endforeach; ?>
                   </div>
                   <div class="ed-pop__t">Kiemelés</div>
-                  <div class="ed-sw">
+                  <div class="ed-sw ed-sw--grid">
                     <?php foreach ($edMarks as $hex => $name): ?>
                       <button type="button" class="sw" data-mark="<?= h($hex) ?>"
                               style="background:<?= h($hex) ?>" title="<?= h($name) ?>"></button>

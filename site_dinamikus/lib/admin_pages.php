@@ -522,7 +522,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
           // egy korabbi javito szkriptem a pick-one osztalyt az INPUT-rol a
           // LABEL-re tette, igy a label.checked mindig undefined volt, es a
           // muveleti sav sosem jott elo. ?>
-
+  </div><?php // .picker ?>
 
   <!-- huzhato elvalaszto: a lista szelesseget a felhasznalo allitja be -->
   <div class="splitter" id="split-articles" role="separator" aria-orientation="vertical"
