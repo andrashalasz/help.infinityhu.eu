@@ -4,7 +4,17 @@
    itt csak az admin-specifikus elrendezés és vezérlők vannak.
    ============================================================ */
 
-body.admin { background: var(--bg); }
+/* A kezelofelulet alapmerete. Az admin 13px koruli meretekre epul (a
+   nyilvanos oldal 15px-re), ami nagy felbontasu kepernyon aprora sikerul;
+   ezert az alapszorzo itt 1.1, es a fejlecben A-/A+ gombbal allithato.
+   A JS ezt a body-n irja felul, es megjegyzi. */
+body.admin { background: var(--bg); --fs: 1.1; }
+
+/* betumeret-allito a fejlecben */
+.fsgrp { display: inline-flex; gap: 2px; flex: none; }
+.sbtn--fs { font-weight: 700; font-size: 13px; letter-spacing: -.5px; }
+.sbtn--fs span { font-size: 11px; margin-left: 1px; }
+@media (max-width: 760px) { .fsgrp { display: none; } }
 
 /* ---------- bejelentkezés ---------- */
 .login-wrap {
@@ -66,14 +76,36 @@ body.admin { background: var(--bg); }
    (A nyilvanos sugonak marad a szuk hasabja - ott olvasni kell.) */
 .page { max-width: none; margin: 0; padding: 18px; }
 
-/* A bal lista az ablakkal egyutt no: 340px-tol indul, es a szelesseg
-   30%-aig nyulik. Igy kisebb ablakban marad hely a szerkesztonek, nagyban
-   viszont a hosszu fejezetcimek is kiferjenek. */
+/* A bal lista szelesseget a FELHASZNALO allitja be: a ket hasab kozotti
+   elvalasztot huzva. Amit beallit, azt a bongeszo megjegyzi (--picker-w).
+   Amig nem nyul hozza, az alapertek az ablakkal egyutt no. */
 .page--split {
-  display: grid; grid-template-columns: clamp(340px, 30vw, 470px) minmax(0, 1fr);
+  display: grid;
+  grid-template-columns: var(--picker-w, clamp(380px, 32vw, 560px)) minmax(0, 1fr);
   gap: 16px; align-items: start;
 }
-@media (max-width: 980px) { .page--split { grid-template-columns: minmax(0, 1fr); } }
+/* Ahol van huzhato elvalaszto, ott harom sav van: lista | fogo | tartalom. */
+.page--split:has(> .splitter) {
+  grid-template-columns: var(--picker-w, clamp(380px, 32vw, 560px)) 10px minmax(0, 1fr);
+  gap: 6px;
+}
+.splitter {
+  align-self: stretch; min-height: 240px; position: relative;
+  cursor: col-resize; border-radius: 100px; background: transparent;
+  transition: background .12s;
+}
+.splitter::before {
+  content: ''; position: absolute; inset: 0 4px; border-radius: 100px;
+  background: var(--line-soft);
+}
+.splitter:hover::before, .splitter.drag::before { background: var(--brand-ring); }
+.splitter:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
+/* huzas kozben ne jeloljon ki szoveget a lap */
+body.splitting, body.splitting * { user-select: none !important; cursor: col-resize !important; }
+@media (max-width: 980px) {
+  .page--split, .page--split:has(> .splitter) { grid-template-columns: minmax(0, 1fr); }
+  .splitter { display: none; }
+}
 
 .panel {
   background: var(--surface); border: 1px solid var(--line);
@@ -796,14 +828,13 @@ a.stat:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
    kiferjenek, es ne csak a szerkeszto kapja meg a teljes teret. A
    fejezetcim a munka kozben ugyanolyan fontos, mint maga a szoveg:
    ebben a listaban kell megtalalni, hova irunk. */
+@media (min-width: 1500px) { :root { --picker-def: 560px; } }
+@media (min-width: 1800px) { :root { --picker-def: 640px; } }
+@media (min-width: 2400px) { :root { --picker-def: 740px; } }
 @media (min-width: 1500px) {
-  .page--split { grid-template-columns: 470px minmax(0, 1fr); }
-}
-@media (min-width: 1800px) {
-  .page--split { grid-template-columns: 540px minmax(0, 1fr); }
-}
-@media (min-width: 2400px) {
-  .page--split { grid-template-columns: 620px minmax(0, 1fr); }
+  .page--split,
+  .page--split:has(> .splitter) { grid-template-columns: var(--picker-w, var(--picker-def)) 10px minmax(0, 1fr); }
+  .page--split:not(:has(> .splitter)) { grid-template-columns: var(--picker-w, var(--picker-def)) minmax(0, 1fr); }
 }
 
 /* felület-nyelv váltó a fejlécben */

@@ -161,6 +161,106 @@
     }, true);
   }
 
+  /* ------------------------------------------- huzhato oszlop-elvalaszto
+     A bal lista szelessege izles es feladat kerdese: aki forditast olvas
+     ossze, annak szeles lista kell; aki hosszu fejezetet ir, annak keskeny.
+     Ezert nem mi talalgatunk meretet - a felhasznalo huzza be, es a
+     bongeszo megjegyzi. Dupla kattintas: vissza az alapertekre. */
+  function wireSplitter() {
+    var KEY = 'help.picker.w';
+    var sp  = document.querySelector('.splitter');
+    if (!sp) { return; }
+    var grid = sp.parentElement;
+
+    function apply(px) {
+      if (px === null) { grid.style.removeProperty('--picker-w'); return; }
+      grid.style.setProperty('--picker-w', px + 'px');
+    }
+    function bounds() {
+      // a lista legalabb 260px, de a tartalomnak is maradjon 380px
+      return { min: 260, max: Math.max(300, grid.clientWidth - 380) };
+    }
+
+    var saved = parseInt(LSget(KEY, ''), 10);
+    if (saved > 0) {
+      var b = bounds();
+      apply(Math.min(Math.max(saved, b.min), b.max));
+    }
+
+    function startDrag(startX) {
+      var b = bounds();
+      var left = grid.getBoundingClientRect().left;
+      document.body.classList.add('splitting');
+      sp.classList.add('drag');
+
+      function move(e) {
+        var x = (e.touches ? e.touches[0].clientX : e.clientX) - left;
+        x = Math.min(Math.max(Math.round(x), b.min), b.max);
+        apply(x);
+        LSset(KEY, String(x));
+      }
+      function end() {
+        document.body.classList.remove('splitting');
+        sp.classList.remove('drag');
+        document.removeEventListener('mousemove', move);
+        document.removeEventListener('mouseup', end);
+        document.removeEventListener('touchmove', move);
+        document.removeEventListener('touchend', end);
+      }
+      document.addEventListener('mousemove', move);
+      document.addEventListener('mouseup', end);
+      document.addEventListener('touchmove', move, { passive: true });
+      document.addEventListener('touchend', end);
+      if (startX !== undefined) { move({ clientX: startX }); }
+    }
+
+    sp.addEventListener('mousedown', function (e) { e.preventDefault(); startDrag(); });
+    sp.addEventListener('touchstart', function () { startDrag(); }, { passive: true });
+
+    // dupla kattintas: alaphelyzet
+    sp.addEventListener('dblclick', function () { apply(null); LSset(KEY, ''); });
+
+    // billentyuvel is allithato (a fogo fokuszalhato)
+    sp.addEventListener('keydown', function (e) {
+      var step = e.shiftKey ? 40 : 10;
+      var cur = parseInt(getComputedStyle(grid).gridTemplateColumns, 10) || 400;
+      var b = bounds();
+      if (e.key === 'ArrowLeft')  { e.preventDefault(); cur -= step; }
+      else if (e.key === 'ArrowRight') { e.preventDefault(); cur += step; }
+      else if (e.key === 'Home') { e.preventDefault(); apply(null); LSset(KEY, ''); return; }
+      else { return; }
+      cur = Math.min(Math.max(cur, b.min), b.max);
+      apply(cur);
+      LSset(KEY, String(cur));
+    });
+  }
+
+  /* ----------------------------------------- a kezelofelulet meretezese
+     Az admin 13px-es alapra epul (a nyilvanos oldal 15px-re), ami nagy
+     felbontasu kepernyon aprora sikerul - ezert allithato. A --fs szorzot
+     a body-n allitjuk, mert minden meret calc(...px * var(--fs)). */
+  function wireFontSize() {
+    var KEY = 'help.admin.fs', MIN = 0.85, MAX = 1.6, STEP = 0.05, DEF = 1.1;
+
+    function apply(v, save) {
+      v = Math.round(Math.min(Math.max(v, MIN), MAX) * 100) / 100;
+      document.body.style.setProperty('--fs', String(v));
+      if (save) { LSset(KEY, String(v)); }
+      return v;
+    }
+    var cur = parseFloat(LSget(KEY, '')) || DEF;
+    apply(cur, false);
+
+    function step(d) { cur = apply(cur + d, true); }
+    var down = document.querySelector('#fs-down'), up = document.querySelector('#fs-up');
+    if (down) { down.addEventListener('click', function () { step(-STEP); }); }
+    if (up)   { up.addEventListener('click',   function () { step(STEP); }); }
+    [down, up].forEach(function (b) {
+      if (!b) { return; }
+      b.addEventListener('dblclick', function () { cur = apply(DEF, true); });
+    });
+  }
+
   function wireConfirmForms() {
     document.addEventListener('submit', function (e) {
       var f = e.target;
@@ -1945,8 +2045,10 @@
     if (tb) { tb.addEventListener('click', function () { applyTheme(isDark() ? 'light' : 'dark'); }); }
 
     wireFlash();
+    wireFontSize();
     wireConfirmForms();
     wireScopeForms();
+    wireSplitter();
     wirePickerFold();
     wireModals();
     wireToggles();

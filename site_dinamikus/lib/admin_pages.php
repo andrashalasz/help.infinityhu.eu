@@ -527,6 +527,10 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
     </form>
   </div>
 
+  <!-- huzhato elvalaszto: a lista szelesseget a felhasznalo allitja be -->
+  <div class="splitter" id="split-articles" role="separator" aria-orientation="vertical"
+       tabindex="0" title="<?= h(t('splitter.cim')) ?>"></div>
+
   <!-- jobb: szerkesztő -->
   <div>
     <?= flash_render() ?>

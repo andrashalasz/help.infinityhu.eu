@@ -72,6 +72,9 @@ function page_releases(PDO $db, array $counts, int $showId = 0): void
       </div>
     </div>
 
+    <div class="splitter" role="separator" aria-orientation="vertical" tabindex="0"
+         title="<?= h(t('splitter.cim')) ?>"></div>
+
     <div>
       <?php if (!$shown): ?>
         <div class="panel"><div class="empty"><?= h(t('Válassz egy kiadást a bal oldali listából.')) ?></div></div>

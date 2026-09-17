@@ -131,6 +131,13 @@ function admin_head(string $title, string $page = '', array $counts = []): void
   </a>
   <button class="sbtn" id="theme-toggle" title="<?= h(t('head.theme')) ?>"></button>
 
+  <?php // A kezelofelulet merete: az admin 13px-es alapra epul, ami nagy
+        // felbontasu kepernyon aprora sikerul. Itt allithato, es megjegyzi. ?>
+  <span class="fsgrp">
+    <button class="sbtn sbtn--fs" id="fs-down" title="<?= h(t('head.fs.down')) ?>">A<span>−</span></button>
+    <button class="sbtn sbtn--fs" id="fs-up"   title="<?= h(t('head.fs.up')) ?>">A<span>+</span></button>
+  </span>
+
   <span class="ashell__user">
     <span class="ashell__av"><?= h(mb_strtoupper(mb_substr($u['display_name'], 0, 1))) ?></span>
     <span><?= h($u['display_name']) ?> · <?= h($u['role']) ?></span>
