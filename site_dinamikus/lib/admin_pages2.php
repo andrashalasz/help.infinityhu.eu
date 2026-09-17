@@ -934,6 +934,18 @@ function page_settings(PDO $db, array $cfg, array $counts): void
     } catch (Throwable $e) {
         // a 07_nyelvek.sql meg nem futott le
     }
+
+    // a kezelofelulet forditando szovegei
+    $uiKeys    = ui_default();
+    $uiTargets = admin_target_langs();
+    $uiText    = [];
+    try {
+        foreach ($db->query('SELECT ui_key, lang, text FROM help_ui')->fetchAll() as $r) {
+            $uiText[(string)$r['lang']][(string)$r['ui_key']] = (string)$r['text'];
+        }
+    } catch (Throwable $e) {
+        // a 08_felulet_forditas.sql meg nem futott le
+    }
     $tr = Translator::fromConfig($cfg, $db);
     $release = $db->query("SELECT * FROM help_release WHERE status = 'open' LIMIT 1")->fetch();
     $closed  = $db->query("SELECT * FROM help_release WHERE status = 'closed' ORDER BY released_at DESC LIMIT 5")->fetchAll();
@@ -1052,6 +1064,52 @@ function page_settings(PDO $db, array $cfg, array $counts): void
         így a formázás és a képek a helyükön maradnak. Gépi fordító nélkül is használható a Fordítás fül,
         csak a nyersfordítás gomb marad inaktív.
       </div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-bottom:16px">
+    <div class="panel__h"><h2>A kezelőfelület szövegei</h2><span class="sp"></span>
+      <span class="badge"><?= count($uiKeys) ?></span></div>
+    <div class="panel__b">
+      <p class="lead" style="margin-bottom:12px">
+        A bal oldali oszlop a forrásnyelvi (magyar) szöveg — ezt a kód adja, nem szerkeszthető.
+        Mellette nyelvenként beírhatod a fordítást. Amit üresen hagysz, az magyarul jelenik meg,
+        tehát a felület sosem marad felirat nélkül.
+        <br><span class="muted">A saját felületed nyelvét a fejlécben, a kódválasztóval állítod.</span>
+      </p>
+
+      <form method="post" action="<?= h(admin_url()) ?>">
+        <?= csrf_input() ?>
+        <input type="hidden" name="a" value="ui.save">
+        <table class="tbl">
+          <thead><tr>
+            <th style="width:220px">Kulcs</th>
+            <th>Magyar (forrás)</th>
+            <?php foreach ($uiTargets as $code => $label): ?>
+              <th><?= h($label) ?></th>
+            <?php endforeach; ?>
+          </tr></thead>
+          <tbody>
+          <?php foreach ($uiKeys as $key => $hu): ?>
+            <tr>
+              <td class="mono muted" data-label="Kulcs"><?= h($key) ?></td>
+              <td data-label="Magyar"><?= h($hu) ?></td>
+              <?php foreach ($uiTargets as $code => $label): ?>
+                <td data-label="<?= h($label) ?>">
+                  <input class="inp" name="ui[<?= h($code) ?>][<?= h($key) ?>]"
+                         value="<?= h($uiText[$code][$key] ?? '') ?>"
+                         placeholder="<?= h($hu) ?>">
+                </td>
+              <?php endforeach; ?>
+            </tr>
+          <?php endforeach; ?>
+          </tbody>
+        </table>
+        <div class="btnbar" style="margin-top:12px">
+          <button class="btn btn--p" type="submit">Szövegek mentése</button>
+          <span class="muted">Új nyelv felvételekor az oszlopa automatikusan megjelenik itt.</span>
+        </div>
+      </form>
     </div>
   </div>
 

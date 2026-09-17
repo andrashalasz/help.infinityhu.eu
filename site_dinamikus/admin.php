@@ -27,6 +27,7 @@ require __DIR__ . '/lib/media.php';
 require __DIR__ . '/lib/docx_export.php';
 require __DIR__ . '/lib/trash.php';
 require __DIR__ . '/lib/admin_layout.php';
+require __DIR__ . '/lib/admin_i18n.php';
 require __DIR__ . '/lib/admin_editor.php';
 require __DIR__ . '/lib/admin_releases.php';
 require __DIR__ . '/lib/admin_actions.php';

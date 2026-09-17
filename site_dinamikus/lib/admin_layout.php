@@ -4,17 +4,17 @@
  */
 declare(strict_types=1);
 
-const ADMIN_TABS = [
-    'dashboard' => 'Áttekintés',
-    'articles'  => 'Fejezetek',
-    'import'    => 'Word import',
-    'translate' => 'Fordítás',
-    'media'     => 'Képek, videók',
-    'releases'  => 'Kiadások',
-    'export'    => 'Export',
-    'users'     => 'Felhasználók',
-    'trash'     => 'Kuka',
-];
+/** A fulek sorrendje. A feliratuk a forditasbol jon: t('tab.<kulcs>'). */
+const ADMIN_TAB_KEYS = ['dashboard', 'articles', 'import', 'translate', 'media',
+                        'releases', 'export', 'users', 'trash'];
+
+/** Ful-kulcs => felirat az aktualis felulet-nyelven. */
+function admin_tabs(): array
+{
+    $out = [];
+    foreach (ADMIN_TAB_KEYS as $k) { $out[$k] = t('tab.' . $k); }
+    return $out;
+}
 
 /** A fulsavon kivul, a fejlec ikonjai kozott elerheto lapok. */
 const ADMIN_ICON_PAGES = ['settings' => 'Beállítások'];
@@ -129,15 +129,29 @@ function admin_head(string $title, string $page = '', array $counts = []): void
   <a class="sbtn" href="/hu/" target="_blank" rel="noopener" title="A súgó megnyitása új lapon">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6M10 14 21 3"/></svg>
   </a>
-  <button class="sbtn" id="theme-toggle" title="Világos / sötét téma"></button>
+  <button class="sbtn" id="theme-toggle" title="<?= h(t('head.theme')) ?>"></button>
 
   <span class="ashell__user">
     <span class="ashell__av"><?= h(mb_strtoupper(mb_substr($u['display_name'], 0, 1))) ?></span>
     <span><?= h($u['display_name']) ?> · <?= h($u['role']) ?></span>
   </span>
+  <?php $uiLangs = admin_langs(); if (count($uiLangs) > 1): ?>
+    <form method="post" action="<?= h(admin_url()) ?>" style="display:inline">
+      <?= csrf_input() ?>
+      <input type="hidden" name="a" value="user.uilang">
+      <select class="sbtn sbtn--sel" name="ui_lang" title="<?= h(t('head.uilang')) ?>"
+              onchange="this.form.submit()">
+        <?php foreach ($uiLangs as $code => $label): ?>
+          <option value="<?= h($code) ?>" <?= ui_lang() === $code ? 'selected' : '' ?>>
+            <?= h(strtoupper($code)) ?></option>
+        <?php endforeach; ?>
+      </select>
+    </form>
+  <?php endif; ?>
+
   <?php if (auth_can('settings')): ?>
     <a class="sbtn<?= $page === 'settings' ? ' on' : '' ?>" href="<?= h(admin_url(['p' => 'settings'])) ?>"
-       title="Beállítások">
+       title="<?= h(t('head.settings')) ?>">
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
            stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="3"/>
@@ -145,16 +159,16 @@ function admin_head(string $title, string $page = '', array $counts = []): void
       </svg>
     </a>
   <?php endif; ?>
-  <a class="sbtn" href="<?= h(admin_url(['p' => 'account'])) ?>" title="Saját fiók, jelszócsere">
+  <a class="sbtn" href="<?= h(admin_url(['p' => 'account'])) ?>" title="<?= h(t('head.account')) ?>">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></svg>
   </a>
-  <a class="sbtn" href="<?= h(admin_url(['a' => 'logout'])) ?>" title="Kilépés">
+  <a class="sbtn" href="<?= h(admin_url(['a' => 'logout'])) ?>" title="<?= h(t('head.logout')) ?>">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 17v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v2"/><path d="M19 12H9m10 0-3-3m3 3-3 3"/></svg>
   </a>
 </header>
 
 <nav class="tabs">
-  <?php foreach (ADMIN_TABS as $key => $label): ?>
+  <?php foreach (admin_tabs() as $key => $label): ?>
     <?php if (!auth_can($key)) { continue; } ?>
     <a class="<?= $page === $key ? 'on' : '' ?>" href="<?= h(admin_url(['p' => $key])) ?>">
       <?= h($label) ?><?php if (isset($counts[$key])): ?><span class="n"><?= (int)$counts[$key] ?></span><?php endif; ?>

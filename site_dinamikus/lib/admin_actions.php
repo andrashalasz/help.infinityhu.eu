@@ -1278,6 +1278,41 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             back(['p' => 'settings']);
         }
 
+        case 'ui.save': {
+            if (!auth_is('admin')) { flash('err', 'Ehhez adminisztrátori jog kell.'); back(['p' => 'settings']); }
+            $known = array_keys(ui_default());
+            $langs = array_keys(admin_langs());
+
+            $ins = $db->prepare('INSERT INTO help_ui (ui_key, lang, text) VALUES (?,?,?)
+                                 ON DUPLICATE KEY UPDATE text = VALUES(text), updated_at = NOW()');
+            $del = $db->prepare('DELETE FROM help_ui WHERE ui_key = ? AND lang = ?');
+
+            $n = 0;
+            foreach ((array)($_POST['ui'] ?? []) as $lang => $pairs) {
+                if (!in_array((string)$lang, $langs, true)) { continue; }
+                foreach ((array)$pairs as $key => $text) {
+                    if (!in_array((string)$key, $known, true)) { continue; }
+                    $text = trim((string)$text);
+                    // az ures mezo torli a forditast: a szoveg magyarul jelenik meg
+                    if ($text === '') { $del->execute([$key, $lang]); continue; }
+                    $ins->execute([$key, $lang, mb_substr($text, 0, 2000)]);
+                    $n++;
+                }
+            }
+            audit_me($db, 'ui.save', null, $n . ' szöveg');
+            flash('ok', '<b>' . $n . ' szöveg</b> mentve. Az üresen hagyottak magyarul jelennek meg.');
+            back(['p' => 'settings']);
+        }
+
+        case 'user.uilang': {
+            $code = strtolower(trim(post('ui_lang')));
+            if (!array_key_exists($code, admin_langs())) { back([]); }
+            $db->prepare('UPDATE help_user SET ui_lang = ? WHERE id = ?')
+               ->execute([$code, auth_user()['id']]);
+            $_SESSION['user']['ui_lang'] = $code;
+            back([]);
+        }
+
         // ================================================== nyelvek
         case 'lang.add': {
             if (!auth_is('admin')) { flash('err', 'Ehhez adminisztrátori jog kell.'); back(['p' => 'settings']); }

@@ -123,6 +123,8 @@ function auth_login(PDO $db, string $username, string $password): array
         'display_name' => $u['display_name'] !== '' ? $u['display_name'] : $u['username'],
         'role'         => $u['role'],
         'must_change'  => (bool)$u['must_change_pw'],
+        // a kezelofelulet nyelve (NULL = a sugo forrasnyelve)
+        'ui_lang'      => $u['ui_lang'] ?? null,
     ];
     audit($db, (int)$u['id'], $u['username'], 'login', 'user:' . $u['username'], null);
     return ['ok' => true, 'error' => null];
