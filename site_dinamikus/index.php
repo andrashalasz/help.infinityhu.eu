@@ -37,6 +37,7 @@ $LANGS = ['hu', 'en', 'de'];
 $UI = [
     'hu' => [
         'title' => 'Infinity Súgó', 'search' => 'Keresés a súgóban…', 'onpage' => 'Ezen az oldalon',
+        'tips' => 'Tippek és figyelmeztetések', 'tiplbl' => 'Tipp', 'warnlbl' => 'Figyelem', 'critlbl' => 'Fontos',
         'action' => 'Műveletek', 'copy' => 'Hivatkozás másolása', 'print' => 'Nyomtatás',
         'updated' => 'Frissítve', 'full' => 'Teljes oldal', 'noresults' => 'Nincs találat.',
         'home' => 'Kezdőlap', 'chapters' => 'fejezet', 'filter' => 'Fejezet szűrése…',
@@ -49,13 +50,14 @@ $UI = [
         'linkcopied' => 'Hivatkozás a vágólapra másolva', 'close' => 'Bezárás',
         'zoomin' => 'Nagyítás', 'zoomout' => 'Kicsinyítés', 'fit' => 'Eredeti méret',
         'fallback' => 'Ez a fejezet még nem érhető el ezen a nyelven — a magyar változat látható.',
-        'news' => 'Mi újság', 'newsslug' => 'mi-ujsag',
+        'news' => 'Frissítések', 'newsslug' => 'mi-ujsag',
         'newslead' => 'A legutóbb megjelent és frissített fejezetek.',
         'nonews' => 'Az elmúlt időszakban nem volt változás.',
         'isnew' => 'új', 'isupd' => 'frissítve', 'allchapters' => 'Összes fejezet',
     ],
     'en' => [
         'title' => 'Infinity Help', 'search' => 'Search the help…', 'onpage' => 'On this page',
+        'tips' => 'Tips and warnings', 'tiplbl' => 'Tip', 'warnlbl' => 'Warning', 'critlbl' => 'Important',
         'action' => 'Actions', 'copy' => 'Copy link', 'print' => 'Print',
         'updated' => 'Updated', 'full' => 'Full page', 'noresults' => 'No results.',
         'home' => 'Home', 'chapters' => 'chapters', 'filter' => 'Filter chapters…',
@@ -68,13 +70,14 @@ $UI = [
         'linkcopied' => 'Link copied to clipboard', 'close' => 'Close',
         'zoomin' => 'Zoom in', 'zoomout' => 'Zoom out', 'fit' => 'Actual size',
         'fallback' => 'This chapter is not available in this language yet — showing the Hungarian version.',
-        'news' => "What's new", 'newsslug' => 'whats-new',
+        'news' => 'Updates', 'newsslug' => 'whats-new',
         'newslead' => 'Recently added and updated chapters.',
         'nonews' => 'No changes in the recent period.',
         'isnew' => 'new', 'isupd' => 'updated', 'allchapters' => 'All chapters',
     ],
     'de' => [
         'title' => 'Infinity Hilfe', 'search' => 'Hilfe durchsuchen…', 'onpage' => 'Auf dieser Seite',
+        'tips' => 'Tipps und Warnungen', 'tiplbl' => 'Tipp', 'warnlbl' => 'Achtung', 'critlbl' => 'Wichtig',
         'action' => 'Aktionen', 'copy' => 'Link kopieren', 'print' => 'Drucken',
         'updated' => 'Aktualisiert', 'full' => 'Volle Seite', 'noresults' => 'Keine Treffer.',
         'home' => 'Startseite', 'chapters' => 'Kapitel', 'filter' => 'Kapitel filtern…',
@@ -87,7 +90,7 @@ $UI = [
         'linkcopied' => 'Link in die Zwischenablage kopiert', 'close' => 'Schließen',
         'zoomin' => 'Vergrößern', 'zoomout' => 'Verkleinern', 'fit' => 'Originalgröße',
         'fallback' => 'Dieses Kapitel ist in dieser Sprache noch nicht verfügbar — es wird die ungarische Fassung gezeigt.',
-        'news' => 'Neuigkeiten', 'newsslug' => 'neuigkeiten',
+        'news' => 'Aktualisierungen', 'newsslug' => 'neuigkeiten',
         'newslead' => 'Zuletzt veröffentlichte und aktualisierte Kapitel.',
         'nonews' => 'Im letzten Zeitraum gab es keine Änderungen.',
         'isnew' => 'neu', 'isupd' => 'aktualisiert', 'allchapters' => 'Alle Kapitel',
@@ -130,6 +133,21 @@ function getArticle(PDO $pdo, string $slug, string $lang): ?array
                           WHERE article_id = ? ORDER BY sort_order, id');
     $st->execute([$a['id']]);
     $a['sections'] = $st->fetchAll();
+
+    // A cimsorok merulesi melysege 1..5-re normalizalva. A level oszlopban
+    // tortenelmi okokbol nem mindenhol ugyanaz a szamozas (a Word-importbol
+    // 3/4, a szerkesztobol 2/3/4 jott), ezert nem a nyers erteket hasznaljuk,
+    // hanem a cikkben ELOFORDULO szintek sorrendjet.
+    $levels = array_values(array_unique(array_map(
+        static fn(array $r): int => (int)$r['level'], $a['sections']
+    )));
+    sort($levels);
+    $rank = array_flip($levels);
+    foreach ($a['sections'] as $i => $sec) {
+        $a['sections'][$i]['depth'] = min(5, ($rank[(int)$sec['level']] ?? 0) + 1);
+    }
+
+    $a['callouts'] = help_extract_callouts((string)$a['body_html']);
     return $a;
 }
 
@@ -225,6 +243,26 @@ $article  = null;
 $fallback = false;
 if ($slug !== null && $slug !== '' && !$isNews) {
     $article = getArticle($pdo, $slug, $lang);
+
+    // Regi hivatkozas: minden nyelv a magyar slugot hasznalta. Ha ezen a
+    // nyelven nincs ilyen slug, de egy masik nyelven van, atiranyitunk az
+    // adott nyelv sajat cimere - igy a korabban kiadott linkek is elnek.
+    if ($article === null) {
+        $st = $pdo->prepare("SELECT chapter_no FROM help_article WHERE slug = ? LIMIT 1");
+        $st->execute([$slug]);
+        $chapterNo = (string)$st->fetchColumn();
+        if ($chapterNo !== '') {
+            $own = $pdo->prepare("SELECT slug FROM help_article
+                                   WHERE chapter_no = ? AND lang = ? AND is_published = 1 LIMIT 1");
+            $own->execute([$chapterNo, $lang]);
+            $target = (string)$own->fetchColumn();
+            if ($target !== '' && $target !== $slug) {
+                header('Location: /' . $lang . '/' . $target, true, 301);
+                exit;
+            }
+        }
+    }
+
     if ($article === null && $lang !== 'hu') {
         // ha az adott nyelven meg nincs kesz a forditas, mutassuk a magyart
         $article = getArticle($pdo, $slug, 'hu');
@@ -232,7 +270,48 @@ if ($slug !== null && $slug !== '' && !$isNews) {
     }
 }
 
+/**
+ * Ugyanennek a fejezetnek a cime egy masik nyelven.
+ *
+ * A nyelvi valtozatokat a FEJEZETSZAM koti ossze (az 5.4 minden nyelven 5.4),
+ * igy a slug nyelvenkent elterhet - az angol oldal angol cimet kap.
+ */
+function slugInLang(PDO $pdo, ?array $article, string $target): string
+{
+    if (!$article) { return ''; }
+    static $cache = [];
+    $key = ($article['chapter_no'] ?? '') . '|' . $target;
+    if (isset($cache[$key])) { return $cache[$key]; }
+
+    $slug = '';
+    if (($article['chapter_no'] ?? '') !== '') {
+        $st = $pdo->prepare("SELECT slug FROM help_article
+                              WHERE chapter_no = ? AND lang = ? AND is_published = 1 LIMIT 1");
+        $st->execute([$article['chapter_no'], $target]);
+        $slug = (string)$st->fetchColumn();
+    }
+    if ($slug === '') { $slug = (string)$article['slug']; }
+    return $cache[$key] = $slug;
+}
+
 $siteTitle = $u['title'];
+
+// A súgó verziója a fejléchez: az ÉPPEN NYITOTT kiadás száma — ez az, amin a
+// mostani frissítések gyűlnek, és amit a Beállítások → Kiadások panel mutat.
+// Ha nincs nyitott kiadás, a legutóbb lezárt, végső esetben a fejezet-verzió.
+$helpVersion = (string)$pdo->query(
+    "SELECT version FROM help_release WHERE status = 'open' ORDER BY id DESC LIMIT 1"
+)->fetchColumn();
+if ($helpVersion === '') {
+    $helpVersion = (string)$pdo->query(
+        "SELECT version FROM help_release WHERE status = 'closed' ORDER BY released_at DESC, id DESC LIMIT 1"
+    )->fetchColumn();
+}
+if ($helpVersion === '') {
+    $helpVersion = (string)$pdo->query(
+        "SELECT doc_version FROM help_article WHERE doc_version <> '' ORDER BY doc_version DESC LIMIT 1"
+    )->fetchColumn();
+}
 
 /** Rovid nyelvi szotar a JS-nek. */
 function jsI18n(array $u): string
@@ -282,7 +361,7 @@ if ($isEmbed) {
 <meta name="robots" content="noindex">
 <title><?= h($article['title']) ?></title>
 <script><?= BOOT_JS ?></script>
-<link rel="stylesheet" href="/assets/app.css">
+<link rel="stylesheet" href="<?= h(asset_url('/assets/app.css')) ?>">
 <style>
   body { background: var(--surface); }
   .embed-bar {
@@ -308,7 +387,7 @@ if ($isEmbed) {
 </div>
 <div class="embed-pad body"><?= fix_img_url((string)$article['body_html']) ?></div>
 <script>window.HELP_LANG=<?= json_encode($lang) ?>;window.HELP_I18N=<?= jsI18n($u) ?>;</script>
-<script src="/assets/app.js" defer></script>
+<script src="<?= h(asset_url('/assets/app.js')) ?>" defer></script>
 </body>
 </html>
     <?php
@@ -334,7 +413,7 @@ $totalArticles = array_sum(array_map(static fn($m) => count($m['articles']), $mo
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/app.css">
+<link rel="stylesheet" href="<?= h(asset_url('/assets/app.css')) ?>">
 </head>
 <body>
 
@@ -348,6 +427,9 @@ $totalArticles = array_sum(array_map(static fn($m) => count($m['articles']), $mo
   <a class="shell__brand" href="/<?= h($lang) ?>/">
     <span class="shell__logo"><?= help_logo(28) ?></span>
     <span class="shell__title"><?= h($siteTitle) ?></span>
+    <?php if ($helpVersion !== ''): ?>
+      <span class="shell__ver" title="<?= h($u['updated']) ?>"><?= h(help_version_label($helpVersion)) ?></span>
+    <?php endif; ?>
   </a>
   <span class="shell__sep" aria-hidden="true"></span>
 
@@ -366,12 +448,14 @@ $totalArticles = array_sum(array_map(static fn($m) => count($m['articles']), $mo
   <nav class="lang" aria-label="<?= h($u['theme']) ?>">
     <?php foreach ($LANGS as $L): ?>
       <a class="<?= $L === $lang ? 'on' : '' ?>" hreflang="<?= h($L) ?>"
-         href="/<?= h($L) ?>/<?= $article ? h($article['slug']) : '' ?>"><?= strtoupper($L) ?></a>
+         href="/<?= h($L) ?>/<?= $article ? h(slugInLang($pdo, $article, $L)) : '' ?>"><?= strtoupper($L) ?></a>
     <?php endforeach; ?>
   </nav>
 
-  <a class="sbtn<?= $isNews ? ' on' : '' ?>" href="/<?= h($lang) ?>/<?= h($u['newsslug']) ?>" title="<?= h($u['news']) ?>">
+  <a class="sbtn sbtn--news<?= $isNews ? ' on' : '' ?><?= $fresh ? ' has' : '' ?>"
+     href="/<?= h($lang) ?>/<?= h($u['newsslug']) ?>" title="<?= h($u['news']) ?>">
     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10v12H4z"/><path d="M14 9h4a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1"/><path d="M7 9h4M7 12h4M7 15h3"/></svg>
+    <span class="sbtn__lbl"><?= h($u['news']) ?></span>
     <?php if ($fresh): ?><span class="count"><?= count($fresh) > 99 ? '99+' : count($fresh) ?></span><?php endif; ?>
   </a>
 
@@ -441,10 +525,27 @@ $totalArticles = array_sum(array_map(static fn($m) => count($m['articles']), $mo
           </button>
           <div class="nav__list">
             <?php foreach ($m['articles'] as $a): ?>
-              <a class="nav__a<?= $article && $a['slug'] === $article['slug'] ? ' on' : '' ?>"
+              <?php
+                $isOpen = $article && $a['slug'] === $article['slug'];
+                // az "1.3.1" egy szinttel beljebb all, mint az "1.3"
+                $aDepth = help_chapter_depth((string)$m['chapter_no'], (string)$a['chapter_no']);
+              ?>
+              <a class="nav__a nav__a--d<?= $aDepth ?><?= $isOpen ? ' on' : '' ?>"
                  href="/<?= h($lang) ?>/<?= h($a['slug']) ?>"><em><?= h($a['chapter_no']) ?></em><?= h($a['title']) ?><?php
-                 if (isset($freshSet[$a['slug']])): ?><span class="fresh" title="<?=
-                     h($freshSet[$a['slug']]['change_flag'] === 'new' ? $u['isnew'] : $u['isupd']) ?>"></span><?php endif; ?></a>
+                 if (isset($freshSet[$a['slug']])):
+                   $fk = $freshSet[$a['slug']]['change_flag'] === 'new' ? 'new' : 'mod'; ?><span
+                     class="fresh fresh--<?= $fk ?>"><?= h($fk === 'new' ? $u['isnew'] : $u['isupd']) ?></span><?php endif; ?></a>
+              <?php if ($isOpen && $article['sections']): ?>
+                <div class="nav__sec">
+                  <?php foreach ($article['sections'] as $sec): ?>
+                    <a class="nav__s nav__s--d<?= (int)$sec['depth'] ?>"
+                       data-anchor="<?= h($sec['anchor']) ?>"
+                       href="#<?= h($sec['anchor']) ?>"><?php
+                      if ($sec['chapter_no'] !== ''): ?><em><?= h($sec['chapter_no']) ?></em><?php endif;
+                      ?><?= h($sec['title']) ?></a>
+                  <?php endforeach; ?>
+                </div>
+              <?php endif; ?>
             <?php endforeach; ?>
           </div>
         </div>
@@ -530,7 +631,7 @@ $totalArticles = array_sum(array_map(static fn($m) => count($m['articles']), $mo
 
         <div class="meta">
           <span class="chip"><?= h($u['updated']) ?> <?= h((string)$article['updated_at']) ?></span>
-          <span class="chip"><?= h((string)$article['doc_version']) ?></span>
+          <span class="chip"><?= h(help_version_label((string)$article['doc_version'])) ?></span>
           <?php if (isset($freshSet[$article['slug']])): ?>
             <span class="chip chip--fresh"><?= h($article['change_flag'] === 'new' ? $u['isnew'] : $u['isupd']) ?></span>
           <?php elseif ($article['change_flag'] === 'new'): ?><span class="chip chip--new"><?= h($u['isnew']) ?></span>
@@ -566,11 +667,20 @@ $totalArticles = array_sum(array_map(static fn($m) => count($m['articles']), $mo
 
   <!-- jobb sáv -->
   <aside class="rail">
-    <?php if ($article && $article['sections']): ?>
-      <div class="rail__t"><?= h($u['onpage']) ?></div>
-      <div class="rail__list">
-        <?php foreach ($article['sections'] as $s): ?>
-          <a class="rail__a" data-anchor="<?= h($s['anchor']) ?>" href="#<?= h($s['anchor']) ?>"><?= h(trim($s['chapter_no'] . ' ' . $s['title'])) ?></a>
+    <?php if ($article && $article['callouts']): ?>
+      <div class="rail__t"><?= h($u['tips']) ?></div>
+      <div class="rail__calls">
+        <?php foreach ($article['callouts'] as $c): ?>
+          <?php $lbl = match ($c['kind']) {
+              'crit' => $u['critlbl'],
+              'warn' => $u['warnlbl'],
+              default => $u['tiplbl'],
+          }; ?>
+          <a class="rcall rcall--<?= h($c['kind']) ?>"
+             <?= $c['anchor'] !== '' ? 'href="#' . h($c['anchor']) . '"' : '' ?>>
+            <span class="rcall__h"><span class="rcall__i" aria-hidden="true"></span><?= h($c['title'] !== '' ? $c['title'] : $lbl) ?></span>
+            <span class="rcall__t"><?= h(mb_strimwidth($c['text'], 0, 190, '…', 'UTF-8')) ?></span>
+          </a>
         <?php endforeach; ?>
       </div>
     <?php endif; ?>
@@ -593,6 +703,6 @@ $totalArticles = array_sum(array_map(static fn($m) => count($m['articles']), $mo
   window.HELP_LANG = <?= json_encode($lang) ?>;
   window.HELP_I18N = <?= jsI18n($u) ?>;
 </script>
-<script src="/assets/app.js" defer></script>
+<script src="<?= h(asset_url('/assets/app.js')) ?>" defer></script>
 </body>
 </html>

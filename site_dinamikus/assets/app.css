@@ -162,6 +162,14 @@ a:hover { text-decoration: underline; }
 .logo-img { display: block; width: auto; height: 28px; object-fit: contain; }
 .logo-inf { display: block; }
 .shell__title { font-weight: 600; font-size: calc(15px * var(--fs)); letter-spacing: .1px; white-space: nowrap; }
+/* a súgó verziója a név mellett */
+.shell__ver {
+  margin-left: 8px; padding: 2px 7px; border-radius: 100px;
+  background: var(--shell-hover); color: var(--shell-muted);
+  font-size: calc(10.8px * var(--fs)); font-weight: 600;
+  letter-spacing: .2px; white-space: nowrap; font-variant-numeric: tabular-nums;
+}
+@media (max-width: 640px) { .shell__ver { display: none; } }
 .shell__sep { width: 1px; height: 22px; background: rgba(255, 255, 255, .18); flex: none; }
 .shell__spacer { flex: 1 1 auto; }
 
@@ -215,6 +223,20 @@ a:hover { text-decoration: underline; }
 }
 .lang a:hover { background: var(--shell-hover); color: var(--shell-ink); text-decoration: none; }
 .lang a.on { background: var(--brand); color: #fff; }
+
+/* --- telefon: a fejléc ne lógjon ki ---
+   375 px-en a nyelvváltó és a négy ikon együtt 435 px volt, ezért a lap
+   vízszintesen görgethetővé vált. A billentyűparancs-súgó érintőképernyőn
+   értelmetlen, a nyelvváltó pedig szorosabbra húzható. */
+@media (max-width: 560px) {
+  #kbd-btn { display: none; }
+  .lang a { padding: 5px 6px; font-size: calc(11.8px * var(--fs)); letter-spacing: 0; }
+  .shell { gap: 2px; }
+  .sbtn { min-width: 30px; padding: 0 6px; }
+}
+@media (max-width: 380px) {
+  .shell__brand .shell__title { display: none; }
+}
 
 /* betűméret-állító */
 .fs-pop, .pop {
@@ -296,7 +318,33 @@ a:hover { text-decoration: underline; }
 .nav__a:hover { background: var(--surface-2); color: var(--ink); text-decoration: none; }
 .nav__a.on { background: var(--brand-soft); color: var(--brand-strong); font-weight: 600; box-shadow: inset 2px 0 0 var(--brand); }
 .nav__a em { font-style: normal; color: var(--ink-3); margin-right: 5px; font-variant-numeric: tabular-nums; }
+
+/* --- a megnyitott fejezet saját címsorai a bal sávban (5 szint) --- */
+.nav__sec { margin: 2px 0 6px; padding-left: 10px; border-left: 1px solid var(--line-soft); margin-left: 9px; }
+.nav__s {
+  display: block; padding: 3px 8px 3px 0; color: var(--ink-3);
+  font-size: calc(12.4px * var(--fs)); line-height: 1.35;
+  border-left: 2px solid transparent; margin-left: -11px; padding-left: 9px;
+}
+.nav__s:hover { color: var(--ink); text-decoration: none; }
+.nav__s.on { color: var(--brand-strong); border-left-color: var(--brand); font-weight: 600; }
+.nav__s em {
+  font-style: normal; color: var(--ink-3); margin-right: 5px;
+  font-variant-numeric: tabular-nums; opacity: .8;
+}
+.nav__s.on em { color: var(--brand); opacity: 1; }
+.nav__s--d1 { padding-left: 9px;  font-weight: 500; color: var(--ink-2); }
+.nav__s--d2 { padding-left: 21px; }
+.nav__s--d3 { padding-left: 33px; font-size: calc(12px * var(--fs)); }
+.nav__s--d4 { padding-left: 45px; font-size: calc(12px * var(--fs)); }
+.nav__s--d5 { padding-left: 57px; font-size: calc(11.6px * var(--fs)); }
 .nav__a.on em { color: var(--brand); }
+
+/* Alfejezetek a bal sávban. A d1 (modulszintű áttekintő, pl. "2 A keretrendszer")
+   és a d2 (a szokásos "2.1") egy vonalban marad — csak a valódi alfejezet
+   (1.3 alatt az 1.3.1) csúszik beljebb. */
+.nav__a--d3 { padding-left: 24px; font-size: calc(12.6px * var(--fs)); }
+.nav__a--d4 { padding-left: 38px; font-size: calc(12.6px * var(--fs)); }
 .nav__empty { padding: 14px 10px; color: var(--ink-3); font-size: calc(12.5px * var(--fs)); }
 .nav__count { padding: 4px 10px 8px; color: var(--ink-3); font-size: calc(11.5px * var(--fs)); }
 
@@ -379,6 +427,39 @@ a:hover { text-decoration: underline; }
 .rail__a { display: block; padding: 5px 10px; margin-left: -2px; border-left: 2px solid transparent; color: var(--ink-3); font-size: calc(12.6px * var(--fs)); line-height: 1.4; }
 .rail__a:hover { color: var(--ink); text-decoration: none; }
 .rail__a.on { color: var(--brand-strong); border-left-color: var(--brand); font-weight: 600; }
+
+/* --- jobb sáv: az oldal tippjei és figyelmeztetései --- */
+.rail__calls { margin-bottom: 22px; display: flex; flex-direction: column; gap: 8px; }
+.rcall {
+  display: block; padding: 9px 11px; border-radius: 8px; border: 1px solid var(--line);
+  background: var(--surface); color: var(--ink-2); cursor: pointer;
+  transition: border-color .14s, box-shadow .14s, transform .14s;
+}
+.rcall:hover { text-decoration: none; box-shadow: var(--shadow-1); transform: translateY(-1px); }
+.rcall__h {
+  display: flex; align-items: center; gap: 6px; font-weight: 600;
+  font-size: calc(12.2px * var(--fs)); line-height: 1.3; margin-bottom: 4px;
+}
+.rcall__i {
+  flex: none; width: 15px; height: 15px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 10px; font-weight: 700; line-height: 1;
+}
+.rcall__t {
+  display: block; font-size: calc(11.8px * var(--fs)); line-height: 1.45; color: var(--ink-3);
+}
+.rcall--tip  { background: var(--info-soft); border-color: color-mix(in srgb, var(--brand) 26%, transparent); }
+.rcall--tip  .rcall__h { color: var(--brand-strong); }
+.rcall--tip  .rcall__i { background: var(--brand); font-style: italic; }
+.rcall--tip  .rcall__i::before { content: "i"; }
+.rcall--warn { background: var(--warn-soft); border-color: color-mix(in srgb, var(--warn) 32%, transparent); }
+.rcall--warn .rcall__h { color: var(--warn); }
+.rcall--warn .rcall__i { background: var(--warn); }
+.rcall--warn .rcall__i::before { content: "!"; }
+.rcall--crit { background: var(--err-soft); border-color: color-mix(in srgb, var(--err) 40%, transparent); }
+.rcall--crit .rcall__h { color: var(--err); }
+.rcall--crit .rcall__i { background: var(--err); }
+.rcall--crit .rcall__i::before { content: "!"; }
 .rail__btn {
   display: flex; align-items: center; gap: 8px; width: 100%;
   padding: 7px 10px; margin-bottom: 2px;
@@ -506,6 +587,10 @@ a:hover { text-decoration: underline; }
 .body .call.warn { background: var(--warn-soft); border-color: color-mix(in srgb, var(--warn) 34%, transparent); }
 .body .call.warn > strong { color: var(--warn); }
 .body .call.warn::before  { content: "!"; background: var(--warn); }
+/* erős, piros kiemelés — amit semmiképp nem szabad elnézni */
+.body .call.crit { background: var(--err-soft); border-color: color-mix(in srgb, var(--err) 42%, transparent); border-left-width: 4px; }
+.body .call.crit > strong { color: var(--err); }
+.body .call.crit::before  { content: "!"; background: var(--err); }
 
 .body .tblwrap { overflow-x: auto; margin-bottom: 18px; }
 .body table.erp-table { margin-bottom: 0; }
@@ -513,6 +598,15 @@ a:hover { text-decoration: underline; }
 .body table.erp-table tr.header td { background: var(--surface-3); font-weight: 700; }
 .body table.erp-table tr.odd  td { background: var(--surface); }
 .body table.erp-table tr.even td { background: var(--surface-2); }
+
+/* --- táblázat-változatok (a szerkesztőben állíthatók) --- */
+.body table.tbl--grid  th, .body table.tbl--grid  td { border: 1px solid var(--line); }
+.body table.tbl--rows  th, .body table.tbl--rows  td { border: 0; border-bottom: 1px solid var(--line); }
+.body table.tbl--frame th, .body table.tbl--frame td { border: 0; }
+.body table.tbl--frame { outline: 1px solid var(--line); outline-offset: -1px; }
+.body table.tbl--plain th, .body table.tbl--plain td { border: 0; }
+.body table.tbl--plain { outline: 0; }
+.body table.tbl--zebra tbody tr:nth-child(even) td { background: var(--surface-2); }
 
 /* ---------- 15. videó a fejezetekben ---------- */
 .body figure.vid { margin: 0 0 20px; }
@@ -528,16 +622,33 @@ a:hover { text-decoration: underline; }
   background: var(--ok); color: #fff; border-color: transparent;
   letter-spacing: .4px; text-transform: uppercase; font-size: calc(10.6px * var(--fs));
 }
+/* a bal sávban jól látható címke a korábbi apró pont helyett */
 .nav__a .fresh {
-  display: inline-block; width: 6px; height: 6px; border-radius: 50%;
-  background: var(--ok); margin-left: 5px; vertical-align: middle;
+  display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 100px;
+  font-size: calc(9.6px * var(--fs)); font-weight: 800; line-height: 1.5;
+  text-transform: uppercase; letter-spacing: .3px; vertical-align: middle; color: #fff;
 }
+.nav__a .fresh--new { background: var(--ok); }
+.nav__a .fresh--mod { background: var(--warn); }
 .sbtn .count {
   position: absolute; top: 3px; right: 2px; min-width: 15px; height: 15px; padding: 0 3px;
   border-radius: 100px; background: var(--ok); color: #fff;
   font-size: 10px; font-weight: 800; line-height: 15px; text-align: center;
 }
 .sbtn { position: relative; }
+
+/* Frissítések: feliratos, kiemelt gomb — ha van újdonság, nem lehet nem észrevenni */
+.sbtn__lbl { display: none; }
+.sbtn--news .sbtn__lbl { display: inline; font-weight: 600; }
+.sbtn--news { padding-right: 12px; }
+.sbtn--news.has {
+  background: var(--ok); color: #fff; border-color: transparent;
+}
+.sbtn--news.has:hover { background: color-mix(in srgb, var(--ok) 86%, #000); }
+.sbtn--news.has .count {
+  position: static; background: rgba(255, 255, 255, .26); margin-left: 2px;
+}
+@media (max-width: 720px) { .sbtn--news .sbtn__lbl { display: none; } }
 
 /* Mi újság lap */
 .news-item {

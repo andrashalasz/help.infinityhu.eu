@@ -302,13 +302,19 @@
         var shown = 0;
         $$('.nav__mod').forEach(function (mod) {
           var any = false;
+          // a fejezet alatti címsorlista együtt mozog a fejezettel
+          function showArticle(a, on) {
+            a.style.display = on ? '' : 'none';
+            var sec = a.nextElementSibling;
+            if (sec && sec.classList.contains('nav__sec')) { sec.style.display = on ? '' : 'none'; }
+          }
           $$('.nav__a', mod).forEach(function (a) {
             var hit = !q || norm(a.textContent).indexOf(q) >= 0;
-            a.style.display = hit ? '' : 'none';
+            showArticle(a, hit);
             if (hit) { any = true; shown++; }
           });
           var modHit = !q || norm($('.nav__mt', mod).textContent).indexOf(q) >= 0;
-          if (modHit && q) { $$('.nav__a', mod).forEach(function (a) { a.style.display = ''; shown++; }); any = true; }
+          if (modHit && q) { $$('.nav__a', mod).forEach(function (a) { showArticle(a, true); shown++; }); any = true; }
           mod.style.display = (any || modHit) ? '' : 'none';
           if (q) { mod.classList.remove('closed'); }
         });
@@ -326,7 +332,7 @@
   /* ---------------------------------------------------------- 7. tartalomjegyzék-követés + olvasási csík */
   function wireScroll() {
     var bar = $('#progress');
-    var links = $$('.rail__a[data-anchor]');
+    var links = $$('.nav__s[data-anchor], .rail__a[data-anchor]');
     var targets = links.map(function (a) { return document.getElementById(a.getAttribute('data-anchor')); });
     var ticking = false;
 
@@ -350,7 +356,7 @@
 
   /* ---------------------------------------------------------- 8. címsor-horgonyok */
   function wireAnchors() {
-    $$('.body h2[id], .body h3[id], .body h4[id]').forEach(function (h) {
+    $$('.body h2[id], .body h3[id], .body h4[id], .body h5[id], .body h6[id]').forEach(function (h) {
       var a = document.createElement('a');
       a.className = 'anchor-link';
       a.href = '#' + h.id;
