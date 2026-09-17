@@ -324,7 +324,8 @@ function page_dashboard(PDO $db, array $cfg, array $counts): void
 }
 
 // ============================================================ FEJEZETEK
-function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId = 0): void
+function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId = 0,
+                       int $diffRev = 0): void
 {
     // A fofejezet szerkesztesehez a jobb oldali oszlop a fejezet-szerkeszto
     // helyett a fofejezet adatlapjat mutatja.
@@ -345,6 +346,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
 
     $article = null;
     $revisions = [];
+    $diffRow = null;
     if ($id > 0) {
         $st = $db->prepare('SELECT * FROM help_article WHERE id = ?');
         $st->execute([$id]);
@@ -357,6 +359,15 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
                                 WHERE r.article_id = ? ORDER BY r.rev_no DESC LIMIT 20');
             $r->execute([$id]);
             $revisions = $r->fetchAll();
+
+            // osszehasonlitando verzio
+            if ($diffRev > 0) {
+                $d = $db->prepare('SELECT r.*, u.display_name FROM help_article_revision r
+                                     LEFT JOIN help_user u ON u.id = r.created_by
+                                    WHERE r.article_id = ? AND r.rev_no = ?');
+                $d->execute([$id, $diffRev]);
+                $diffRow = $d->fetch() ?: null;
+            }
         }
     }
 
@@ -716,6 +727,57 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
         <input type="hidden" name="id" value="<?= (int)$article['id'] ?>">
       </form>
 
+      <?php if ($diffRow): ?>
+        <?php
+        // Amivel osszevetjuk: a mostani vazlat, ha van, kulonben a kozzetett.
+        $nowHtml  = (string)($article['draft_html'] ?? $article['body_html']);
+        $nowTitle = (string)($article['draft_title'] ?? $article['title']);
+        $nowLabel = $article['draft_html'] !== null ? 'a mostani vázlat' : 'a közzétett változat';
+        $cmp = diff_html(help_plain((string)$diffRow['body_html']), help_plain($nowHtml));
+        ?>
+        <div class="panel" style="margin-top:16px">
+          <div class="panel__h"><h2>Összehasonlítás: <?= (int)$diffRow['rev_no'] ?>. változat → <?= h($nowLabel) ?></h2>
+            <span class="sp"></span>
+            <a class="btn btn--sm btn--ghost"
+               href="<?= h(admin_url(['p' => 'articles', 'lang' => $lang, 'id' => $article['id']])) ?>">Bezárás</a>
+          </div>
+          <div class="panel__b">
+            <div class="hint" style="margin-bottom:10px">
+              A <b><?= (int)$diffRow['rev_no'] ?>. változatot</b>
+              <?= h(substr((string)$diffRow['created_at'], 0, 16)) ?>-kor mentette
+              <b><?= h((string)($diffRow['display_name'] ?: 'ismeretlen')) ?></b><?php
+                if ((string)$diffRow['note'] !== ''): ?> — „<?= h((string)$diffRow['note']) ?>"<?php endif; ?>.
+              <?php if ((string)$diffRow['title'] !== $nowTitle): ?>
+                <br>A cím is változott: „<b><?= h((string)$diffRow['title']) ?></b>" → „<b><?= h($nowTitle) ?></b>"
+              <?php endif; ?>
+            </div>
+
+            <?php if (!$cmp['changed']): ?>
+              <div class="msg msg--info" style="margin:0">A két változat szövege <b>szó szerint megegyezik</b>.</div>
+            <?php else: ?>
+              <div class="diff-legend">
+                <span><i style="background:var(--ok-soft);color:var(--ok)">+ <?= (int)$cmp['added'] ?> új szó</i></span>
+                <span><i style="background:var(--err-soft);color:var(--err)">− <?= (int)$cmp['removed'] ?> elhagyott szó</i></span>
+                <span class="muted">A zöld a mostaniban van benne, a piros a régiben volt.</span>
+              </div>
+              <div class="diff"><?= $cmp['html'] ?></div>
+            <?php endif; ?>
+
+            <div class="btnbar" style="margin-top:12px">
+              <form method="post" action="<?= h(admin_url()) ?>"
+                    data-confirm="Betöltöd a(z) <?= (int)$diffRow['rev_no'] ?>. változatot vázlatként? A jelenlegi vázlat felülíródik.">
+                <?= csrf_input() ?>
+                <input type="hidden" name="a" value="article.restore">
+                <input type="hidden" name="id" value="<?= (int)$article['id'] ?>">
+                <input type="hidden" name="rev" value="<?= (int)$diffRow['rev_no'] ?>">
+                <button class="btn btn--p btn--sm" type="submit">Ezt a változatot töltöm vissza</button>
+              </form>
+              <span class="muted">A visszatöltés vázlatot készít — a nyilvános oldal csak közzététel után változik.</span>
+            </div>
+          </div>
+        </div>
+      <?php endif; ?>
+
       <!-- korábbi változatok -->
       <div class="panel" style="margin-top:16px">
  <div class="panel__h"><h2>Korábbi változatok</h2><span class="sp"></span>
@@ -742,6 +804,9 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
                       <input type="hidden" name="rev" value="<?= (int)$r['rev_no'] ?>">
                       <button class="btn btn--sm" type="submit">Visszatöltés</button>
                     </form>
+                    <a class="btn btn--sm btn--ghost"
+                       href="<?= h(admin_url(['p' => 'articles', 'lang' => $lang, 'id' => $article['id'],
+                                              'diff' => $r['rev_no']])) ?>">Összehasonlítás</a>
                   </td>
                 </tr>
               <?php endforeach; ?>

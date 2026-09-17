@@ -158,7 +158,8 @@ if (!auth_can($page) && $page !== 'dashboard') {
 
 switch ($page) {
     case 'articles':
-        page_articles($db, $lang, (int)($_GET['id'] ?? 0), $counts, (int)($_GET['mod'] ?? 0));
+        page_articles($db, $lang, (int)($_GET['id'] ?? 0), $counts, (int)($_GET['mod'] ?? 0),
+                      (int)($_GET['diff'] ?? 0));
         break;
     case 'modules':
         // A Modulok ful beolvadt a Fejezetek fulbe: a fofejezetek ott
