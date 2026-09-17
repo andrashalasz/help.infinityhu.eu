@@ -77,8 +77,7 @@ function page_chpw(bool $forced): void
 <div class="page" style="max-width:560px">
   <h1 class="pt"><?= h(t('Jelszócsere')) ?></h1>
   <p class="lead">
-    Adj meg egy új jelszót ehhez a fiókhoz. Ez nem kötelező — a
-    <a href="<?= h(admin_url(['p' => 'settings'])) ?>#jelszo"><?= h(t('Beállítások')) ?></a> fülön is bármikor elvégezhető.
+    <?= t('jelszo.nem.kotelezo', ['url' => h(admin_url(['p' => 'settings'])) . '#jelszo']) ?>
   </p>
   <?= flash_render() ?>
  <div class="panel"><div class="panel__b">
@@ -294,8 +293,7 @@ function page_dashboard(PDO $db, array $cfg, array $counts): void
         <div class="panel__b">
           <?php if ($release): ?>
             <div class="stat__n" style="font-size:calc(20px * var(--fs))"><?= h($release['version']) ?></div>
-            <div class="hint">A közzétételkor megadott összefoglalók ebbe a kiadásba gyűlnek.
-              Lezárni a <a href="<?= h(admin_url(['p' => 'settings'])) ?>"><?= h(t('Beállítások')) ?></a> fülön lehet.</div>
+            <div class="hint"><?= t('kiadas.gyujtes', ['url' => h(admin_url(['p' => 'settings']))]) ?></div>
           <?php else: ?>
             <div class="muted"><?= h(t('Nincs nyitott kiadás.')) ?></div>
           <?php endif; ?>
@@ -553,7 +551,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
         </div>
       <?php endif; ?>
       <?php if (!$article['is_published']): ?>
-        <div class="msg msg--info">Ez a fejezet <b><?= h(t('nincs közzétéve')) ?></b>, a nyilvános oldalon nem jelenik meg.</div>
+        <div class="msg msg--info"><?= t('fejezet.nincs.kozzeteve') ?></div>
       <?php endif; ?>
 
       <?php
@@ -760,10 +758,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
         <div class="panel__b panel__b--flush">
           <?php if (!$revisions): ?>
             <div class="empty">
-              Még nem volt közzététel ezen a fejezeten, ezért nincs mivel összehasonlítani.<br>
-              <span class="muted">A rendszer minden közzétételkor elmenti az előző állapotot —
-              az első közzétételtől kezdve itt fognak sorakozni a változatok,
-              <b><?= h(t('Összehasonlítás')) ?></b> és <b><?= h(t('Visszatöltés')) ?></b> gombbal.</span>
+              <?= t('valtozatok.uresen') ?>
             </div>
           <?php else: ?>
             <table class="tbl">
@@ -844,8 +839,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
             <div class="modal__b">
               <div class="msg msg--err" style="margin:0">
                 <span class="msg__h"><?= h(trim($article['chapter_no'] . ' ' . $article['title'])) ?></span>
-                A fejezet a <b><?= h(t('Kukába')) ?></b> kerül a korábbi változataival együtt — onnan
-                egy kattintással visszaállítható, amíg ki nem üríted.
+                <?= t('torles.kukaba.magyarazat') ?>
               </div>
             </div>
             <div class="modal__f">

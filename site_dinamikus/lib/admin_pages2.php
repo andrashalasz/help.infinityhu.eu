@@ -305,8 +305,7 @@ function page_translate(PDO $db, array $cfg, int $srcId, string $to, array $coun
 <div class="page page--tr">
   <h1 class="pt"><?= h(t('Fordítás')) ?></h1>
   <p class="lead">
-    A magyar a forrásnyelv. Válaszd ki a fejezetet, és írd meg mellé az idegen nyelvű változatot —
-    vagy kérj gépi nyersfordítást, és javíts bele. A mentés <b><?= h(t('vázlatot')) ?></b> készít, közzétenni külön kell.
+    <?= t('forditas.magyarazat') ?>
   </p>
   <?= flash_render() ?>
 

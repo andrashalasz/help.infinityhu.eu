@@ -190,6 +190,27 @@ function ui_default(string $key = ''): string|array
         'media.mappa.ro'    => 'A képek mappája nem írható: {mappa}',
         'kep.formatum.kihagyva' => 'Nem támogatott képformátum kihagyva: .{kit}',
 
+        // --- hosszabb magyarazo blokkok (egyben, {url} = hivatkozas) ---
+        'jelszo.nem.kotelezo' => 'Adj meg egy új jelszót ehhez a fiókhoz. Ez nem kötelező — a '
+            . '<a href="{url}">Beállítások</a> fülön is bármikor elvégezhető.',
+        'kiadas.gyujtes' => 'A közzétételkor megadott összefoglalók ebbe a kiadásba gyűlnek. '
+            . 'Lezárni a <a href="{url}">Beállítások</a> fülön lehet.',
+        'fejezet.nincs.kozzeteve' => 'Ez a fejezet <b>nincs közzétéve</b>, a nyilvános oldalon '
+            . 'nem jelenik meg.',
+        'valtozatok.uresen' => 'Még nem volt közzététel ezen a fejezeten, ezért nincs mivel '
+            . 'összehasonlítani.<br><span class="muted">A rendszer minden közzétételkor elmenti '
+            . 'az előző állapotot — az első közzétételtől kezdve itt fognak sorakozni a változatok, '
+            . '<b>Összehasonlítás</b> és <b>Visszatöltés</b> gombbal.</span>',
+        'torles.kukaba.magyarazat' => 'A fejezet a <b>Kukába</b> kerül a korábbi változataival '
+            . 'együtt — onnan egy kattintással visszaállítható, amíg ki nem üríted.',
+        'kiadas.magyarazat' => 'Minden közzétételkor keletkezik egy <b>összefoglaló</b>, és a '
+            . '<b>nyitott</b> kiadásba gyűlik. Ez az a szöveg, amit az olvasó a <b>Frissítések</b> '
+            . 'lapon lát. A kiadás lezárása dátumot és verziószámot ad nekik, leveszi az '
+            . 'újdonságjelzéseket, és megnyit egy újat.',
+        'forditas.magyarazat' => 'A forrásnyelvről fordítunk. Válaszd ki a fejezetet, és írd meg '
+            . 'mellé az idegen nyelvű változatot — vagy kérj gépi nyersfordítást, és javíts bele. '
+            . 'A mentés <b>vázlatot</b> készít, közzétenni külön kell.',
+
         // --- kozzetetel ---
         'kozzetetel.forditas.marad' => 'A fordítások maradjanak naprakészek',
         'kozzetetel.forditas.sugo'  => 'Egy fordítás attól lesz <b>elavult</b>, hogy a magyar '

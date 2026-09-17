@@ -47,10 +47,7 @@ function page_releases(PDO $db, array $counts, int $showId = 0): void
 <div class="page">
   <h1 class="pt"><?= h(t('Kiadások')) ?></h1>
   <p class="lead">
-    Minden közzétételkor keletkezik egy <b><?= h(t('változásnapló-bejegyzés')) ?></b>, és a <b>nyitott</b>
-    kiadásba gyűlik. Ez az a szöveg, amit az olvasó a <b><?= h(t('Frissítések')) ?></b> lapon lát.
-    A kiadás lezárása dátumot és verziószámot ad nekik, leveszi az újdonságjelzéseket,
-    és megnyit egy újat.
+    <?= t('kiadas.magyarazat') ?>
     <br><span class="muted">A fejezetek <b><?= h(t('korábbi állapotai')) ?></b> nem itt, hanem a Fejezetek
     fülön, a <b><?= h(t('Változatok')) ?></b> gomb alatt vannak.</span>
   </p>
