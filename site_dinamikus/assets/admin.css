@@ -62,7 +62,10 @@ body.admin { background: var(--bg); }
 .tabs a.on .n { background: var(--brand); color: #fff; }
 
 /* ---------- lap ---------- */
-.page { max-width: 1600px; margin: 0 auto; padding: 18px; }
+/* Az admin felulet a TELJES ablakot hasznalja: itt dolgozol, a hely hasznos.
+   (A nyilvanos sugonak marad a szuk hasabja - ott olvasni kell.) */
+.page { max-width: none; margin: 0; padding: 18px; }
+
 .page--split { display: grid; grid-template-columns: 330px minmax(0, 1fr); gap: 16px; align-items: start; }
 @media (max-width: 980px) { .page--split { grid-template-columns: minmax(0, 1fr); } }
 
@@ -420,10 +423,6 @@ p.lead { margin: 0 0 18px; color: var(--ink-3); font-size: calc(13.4px * var(--f
   .tr-col--src { position: static; }
 }
 
-/* A forditas lapon ket teljes szerkeszto all egymas mellett, ezert itt a lap
-   a TELJES ablakot hasznalja - az 1600 px-es korlat mashol jo, itt szuk. */
-.page--tr { max-width: none; }
-
 /* A bal lista is keskenyebb, hogy a ket nyelvnek maradjon hely. */
 @media (max-width: 1400px) {
   .page--tr .page--split { grid-template-columns: 230px minmax(0, 1fr); }
@@ -708,3 +707,12 @@ a.stat:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 /* a szerkesztőben a kép kattintható, de ne húzza el a böngésző */
 .ed-area img, .ed-area video { cursor: pointer; -webkit-user-drag: none; }
 .ed-area img::selection { background: transparent; }
+
+/* Nagy kepernyon a bal lista is szelesebb, hogy a hosszu fejezetcimek
+   kiferjenek, es ne csak a szerkeszto kapja meg a teljes teret. */
+@media (min-width: 1800px) {
+  .page--split { grid-template-columns: 420px minmax(0, 1fr); }
+}
+@media (min-width: 2400px) {
+  .page--split { grid-template-columns: 480px minmax(0, 1fr); }
+}
