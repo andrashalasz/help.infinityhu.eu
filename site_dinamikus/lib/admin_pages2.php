@@ -960,7 +960,7 @@ function page_settings(PDO $db, array $cfg, array $counts): void
         </div>
         <div class="hint" style="margin-top:4px">
           <b><?= h(t('Újdonságjelzés:')) ?></b> a közzétett fejezet <b><?= h(t('ÚJ')) ?></b> vagy <b><?= h(t('FRISSÍTVE')) ?></b> címkét kap a bal
-          sávban, és felkerül a <b><?= h(t('Frissítések')) ?></b> lapra. A jelzés a <b><?= h(t('kiadás lezárásáig')) ?></b> marad kint
+          sávban, és felkerül a <b><?= h(t('Újdonságok')) ?></b> lapra. A jelzés a <b><?= h(t('kiadás lezárásáig')) ?></b> marad kint
           (Beállítások → Kiadások) — nem jár le magától. Az „apró javítás" jelöléssel közzétett
           módosítás nem kelti újra a jelzést.
         </div>

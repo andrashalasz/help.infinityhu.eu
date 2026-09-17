@@ -906,3 +906,11 @@ a.stat:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 /* a hianyzo forditas mezoje halvany sargan - igy egy pillantassal latszik,
    hol van meg dolgunk, anelkul hogy szurni kellene */
 .uit-cell--missing .inp { background: color-mix(in srgb, var(--warn) 7%, var(--surface)); }
+
+/* lapozo (naplo) */
+.pager {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  padding: 10px; border-top: 1px solid var(--line-soft);
+  font-size: calc(12.6px * var(--fs));
+}
+.pager .is-off { pointer-events: none; opacity: .35; }

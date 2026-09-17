@@ -203,7 +203,17 @@ function page_dashboard(PDO $db, array $cfg, array $counts): void
         SELECT i.*, u.display_name FROM help_import i LEFT JOIN help_user u ON u.id = i.uploaded_by
       ORDER BY i.uploaded_at DESC LIMIT 5")->fetchAll();
 
-    $audit = $db->query("SELECT * FROM help_audit ORDER BY created_at DESC LIMIT 12")->fetchAll();
+    // A naplo lapozhato: 12 sor fer el kenyelmesen az attekinto lapon, a
+    // tobbi lapozassal erheto el (nem vegtelen gorgetes).
+    $auditPerPage = 12;
+    $auditTotal = (int)$db->query('SELECT COUNT(*) FROM help_audit')->fetchColumn();
+    $auditPages = max(1, (int)ceil($auditTotal / $auditPerPage));
+    $auditPage  = max(1, min($auditPages, (int)($_GET['nlap'] ?? 1)));
+    $auditFrom  = ($auditPage - 1) * $auditPerPage;
+    $aq = $db->prepare('SELECT * FROM help_audit ORDER BY created_at DESC, id DESC LIMIT ' . $auditPerPage . ' OFFSET ?');
+    $aq->bindValue(1, $auditFrom, PDO::PARAM_INT);
+    $aq->execute();
+    $audit = $aq->fetchAll();
     $release = $db->query("SELECT * FROM help_release WHERE status = 'open' LIMIT 1")->fetch();
 
     admin_head(t('Áttekintés'), 'dashboard', $counts);
@@ -301,18 +311,32 @@ function page_dashboard(PDO $db, array $cfg, array $counts): void
       </div>
 
       <div class="panel">
-        <div class="panel__h"><h2><?= h(t('Napló')) ?></h2></div>
+        <div class="panel__h"><h2><?= h(t('Napló')) ?></h2>
+          <span class="sp"></span>
+          <span class="muted"><?= h(t('naplo.osszesen', ['n' => $auditTotal])) ?></span></div>
         <div class="panel__b panel__b--flush">
           <table class="tbl">
             <?php foreach ($audit as $a): ?>
               <tr>
-                <td class="nowrap muted" style="width:104px" data-label="Mikor"><?= h(substr((string)$a['created_at'], 5, 11)) ?></td>
+                <td class="nowrap muted" style="width:104px" data-label="<?= h(t('Mikor')) ?>"><?= h(substr((string)$a['created_at'], 5, 11)) ?></td>
                 <td class="mono nowrap" data-label="<?= h(t('Művelet')) ?>"><?= h($a['action']) ?></td>
-                <td class="muted" data-label="Ki"><?= h((string)$a['username']) ?></td>
+                <td class="muted" data-label="<?= h(t('Ki')) ?>"><?= h((string)$a['username']) ?></td>
               </tr>
             <?php endforeach; ?>
+            <?php if (!$audit): ?>
+              <tr><td class="empty"><?= h(t('A napló üres.')) ?></td></tr>
+            <?php endif; ?>
           </table>
         </div>
+        <?php if ($auditPages > 1): ?>
+          <div class="pager">
+            <a class="btn btn--sm btn--ghost<?= $auditPage <= 1 ? ' is-off' : '' ?>"
+               href="<?= h(admin_url(['p' => 'dashboard', 'nlap' => max(1, $auditPage - 1)])) ?>">←</a>
+            <span class="muted"><?= h(t('naplo.lap', ['lap' => $auditPage, 'ossz' => $auditPages])) ?></span>
+            <a class="btn btn--sm btn--ghost<?= $auditPage >= $auditPages ? ' is-off' : '' ?>"
+               href="<?= h(admin_url(['p' => 'dashboard', 'nlap' => min($auditPages, $auditPage + 1)])) ?>">→</a>
+          </div>
+        <?php endif; ?>
       </div>
     </div>
   </div>
@@ -802,7 +826,7 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
             <div class="modal__b">
               <p class="lead" style="margin-bottom:14px"><?= t('A vázlat élesítése: ettől kezdve ez látszik a nyilvános oldalon. A korábbi változat megmarad, bármikor visszatölthető.') ?></p>
               <div class="field">
-                <label for="summary"><?= h(t('Mi változott? (a Frissítések listába kerül)')) ?></label>
+                <label for="summary"><?= h(t('Mi változott? (az Újdonságok listába kerül)')) ?></label>
                 <input class="inp" id="summary" name="summary" placeholder="<?= h(t('pl. Frissített képernyőképek a kintlévőség-kezelésnél')) ?>">
                 <div class="hint"><?= h(t('Üresen hagyva nem készül változásnapló-bejegyzés.')) ?></div>
               </div>

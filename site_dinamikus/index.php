@@ -69,7 +69,7 @@ $UI = [
         'linkcopied' => 'Hivatkozás a vágólapra másolva', 'close' => 'Bezárás',
         'zoomin' => 'Nagyítás', 'zoomout' => 'Kicsinyítés', 'fit' => 'Eredeti méret',
         'fallback' => 'Ez a fejezet még nem érhető el ezen a nyelven — a magyar változat látható.',
-        'news' => 'Frissítések', 'newsslug' => 'mi-ujsag',
+        'news' => 'Újdonságok', 'newsslug' => 'mi-ujsag',
         'newslead' => 'A legutóbb megjelent és frissített fejezetek.',
         'nonews' => 'Az elmúlt időszakban nem volt változás.',
         'isnew' => 'új', 'isupd' => 'frissítve', 'allchapters' => 'Összes fejezet',
@@ -469,6 +469,15 @@ $totalArticles = array_sum(array_map(static fn($m) => count($m['articles']), $mo
     <div class="gsearch__res" id="gsearch-res" role="listbox"></div>
   </div>
 
+  <?php // Az Ujdonsagok rogton a kereso mogott: ez a masodik leggyakrabban
+        // hasznalt dolog a fejlecben, nem a sor vegen a helye. ?>
+  <a class="sbtn sbtn--news<?= $isNews ? ' on' : '' ?><?= $fresh ? ' has' : '' ?>"
+     href="/<?= h($lang) ?>/<?= h($u['newsslug']) ?>" title="<?= h($u['news']) ?>">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10v12H4z"/><path d="M14 9h4a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1"/><path d="M7 9h4M7 12h4M7 15h3"/></svg>
+    <span class="sbtn__lbl"><?= h($u['news']) ?></span>
+    <?php if ($fresh): ?><span class="count"><?= count($fresh) > 99 ? '99+' : count($fresh) ?></span><?php endif; ?>
+  </a>
+
   <span class="shell__spacer"></span>
 
   <nav class="lang" aria-label="<?= h($u['theme']) ?>">
@@ -477,13 +486,6 @@ $totalArticles = array_sum(array_map(static fn($m) => count($m['articles']), $mo
          href="/<?= h($L) ?>/<?= $article ? h(slugInLang($pdo, $article, $L)) : '' ?>"><?= strtoupper($L) ?></a>
     <?php endforeach; ?>
   </nav>
-
-  <a class="sbtn sbtn--news<?= $isNews ? ' on' : '' ?><?= $fresh ? ' has' : '' ?>"
-     href="/<?= h($lang) ?>/<?= h($u['newsslug']) ?>" title="<?= h($u['news']) ?>">
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10v12H4z"/><path d="M14 9h4a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1"/><path d="M7 9h4M7 12h4M7 15h3"/></svg>
-    <span class="sbtn__lbl"><?= h($u['news']) ?></span>
-    <?php if ($fresh): ?><span class="count"><?= count($fresh) > 99 ? '99+' : count($fresh) ?></span><?php endif; ?>
-  </a>
 
   <button class="sbtn" id="theme-toggle" title="<?= h($u['theme']) ?>" aria-label="<?= h($u['theme']) ?>"></button>
 

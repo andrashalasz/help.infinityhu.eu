@@ -156,8 +156,8 @@ function editor_block(string $chapter, string $body): void
 
             <div class="ed-grp">
               <button type="button" data-act="link" title="<?= h(t('Hivatkozás (Ctrl+K)')) ?>">🔗</button>
-              <button type="button" data-act="upload-image" title="<?= h(t('Kép feltöltése és beszúrása')) ?>"><?= h(t('🖼&nbsp;Kép')) ?></button>
-              <button type="button" data-act="upload-video" title="<?= h(t('Videó feltöltése és beszúrása')) ?>"><?= h(t('🎬&nbsp;Videó')) ?></button>
+              <button type="button" data-act="upload-image" title="<?= h(t('Kép feltöltése és beszúrása')) ?>">🖼&nbsp;<?= h(t('Kép')) ?></button>
+              <button type="button" data-act="upload-video" title="<?= h(t('Videó feltöltése és beszúrása')) ?>">🎬&nbsp;<?= h(t('Videó')) ?></button>
               <div class="ed-pop">
  <button type="button" class="ed-pop__b ed-pop__b--wide" data-pop="table" title="<?= h(t('Táblázat beszúrása')) ?>">▦&nbsp;Tábla<span class="ed-car">▾</span></button>
                 <div class="ed-pop__m ed-pop__m--tbl" data-pop-menu="table">

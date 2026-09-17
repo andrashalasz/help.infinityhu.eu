@@ -143,7 +143,7 @@ function page_releases(PDO $db, array $counts, int $showId = 0): void
                         <input type="hidden" name="rel" value="<?= (int)$showId ?>">
                         <input class="inp" name="description" value="<?= h((string)$c['description']) ?>"
                                style="flex:1;min-width:200px">
-                        <label class="check" title="<?= h(t('Az apró javítás nem jelenik meg a Frissítések lapon')) ?>">
+                        <label class="check" title="<?= h(t('Az apró javítás nem jelenik meg az Újdonságok lapon')) ?>">
                           <input type="checkbox" name="is_minor" value="1" <?= (int)$c['is_minor'] ? 'checked' : '' ?>> <?= h(t('apró')) ?>
                         </label>
                         <button class="btn btn--sm" type="submit"><?= h(t('Mentés')) ?></button>

@@ -91,8 +91,12 @@ function ui_keys_in_use(): array
         if (preg_match_all("/\bt\(\s*'((?:[^'\\\\]|\\\\.)*)'/", $src, $m)) {
             foreach ($m[1] as $k) {
                 $k = str_replace(["\\'", '\\\\'], ["'", '\\'], $k);
-                // az osszefuzes toredeke ("tab.", "flash.") nem kulcs
-                if ($k === '' || str_ends_with($k, '.')) { continue; }
+                // Az OSSZEFUZES TOREDEKE nem kulcs: t('tab.' . $x) eseten a
+                // beolvaso csak a "tab." reszt latja. Ezek pontozott
+                // azonosito-elotagok - csupa ekezet nelkuli kisbetu, pont es
+                // alulvonas, szokoz nelkul. Egy rendes MONDAT is vegzodhet
+                // ponttal, azt nem szabad eldobni.
+                if ($k === '' || preg_match('/^[a-z0-9_]+(?:\.[a-z0-9_]+)*\.$/', $k)) { continue; }
                 $found[$k] = $known[$k] ?? $k;
             }
         }
@@ -210,7 +214,7 @@ function ui_default(string $key = ''): string|array
         'torles.kukaba.magyarazat' => 'A fejezet a <b>Kukába</b> kerül a korábbi változataival '
             . 'együtt — onnan egy kattintással visszaállítható, amíg ki nem üríted.',
         'kiadas.magyarazat' => 'Minden közzétételkor keletkezik egy <b>összefoglaló</b>, és a '
-            . '<b>nyitott</b> kiadásba gyűlik. Ez az a szöveg, amit az olvasó a <b>Frissítések</b> '
+            . '<b>nyitott</b> kiadásba gyűlik. Ez az a szöveg, amit az olvasó a <b>Újdonságok</b> '
             . 'lapon lát. A kiadás lezárása dátumot és verziószámot ad nekik, leveszi az '
             . 'újdonságjelzéseket, és megnyit egy újat.',
         'forditas.magyarazat' => 'A forrásnyelvről fordítunk. Válaszd ki a fejezetet, és írd meg '
@@ -282,6 +286,10 @@ function ui_default(string $key = ''): string|array
         'Súgószövegek' => 'Súgószövegek',
         'Visszavonás' => 'Visszavonás',
         'Általános' => 'Általános',
+
+        // --- naplo ---
+        'naplo.osszesen' => 'összesen {n} bejegyzés',
+        'naplo.lap'      => '{lap}. lap / {ossz}',
 
         // --- kozzetetel ---
         'kozzetetel.forditas.marad' => 'A fordítások maradjanak naprakészek',
