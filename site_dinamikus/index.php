@@ -544,11 +544,36 @@ $totalArticles = array_sum(array_map(static fn($m) => count($m['articles']), $mo
         <div class="nav__empty"><?= h($u['nocontent']) ?></div>
       <?php endif; ?>
       <?php foreach ($modules as $m): ?>
+        <?php
+          // A fofejezet BEVEZETO fejezete az, aminek ugyanaz a szama, mint a
+          // fofejezetnek (pl. "6" a "6 Keszletezes" alatt). Ez a fofejezet
+          // leirasa - kulon sorban felsorolva ugyanaz allt ott ketszer.
+          // Ezert kiemeljuk a listabol: maga a fofejezet cime nyitja meg.
+          $intro = null;
+          foreach ($m['articles'] as $ik => $ia) {
+              if (trim((string)$ia['chapter_no']) === trim((string)$m['chapter_no'])) {
+                  $intro = $ia;
+                  unset($m['articles'][$ik]);
+                  break;
+              }
+          }
+          $introOpen = $intro !== null && $article && $intro['slug'] === $article['slug'];
+        ?>
         <div class="nav__mod" data-mod="<?= h((string)$m['id']) ?>">
-          <button class="nav__mt" aria-expanded="true">
-            <i><?= h($m['chapter_no']) ?></i><span><?= h($m['title']) ?></span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-          </button>
+          <div class="nav__mh">
+            <?php if ($intro !== null): ?>
+              <a class="nav__mt<?= $introOpen ? ' on' : '' ?>"
+                 href="/<?= h($lang) ?>/<?= h($intro['slug']) ?>">
+                <i><?= h($m['chapter_no']) ?></i><span><?= h($m['title']) ?></span></a>
+            <?php else: ?>
+              <button class="nav__mt nav__fold" aria-expanded="true">
+                <i><?= h($m['chapter_no']) ?></i><span><?= h($m['title']) ?></span></button>
+            <?php endif; ?>
+            <button class="nav__fold nav__caret" aria-expanded="true"
+                    aria-label="<?= h($u['fold'] ?? 'Ki- és összecsukás') ?>">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+          </div>
           <div class="nav__list">
             <?php foreach ($m['articles'] as $a): ?>
               <?php

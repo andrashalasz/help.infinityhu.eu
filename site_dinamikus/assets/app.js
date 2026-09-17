@@ -83,7 +83,10 @@
   }
   document.addEventListener('click', function () {
     $$('.pop, .fs-pop').forEach(function (p) { p.classList.remove('on'); });
-    $$('[aria-expanded]').forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
+    // csak a felugro panelek gombjai - a menu nyitottsagat nem ez jelzi
+    $$('.pop-btn[aria-expanded], .fs-btn[aria-expanded]').forEach(function (b) {
+      b.setAttribute('aria-expanded', 'false');
+    });
   });
 
   /* ---------------------------------------------------------- 4. képnagyító */
@@ -275,13 +278,18 @@
       var id = mod.getAttribute('data-mod');
       var hasActive = !!$('.nav__a.on', mod);
       if (closed[id] && !hasActive) { mod.classList.add('closed'); }
-      var bt = $('.nav__mt', mod);
-      if (!bt) { return; }
-      bt.addEventListener('click', function () {
-        var isClosed = mod.classList.toggle('closed');
-        closed[id] = isClosed;
-        bt.setAttribute('aria-expanded', String(!isClosed));
-        LS.set(OPEN_KEY, JSON.stringify(closed));
+      // A cim LINK lett (a fofejezet leirasara mutat), ezert a nyitast es
+      // csukast kulon gomb vegzi: a nyil, illetve - ha nincs leiras - maga
+      // a cim is, mert az akkor gomb marad.
+      var folds = $$('.nav__fold', mod);
+      if (!folds.length) { return; }
+      folds.forEach(function (bt) {
+        bt.addEventListener('click', function () {
+          var isClosed = mod.classList.toggle('closed');
+          closed[id] = isClosed;
+          folds.forEach(function (b) { b.setAttribute('aria-expanded', String(!isClosed)); });
+          LS.set(OPEN_KEY, JSON.stringify(closed));
+        });
       });
     });
 
