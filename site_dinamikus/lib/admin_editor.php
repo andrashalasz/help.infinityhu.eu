@@ -11,8 +11,35 @@
  */
 declare(strict_types=1);
 
+/**
+ * A szerkesztoben kinalt betuszinek. A kimenetet a help_clean_style() ugyis
+ * ellenorzi, ez csak a kinalat.
+ *
+ * @return array<string,string> hex => nev
+ */
+function editor_colors(): array
+{
+    return [
+        '#1f2a36' => 'Alap',    '#0a6ed1' => 'Kék',   '#107e3e' => 'Zöld',
+        '#b8681a' => 'Narancs', '#bb0000' => 'Piros', '#6b21a8' => 'Lila',
+        '#6b7a8d' => 'Szürke',
+    ];
+}
+
+/** A szovegkiemelo (hatterszin) szinei. @return array<string,string> */
+function editor_marks(): array
+{
+    return ['#fff3a3' => 'Sárga', '#d6f2e0' => 'Zöld', '#fde2e2' => 'Piros', '#dceafd' => 'Kék'];
+}
+
 function editor_block(string $chapter, string $body): void
 {
+    // FIGYELEM: ezek fuggvenyhivasok, nem a hivo valtozoi. Amikor a
+    // szerkeszto kikerult sajat fuggvenybe, a $edColors/$edMarks a hivo
+    // hatokoreben maradt - a ket szinsor ures lett, es csak a "kiemeles
+    // torlese" kocka latszott.
+    $edColors = editor_colors();
+    $edMarks  = editor_marks();
     ?>
         <div class="ed" data-chapter="<?= h($chapter) ?>">
           <div class="ed-toolbar">

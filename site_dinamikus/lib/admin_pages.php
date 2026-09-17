@@ -731,16 +731,6 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
                  value="<?= h((string)($article['draft_title'] ?? $article['title'])) ?>">
         </div>
 
-        <?php
-        // A szerkesztoben hasznalt betu- es kiemeloszinek. A kimenetet a
-        // help_clean_style() ugyis ellenorzi, ez csak a kinalat.
-        $edColors = [
-            '#1f2a36' => 'Alap', '#0a6ed1' => 'Kék', '#107e3e' => 'Zöld',
-            '#b8681a' => 'Narancs', '#bb0000' => 'Piros', '#6b21a8' => 'Lila',
-            '#6b7a8d' => 'Szürke',
-        ];
-        $edMarks = ['#fff3a3' => 'Sárga', '#d6f2e0' => 'Zöld', '#fde2e2' => 'Piros', '#dceafd' => 'Kék'];
-        ?>
         <?php editor_block((string)$article['chapter_no'], $body); ?>
 
         <div class="hint" style="margin-top:6px">
