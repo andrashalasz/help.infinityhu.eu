@@ -914,3 +914,20 @@ a.stat:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
   font-size: calc(12.6px * var(--fs));
 }
 .pager .is-off { pointer-events: none; opacity: .35; }
+
+/* ---------- fogaskerék-menü a fejlécben ---------- */
+/* A ritkabban kello lapok (gepi forditas, felulet-szovegek, nyelvek,
+   kiadasok) innen nyilnak - nem egy hosszu Beallitasok oldal paneljei. */
+.amenu { position: relative; flex: none; }
+.amenu__m {
+  position: absolute; top: calc(100% + 6px); right: 0; z-index: 70; min-width: 220px;
+  padding: 5px; background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--r); box-shadow: var(--shadow-3);
+}
+.amenu__m[hidden] { display: none; }
+.amenu__m a {
+  display: block; padding: 8px 10px; border-radius: var(--r-sm);
+  color: var(--ink); font-size: calc(13.2px * var(--fs)); white-space: nowrap;
+}
+.amenu__m a:hover { background: var(--surface-2); text-decoration: none; }
+.amenu__m a.on { background: var(--brand-soft); color: var(--brand-strong); font-weight: 600; }

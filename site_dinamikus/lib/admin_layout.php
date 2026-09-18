@@ -17,7 +17,17 @@ function admin_tabs(): array
 }
 
 /** A fulsavon kivul, a fejlec ikonjai kozott elerheto lapok. */
-const ADMIN_ICON_PAGES = ['settings' => 'Beállítások', 'uitexts' => 'A kezelőfelület szövegei'];
+/**
+ * A fogaskerek menujenek pontjai. Ezek nem a fulsavon vannak, mert
+ * ritkabban kellenek - de mindegyik onallo lap, nem egy hosszu
+ * "Beallitasok" oldal egymas ala zsufolt paneljei.
+ */
+const ADMIN_ICON_PAGES = [
+    'mt'       => 'Gépi fordítás',
+    'uitexts'  => 'A kezelőfelület szövegei',
+    'langs'    => 'Nyelvek',
+    'releases' => 'Kiadások',
+];
 
 /**
  * A sugo nyelvei. UJ NYELVET ITT kell felvenni - a forrasnyelv az elso elem
@@ -158,14 +168,25 @@ function admin_head(string $title, string $page = '', array $counts = []): void
   <?php endif; ?>
 
   <?php if (auth_can('settings')): ?>
-    <a class="sbtn<?= $page === 'settings' ? ' on' : '' ?>" href="<?= h(admin_url(['p' => 'settings'])) ?>"
-       title="<?= h(t('head.settings')) ?>">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-           stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="3"/>
-        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.14.35.4.64.73.82.29.16.62.24.95.24H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-      </svg>
-    </a>
+    <?php // A fogaskerek MENUT nyit: gepi forditas, felulet-szovegek,
+          // nyelvek, kiadasok - mindegyik sajat lap. ?>
+    <div class="amenu">
+      <button class="sbtn<?= array_key_exists($page, ADMIN_ICON_PAGES) ? ' on' : '' ?>" type="button"
+              id="gear-btn" aria-expanded="false" aria-haspopup="true"
+              title="<?= h(t('head.settings')) ?>">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.14.35.4.64.73.82.29.16.62.24.95.24H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
+      <div class="amenu__m" id="gear-menu" role="menu" hidden>
+        <?php foreach (ADMIN_ICON_PAGES as $key => $label): ?>
+          <a role="menuitem" class="<?= $page === $key ? 'on' : '' ?>"
+             href="<?= h(admin_url(['p' => $key])) ?>"><?= h(t($label)) ?></a>
+        <?php endforeach; ?>
+      </div>
+    </div>
   <?php endif; ?>
   <a class="sbtn" href="<?= h(admin_url(['p' => 'account'])) ?>" title="<?= h(t('head.account')) ?>">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></svg>

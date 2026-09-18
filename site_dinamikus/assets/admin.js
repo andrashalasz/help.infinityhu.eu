@@ -266,6 +266,25 @@
     });
   }
 
+  /* --------------------------------- fogaskerek-menu a fejlecben
+     A ritkabban kello lapok (gepi forditas, felulet-szovegek, nyelvek,
+     kiadasok) menubol nyilnak, nem egy hosszu Beallitasok oldalrol. */
+  function wireGearMenu() {
+    var btn = $('#gear-btn'), menu = $('#gear-menu');
+    if (!btn || !menu) { return; }
+
+    function close() { menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); }
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var open = menu.hidden;
+      menu.hidden = !open;
+      btn.setAttribute('aria-expanded', String(open));
+    });
+    menu.addEventListener('click', function (e) { e.stopPropagation(); });
+    document.addEventListener('click', close);
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { close(); } });
+  }
+
   function wireConfirmForms() {
     document.addEventListener('submit', function (e) {
       var f = e.target;
@@ -2210,6 +2229,7 @@
 
     wireFlash();
     wireFontSize();
+    wireGearMenu();
     wireUiTexts();
     wireConfirmForms();
     wireScopeForms();

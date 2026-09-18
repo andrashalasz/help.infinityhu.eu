@@ -198,8 +198,15 @@ switch ($page) {
     case 'trash':
         page_trash($db, $counts);
         break;
+    // A "Beallitasok" szetesett: minden temanak sajat lapja van, a
+    // fogaskerek pedig menut nyit. A regi ?p=settings a gepi forditasra
+    // visz, hogy a konyvjelzok es a regi hivatkozasok ne torjenek el.
     case 'settings':
-        page_settings($db, $cfg, $counts);
+    case 'mt':
+        page_mt($db, $cfg, $counts);
+        break;
+    case 'langs':
+        page_langs($db, $cfg, $counts);
         break;
     case 'uitexts':
         page_uitexts($db, $cfg, $counts);

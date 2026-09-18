@@ -485,6 +485,31 @@ function page_translate(PDO $db, array $cfg, int $srcId, string $to, array $coun
     </div>
   </div>
 </div>
+
+  <?php // Az oldalcimek is NYELVENKENTI SZOVEGEK, ezert ide tartoznak, nem a
+        // beallitasok koze: itt dolgozol a nyelvi valtozatokkal. ?>
+  <div class="panel" style="margin-bottom:16px">
+      <div class="panel__h"><h2><?= h(t('Oldalcímek')) ?></h2></div>
+      <div class="panel__b">
+        <form method="post" action="<?= h(admin_url()) ?>">
+          <?= csrf_input() ?>
+          <input type="hidden" name="a" value="setting.save">
+          <div class="row">
+            <?php foreach (admin_langs() as $code => $label): ?>
+              <div class="field"><label><?= h($label) ?></label>
+                <input class="inp" name="site_title_<?= h($code) ?>" value="<?= h(admin_setting($db, 'site_title_' . $code)) ?>"></div>
+            <?php endforeach; ?>
+          </div>
+          <div class="hint" style="margin-top:4px">
+            <b><?= h(t('Újdonságjelzés:')) ?></b> a közzétett fejezet <b><?= h(t('ÚJ')) ?></b> vagy <b><?= h(t('FRISSÍTVE')) ?></b> címkét kap a bal
+            sávban, és felkerül a <b><?= h(t('Újdonságok')) ?></b> lapra. A jelzés a <b><?= h(t('kiadás lezárásáig')) ?></b> marad kint
+            (Beállítások → Kiadások) — nem jár le magától. Az „apró javítás" jelöléssel közzétett
+            módosítás nem kelti újra a jelzést.
+          </div>
+          <button class="btn btn--p" type="submit"><?= h(t('Mentés')) ?></button>
+        </form>
+      </div>
+    </div>
     <?php
     admin_foot();
 }
@@ -913,87 +938,26 @@ function page_users(PDO $db, array $counts): void
 }
 
 // ============================================================ BEÁLLÍTÁSOK
-function page_settings(PDO $db, array $cfg, array $counts): void
+/**
+ * A "Beallitasok" szetbontva: minden temanak sajat lapja van.
+ *
+ * Egyetlen hosszu Beallitasok lapon egymas alatt allt a gepi fordito, a
+ * nyelvek, a kiadasok, a felulet szovegei, a sajat jelszo es az oldalcimek -
+ * ot-hat, egymashoz semmi kozuk. Mostantol a fogaskerek egy MENUT nyit, es
+ * mindegyik onallo lap. Ket panel pedig oda kerult, ahova tartozik:
+ *   - a sajat jelszo a Sajat fiok lapra
+ *   - az oldalcimek a Forditas lapra (azok is nyelvenkenti szovegek)
+ */
+function page_mt(PDO $db, array $cfg, array $counts): void
 {
-    $langs = [];
-    try {
-        $langs = $db->query('SELECT * FROM help_lang ORDER BY is_source DESC, sort_order, code')->fetchAll();
-    } catch (Throwable $e) {
-        // a 07_nyelvek.sql meg nem futott le
-    }
-
-    // a kezelofelulet forditando szovegei
-    $uiKeys    = ui_keys_in_use();
-    $uiTargets = admin_target_langs();
-    $uiText    = [];
-    try {
-        foreach ($db->query('SELECT ui_key, lang, text FROM help_ui')->fetchAll() as $r) {
-            $uiText[(string)$r['lang']][(string)$r['ui_key']] = (string)$r['text'];
-        }
-    } catch (Throwable $e) {
-        // a 08_felulet_forditas.sql meg nem futott le
-    }
     $tr = Translator::fromConfig($cfg, $db);
-    $release = $db->query("SELECT * FROM help_release WHERE status = 'open' LIMIT 1")->fetch();
-    $closed  = $db->query("SELECT * FROM help_release WHERE status = 'closed' ORDER BY released_at DESC LIMIT 5")->fetchAll();
-    $pending = (int)$db->query("SELECT COUNT(*) FROM help_changelog
-                                  WHERE release_id = (SELECT id FROM (SELECT id FROM help_release WHERE status='open' LIMIT 1) r)")->fetchColumn();
     $envMt = ($cfg['mt_provider'] ?? '') !== '';
 
-    admin_head(t('Beállítások'), 'settings', $counts);
+    admin_head(t('Gépi fordítás'), 'settings', $counts);
     ?>
 <div class="page" style="max-width:900px">
-  <h1 class="pt"><?= h(t('Beállítások')) ?></h1>
+  <h1 class="pt"><?= h(t('Gépi fordítás')) ?></h1>
   <?= flash_render() ?>
-
-  <div class="panel" style="margin-bottom:16px">
-    <div class="panel__h"><h2><?= h(t('Oldalcímek')) ?></h2></div>
-    <div class="panel__b">
-      <form method="post" action="<?= h(admin_url()) ?>">
-        <?= csrf_input() ?>
-        <input type="hidden" name="a" value="setting.save">
-        <div class="row">
-          <?php foreach (admin_langs() as $code => $label): ?>
-            <div class="field"><label><?= h($label) ?></label>
-              <input class="inp" name="site_title_<?= h($code) ?>" value="<?= h(admin_setting($db, 'site_title_' . $code)) ?>"></div>
-          <?php endforeach; ?>
-        </div>
-        <div class="hint" style="margin-top:4px">
-          <b><?= h(t('Újdonságjelzés:')) ?></b> a közzétett fejezet <b><?= h(t('ÚJ')) ?></b> vagy <b><?= h(t('FRISSÍTVE')) ?></b> címkét kap a bal
-          sávban, és felkerül a <b><?= h(t('Újdonságok')) ?></b> lapra. A jelzés a <b><?= h(t('kiadás lezárásáig')) ?></b> marad kint
-          (Beállítások → Kiadások) — nem jár le magától. Az „apró javítás" jelöléssel közzétett
-          módosítás nem kelti újra a jelzést.
-        </div>
-        <button class="btn btn--p" type="submit"><?= h(t('Mentés')) ?></button>
-      </form>
-    </div>
-  </div>
-
-  <div class="panel" style="margin-bottom:16px" id="jelszo">
- <div class="panel__h"><h2><?= h(t('Saját jelszó')) ?></h2><span class="sp"></span>
-      <span class="muted"><?= h(auth_user()['username']) ?></span></div>
-    <div class="panel__b">
-      <p class="lead" style="margin-bottom:14px">
-        A jelszó cseréje <b><?= h(t('nem kötelező')) ?></b> — akkor változtasd meg, amikor szeretnéd.
-      </p>
-      <form method="post" action="<?= h(admin_url()) ?>" autocomplete="off">
-        <?= csrf_input() ?>
-        <input type="hidden" name="a" value="chpw">
-        <div class="row">
-          <div class="field"><label for="s-cur"><?= h(t('Jelenlegi jelszó')) ?></label>
-            <input class="inp" id="s-cur" name="current" type="password" autocomplete="current-password" required></div>
-          <div class="field"><label for="s-n1"><?= h(t('Új jelszó')) ?></label>
-            <input class="inp" id="s-n1" name="new" type="password" autocomplete="new-password" required minlength="8"></div>
-          <div class="field"><label for="s-n2"><?= h(t('Még egyszer')) ?></label>
-            <input class="inp" id="s-n2" name="new2" type="password" autocomplete="new-password" required minlength="8"></div>
-          <div class="field" style="flex:0 1 auto;align-self:flex-end">
-            <button class="btn btn--p" type="submit"><?= h(t('Jelszó mentése')) ?></button></div>
-        </div>
-        <div class="hint"><?= h(t('Legalább 8 karakter, betű és szám is legyen benne.')) ?></div>
-      </form>
-    </div>
-  </div>
-
   <div class="panel" style="margin-bottom:16px">
  <div class="panel__h"><h2><?= h(t('Gépi fordítás')) ?></h2><span class="sp"></span>
       <span class="badge <?= $tr->isConfigured() ? 'badge--ok' : '' ?>"><?= h($tr->label()) ?></span></div>
@@ -1053,32 +1017,25 @@ function page_settings(PDO $db, array $cfg, array $counts): void
       </div>
     </div>
   </div>
+</div>
+    <?php
+    admin_foot();
+}
 
-  <?php // A felulet szovegei sajat lapot kaptak: 600+ sor egy tablazatban
-        // kezelhetetlen volt. Itt csak a bejarat es a keszultseg latszik. ?>
-  <div class="panel" style="margin-bottom:16px">
-    <div class="panel__h"><h2><?= h(t('A kezelőfelület szövegei')) ?></h2>
-      <span class="sp"></span>
-      <a class="btn btn--sm btn--p" href="<?= h(admin_url(['p' => 'uitexts'])) ?>"><?= h(t('Megnyitás')) ?> →</a>
-    </div>
-    <div class="panel__b">
-      <p class="lead" style="margin:0 0 10px"><?= t('uitext.bevezeto') ?></p>
-      <div class="uit-stats">
-        <?php foreach ($uiTargets as $code => $label):
-            $kesz = 0;
-            foreach ($uiKeys as $k => $srcTxt) { if (trim((string)($uiText[$code][$k] ?? '')) !== '') { $kesz++; } }
-            $pct = count($uiKeys) ? (int)round($kesz / count($uiKeys) * 100) : 100;
-        ?>
-          <div class="uit-stat">
-            <div class="uit-stat__h"><b><?= h($label) ?></b>
-              <span class="muted"><?= $kesz ?> / <?= count($uiKeys) ?></span></div>
-            <div class="uit-bar"><i style="width:<?= $pct ?>%"></i></div>
-          </div>
-        <?php endforeach; ?>
-      </div>
-    </div>
-  </div>
+function page_langs(PDO $db, array $cfg, array $counts): void
+{
+    $langs = [];
+    try {
+        $langs = $db->query('SELECT * FROM help_lang ORDER BY is_source DESC, sort_order, code')->fetchAll();
+    } catch (Throwable $e) {
+        // a 07_nyelvek.sql meg nem futott le
+    }
 
+    admin_head(t('Nyelvek'), 'settings', $counts);
+    ?>
+<div class="page" style="max-width:900px">
+  <h1 class="pt"><?= h(t('Nyelvek')) ?></h1>
+  <?= flash_render() ?>
   <div class="panel" style="margin-bottom:16px">
     <div class="panel__h"><h2><?= h(t('Nyelvek')) ?></h2><span class="sp"></span>
       <span class="badge"><?= count($langs) ?></span></div>
@@ -1154,56 +1111,6 @@ function page_settings(PDO $db, array $cfg, array $counts): void
         </div>
         <div class="hint"><?= t('A felvételkor a főfejezetek átmásolódnak az új nyelvre (magyar névvel, amit utána a Fejezetek fülön írhatsz át), hogy legyen hova tenni a fordításokat.') ?></div>
       </form>
-    </div>
-  </div>
-
-  <div class="panel">
-    <div class="panel__h"><h2><?= h(t('Kiadások')) ?></h2></div>
-    <div class="panel__b">
-      <p class="lead" style="margin-bottom:14px"><?= t('A közzétételkor megadott összefoglalók a nyitott kiadásba gyűlnek. A kiadás lezárása dátumot és verziószámot ad nekik, és megnyit egy újat.') ?></p>
-      <?php if ($release): ?>
-        <div class="msg msg--info" style="margin-bottom:14px">
-          Nyitott kiadás: <b><?= h($release['version']) ?></b> — <?= $pending ?> bejegyzés vár benne.
-        </div>
-        <?php
-        // A kovetkezo verzioszam a mostanibol kepzodik: v2026.09 -> v2026.10,
-        // ev vegen v2026.12 -> v2027.01. Ha nem ilyen alaku, marad uresen.
-        $nextVersion = '';
-        if (preg_match('/^v?(\d{4})\.(\d{1,2})$/', trim((string)$release['version']), $vm)) {
-            $y = (int)$vm[1];
-            $mo = (int)$vm[2] + 1;
-            if ($mo > 12) { $mo = 1; $y++; }
-            $nextVersion = sprintf('v%04d.%02d', $y, $mo);
-        }
-        ?>
-        <form method="post" action="<?= h(admin_url()) ?>"
-              data-confirm="<?= h(t('Lezárod a kiadást? Ez minden fejezet verziószámát frissíti.')) ?>">
-          <?= csrf_input() ?>
-          <input type="hidden" name="a" value="release.close">
-          <div class="row">
-            <div class="field"><label><?= h(t('Lezárandó verzió neve')) ?></label>
-              <input class="inp" name="version" value="<?= h($release['version']) ?>" required></div>
-            <div class="field"><label><?= h(t('A következő (nyitott) verzió')) ?></label>
-              <input class="inp" name="next" value="<?= h($nextVersion) ?>" placeholder="v2026.10" required>
-              <div class="hint"><?= h(t('Automatikusan a következő hónap — átírható.')) ?></div></div>
-            <div class="field" style="flex:0 1 auto;align-self:flex-end">
-              <button class="btn" type="submit"><?= h(t('Kiadás lezárása')) ?></button></div>
-          </div>
-        </form>
-      <?php else: ?>
-        <div class="muted"><?= h(t('Nincs nyitott kiadás.')) ?></div>
-      <?php endif; ?>
-
-      <?php if ($closed): ?>
-        <table class="tbl" style="margin-top:16px">
-          <thead><tr><th><?= h(t('Verzió')) ?></th><th><?= h(t('Lezárva')) ?></th></tr></thead>
-          <tbody>
-          <?php foreach ($closed as $c): ?>
-            <tr><td><b><?= h($c['version']) ?></b></td><td class="muted"><?= h((string)$c['released_at']) ?></td></tr>
-          <?php endforeach; ?>
-          </tbody>
-        </table>
-      <?php endif; ?>
     </div>
   </div>
 </div>
