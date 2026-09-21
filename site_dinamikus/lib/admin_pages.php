@@ -347,8 +347,10 @@ function page_dashboard(PDO $db, array $cfg, array $counts): void
 
 // ============================================================ FEJEZETEK
 function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId = 0,
-                       int $diffRev = 0): void
+                       int $diffRev = 0, array $cfg = []): void
 {
+    // a gepi fordito allapotahoz kell (a "Kozzeteves mindenhol" gombhoz)
+    if (!$cfg) { $cfg = require __DIR__ . '/../config.php'; }
     // A fofejezet szerkesztesehez a jobb oldali oszlop a fejezet-szerkeszto
     // helyett a fofejezet adatlapjat mutatja.
     $module = null;
@@ -846,7 +848,21 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
             </div>
             <div class="modal__f">
               <button class="btn btn--ghost" type="button" data-close><?= h(t('Mégsem')) ?></button>
-              <button class="btn btn--ok" type="submit"><?= h(t('Közzététel')) ?></button>
+              <span style="flex:1"></span>
+              <button class="btn" type="submit"><?= h(t('Közzététel')) ?></button>
+              <?php // A tobbi nyelv EGY gombbal: leforditja es kozze is teszi.
+                    // Csak a forrasnyelven van ertelme, es csak ha van fordito. ?>
+              <?php if ($article['lang'] === admin_source_lang() && admin_target_langs()):
+                      $trCfg = Translator::fromConfig($cfg, $db); ?>
+                <button class="btn btn--ok" type="submit" id="publish-all"
+                        data-langs="<?= h(implode(',', array_keys(admin_target_langs()))) ?>"
+                        <?= $trCfg->isConfigured() ? '' : 'disabled' ?>
+                        title="<?= h($trCfg->isConfigured()
+                             ? t('kozzetetel.mindenhol.sugo')
+                             : t('Nincs beállítva gépi fordító')) ?>">
+                  <?= h(t('kozzetetel.mindenhol')) ?>
+                </button>
+              <?php endif; ?>
             </div>
           </form>
         </div>

@@ -168,7 +168,10 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
 
             if ($wantsJson) { help_json(['ok' => true, 'saved_at' => date('H:i:s'), 'renamed' => $renamed]); }
             flash('ok', t('flash.article.draft.vazlat-mentve'));
-            back(['p' => 'articles', 'id' => $id]);
+            // A mentes utan rogton felajanljuk a kozzetetelt: enelkul a
+            // szerkesztonek kulon meg kell keresnie a gombot minden
+            // apro javitas utan.
+            back(['p' => 'articles', 'id' => $id, 'kerdez' => 1]);
         }
 
         case 'article.publish': {
@@ -344,6 +347,86 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                      ($on ? 'lathato' : 'elrejtve') . ', ' . $scope . ', ' . $n . ' nyelv');
             flash('ok', visibility_flash($on, $name, $scope, $n, (string)$m['lang']));
             back(['p' => 'articles', 'lang' => (string)$m['lang']]);
+        }
+
+        // EGY nyelv leforditasa a forrasbol ES rogton kozzeteve.
+        //
+        // A "Kozzeteves mindenhol" gomb hivja, nyelvenkent kulon keresben: egy
+        // fejezet forditasa nyelvenkent fel perc is lehet, harom nyelv egyben
+        // tullepne a webkiszolgalo idokorlatjat. A bongeszo hajtja vegig, es
+        // kozben latszik, hol tart.
+        case 'article.translate-publish': {
+            $srcId = (int)post('src_id');
+            $to    = strtolower(trim(post('lang')));
+            if (!array_key_exists($to, admin_langs()) || $to === admin_source_lang()) {
+                help_json(['ok' => false, 'error' => t('Ismeretlen célnyelv.')], 400);
+            }
+
+            $q = $db->prepare('SELECT chapter_no, lang FROM help_article WHERE id = ?');
+            $q->execute([$srcId]);
+            $src = $q->fetch();
+            if (!$src) { help_json(['ok' => false, 'error' => t('Nincs ilyen forrásfejezet.')], 404); }
+
+            // 1. Van-e MAR friss forditas-vazlat ezen a nyelven? A forras
+            //    kozzetetele az automatikus forditassal (ha be van kapcsolva)
+            //    ezt mar elkeszitette - ilyenkor felesleges ujra elkuldeni a
+            //    forditonak, csak penzbe es idobe kerulne.
+            $h = $db->prepare('SELECT content_hash FROM help_article WHERE id = ?');
+            $h->execute([$srcId]);
+            $srcHash = (string)$h->fetchColumn();
+
+            $kesz = $db->prepare('SELECT id FROM help_article
+                                   WHERE chapter_no = ? AND lang = ?
+                                     AND draft_html IS NOT NULL
+                                     AND translated_from_hash = ? LIMIT 1');
+            $kesz->execute([$src['chapter_no'], $to, $srcHash]);
+            $marVan = (int)$kesz->fetchColumn() > 0;
+
+            $r = $marVan
+                ? ['done' => [$to], 'failed' => [], 'why' => '']
+                : mt_auto_translate($db, $cfg, $srcId, auth_user()['id'], [$to]);
+            if (isset($r['failed'][$to])) {
+                help_json(['ok' => false, 'lang' => $to, 'error' => strip_tags((string)$r['failed'][$to])], 500);
+            }
+            if (!$r['done']) {
+                help_json(['ok' => false, 'lang' => $to,
+                           'error' => strip_tags(t(match ($r['why'] ?? '') {
+                               'ures'       => 'flash.translate.auto.ures',
+                               'nem-magyar' => 'flash.translate.auto.nem-forras',
+                               'nincs'      => 'flash.translate.auto.nincs',
+                               default      => 'flash.translate.auto.semmi',
+                           }))], 400);
+            }
+
+            // 2. a most keszult vazlat kozzetetele ezen a nyelven
+            $t = $db->prepare('SELECT id FROM help_article
+                                WHERE chapter_no = ? AND lang = ? AND draft_html IS NOT NULL LIMIT 1');
+            $t->execute([$src['chapter_no'], $to]);
+            $tid = (int)$t->fetchColumn();
+            if ($tid === 0) {
+                help_json(['ok' => false, 'lang' => $to,
+                           'error' => strip_tags(t('flash.article.publish.nincs-kozzetetelre-varo-vazlat'))], 500);
+            }
+
+            $db->beginTransaction();
+            try {
+                $p = $db->prepare('CALL help_publish(?, ?, ?, ?, NULL, ?)');
+                // apro javitaskent megy: a forras fejezet mar felkerult az
+                // Ujdonsagokba, nem kell nyelvenkent ujra
+                $p->execute([$tid, auth_user()['id'], null, 'mod', 1]);
+                $p->closeCursor();
+                $body = $db->prepare('SELECT body_html FROM help_article WHERE id = ?');
+                $body->execute([$tid]);
+                sections_rebuild($db, $tid, (string)$body->fetchColumn());
+                $db->commit();
+            } catch (Throwable $e) {
+                if ($db->inTransaction()) { $db->rollBack(); }
+                help_json(['ok' => false, 'lang' => $to, 'error' => strip_tags($e->getMessage())], 500);
+            }
+
+            audit_me($db, 'article.translate-publish', 'article:' . $tid,
+                     strtoupper($to) . ($marVan ? ' (meglevo vazlat)' : ' (uj forditas)'));
+            help_json(['ok' => true, 'lang' => $to, 'id' => $tid, 'reused' => $marVan]);
         }
 
         case 'article.meta': {

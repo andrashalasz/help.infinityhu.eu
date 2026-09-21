@@ -285,6 +285,84 @@
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { close(); } });
   }
 
+  /* ------------------------------ kozzeteves: kerdes es "mindenhol"
+     Ket dolgot old meg, amitol eddig sok volt a kattintgatas:
+       1. vazlatmentes utan rogton felajanlja a kozzetetelt (a szerver
+          ?kerdez=1-gyel jon vissza)
+       2. egy gomb, ami a tobbi nyelvre leforditja ES kozze is teszi.
+          Nyelvenkent KULON keresben megy: egy fejezet forditasa fel perc
+          is lehet, harom nyelv egyben tullepne a kiszolgalo idokorlatjat. */
+  function wirePublish() {
+    // 1. mentes utan: nyissuk ki a kozzeteteli ablakot
+    if (/[?&]kerdez=1/.test(location.search)) {
+      var m = document.querySelector('#modal-publish');
+      if (m) { m.classList.add('on'); }
+      // a cim maradjon tiszta, hogy frissitesre ne nyiljon ujra
+      try { history.replaceState(null, '', location.href.replace(/([?&])kerdez=1&?/, '$1').replace(/[?&]$/, '')); } catch (e) {}
+    }
+
+    // 2. "Kozzeteves + forditas mindenhol"
+    var btn = $('#publish-all');
+    if (!btn) { return; }
+    var form = btn.closest('form');
+    if (!form) { return; }
+
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      var langs = (btn.getAttribute('data-langs') || '').split(',').filter(Boolean);
+      var eredeti = btn.textContent;
+      btn.disabled = true;
+
+      function baj(uzenet) {
+        toast(uzenet || 'A művelet megszakadt.', 'err');
+        btn.disabled = false;
+        btn.textContent = eredeti;
+      }
+
+      // a forras kozzetetele az urlap adataival (osszefoglalo, tipus, pipak)
+      btn.textContent = 'Közzététel…';
+      var fd = new FormData(form);
+      fd.append('fmt', 'json');
+      // a forditasokat ugyis frissen keszitjuk, ne jelolje oket naprakesznek
+      fd.delete('keep_tr');
+
+      fetch('admin.php', { method: 'POST', body: fd, credentials: 'same-origin' })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (!d.ok) { baj(d.error); return; }
+          var i = 0, kesz = 0;
+          (function kovetkezo() {
+            if (i >= langs.length) {
+              toast(kesz + ' nyelven közzétéve.');
+              location.href = location.pathname + location.search.replace(/[?&]kerdez=1/, '');
+              return;
+            }
+            var lang = langs[i++];
+            btn.textContent = 'Fordítás és közzététel: ' + lang.toUpperCase() + '…';
+            var f2 = new FormData();
+            var csrf = document.querySelector('[name=csrf]');
+            f2.append('csrf', csrf ? csrf.value : '');
+            f2.append('a', 'article.translate-publish');
+            f2.append('src_id', form.querySelector('[name=id]').value);
+            f2.append('lang', lang);
+            f2.append('fmt', 'json');
+            fetch('admin.php', { method: 'POST', body: f2, credentials: 'same-origin' })
+              .then(function (r) { return r.json(); })
+              .then(function (d2) {
+                if (d2.ok) { kesz++; }
+                else { toast(lang.toUpperCase() + ': ' + (d2.error || ''), 'err'); }
+                kovetkezo();
+              })
+              .catch(function () {
+                toast(lang.toUpperCase() + ': a fordítás megszakadt.', 'err');
+                kovetkezo();
+              });
+          })();
+        })
+        .catch(function () { baj(); });
+    });
+  }
+
   function wireConfirmForms() {
     document.addEventListener('submit', function (e) {
       var f = e.target;
@@ -2230,6 +2308,7 @@
     wireFlash();
     wireFontSize();
     wireGearMenu();
+    wirePublish();
     wireUiTexts();
     wireConfirmForms();
     wireScopeForms();

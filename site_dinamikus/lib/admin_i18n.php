@@ -291,6 +291,13 @@ function ui_default(string $key = ''): string|array
         'naplo.osszesen' => 'összesen {n} bejegyzés',
         'naplo.lap'      => '{lap}. lap / {ossz}',
 
+        // --- kozzeteves mindenhol ---
+        'kozzetetel.mindenhol'      => 'Közzététel + fordítás mindenhol',
+        'kozzetetel.mindenhol.sugo' => 'Közzéteszi ezt a fejezetet, majd a többi nyelvre '
+            . 'lefordítja és azokat is közzéteszi — egy gombbal. Nyelvenként fél perc is lehet.',
+        'kozzetetel.mindenhol.folyamat' => 'Fordítás és közzététel: {nyelv}…',
+        'kozzetetel.mindenhol.kesz'     => 'Kész: {n} nyelven közzétéve.',
+
         // --- kozzetetel ---
         'kozzetetel.forditas.marad' => 'A fordítások maradjanak naprakészek',
         'kozzetetel.forditas.sugo'  => 'Egy fordítás attól lesz <b>elavult</b>, hogy a magyar '
