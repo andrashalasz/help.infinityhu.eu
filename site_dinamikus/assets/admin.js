@@ -2106,12 +2106,32 @@
       if (list) {
         makeSortable(list, '.picker__mod', '.picker__mgrip', function (item, cont) {
           var ids = $$('.picker__mod', cont).map(function (r) { return r.dataset.id; });
-          post('modules.reorder', { order: ids })
-            .then(function (d) {
-              if (d.ok) { toast('Főfejezetek sorrendje mentve.'); }
-              else { toast('Nem sikerült: ' + (d.error || ''), 'err'); }
-            })
-            .catch(function () { toast('A sorrend mentése nem sikerült.', 'err'); });
+
+          // A SZAMOZAS atirasa sok mindent erint (minden fejezet szamat,
+          // minden nyelven), ezert megkerdezzuk - nem tesszuk magatol.
+          function ment(ujraszamoz) {
+            post('modules.reorder', { order: ids, renumber: ujraszamoz ? '1' : '' })
+              .then(function (d) {
+                if (!d.ok) { toast('Nem sikerült: ' + (d.error || ''), 'err'); return; }
+                if (d.renamed > 0) {
+                  toast('Sorrend mentve, ' + d.renamed + ' sor átszámozva.');
+                  setTimeout(function () { location.reload(); }, 700);
+                } else {
+                  toast('Főfejezetek sorrendje mentve.');
+                }
+              })
+              .catch(function () { toast('A sorrend mentése nem sikerült.', 'err'); });
+          }
+
+          var sz = list.getAttribute('data-renum-ask')
+                || 'A sorszámok is kövessék az új sorrendet?';
+          askConfirm(sz, function () { ment(true); },
+                     list.getAttribute('data-renum-title') || 'Főfejezetek sorrendje', {
+            danger: false,
+            okLabel:  list.getAttribute('data-renum-yes') || 'Igen, számozd át',
+            altLabel: list.getAttribute('data-renum-no')  || 'Csak a sorrend',
+            onAlt: function () { ment(false); }
+          });
         });
       }
 

@@ -450,7 +450,11 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
 
     <div class="picker__hint" id="pick-hint" hidden></div>
 
-    <div class="picker__l" id="pick-list">
+    <div class="picker__l" id="pick-list"
+         data-renum-title="<?= h(t('fofejezet.sorrend.cim')) ?>"
+         data-renum-ask="<?= h(t('fofejezet.sorrend.kerdes')) ?>"
+         data-renum-yes="<?= h(t('fofejezet.sorrend.igen')) ?>"
+         data-renum-no="<?= h(t('fofejezet.sorrend.nem')) ?>">
       <?php foreach ($tree as $m): ?>
         <?php
           // A fofejezet BEVEZETO fejezete az, aminek ugyanaz a szama, mint a

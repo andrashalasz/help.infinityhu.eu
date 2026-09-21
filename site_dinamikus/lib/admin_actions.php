@@ -804,8 +804,17 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                 if ($db->inTransaction()) { $db->rollBack(); }
                 help_json(['ok' => false, 'error' => $e->getMessage()], 500);
             }
-            audit_me($db, 'modules.reorder', null, count($ids) . ' elem');
-            help_json(['ok' => true, 'count' => count($ids)]);
+            // A szamozas CSAK KERESRE koveti a sorrendet: egy vetlen huzas
+            // kulonben az egesz sugo szamozasat atirna. A felulet elotte
+            // megkerdezi a szerkesztot.
+            $renamed = 0;
+            if (post('renumber') === '1') {
+                try { $renamed = renumber_modules($db); } catch (Throwable $e) { $renamed = 0; }
+            }
+
+            audit_me($db, 'modules.reorder', null,
+                     count($ids) . ' elem' . ($renamed ? ', ' . $renamed . ' ujraszamozva' : ''));
+            help_json(['ok' => true, 'count' => count($ids), 'renamed' => $renamed]);
         }
 
         // ---------- kuka ----------
