@@ -1032,7 +1032,15 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
 
             $tids = [];
             foreach ($family as $one) { $tids[] = trash_module($db, $one, auth_user()['id']); }
-            audit_me($db, 'module.delete', 'module:' . $id, $row['title'] . ' (' . count($family) . ' nyelv)');
+
+            // A megmaradt fofejezetek szama zarkozzon fel: a 14-es torlese
+            // utan a 15-osbol 14 lesz, es vele az alatta levo fejezetek is
+            // (15.2 -> 14.2), minden nyelven.
+            $renamed = 0;
+            try { $renamed = renumber_modules($db); } catch (Throwable $e) { $renamed = 0; }
+
+            audit_me($db, 'module.delete', 'module:' . $id,
+                     $row['title'] . ' (' . count($family) . ' nyelv, ' . $renamed . ' ujraszamozva)');
             flash('ok', t('flash.module.delete.kesz', ['n' => count($family)]) . ' '
                 . undo_button($db, 'trash.restore-many', ['ids' => $tids, 'back' => 'modules'], t('undo.restore')));
             back(['p' => post('from') === 'articles' ? 'articles' : 'modules', 'lang' => $lang]);

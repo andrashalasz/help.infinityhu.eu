@@ -581,13 +581,25 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
       <?php endif; ?>
 
       <?php
-      // a fejezet osszes nyelvi valtozata (ugyanaz a slug), hogy nyelvenkent
-      // lehessen ki-/bekapcsolni
-      $sib = $db->prepare('SELECT id, lang, is_published, draft_html IS NOT NULL AS has_draft
-                             FROM help_article WHERE slug = ? ORDER BY lang');
-      $sib->execute([$article['slug']]);
+      // A fejezet osszes nyelvi valtozata, hogy nyelvenkent lehessen
+      // ki-/bekapcsolni. A parokat a FEJEZETSZAM koti ossze - a slug
+      // nyelvenkent mas (5-3-penzmozgasok / 5-3-cash-movements), ezert
+      // slug szerint keresve a panel azt irta, hogy "nincs ilyen nyelvu
+      // valtozat", holott volt. A slug csak tartalek a szam nelkuli
+      // fejezetekhez.
       $siblings = [];
-      foreach ($sib->fetchAll() as $r) { $siblings[$r['lang']] = $r; }
+      if (trim((string)$article['chapter_no']) !== '') {
+          $sib = $db->prepare('SELECT id, lang, is_published, draft_html IS NOT NULL AS has_draft
+                                 FROM help_article WHERE chapter_no = ? ORDER BY lang');
+          $sib->execute([$article['chapter_no']]);
+          foreach ($sib->fetchAll() as $r) { $siblings[$r['lang']] = $r; }
+      }
+      if (!$siblings) {
+          $sib = $db->prepare('SELECT id, lang, is_published, draft_html IS NOT NULL AS has_draft
+                                 FROM help_article WHERE slug = ? ORDER BY lang');
+          $sib->execute([$article['slug']]);
+          foreach ($sib->fetchAll() as $r) { $siblings[$r['lang']] = $r; }
+      }
       $onCount = count(array_filter($siblings, static fn($r) => $r['is_published']));
       ?>
       <div class="panel" style="margin-bottom:14px">

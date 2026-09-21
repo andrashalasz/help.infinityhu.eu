@@ -482,6 +482,67 @@ function visibility_flash(bool $on, string $name, string $scope, int $langs, str
  * @return int ahany fejezet szama valoban megvaltozott (minden nyelvvel egyutt)
  */
 /**
+ * A FOFEJEZETEK szamozasanak hezagmentesitese.
+ *
+ * Ha kitorolsz egy fofejezetet (pl. a 14-est), a tobbi szama zarkozzon fel:
+ * 15 -> 14, 16 -> 15, 17 -> 16. A kezdoszam NEM valtozik: ha a sugo az
+ * 5-ossel indul, marad az 5-os - nem szamozzuk at 1-tol, mert a fofejezetek
+ * szamai az ERP moduljaihoz igazodnak.
+ *
+ * A megjelenitesi sorrend (sort_order) szerint halad, es a fofejezettel
+ * egyutt viszi az alatta levo fejezeteket is (15.2 -> 14.2), minden nyelven.
+ * Csak a tisztan szamokbol allo fofejezet-szamok vesznek reszt; ami mas
+ * (pl. "A" vagy "1a"), azt nem bantja.
+ *
+ * @return int ahany sort atirt
+ */
+function renumber_modules(PDO $db): int
+{
+    $src  = admin_source_lang();
+    $st   = $db->prepare('SELECT chapter_no FROM help_module WHERE lang = ? ORDER BY sort_order, id');
+    $st->execute([$src]);
+
+    $szamok = [];
+    foreach ($st->fetchAll(PDO::FETCH_COLUMN) as $no) {
+        $no = trim((string)$no);
+        if ($no !== '' && ctype_digit($no)) { $szamok[] = $no; }
+    }
+    if (count($szamok) < 2) { return 0; }
+
+    // a kezdoszam megmarad; onnan folyamatos
+    $kovetkezo = min(array_map('intval', $szamok));
+    $terv = [];
+    foreach ($szamok as $regi) {
+        $uj = (string)$kovetkezo++;
+        if ($uj !== $regi) { $terv[] = ['regi' => $regi, 'uj' => $uj]; }
+    }
+    if (!$terv) { return 0; }
+
+    // KET MENETBEN: a 16 -> 15 pillanataban a 15 meg letezhet, ezert eloszor
+    // mindegyik egyedi ideiglenes jelolest kap.
+    $modulT = $db->prepare('UPDATE help_module SET chapter_no = ? WHERE chapter_no = ?');
+    $cikkT  = $db->prepare("UPDATE help_article
+                               SET chapter_no = CONCAT(?, SUBSTRING(chapter_no, CHAR_LENGTH(?) + 1))
+                             WHERE chapter_no = ? OR chapter_no LIKE CONCAT(?, '.%')");
+
+    $atmenet = [];
+    foreach ($terv as $i => $l) {
+        $tmp = '~' . ($i + 1);
+        $atmenet[$tmp] = $l['uj'];
+        $cikkT->execute([$tmp, $l['regi'], $l['regi'], $l['regi']]);
+        $modulT->execute([$tmp, $l['regi']]);
+    }
+    $n = 0;
+    foreach ($atmenet as $tmp => $uj) {
+        $cikkT->execute([$uj, $tmp, $tmp, $tmp]);
+        $n += $cikkT->rowCount();
+        $modulT->execute([$uj, $tmp]);
+        $n += $modulT->rowCount();
+    }
+    return $n;
+}
+
+/**
  * Ujraszamozas a FORRASNYELV szerint, barmelyik nyelvu modul-azonositobol.
  *
  * A fejezetszam nyelvfuggetlen: egy fejezetnek minden nyelven ugyanaz a
