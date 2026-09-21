@@ -458,11 +458,16 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             // ezert azokat itt NEM irjuk felul (korabban egy "Adatok
             // mentese" eleg volt hozza, hogy a sorrend nullazodjon).
             try {
+                // A slugot kulon, a slug_change()-en at: az feljegyzi a REGI
+                // cimet, hogy a korabban kiadott hivatkozasok 301-gyel
+                // ideeljenek, ne 404-re fussanak.
+                slug_change($db, $id, mb_substr($slug, 0, 160));
+
                 $db->prepare('UPDATE help_article
-                                 SET chapter_no = ?, slug = ?, title = ?, module_id = ?
+                                 SET chapter_no = ?, title = ?, module_id = ?
                                WHERE id = ?')
                    ->execute([
-                       mb_substr($chapter, 0, 16), mb_substr($slug, 0, 160), mb_substr($title, 0, 255),
+                       mb_substr($chapter, 0, 16), mb_substr($title, 0, 255),
                        (int)post('module_id') ?: null,
                        $id,
                    ]);

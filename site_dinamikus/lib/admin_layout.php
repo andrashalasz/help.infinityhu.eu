@@ -482,6 +482,79 @@ function visibility_flash(bool $on, string $name, string $scope, int $langs, str
  * @return int ahany fejezet szama valoban megvaltozott (minden nyelvvel egyutt)
  */
 /**
+ * Egy fejezet URL-jenek (slug) megvaltoztatasa UGY, hogy a regi cim se
+ * haljon el: feljegyezzuk a slug-tortenetbe, es a nyilvanos oldal onnan
+ * iranyit at 301-gyel.
+ *
+ * @return bool valtozott-e
+ */
+function slug_change(PDO $db, int $articleId, string $newSlug): bool
+{
+    $newSlug = trim($newSlug);
+    if ($newSlug === '') { return false; }
+
+    $st = $db->prepare('SELECT slug, lang FROM help_article WHERE id = ?');
+    $st->execute([$articleId]);
+    $r = $st->fetch();
+    if (!$r || (string)$r['slug'] === $newSlug) { return false; }
+
+    // ne vegyuk el mas fejezet cimet
+    $foglalt = $db->prepare('SELECT 1 FROM help_article WHERE slug = ? AND lang = ? AND id <> ? LIMIT 1');
+    $foglalt->execute([$newSlug, $r['lang'], $articleId]);
+    if ($foglalt->fetchColumn()) { return false; }
+
+    $db->prepare('UPDATE help_article SET slug = ? WHERE id = ?')->execute([$newSlug, $articleId]);
+
+    // a REGI cim mostantol ide mutat
+    $db->prepare('INSERT INTO help_slug_history (slug, lang, article_id) VALUES (?,?,?)
+                  ON DUPLICATE KEY UPDATE article_id = VALUES(article_id), created_at = now()')
+       ->execute([(string)$r['slug'], (string)$r['lang'], $articleId]);
+
+    // ha az UJ cim korabban mas fejezete volt, az a bejegyzes elavult
+    $db->prepare('DELETE FROM help_slug_history WHERE slug = ? AND lang = ?')
+       ->execute([$newSlug, (string)$r['lang']]);
+
+    return true;
+}
+
+/**
+ * A fejezetszam-elotag atvezetese a slugban, ha a slug MEG A GENERALT
+ * alakjaban van.
+ *
+ * A slug a szambol es a cimbol kepzodik ("15.1 Felhasznalok" ->
+ * "15-1-felhasznalok"). Atszamozaskor az elotag elavul. Csak akkor irjuk
+ * at, ha a slug pontosan az, amit a regi szambol es a mostani cimbol
+ * kepeznenk - vagyis KEZZEL NEM IRTAK AT. Amit a szerkeszto sajat kezuleg
+ * allitott be, ahhoz nem nyulunk.
+ *
+ * @param array<int,string> $regiSzamok  fejezet-azonosito => a REGI fejezetszam
+ * @return int ahany slug valtozott
+ */
+function slug_follow_numbers(PDO $db, array $regiSzamok): int
+{
+    if (!$regiSzamok) { return 0; }
+    $in = implode(',', array_map('intval', array_keys($regiSzamok)));
+    $rows = $db->query("SELECT id, slug, title, chapter_no FROM help_article WHERE id IN ($in)")->fetchAll();
+
+    $n = 0;
+    foreach ($rows as $r) {
+        $id   = (int)$r['id'];
+        $regi = (string)($regiSzamok[$id] ?? '');
+        if ($regi === '') { continue; }
+
+        // Csak akkor nyulunk hozza, ha a slug PONTOSAN az, amit a REGI
+        // szambol es a mostani cimbol kepeznenk. Ha nem az, akkor kezzel
+        // allitottak be - azt meghagyjuk.
+        if (help_slug($regi, (string)$r['title']) !== (string)$r['slug']) { continue; }
+
+        $kell = help_slug((string)$r['chapter_no'], (string)$r['title']);
+        if ($kell === '' || $kell === (string)$r['slug']) { continue; }
+        if (slug_change($db, $id, $kell)) { $n++; }
+    }
+    return $n;
+}
+
+/**
  * A FOFEJEZETEK szamozasanak hezagmentesitese.
  *
  * Ha kitorolsz egy fofejezetet (pl. a 14-est), a tobbi szama zarkozzon fel:
@@ -539,6 +612,21 @@ function renumber_modules(PDO $db): int
         $modulT->execute([$uj, $tmp]);
         $n += $modulT->rowCount();
     }
+
+    // A fofejezettel egyutt a fejezetei is uj szamot kaptak (15.2 -> 14.2),
+    // igy a slugjuk elotagja elavult - kovesse.
+    $erintett = [];
+    foreach ($terv as $l) {
+        $q = $db->prepare("SELECT id, chapter_no FROM help_article
+                            WHERE chapter_no = ? OR chapter_no LIKE CONCAT(?, '.%')");
+        $q->execute([$l['uj'], $l['uj']]);
+        foreach ($q->fetchAll() as $r) {
+            // a regi szam ugyanaz, csak a fofejezet-elotag mas
+            $erintett[(int)$r['id']] = $l['regi'] . substr((string)$r['chapter_no'], strlen($l['uj']));
+        }
+    }
+    slug_follow_numbers($db, $erintett);
+
     return $n;
 }
 
@@ -644,6 +732,17 @@ function renumber_module(PDO $db, int $moduleId, string $lang): int
         $vegleges->execute([$new, $tmp]);
         $changed += $vegleges->rowCount();
     }
+
+    // A slugot CSAK a vegleges szamok beallasa utan kepezzuk. Kik kaptak uj
+    // szamot? A masik nyelvu parok is - az o slugjuk is kovesse.
+    $erintett = [];
+    foreach ($plan as $lepes) {
+        $q = $db->prepare('SELECT id FROM help_article WHERE chapter_no = ?');
+        $q->execute([$lepes['new']]);
+        foreach ($q->fetchAll(PDO::FETCH_COLUMN) as $aid) { $erintett[(int)$aid] = $lepes['old']; }
+    }
+    slug_follow_numbers($db, $erintett);
+
     return $changed;
 }
 
