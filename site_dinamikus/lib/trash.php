@@ -64,8 +64,16 @@ function trash_module(PDO $db, array $module, ?int $userId): int
  * Visszaallitas a kukabol. Ha az eredeti azonosito mar foglalt, ujat kap.
  * @throws RuntimeException
  */
-function trash_restore(PDO $db, int $trashId): void
+/**
+ * Visszaallitas a Kukabol.
+ *
+ * @return array{module_id: ?int, lang: ?string} hova kerult vissza - a hivo
+ *         ezutan ujraszamozza azt a fofejezetet, mert a szamok idokozben
+ *         osszecsusztak (torles utan a rendszer ujraszamoz).
+ */
+function trash_restore(PDO $db, int $trashId): array
 {
+    $hova = ['module_id' => null, 'lang' => null];
     $st = $db->prepare('SELECT * FROM help_trash WHERE id = ?');
     $st->execute([$trashId]);
     $t = $st->fetch();
@@ -100,6 +108,22 @@ function trash_restore(PDO $db, int $trashId): void
                     ? mb_substr($a['slug'], 0, 150) . '-' . substr((string)time(), -4)
                     : $a['slug'];
 
+                // A szam idokozben masra kerulhetett: torleskor a rendszer
+                // ujraszamoz, igy a regi 1.1 mar egy masik fejezete lehet.
+                // Ilyenkor a visszaallo fejezet a modul kovetkezo szabad
+                // szamat kapja - igy nem keletkezik ket azonos szamu fejezet,
+                // es a nyelvi parositast sem kell talalgatni.
+                $ujSzam = (string)($a['chapter_no'] ?? '');
+                if ($moduleId !== null && $ujSzam !== '') {
+                    $foglalt = $db->prepare('SELECT 1 FROM help_article
+                                              WHERE lang = ? AND chapter_no = ? LIMIT 1');
+                    $foglalt->execute([$a['lang'], $ujSzam]);
+                    if ($foglalt->fetchColumn()) {
+                        [$ujSzam] = article_next_slot($db, $moduleId, (string)$a['lang'], '', '');
+                    }
+                }
+                $a['chapter_no'] = $ujSzam;
+
                 $cols = ['module_id', 'chapter_no', 'slug', 'title', 'lang', 'body_html', 'plain_text',
                          'doc_version', 'updated_at', 'change_flag', 'img_count', 'content_hash',
                          'sort_order', 'is_published', 'permission', 'draft_html', 'draft_title',
@@ -118,6 +142,7 @@ function trash_restore(PDO $db, int $trashId): void
                 $ins = $db->prepare($sql);
                 $ins->execute($vals);
                 $newId = (int)$db->lastInsertId();
+                $hova = ['module_id' => $moduleId, 'lang' => (string)$a['lang']];
 
                 $sec = $db->prepare('INSERT INTO help_section
                         (article_id, chapter_no, anchor, title, level, plain_text, sort_order)
@@ -174,6 +199,7 @@ function trash_restore(PDO $db, int $trashId): void
         if ($db->inTransaction()) { $db->rollBack(); }
         throw $e;
     }
+    return $hova;
 }
 
 /**

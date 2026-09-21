@@ -465,7 +465,19 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             $family = $siblings($db, $a);
             $tids = [];
             foreach ($family as $one) { $tids[] = trash_article($db, $one, auth_user()['id']); }
-            audit_me($db, 'article.delete', 'article:' . $id, $a['title'] . ' (' . count($family) . ' nyelv)');
+
+            // A megmaradt fejezetek szama zarkozzon fel: ha az 1.1-et toroltuk,
+            // az 1.2-bol legyen 1.1. Enelkul lyuk marad a szamozasban.
+            // Nyelvfuggetlen: a renumber_module a fejezetszam alapjan minden
+            // nyelvi valtozatot egyszerre ir at.
+            $renamed = 0;
+            if ((int)$a['module_id'] > 0) {
+                try { $renamed = renumber_module_source($db, (int)$a['module_id']); }
+                catch (Throwable $e) { $renamed = 0; }   // a torles ettol meg sikerult
+            }
+
+            audit_me($db, 'article.delete', 'article:' . $id,
+                     $a['title'] . ' (' . count($family) . ' nyelv, ' . $renamed . ' ujraszamozva)');
 
             $extra = count($family) > 1
                 ? ' A(z) ' . (count($family) - 1) . ' idegen nyelvű változatával együtt.'
@@ -625,13 +637,19 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                     $st->execute($ids);
                     $tids = [];
                     $done = [];
+                    $ujra = [];              // [modul_id => nyelv]
                     foreach ($st->fetchAll() as $a) {
+                        if ((int)$a['module_id'] > 0) { $ujra[(int)$a['module_id']] = true; }
                         foreach ($siblings($db, $a) as $one) {
                             if (isset($done[(int)$one['id']])) { continue; }
                             $done[(int)$one['id']] = true;
                             $tids[] = trash_article($db, $one, auth_user()['id']);
                             $n++;
                         }
+                    }
+                    // a megmaradt fejezetek szama zarkozzon fel (mint egyesevel torlesnel)
+                    foreach (array_keys($ujra) as $modulId) {
+                        try { renumber_module_source($db, $modulId); } catch (Throwable $e) { /* nem kritikus */ }
                     }
                     audit_me($db, 'articles.bulk', 'delete', (string)$n);
                     flash('ok', t('flash.bulk.kukaba', ['n' => $n]) . ' '
@@ -675,8 +693,9 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                     $q->execute([$ids[0]]);
                     $lang = (string)$q->fetchColumn();
                 }
-                if ($moduleId > 0) { $renamed += renumber_module($db, $moduleId, $lang); }
-                if ($from > 0 && $from !== $moduleId) { $renamed += renumber_module($db, $from, $lang); }
+                // mindig a forrasnyelv szerint - a szamozas nyelvfuggetlen
+                if ($moduleId > 0) { $renamed += renumber_module_source($db, $moduleId); }
+                if ($from > 0 && $from !== $moduleId) { $renamed += renumber_module_source($db, $from); }
             } catch (Throwable $e) {
                 // az ujraszamozas sosem akaszthatja meg a sorrend mentest
                 $renamed = 0;
@@ -713,14 +732,34 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                 ? [(int)post('id')]
                 : array_values(array_filter(array_map('intval', (array)($_POST['ids'] ?? []))));
             $ok = 0; $err = [];
+            $ujra = [];                       // mely fofejezeteket kell ujraszamozni
             foreach ($ids as $tid) {
                 try {
-                    trash_restore($db, $tid);
+                    $hova = trash_restore($db, $tid);
+                    if (!empty($hova['module_id'])) { $ujra[(int)$hova['module_id']] = true; }
                     $ok++;
                 } catch (Throwable $e) {
                     $err[] = $e->getMessage();
                 }
             }
+
+            // A visszaallitott fejezet a REGI szamaval jon vissza, ami idokozben
+            // mar masra kerulhetett (torleskor a rendszer ujraszamoz). A sorrendet
+            // a sort_order orzi, ezert az ujraszamozas a helyere teszi.
+            $mar = [];
+            foreach (array_keys($ujra) as $modulId) {
+                try {
+                    // ugyanaz a fofejezet harom nyelven harom modul-sor: eleg
+                    // egyszer, a forrasnyelv szerint ujraszamozni
+                    $st = $db->prepare('SELECT chapter_no FROM help_module WHERE id = ?');
+                    $st->execute([$modulId]);
+                    $no = (string)$st->fetchColumn();
+                    if ($no === '' || isset($mar[$no])) { continue; }
+                    $mar[$no] = true;
+                    renumber_module_source($db, $modulId);
+                } catch (Throwable $e) { /* nem kritikus */ }
+            }
+
             audit_me($db, 'trash.restore', null, (string)$ok);
             if ($ok) { flash('ok', t('flash.trash.restore.kesz', ['n' => $ok])); }
             foreach (array_slice($err, 0, 3) as $e) { flash('err', h($e)); }

@@ -481,6 +481,31 @@ function visibility_flash(bool $on, string $name, string $scope, int $langs, str
  *
  * @return int ahany fejezet szama valoban megvaltozott (minden nyelvvel egyutt)
  */
+/**
+ * Ujraszamozas a FORRASNYELV szerint, barmelyik nyelvu modul-azonositobol.
+ *
+ * A fejezetszam nyelvfuggetlen: egy fejezetnek minden nyelven ugyanaz a
+ * szama. Ezert a sorrendet EGY nyelv - a forrasnyelv - dontheti el. Ha
+ * nyelvenkent kulon futtatnank az ujraszamozast, a masodik hivas felulirna
+ * az elsot (a nyelvek fejezetkeszlete elterhet), es osszekeverednenek a
+ * szamok.
+ */
+function renumber_module_source(PDO $db, int $moduleId): int
+{
+    $st = $db->prepare('SELECT chapter_no FROM help_module WHERE id = ?');
+    $st->execute([$moduleId]);
+    $no = trim((string)$st->fetchColumn());
+    if ($no === '') { return 0; }
+
+    $src = admin_source_lang();
+    $q = $db->prepare('SELECT id FROM help_module WHERE chapter_no = ? AND lang = ?');
+    $q->execute([$no, $src]);
+    $srcModule = (int)$q->fetchColumn();
+    if ($srcModule === 0) { return 0; }
+
+    return renumber_module($db, $srcModule, $src);
+}
+
 function renumber_module(PDO $db, int $moduleId, string $lang): int
 {
     $st = $db->prepare('SELECT chapter_no FROM help_module WHERE id = ?');
@@ -512,7 +537,14 @@ function renumber_module(PDO $db, int $moduleId, string $lang): int
             $new = $moduleNo;
             for ($j = 0; $j <= $i; $j++) { $new .= '.' . $counters[$j]; }
         }
-        if ($new !== $old && $old !== '') { $plan[$old] = $new; }
+        if ($new !== $old && $old !== '') {
+            // A terv AZONOSITO szerint keszul, nem fejezetszam szerint. A
+            // szam ugyanis nem mindig egyedi: a Kukabol visszaallitott
+            // fejezet a REGI szamaval jon vissza, ami idokozben mar masra
+            // kerulhetett. Szam szerint tervezve mindket sort atirnank
+            // ugyanarra, es tartos duplikatum keletkezne.
+            $plan[] = ['id' => (int)$r['id'], 'old' => $old, 'new' => $new];
+        }
     }
     if (!$plan) { return 0; }
 
@@ -522,17 +554,34 @@ function renumber_module(PDO $db, int $moduleId, string $lang): int
     // egy egyedi ideiglenes jelolest kap (~1, ~2, ...), es csak utana kapja
     // meg a vegleges szamat.
     $changed = 0;
-    $toTmp   = $db->prepare('UPDATE help_article SET chapter_no = ? WHERE chapter_no = ?');
-    $i = 0;
+    $egy     = $db->prepare('UPDATE help_article SET chapter_no = ? WHERE id = ?');
+    // a tobbi nyelv a REGI szam alapjan koveti (a nyelvi parokat az koti ossze)
+    $tarsak  = $db->prepare('UPDATE help_article SET chapter_no = ?
+                              WHERE chapter_no = ? AND lang <> ?');
+    $vegleges = $db->prepare('UPDATE help_article SET chapter_no = ? WHERE chapter_no = ?');
+
+    // Hanyszor fordul elo egy regi szam EBBEN a nyelvben? Ha ketszer (ilyen
+    // allapot all elo kozvetlenul a Kukabol valo visszaallitas utan), akkor
+    // nem lehet eldonteni, melyikhez tartoznak a masik nyelvu parok - ilyenkor
+    // a tarsakhoz NEM nyulunk, csak ezt a nyelvet tesszuk rendbe.
+    $elofordul = [];
+    foreach ($rows as $r) {
+        $k = trim((string)$r['chapter_no']);
+        $elofordul[$k] = ($elofordul[$k] ?? 0) + 1;
+    }
+
     $tmpMap = [];
-    foreach ($plan as $old => $new) {
-        $tmp = '~' . (++$i);
-        $tmpMap[$tmp] = $new;
-        $toTmp->execute([$tmp, $old]);
+    foreach ($plan as $i => $lepes) {
+        $tmp = '~' . ($i + 1);
+        $tmpMap[$tmp] = $lepes['new'];
+        if (($elofordul[$lepes['old']] ?? 0) === 1) {
+            $tarsak->execute([$tmp, $lepes['old'], $lang]);   // elobb a tarsak...
+        }
+        $egy->execute([$tmp, $lepes['id']]);                  // ...aztan a sajat sor
     }
     foreach ($tmpMap as $tmp => $new) {
-        $toTmp->execute([$new, $tmp]);
-        $changed += $toTmp->rowCount();
+        $vegleges->execute([$new, $tmp]);
+        $changed += $vegleges->rowCount();
     }
     return $changed;
 }
