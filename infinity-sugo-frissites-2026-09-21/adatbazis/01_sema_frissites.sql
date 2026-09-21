@@ -1,6 +1,6 @@
 -- ============================================================
 -- Infinity Súgó — adatbázis-frissítés
--- a 2026-09-15-i telepítőcsomagról a 2026-09-21-i változatra
+-- a 2026-09-15-i telepítőcsomagról a 2026-09-18-i változatra
 --
 --   *** EZ A FÁJL NEM ÍR FELÜL EGYETLEN SÚGÓSZÖVEGET SEM. ***
 --

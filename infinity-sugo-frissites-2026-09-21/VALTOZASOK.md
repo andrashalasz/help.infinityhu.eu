@@ -1,4 +1,4 @@
-# Mi újság — 2026-09-21
+# Mi újság — 2026-09-18
 
 A 2026-09-15-i telepítőcsomag óta. A szerkesztőknek szól; a telepítés
 menetét az `OLVASD_EL.md` írja le.
@@ -22,40 +22,6 @@ szövegre, és a régi szín maradt látható.
 keret), szövegigazítás, „Tipp / Figyelem / Fontos" dobozok.
 
 ---
-
-## Közzététel — kevesebb kattintás
-
-**A vázlat mentése után rögtön megkérdezi**, közzé akarod-e tenni — nem
-kell külön megkeresni a gombot minden apró javítás után.
-
-**„Közzététel + fordítás mindenhol"** gomb: közzéteszi a fejezetet, majd a
-többi nyelvre lefordítja és azokat is közzéteszi, egyetlen gombbal.
-Nyelvenként halad, közben mutatja, hol tart, és egy nyelv hibája nem
-állítja meg a többit. Ha az automatikus fordítás a vázlatot már
-elkészítette, nem fordít újra — csak közzéteszi.
-
-## Számozás
-
-**Törlés után felzárkózik a számozás.** Ha kitörlöd az 1.1-et, a többi
-fejezet száma helyreáll — minden nyelven egyszerre. Ugyanígy a Kukából
-visszaállításkor és tömeges törlésnél is.
-
-**Főfejezet törlésekor bezárul a hézag**: a 14-es törlése után a 15-ösből
-14 lesz, és vele az alatta levő összes fejezet is átszámozódik. A
-kezdőszám nem változik.
-
-**Főfejezet elhúzásakor megkérdezi**, hogy a sorszámok is kövessék-e az új
-sorrendet. Nem magától teszi: egy véletlen húzás különben az egész súgó
-számozását átírná.
-
-## Az URL követi a fejezetszámot
-
-A cím eddig akkor is a régi számot vitte, ha a fejezet átszámozódott
-(„7.1 Felhasználók" → `16-1-felhasznalok`). Mostantól követi.
-
-**A korábban kiadott hivatkozások nem törnek el**: minden címváltozás
-feljegyződik, és a régi cím 301-gyel átirányít a mostanira. Amit kézzel
-állítottál be, ahhoz a rendszer nem nyúl.
 
 ## Fejezetlista
 

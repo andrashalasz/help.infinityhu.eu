@@ -1,6 +1,6 @@
 # Infinity Súgó — frissítés
 
-**Erről:** 2026-09-15-i telepítőcsomag → **Erre:** 2026-09-21-i változat
+**Erről:** 2026-09-15-i telepítőcsomag → **Erre:** 2026-09-18-i változat
 
 ---
 
@@ -18,7 +18,6 @@
 > | új oszlopok, táblák, nézetek, tárolt eljárások | az új funkciókhoz |
 > | `help_ui` tábla | a **kezelőfelület** angol/német feliratai — nem a súgó tartalma |
 > | `help_lang` tábla | a nyelvek listája, csak ha még nincs benne (`INSERT IGNORE`) |
-> | `help_slug_history` tábla | a régi URL-ek megőrzése, hogy a kiadott hivatkozások éljenek |
 > | `help_article.highlight_until` | **egyetlen tartalmi mező**: az „új/frissítve" jelvény lejárati dátuma. A fejezet szövegéhez nem nyúl. Részletek lent. |
 >
 > Ezt ellenőrizve is: a frissítés előtt és után a teljes tartalomról vett
@@ -33,11 +32,10 @@
 frissites.sh                        a frissítő szkript (ezt kell futtatni)
 adatbazis/
   01_sema_frissites.sql             szerkezeti frissítés — többször is futtatható
-  02_felulet_forditasok.sql         a kezelőfelület angol/német feliratai (1404 sor)
+  02_felulet_forditasok.sql         a kezelőfelület angol/német feliratai (1388 sor)
 site_dinamikus/                     az alkalmazás új fájljai
   config.php.minta                  MINTA — a meglévő config.php-t NEM cseréljük le
   tools/felulet_forditas.php        parancssori felület-fordító (később, ha kell)
-  tools/slug_igazitas.php           egyszeri címigazítás (lásd lent, 5. pont)
 OLVASD_EL.md                        ez a fájl
 VALTOZASOK.md                       mi újság ebben a változatban
 ```
@@ -54,8 +52,8 @@ Ami **nincs** benne, és ezért nem is sérülhet:
 ## 2. Frissítés egy paranccsal
 
 ```bash
-tar -xzf infinity-sugo-frissites-2026-09-21.tar.gz
-cd infinity-sugo-frissites-2026-09-21
+tar -xzf infinity-sugo-frissites-2026-09-18.tar.gz
+cd infinity-sugo-frissites-2026-09-18
 ./frissites.sh /var/www/help.infinityhu.eu
 ```
 
@@ -143,25 +141,6 @@ A kezelőfelület nyelvét a fejlécben, a nyelvkóddal (HU / EN / DE) állítod
 Angolra vagy németre váltva a feliratoknak le kell fordulniuk — ha valahol
 magyar maradt, az a **Kezelőfelület szövegei** lapon javítható, akár
 kézzel, akár a „Hiányzó szövegek gépi fordítása" gombbal.
-
----
-
-## 5/b. Egyszeri címigazítás (nem kötelező)
-
-Az URL mostantól követi a fejezetszámot. A **régebbi** fejezeteknél a cím
-elcsúszhatott (a „7.1 Felhasználók" címe maradhatott `16-1-felhasznalok`).
-Ez egyszer futtatható rendrakás:
-
-```bash
-# csak megmutatja, mit írna át:
-php site_dinamikus/tools/slug_igazitas.php
-# és ha rendben:
-php site_dinamikus/tools/slug_igazitas.php --alkalmaz
-```
-
-Csak azt bántja, ami magától keletkezett; amit kézzel állítottak be, ahhoz
-nem nyúl. A régi címek bekerülnek a slug-történetbe, tehát a kiadott
-hivatkozások **301-gyel tovább élnek**.
 
 ---
 

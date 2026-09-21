@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================
-# Infinity Súgó — frissítés a 2026-09-21-i változatra
+# Infinity Súgó — frissítés a 2026-09-18-i változatra
 #
 #   *** A SÚGÓ SZÖVEGEIHEZ NEM NYÚL. ***
 #
