@@ -37,7 +37,8 @@ adatbazis/
 site_dinamikus/                     az alkalmazás új fájljai
   config.php.minta                  MINTA — a meglévő config.php-t NEM cseréljük le
   tools/felulet_forditas.php        parancssori felület-fordító (később, ha kell)
-  tools/slug_igazitas.php           egyszeri címigazítás (lásd lent, 5. pont)
+  tools/szamozas_rendbetetel.php    egyszeri számozás-helyretétel (5/b pont)
+  tools/slug_igazitas.php           egyszeri címigazítás (5/c pont)
 OLVASD_EL.md                        ez a fájl
 VALTOZASOK.md                       mi újság ebben a változatban
 ```
@@ -146,7 +147,44 @@ kézzel, akár a „Hiányzó szövegek gépi fordítása" gombbal.
 
 ---
 
-## 5/b. Egyszeri címigazítás (nem kötelező)
+## 5/b. A fejezetszámok helyretétele — EZT VALÓSZÍNŰLEG FUTTATNI KELL
+
+A frissítés a **mostantól** végzett műveleteket számozza újra: törléskor,
+áthúzáskor és a Kukából visszaállításkor a számok maguktól felzárkóznak.
+A **korábban keletkezett hézagokhoz nem nyúl** — se a régi törlésekből,
+se a Word-importból származókhoz. Ezért a frissítés után a számozás
+ugyanolyan marad, amilyen volt.
+
+Ha a számozásban hézag van (5, 5.2, 5.3 — hiányzik az 5.1), ez teszi rendbe:
+
+```bash
+cd /var/www/help.infinityhu.eu
+# 1. előbb NÉZD MEG, mit csinálna — semmit nem ír:
+php site_dinamikus/tools/szamozas_rendbetetel.php
+# 2. ha rendben van, alkalmazd:
+php site_dinamikus/tools/szamozas_rendbetetel.php --alkalmaz
+```
+
+Az első parancs kiírja a **mostani** és a **leendő** állapotot egymás alá,
+és nem módosít semmit. Így előre látható, mi változna.
+
+Mit csinál:
+
+- **főfejezetek**: bezárja a hézagot (ha a 14-est törölték, a 15-ösből 14
+  lesz). A kezdőszám nem változik — ha a súgó az 5-össel indul, az marad.
+- **fejezetek**: főfejezetenként folyamatos számozás a megjelenítési
+  sorrend szerint.
+- **minden nyelven egyszerre** — a forrásnyelv sorrendje dönt, az angol és
+  a német változat ugyanazt a számot kapja.
+- az **URL-ek is követik** a számot, de a régi címek 301-gyel átirányítanak
+  (lásd a következő pontot), tehát a kiadott hivatkozások nem törnek el.
+
+> **A fejezetek szövegéhez nem nyúl** — csak a számokat és az URL-eket
+> rendezi. Futtatás előtt azért készíts adatbázis-mentést.
+
+---
+
+## 5/c. Egyszeri címigazítás (nem kötelező)
 
 Az URL mostantól követi a fejezetszámot. A **régebbi** fejezeteknél a cím
 elcsúszhatott (a „7.1 Felhasználók" címe maradhatott `16-1-felhasznalok`).
