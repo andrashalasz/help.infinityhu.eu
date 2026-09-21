@@ -291,6 +291,22 @@ function ui_default(string $key = ''): string|array
         'naplo.osszesen' => 'összesen {n} bejegyzés',
         'naplo.lap'      => '{lap}. lap / {ossz}',
 
+        // --- kozzeteves mindenhol ---
+        'kozzetetel.mindenhol'      => 'Közzététel + fordítás mindenhol',
+        'kozzetetel.mindenhol.sugo' => 'Közzéteszi ezt a fejezetet, majd a többi nyelvre '
+            . 'lefordítja és azokat is közzéteszi — egy gombbal. Nyelvenként fél perc is lehet.',
+        'kozzetetel.mindenhol.folyamat' => 'Fordítás és közzététel: {nyelv}…',
+        'kozzetetel.mindenhol.kesz'     => 'Kész: {n} nyelven közzétéve.',
+
+        // --- fofejezetek sorrendje ---
+        'fofejezet.sorrend.cim'    => 'Főfejezetek sorrendje',
+        'fofejezet.sorrend.kerdes' => 'A <b>sorszámok</b> is kövessék az új sorrendet? Ilyenkor az '
+            . 'átmozgatott főfejezetek és az alattuk levő összes fejezet új számot kap, minden '
+            . 'nyelven — az URL-ek viszont változatlanok maradnak, tehát a kiadott hivatkozások '
+            . 'nem törnek el.',
+        'fofejezet.sorrend.igen'   => 'Igen, számozd át',
+        'fofejezet.sorrend.nem'    => 'Csak a sorrend',
+
         // --- kozzetetel ---
         'kozzetetel.forditas.marad' => 'A fordítások maradjanak naprakészek',
         'kozzetetel.forditas.sugo'  => 'Egy fordítás attól lesz <b>elavult</b>, hogy a magyar '

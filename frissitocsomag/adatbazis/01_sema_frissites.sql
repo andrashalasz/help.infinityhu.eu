@@ -140,6 +140,27 @@ SELECT a.lang, a.slug, a.chapter_no, a.title,
    AND a.highlight_until >= curdate();
 
 
+
+-- ============================================================
+-- 3/b. SLUG-TÖRTÉNET — a régi címek ne haljanak el
+--
+-- A fejezetszám mostantól látszik az URL-ben is, és átszámozáskor követi.
+-- Hogy a korábban kiadott hivatkozások (könyvjelzők, e-mailbe másolt
+-- linkek) ne fussanak 404-re, minden címváltozás feljegyződik ide, és a
+-- nyilvános oldal innen irányít át 301-gyel a mostani címre.
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS help_slug_history (
+  slug       VARCHAR(160) NOT NULL,
+  lang       CHAR(5)      NOT NULL,
+  article_id INT          NOT NULL,
+  created_at DATETIME     NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (slug, lang),
+  KEY help_slug_history_article (article_id),
+  CONSTRAINT help_slug_history_fk FOREIGN KEY (article_id)
+      REFERENCES help_article (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- ============================================================
 -- 4. KÖZZÉTÉTELI ELJÁRÁSOK
 -- Az újdonságjelzés mostantól a KIADÁS LEZÁRÁSÁIG marad kint, nem 30 napig.

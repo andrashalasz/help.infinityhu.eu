@@ -481,6 +481,180 @@ function visibility_flash(bool $on, string $name, string $scope, int $langs, str
  *
  * @return int ahany fejezet szama valoban megvaltozott (minden nyelvvel egyutt)
  */
+/**
+ * Egy fejezet URL-jenek (slug) megvaltoztatasa UGY, hogy a regi cim se
+ * haljon el: feljegyezzuk a slug-tortenetbe, es a nyilvanos oldal onnan
+ * iranyit at 301-gyel.
+ *
+ * @return bool valtozott-e
+ */
+function slug_change(PDO $db, int $articleId, string $newSlug): bool
+{
+    $newSlug = trim($newSlug);
+    if ($newSlug === '') { return false; }
+
+    $st = $db->prepare('SELECT slug, lang FROM help_article WHERE id = ?');
+    $st->execute([$articleId]);
+    $r = $st->fetch();
+    if (!$r || (string)$r['slug'] === $newSlug) { return false; }
+
+    // ne vegyuk el mas fejezet cimet
+    $foglalt = $db->prepare('SELECT 1 FROM help_article WHERE slug = ? AND lang = ? AND id <> ? LIMIT 1');
+    $foglalt->execute([$newSlug, $r['lang'], $articleId]);
+    if ($foglalt->fetchColumn()) { return false; }
+
+    $db->prepare('UPDATE help_article SET slug = ? WHERE id = ?')->execute([$newSlug, $articleId]);
+
+    // a REGI cim mostantol ide mutat
+    $db->prepare('INSERT INTO help_slug_history (slug, lang, article_id) VALUES (?,?,?)
+                  ON DUPLICATE KEY UPDATE article_id = VALUES(article_id), created_at = now()')
+       ->execute([(string)$r['slug'], (string)$r['lang'], $articleId]);
+
+    // ha az UJ cim korabban mas fejezete volt, az a bejegyzes elavult
+    $db->prepare('DELETE FROM help_slug_history WHERE slug = ? AND lang = ?')
+       ->execute([$newSlug, (string)$r['lang']]);
+
+    return true;
+}
+
+/**
+ * A fejezetszam-elotag atvezetese a slugban, ha a slug MEG A GENERALT
+ * alakjaban van.
+ *
+ * A slug a szambol es a cimbol kepzodik ("15.1 Felhasznalok" ->
+ * "15-1-felhasznalok"). Atszamozaskor az elotag elavul. Csak akkor irjuk
+ * at, ha a slug pontosan az, amit a regi szambol es a mostani cimbol
+ * kepeznenk - vagyis KEZZEL NEM IRTAK AT. Amit a szerkeszto sajat kezuleg
+ * allitott be, ahhoz nem nyulunk.
+ *
+ * @param array<int,string> $regiSzamok  fejezet-azonosito => a REGI fejezetszam
+ * @return int ahany slug valtozott
+ */
+function slug_follow_numbers(PDO $db, array $regiSzamok): int
+{
+    if (!$regiSzamok) { return 0; }
+    $in = implode(',', array_map('intval', array_keys($regiSzamok)));
+    $rows = $db->query("SELECT id, slug, title, chapter_no FROM help_article WHERE id IN ($in)")->fetchAll();
+
+    $n = 0;
+    foreach ($rows as $r) {
+        $id   = (int)$r['id'];
+        $regi = (string)($regiSzamok[$id] ?? '');
+        if ($regi === '') { continue; }
+
+        // Csak akkor nyulunk hozza, ha a slug PONTOSAN az, amit a REGI
+        // szambol es a mostani cimbol kepeznenk. Ha nem az, akkor kezzel
+        // allitottak be - azt meghagyjuk.
+        if (help_slug($regi, (string)$r['title']) !== (string)$r['slug']) { continue; }
+
+        $kell = help_slug((string)$r['chapter_no'], (string)$r['title']);
+        if ($kell === '' || $kell === (string)$r['slug']) { continue; }
+        if (slug_change($db, $id, $kell)) { $n++; }
+    }
+    return $n;
+}
+
+/**
+ * A FOFEJEZETEK szamozasanak hezagmentesitese.
+ *
+ * Ha kitorolsz egy fofejezetet (pl. a 14-est), a tobbi szama zarkozzon fel:
+ * 15 -> 14, 16 -> 15, 17 -> 16. A kezdoszam NEM valtozik: ha a sugo az
+ * 5-ossel indul, marad az 5-os - nem szamozzuk at 1-tol, mert a fofejezetek
+ * szamai az ERP moduljaihoz igazodnak.
+ *
+ * A megjelenitesi sorrend (sort_order) szerint halad, es a fofejezettel
+ * egyutt viszi az alatta levo fejezeteket is (15.2 -> 14.2), minden nyelven.
+ * Csak a tisztan szamokbol allo fofejezet-szamok vesznek reszt; ami mas
+ * (pl. "A" vagy "1a"), azt nem bantja.
+ *
+ * @return int ahany sort atirt
+ */
+function renumber_modules(PDO $db): int
+{
+    $src  = admin_source_lang();
+    $st   = $db->prepare('SELECT chapter_no FROM help_module WHERE lang = ? ORDER BY sort_order, id');
+    $st->execute([$src]);
+
+    $szamok = [];
+    foreach ($st->fetchAll(PDO::FETCH_COLUMN) as $no) {
+        $no = trim((string)$no);
+        if ($no !== '' && ctype_digit($no)) { $szamok[] = $no; }
+    }
+    if (count($szamok) < 2) { return 0; }
+
+    // a kezdoszam megmarad; onnan folyamatos
+    $kovetkezo = min(array_map('intval', $szamok));
+    $terv = [];
+    foreach ($szamok as $regi) {
+        $uj = (string)$kovetkezo++;
+        if ($uj !== $regi) { $terv[] = ['regi' => $regi, 'uj' => $uj]; }
+    }
+    if (!$terv) { return 0; }
+
+    // KET MENETBEN: a 16 -> 15 pillanataban a 15 meg letezhet, ezert eloszor
+    // mindegyik egyedi ideiglenes jelolest kap.
+    $modulT = $db->prepare('UPDATE help_module SET chapter_no = ? WHERE chapter_no = ?');
+    $cikkT  = $db->prepare("UPDATE help_article
+                               SET chapter_no = CONCAT(?, SUBSTRING(chapter_no, CHAR_LENGTH(?) + 1))
+                             WHERE chapter_no = ? OR chapter_no LIKE CONCAT(?, '.%')");
+
+    $atmenet = [];
+    foreach ($terv as $i => $l) {
+        $tmp = '~' . ($i + 1);
+        $atmenet[$tmp] = $l['uj'];
+        $cikkT->execute([$tmp, $l['regi'], $l['regi'], $l['regi']]);
+        $modulT->execute([$tmp, $l['regi']]);
+    }
+    $n = 0;
+    foreach ($atmenet as $tmp => $uj) {
+        $cikkT->execute([$uj, $tmp, $tmp, $tmp]);
+        $n += $cikkT->rowCount();
+        $modulT->execute([$uj, $tmp]);
+        $n += $modulT->rowCount();
+    }
+
+    // A fofejezettel egyutt a fejezetei is uj szamot kaptak (15.2 -> 14.2),
+    // igy a slugjuk elotagja elavult - kovesse.
+    $erintett = [];
+    foreach ($terv as $l) {
+        $q = $db->prepare("SELECT id, chapter_no FROM help_article
+                            WHERE chapter_no = ? OR chapter_no LIKE CONCAT(?, '.%')");
+        $q->execute([$l['uj'], $l['uj']]);
+        foreach ($q->fetchAll() as $r) {
+            // a regi szam ugyanaz, csak a fofejezet-elotag mas
+            $erintett[(int)$r['id']] = $l['regi'] . substr((string)$r['chapter_no'], strlen($l['uj']));
+        }
+    }
+    slug_follow_numbers($db, $erintett);
+
+    return $n;
+}
+
+/**
+ * Ujraszamozas a FORRASNYELV szerint, barmelyik nyelvu modul-azonositobol.
+ *
+ * A fejezetszam nyelvfuggetlen: egy fejezetnek minden nyelven ugyanaz a
+ * szama. Ezert a sorrendet EGY nyelv - a forrasnyelv - dontheti el. Ha
+ * nyelvenkent kulon futtatnank az ujraszamozast, a masodik hivas felulirna
+ * az elsot (a nyelvek fejezetkeszlete elterhet), es osszekeverednenek a
+ * szamok.
+ */
+function renumber_module_source(PDO $db, int $moduleId): int
+{
+    $st = $db->prepare('SELECT chapter_no FROM help_module WHERE id = ?');
+    $st->execute([$moduleId]);
+    $no = trim((string)$st->fetchColumn());
+    if ($no === '') { return 0; }
+
+    $src = admin_source_lang();
+    $q = $db->prepare('SELECT id FROM help_module WHERE chapter_no = ? AND lang = ?');
+    $q->execute([$no, $src]);
+    $srcModule = (int)$q->fetchColumn();
+    if ($srcModule === 0) { return 0; }
+
+    return renumber_module($db, $srcModule, $src);
+}
+
 function renumber_module(PDO $db, int $moduleId, string $lang): int
 {
     $st = $db->prepare('SELECT chapter_no FROM help_module WHERE id = ?');
@@ -512,7 +686,14 @@ function renumber_module(PDO $db, int $moduleId, string $lang): int
             $new = $moduleNo;
             for ($j = 0; $j <= $i; $j++) { $new .= '.' . $counters[$j]; }
         }
-        if ($new !== $old && $old !== '') { $plan[$old] = $new; }
+        if ($new !== $old && $old !== '') {
+            // A terv AZONOSITO szerint keszul, nem fejezetszam szerint. A
+            // szam ugyanis nem mindig egyedi: a Kukabol visszaallitott
+            // fejezet a REGI szamaval jon vissza, ami idokozben mar masra
+            // kerulhetett. Szam szerint tervezve mindket sort atirnank
+            // ugyanarra, es tartos duplikatum keletkezne.
+            $plan[] = ['id' => (int)$r['id'], 'old' => $old, 'new' => $new];
+        }
     }
     if (!$plan) { return 0; }
 
@@ -522,18 +703,46 @@ function renumber_module(PDO $db, int $moduleId, string $lang): int
     // egy egyedi ideiglenes jelolest kap (~1, ~2, ...), es csak utana kapja
     // meg a vegleges szamat.
     $changed = 0;
-    $toTmp   = $db->prepare('UPDATE help_article SET chapter_no = ? WHERE chapter_no = ?');
-    $i = 0;
+    $egy     = $db->prepare('UPDATE help_article SET chapter_no = ? WHERE id = ?');
+    // a tobbi nyelv a REGI szam alapjan koveti (a nyelvi parokat az koti ossze)
+    $tarsak  = $db->prepare('UPDATE help_article SET chapter_no = ?
+                              WHERE chapter_no = ? AND lang <> ?');
+    $vegleges = $db->prepare('UPDATE help_article SET chapter_no = ? WHERE chapter_no = ?');
+
+    // Hanyszor fordul elo egy regi szam EBBEN a nyelvben? Ha ketszer (ilyen
+    // allapot all elo kozvetlenul a Kukabol valo visszaallitas utan), akkor
+    // nem lehet eldonteni, melyikhez tartoznak a masik nyelvu parok - ilyenkor
+    // a tarsakhoz NEM nyulunk, csak ezt a nyelvet tesszuk rendbe.
+    $elofordul = [];
+    foreach ($rows as $r) {
+        $k = trim((string)$r['chapter_no']);
+        $elofordul[$k] = ($elofordul[$k] ?? 0) + 1;
+    }
+
     $tmpMap = [];
-    foreach ($plan as $old => $new) {
-        $tmp = '~' . (++$i);
-        $tmpMap[$tmp] = $new;
-        $toTmp->execute([$tmp, $old]);
+    foreach ($plan as $i => $lepes) {
+        $tmp = '~' . ($i + 1);
+        $tmpMap[$tmp] = $lepes['new'];
+        if (($elofordul[$lepes['old']] ?? 0) === 1) {
+            $tarsak->execute([$tmp, $lepes['old'], $lang]);   // elobb a tarsak...
+        }
+        $egy->execute([$tmp, $lepes['id']]);                  // ...aztan a sajat sor
     }
     foreach ($tmpMap as $tmp => $new) {
-        $toTmp->execute([$new, $tmp]);
-        $changed += $toTmp->rowCount();
+        $vegleges->execute([$new, $tmp]);
+        $changed += $vegleges->rowCount();
     }
+
+    // A slugot CSAK a vegleges szamok beallasa utan kepezzuk. Kik kaptak uj
+    // szamot? A masik nyelvu parok is - az o slugjuk is kovesse.
+    $erintett = [];
+    foreach ($plan as $lepes) {
+        $q = $db->prepare('SELECT id FROM help_article WHERE chapter_no = ?');
+        $q->execute([$lepes['new']]);
+        foreach ($q->fetchAll(PDO::FETCH_COLUMN) as $aid) { $erintett[(int)$aid] = $lepes['old']; }
+    }
+    slug_follow_numbers($db, $erintett);
+
     return $changed;
 }
 

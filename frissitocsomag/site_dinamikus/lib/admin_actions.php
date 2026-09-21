@@ -168,7 +168,10 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
 
             if ($wantsJson) { help_json(['ok' => true, 'saved_at' => date('H:i:s'), 'renamed' => $renamed]); }
             flash('ok', t('flash.article.draft.vazlat-mentve'));
-            back(['p' => 'articles', 'id' => $id]);
+            // A mentes utan rogton felajanljuk a kozzetetelt: enelkul a
+            // szerkesztonek kulon meg kell keresnie a gombot minden
+            // apro javitas utan.
+            back(['p' => 'articles', 'id' => $id, 'kerdez' => 1]);
         }
 
         case 'article.publish': {
@@ -346,6 +349,86 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             back(['p' => 'articles', 'lang' => (string)$m['lang']]);
         }
 
+        // EGY nyelv leforditasa a forrasbol ES rogton kozzeteve.
+        //
+        // A "Kozzeteves mindenhol" gomb hivja, nyelvenkent kulon keresben: egy
+        // fejezet forditasa nyelvenkent fel perc is lehet, harom nyelv egyben
+        // tullepne a webkiszolgalo idokorlatjat. A bongeszo hajtja vegig, es
+        // kozben latszik, hol tart.
+        case 'article.translate-publish': {
+            $srcId = (int)post('src_id');
+            $to    = strtolower(trim(post('lang')));
+            if (!array_key_exists($to, admin_langs()) || $to === admin_source_lang()) {
+                help_json(['ok' => false, 'error' => t('Ismeretlen célnyelv.')], 400);
+            }
+
+            $q = $db->prepare('SELECT chapter_no, lang FROM help_article WHERE id = ?');
+            $q->execute([$srcId]);
+            $src = $q->fetch();
+            if (!$src) { help_json(['ok' => false, 'error' => t('Nincs ilyen forrásfejezet.')], 404); }
+
+            // 1. Van-e MAR friss forditas-vazlat ezen a nyelven? A forras
+            //    kozzetetele az automatikus forditassal (ha be van kapcsolva)
+            //    ezt mar elkeszitette - ilyenkor felesleges ujra elkuldeni a
+            //    forditonak, csak penzbe es idobe kerulne.
+            $h = $db->prepare('SELECT content_hash FROM help_article WHERE id = ?');
+            $h->execute([$srcId]);
+            $srcHash = (string)$h->fetchColumn();
+
+            $kesz = $db->prepare('SELECT id FROM help_article
+                                   WHERE chapter_no = ? AND lang = ?
+                                     AND draft_html IS NOT NULL
+                                     AND translated_from_hash = ? LIMIT 1');
+            $kesz->execute([$src['chapter_no'], $to, $srcHash]);
+            $marVan = (int)$kesz->fetchColumn() > 0;
+
+            $r = $marVan
+                ? ['done' => [$to], 'failed' => [], 'why' => '']
+                : mt_auto_translate($db, $cfg, $srcId, auth_user()['id'], [$to]);
+            if (isset($r['failed'][$to])) {
+                help_json(['ok' => false, 'lang' => $to, 'error' => strip_tags((string)$r['failed'][$to])], 500);
+            }
+            if (!$r['done']) {
+                help_json(['ok' => false, 'lang' => $to,
+                           'error' => strip_tags(t(match ($r['why'] ?? '') {
+                               'ures'       => 'flash.translate.auto.ures',
+                               'nem-magyar' => 'flash.translate.auto.nem-forras',
+                               'nincs'      => 'flash.translate.auto.nincs',
+                               default      => 'flash.translate.auto.semmi',
+                           }))], 400);
+            }
+
+            // 2. a most keszult vazlat kozzetetele ezen a nyelven
+            $t = $db->prepare('SELECT id FROM help_article
+                                WHERE chapter_no = ? AND lang = ? AND draft_html IS NOT NULL LIMIT 1');
+            $t->execute([$src['chapter_no'], $to]);
+            $tid = (int)$t->fetchColumn();
+            if ($tid === 0) {
+                help_json(['ok' => false, 'lang' => $to,
+                           'error' => strip_tags(t('flash.article.publish.nincs-kozzetetelre-varo-vazlat'))], 500);
+            }
+
+            $db->beginTransaction();
+            try {
+                $p = $db->prepare('CALL help_publish(?, ?, ?, ?, NULL, ?)');
+                // apro javitaskent megy: a forras fejezet mar felkerult az
+                // Ujdonsagokba, nem kell nyelvenkent ujra
+                $p->execute([$tid, auth_user()['id'], null, 'mod', 1]);
+                $p->closeCursor();
+                $body = $db->prepare('SELECT body_html FROM help_article WHERE id = ?');
+                $body->execute([$tid]);
+                sections_rebuild($db, $tid, (string)$body->fetchColumn());
+                $db->commit();
+            } catch (Throwable $e) {
+                if ($db->inTransaction()) { $db->rollBack(); }
+                help_json(['ok' => false, 'lang' => $to, 'error' => strip_tags($e->getMessage())], 500);
+            }
+
+            audit_me($db, 'article.translate-publish', 'article:' . $tid,
+                     strtoupper($to) . ($marVan ? ' (meglevo vazlat)' : ' (uj forditas)'));
+            help_json(['ok' => true, 'lang' => $to, 'id' => $tid, 'reused' => $marVan]);
+        }
+
         case 'article.meta': {
             $id = (int)post('id');
             $slug = post('slug');
@@ -375,11 +458,16 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             // ezert azokat itt NEM irjuk felul (korabban egy "Adatok
             // mentese" eleg volt hozza, hogy a sorrend nullazodjon).
             try {
+                // A slugot kulon, a slug_change()-en at: az feljegyzi a REGI
+                // cimet, hogy a korabban kiadott hivatkozasok 301-gyel
+                // ideeljenek, ne 404-re fussanak.
+                slug_change($db, $id, mb_substr($slug, 0, 160));
+
                 $db->prepare('UPDATE help_article
-                                 SET chapter_no = ?, slug = ?, title = ?, module_id = ?
+                                 SET chapter_no = ?, title = ?, module_id = ?
                                WHERE id = ?')
                    ->execute([
-                       mb_substr($chapter, 0, 16), mb_substr($slug, 0, 160), mb_substr($title, 0, 255),
+                       mb_substr($chapter, 0, 16), mb_substr($title, 0, 255),
                        (int)post('module_id') ?: null,
                        $id,
                    ]);
@@ -465,7 +553,19 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             $family = $siblings($db, $a);
             $tids = [];
             foreach ($family as $one) { $tids[] = trash_article($db, $one, auth_user()['id']); }
-            audit_me($db, 'article.delete', 'article:' . $id, $a['title'] . ' (' . count($family) . ' nyelv)');
+
+            // A megmaradt fejezetek szama zarkozzon fel: ha az 1.1-et toroltuk,
+            // az 1.2-bol legyen 1.1. Enelkul lyuk marad a szamozasban.
+            // Nyelvfuggetlen: a renumber_module a fejezetszam alapjan minden
+            // nyelvi valtozatot egyszerre ir at.
+            $renamed = 0;
+            if ((int)$a['module_id'] > 0) {
+                try { $renamed = renumber_module_source($db, (int)$a['module_id']); }
+                catch (Throwable $e) { $renamed = 0; }   // a torles ettol meg sikerult
+            }
+
+            audit_me($db, 'article.delete', 'article:' . $id,
+                     $a['title'] . ' (' . count($family) . ' nyelv, ' . $renamed . ' ujraszamozva)');
 
             $extra = count($family) > 1
                 ? ' A(z) ' . (count($family) - 1) . ' idegen nyelvű változatával együtt.'
@@ -625,13 +725,19 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                     $st->execute($ids);
                     $tids = [];
                     $done = [];
+                    $ujra = [];              // [modul_id => nyelv]
                     foreach ($st->fetchAll() as $a) {
+                        if ((int)$a['module_id'] > 0) { $ujra[(int)$a['module_id']] = true; }
                         foreach ($siblings($db, $a) as $one) {
                             if (isset($done[(int)$one['id']])) { continue; }
                             $done[(int)$one['id']] = true;
                             $tids[] = trash_article($db, $one, auth_user()['id']);
                             $n++;
                         }
+                    }
+                    // a megmaradt fejezetek szama zarkozzon fel (mint egyesevel torlesnel)
+                    foreach (array_keys($ujra) as $modulId) {
+                        try { renumber_module_source($db, $modulId); } catch (Throwable $e) { /* nem kritikus */ }
                     }
                     audit_me($db, 'articles.bulk', 'delete', (string)$n);
                     flash('ok', t('flash.bulk.kukaba', ['n' => $n]) . ' '
@@ -675,8 +781,9 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                     $q->execute([$ids[0]]);
                     $lang = (string)$q->fetchColumn();
                 }
-                if ($moduleId > 0) { $renamed += renumber_module($db, $moduleId, $lang); }
-                if ($from > 0 && $from !== $moduleId) { $renamed += renumber_module($db, $from, $lang); }
+                // mindig a forrasnyelv szerint - a szamozas nyelvfuggetlen
+                if ($moduleId > 0) { $renamed += renumber_module_source($db, $moduleId); }
+                if ($from > 0 && $from !== $moduleId) { $renamed += renumber_module_source($db, $from); }
             } catch (Throwable $e) {
                 // az ujraszamozas sosem akaszthatja meg a sorrend mentest
                 $renamed = 0;
@@ -702,8 +809,17 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                 if ($db->inTransaction()) { $db->rollBack(); }
                 help_json(['ok' => false, 'error' => $e->getMessage()], 500);
             }
-            audit_me($db, 'modules.reorder', null, count($ids) . ' elem');
-            help_json(['ok' => true, 'count' => count($ids)]);
+            // A szamozas CSAK KERESRE koveti a sorrendet: egy vetlen huzas
+            // kulonben az egesz sugo szamozasat atirna. A felulet elotte
+            // megkerdezi a szerkesztot.
+            $renamed = 0;
+            if (post('renumber') === '1') {
+                try { $renamed = renumber_modules($db); } catch (Throwable $e) { $renamed = 0; }
+            }
+
+            audit_me($db, 'modules.reorder', null,
+                     count($ids) . ' elem' . ($renamed ? ', ' . $renamed . ' ujraszamozva' : ''));
+            help_json(['ok' => true, 'count' => count($ids), 'renamed' => $renamed]);
         }
 
         // ---------- kuka ----------
@@ -713,14 +829,34 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                 ? [(int)post('id')]
                 : array_values(array_filter(array_map('intval', (array)($_POST['ids'] ?? []))));
             $ok = 0; $err = [];
+            $ujra = [];                       // mely fofejezeteket kell ujraszamozni
             foreach ($ids as $tid) {
                 try {
-                    trash_restore($db, $tid);
+                    $hova = trash_restore($db, $tid);
+                    if (!empty($hova['module_id'])) { $ujra[(int)$hova['module_id']] = true; }
                     $ok++;
                 } catch (Throwable $e) {
                     $err[] = $e->getMessage();
                 }
             }
+
+            // A visszaallitott fejezet a REGI szamaval jon vissza, ami idokozben
+            // mar masra kerulhetett (torleskor a rendszer ujraszamoz). A sorrendet
+            // a sort_order orzi, ezert az ujraszamozas a helyere teszi.
+            $mar = [];
+            foreach (array_keys($ujra) as $modulId) {
+                try {
+                    // ugyanaz a fofejezet harom nyelven harom modul-sor: eleg
+                    // egyszer, a forrasnyelv szerint ujraszamozni
+                    $st = $db->prepare('SELECT chapter_no FROM help_module WHERE id = ?');
+                    $st->execute([$modulId]);
+                    $no = (string)$st->fetchColumn();
+                    if ($no === '' || isset($mar[$no])) { continue; }
+                    $mar[$no] = true;
+                    renumber_module_source($db, $modulId);
+                } catch (Throwable $e) { /* nem kritikus */ }
+            }
+
             audit_me($db, 'trash.restore', null, (string)$ok);
             if ($ok) { flash('ok', t('flash.trash.restore.kesz', ['n' => $ok])); }
             foreach (array_slice($err, 0, 3) as $e) { flash('err', h($e)); }
@@ -910,7 +1046,15 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
 
             $tids = [];
             foreach ($family as $one) { $tids[] = trash_module($db, $one, auth_user()['id']); }
-            audit_me($db, 'module.delete', 'module:' . $id, $row['title'] . ' (' . count($family) . ' nyelv)');
+
+            // A megmaradt fofejezetek szama zarkozzon fel: a 14-es torlese
+            // utan a 15-osbol 14 lesz, es vele az alatta levo fejezetek is
+            // (15.2 -> 14.2), minden nyelven.
+            $renamed = 0;
+            try { $renamed = renumber_modules($db); } catch (Throwable $e) { $renamed = 0; }
+
+            audit_me($db, 'module.delete', 'module:' . $id,
+                     $row['title'] . ' (' . count($family) . ' nyelv, ' . $renamed . ' ujraszamozva)');
             flash('ok', t('flash.module.delete.kesz', ['n' => count($family)]) . ' '
                 . undo_button($db, 'trash.restore-many', ['ids' => $tids, 'back' => 'modules'], t('undo.restore')));
             back(['p' => post('from') === 'articles' ? 'articles' : 'modules', 'lang' => $lang]);

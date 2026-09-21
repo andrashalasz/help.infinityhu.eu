@@ -347,8 +347,10 @@ function page_dashboard(PDO $db, array $cfg, array $counts): void
 
 // ============================================================ FEJEZETEK
 function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId = 0,
-                       int $diffRev = 0): void
+                       int $diffRev = 0, array $cfg = []): void
 {
+    // a gepi fordito allapotahoz kell (a "Kozzeteves mindenhol" gombhoz)
+    if (!$cfg) { $cfg = require __DIR__ . '/../config.php'; }
     // A fofejezet szerkesztesehez a jobb oldali oszlop a fejezet-szerkeszto
     // helyett a fofejezet adatlapjat mutatja.
     $module = null;
@@ -448,7 +450,11 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
 
     <div class="picker__hint" id="pick-hint" hidden></div>
 
-    <div class="picker__l" id="pick-list">
+    <div class="picker__l" id="pick-list"
+         data-renum-title="<?= h(t('fofejezet.sorrend.cim')) ?>"
+         data-renum-ask="<?= h(t('fofejezet.sorrend.kerdes')) ?>"
+         data-renum-yes="<?= h(t('fofejezet.sorrend.igen')) ?>"
+         data-renum-no="<?= h(t('fofejezet.sorrend.nem')) ?>">
       <?php foreach ($tree as $m): ?>
         <?php
           // A fofejezet BEVEZETO fejezete az, aminek ugyanaz a szama, mint a
@@ -579,13 +585,25 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
       <?php endif; ?>
 
       <?php
-      // a fejezet osszes nyelvi valtozata (ugyanaz a slug), hogy nyelvenkent
-      // lehessen ki-/bekapcsolni
-      $sib = $db->prepare('SELECT id, lang, is_published, draft_html IS NOT NULL AS has_draft
-                             FROM help_article WHERE slug = ? ORDER BY lang');
-      $sib->execute([$article['slug']]);
+      // A fejezet osszes nyelvi valtozata, hogy nyelvenkent lehessen
+      // ki-/bekapcsolni. A parokat a FEJEZETSZAM koti ossze - a slug
+      // nyelvenkent mas (5-3-penzmozgasok / 5-3-cash-movements), ezert
+      // slug szerint keresve a panel azt irta, hogy "nincs ilyen nyelvu
+      // valtozat", holott volt. A slug csak tartalek a szam nelkuli
+      // fejezetekhez.
       $siblings = [];
-      foreach ($sib->fetchAll() as $r) { $siblings[$r['lang']] = $r; }
+      if (trim((string)$article['chapter_no']) !== '') {
+          $sib = $db->prepare('SELECT id, lang, is_published, draft_html IS NOT NULL AS has_draft
+                                 FROM help_article WHERE chapter_no = ? ORDER BY lang');
+          $sib->execute([$article['chapter_no']]);
+          foreach ($sib->fetchAll() as $r) { $siblings[$r['lang']] = $r; }
+      }
+      if (!$siblings) {
+          $sib = $db->prepare('SELECT id, lang, is_published, draft_html IS NOT NULL AS has_draft
+                                 FROM help_article WHERE slug = ? ORDER BY lang');
+          $sib->execute([$article['slug']]);
+          foreach ($sib->fetchAll() as $r) { $siblings[$r['lang']] = $r; }
+      }
       $onCount = count(array_filter($siblings, static fn($r) => $r['is_published']));
       ?>
       <div class="panel" style="margin-bottom:14px">
@@ -846,7 +864,21 @@ function page_articles(PDO $db, string $lang, int $id, array $counts, int $modId
             </div>
             <div class="modal__f">
               <button class="btn btn--ghost" type="button" data-close><?= h(t('Mégsem')) ?></button>
-              <button class="btn btn--ok" type="submit"><?= h(t('Közzététel')) ?></button>
+              <span style="flex:1"></span>
+              <button class="btn" type="submit"><?= h(t('Közzététel')) ?></button>
+              <?php // A tobbi nyelv EGY gombbal: leforditja es kozze is teszi.
+                    // Csak a forrasnyelven van ertelme, es csak ha van fordito. ?>
+              <?php if ($article['lang'] === admin_source_lang() && admin_target_langs()):
+                      $trCfg = Translator::fromConfig($cfg, $db); ?>
+                <button class="btn btn--ok" type="submit" id="publish-all"
+                        data-langs="<?= h(implode(',', array_keys(admin_target_langs()))) ?>"
+                        <?= $trCfg->isConfigured() ? '' : 'disabled' ?>
+                        title="<?= h($trCfg->isConfigured()
+                             ? t('kozzetetel.mindenhol.sugo')
+                             : t('Nincs beállítva gépi fordító')) ?>">
+                  <?= h(t('kozzetetel.mindenhol')) ?>
+                </button>
+              <?php endif; ?>
             </div>
           </form>
         </div>

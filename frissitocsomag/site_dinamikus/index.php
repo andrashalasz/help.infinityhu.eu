@@ -270,7 +270,27 @@ $fallback = false;
 if ($slug !== null && $slug !== '' && !$isNews) {
     $article = getArticle($pdo, $slug, $lang);
 
-    // Regi hivatkozas: minden nyelv a magyar slugot hasznalta. Ha ezen a
+    // 1. REGI CIM: a fejezet szama (es vele a slug elotagja) megvaltozhatott,
+    //    pl. atszamozaskor. A slug-tortenet megorzi a korabbi cimeket, igy a
+    //    konyvjelzok es a kikuldott linkek nem halnak el.
+    if ($article === null) {
+        try {
+            $h = $pdo->prepare("SELECT a.slug FROM help_slug_history sh
+                                  JOIN help_article a ON a.id = sh.article_id
+                                 WHERE sh.slug = ? AND sh.lang = ? AND a.is_published = 1
+                                 LIMIT 1");
+            $h->execute([$slug, $lang]);
+            $target = (string)$h->fetchColumn();
+            if ($target !== '' && $target !== $slug) {
+                header('Location: /' . $lang . '/' . $target, true, 301);
+                exit;
+            }
+        } catch (Throwable $e) {
+            // a 12_slug_tortenet.sql meg nem futott le - nem baj, megy tovabb
+        }
+    }
+
+    // 2. Regi hivatkozas: minden nyelv a magyar slugot hasznalta. Ha ezen a
     // nyelven nincs ilyen slug, de egy masik nyelven van, atiranyitunk az
     // adott nyelv sajat cimere - igy a korabban kiadott linkek is elnek.
     if ($article === null) {
