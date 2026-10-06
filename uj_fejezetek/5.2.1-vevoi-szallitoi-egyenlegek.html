@@ -1,0 +1,341 @@
+<p>Ezen a képernyőn egyben látod, hogy kinek tartozol és ki tartozik neked.
+Partnerenként egy sor, bontva vevői és szállítói oldalra, a kettő különbsége
+az összegyenleg.</p>
+
+<p>Innen tudod megnézni, melyik számla van még nyitva egy partnernél,
+kinyomtatni a folyószámla-kivonatot, egyenlegközlőt küldeni egy partnernek
+vagy akár az összesnek egyszerre, elindítani a kompenzálást annál a
+partnernél, akivel kölcsönösen tartoztok egymásnak, és Excelbe exportálni
+azt, amit épp látsz.</p>
+
+<p>A képernyőt a <strong>Pénzügy → Kintlévőség kezelés → Vevői / Szállítói
+egyenlegek</strong> menüpont alatt találod.</p>
+
+<p><img src="/media/egyenlegek-01-attekintes.png" class="shot" loading="lazy" alt="A Vevői / Szállítói egyenlegek képernyő"></p>
+
+<h2 id="a-negy-csempe">Első pillantás: a négy csempe</h2>
+
+<p>A lista fölött négy csempe összegzi a helyzetet. Mindegyik kattintható –
+rákattintva rászűr a listára, újra rákattintva leveszi a szűrést.</p>
+
+<table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Csempe</strong></th>
+<th><strong>Mit mutat</strong></th>
+<th><strong>Mire jó</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Vevői egyenleg</td>
+<td>Amivel a vevők tartoznak neked, összesen</td>
+<td>Kattintásra csak a vevői partnerek maradnak</td>
+</tr>
+<tr class="even">
+<td>Szállítói egyenleg</td>
+<td>Amivel te tartozol a szállítóknak</td>
+<td>Kattintásra csak a szállítói partnerek maradnak</td>
+</tr>
+<tr class="odd">
+<td>Nettó pozíció</td>
+<td>A kettő különbsége, alatta hogy javadra vagy terhedre</td>
+<td>Kattintásra visszaáll az alapszűrés</td>
+</tr>
+<tr class="even">
+<td>30 napon túl lejárt</td>
+<td>A komolyan késésben lévő kintlévőség, és hogy ez a teljes kintlévőség hány százaléka</td>
+<td>Kattintásra csak az érintett partnerek</td>
+</tr>
+</tbody>
+</table>
+
+<p>A csempén a nagy szám kerekített, alatta kisebb betűvel ott a pontos
+összeg is.</p>
+
+<div class="call tip"><strong>Tipp</strong>
+<p>A <em>30 napon túl lejárt</em> csempe százaléka a leggyorsabb
+egészségjelző. Ha ez 5% körül van, rendben vagy. Ha 30% fölé megy, érdemes
+végignézni a listát.</p></div>
+
+<h2 id="a-ket-nezet">A két nézet</h2>
+
+<p>A szűrősáv jobb szélén válthatsz a két nézet között. A szűréseid és a
+kijelölésed megmarad váltáskor.</p>
+
+<h3 id="egyenleg-nezet">Egyenleg nézet</h3>
+
+<p>Ez az alapértelmezett. Azt mutatja, mennyi az egyenleg partnerenként:
+vevői egyenleg, szállítói egyenleg, és jobb szélen az összegyenleg.</p>
+
+<ul>
+<li><p>Pozitív összegyenleg (kék): a partner tartozik neked.</p></li>
+<li><p>Negatív összegyenleg (piros): te tartozol a partnernek.</p></li>
+</ul>
+
+<p>Ha a bontás is érdekel – mennyi volt a kiszámlázott összeg és mennyi
+érkezett be belőle –, kapcsold be a <strong>Részlet oszlopok</strong> pillt.
+Négy további oszlop nyílik: vevői tartozás, vevői befizetés, szállítói
+követelés, szállítói kifizetés.</p>
+
+<h3 id="korositas-nezet">Korosítás nézet</h3>
+
+<p><img src="/media/egyenlegek-02-korositas.png" class="shot" loading="lazy" alt="Korosítás nézet az öt sávval"></p>
+
+<p>Ez azt mutatja, mióta áll fenn a tartozás. Öt sáv: nem lejárt, 1–30 nap,
+31–60 nap, 61–90 nap, 90 napon túl. Minden sáv saját színt kap, a zöldtől a
+pirosig. A pilleknél választhatod, hogy a vevői kintlévőséget vagy a
+szállítói tartozást korosítja.</p>
+
+<div class="call warn"><strong>Figyelem</strong>
+<p>Felszólítás előtt mindig ebben a nézetben nézd meg a listát, mert az
+egyenleg nézetből nem derül ki, hogy egy tartozás öt vagy százötven
+napos.</p></div>
+
+<h2 id="fordulonap-es-valuta">Fordulónap és valuta</h2>
+
+<h3 id="fordulonap">Fordulónap</h3>
+
+<p>A fordulónap azt mondja meg, hogy melyik napra számoljuk az egyenleget.
+Alapértelmezés a mai nap. Ha visszaállítod például az előző hónap utolsó
+napjára, a rendszer úgy számol, mintha akkor néznéd: csak az addig
+kiállított számlákat és az addig beérkezett befizetéseket veszi
+figyelembe.</p>
+
+<p>Ezért tudsz utólag is egyenlegközlőt küldeni egy lezárt hónapra.</p>
+
+<h3 id="valuta">Valuta</h3>
+
+<p>Különböző valutájú összegeket nem lehet csak úgy összeadni, ezért három
+lehetőség van:</p>
+
+<table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Beállítás</strong></th>
+<th><strong>Mit csinál</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Mind – átszámítva</td>
+<td>Alapértelmezés. A devizás egyenlegeket átszámolja az elszámoló pénznemre a fordulónapi MNB árfolyammal. Az árfolyam a lista alján kiírva.</td>
+</tr>
+<tr class="even">
+<td>Csak egy valuta</td>
+<td>Csak az adott pénznemű egyenlegek látszanak. A választóban csak azok a valuták jelennek meg, amelyek tényleg előfordulnak a rendszerben.</td>
+</tr>
+</tbody>
+</table>
+
+<p>Ha nem átszámított módban vagy, és vegyesen van forintos és devizás
+partnered, a lista alján figyelmeztetés jelenik meg: az összesítő sor
+ilyenkor nem értelmes.</p>
+
+<div class="call tip"><strong>Megjegyzés</strong>
+<p>Az egyenlegközlőn mindig az eredeti valuta szerepel, sosem az
+átszámított.</p></div>
+
+<h2 id="kereses">Keresés</h2>
+
+<p>A kereső egyszerre keres a partner nevében, azonosítójában, adószámában
+és címében. Három dolgot érdemes tudni róla:</p>
+
+<table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Amit beírsz</strong></th>
+<th><strong>Mit jelent</strong></th>
+<th><strong>Példa</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Szóköz</td>
+<td>ÉS kapcsolat – mindkét kifejezésnek szerepelnie kell</td>
+<td><code>teszt kft</code> – csak az, amiben mindkettő benne van</td>
+</tr>
+<tr class="even">
+<td>Vessző</td>
+<td>VAGY kapcsolat – bármelyik elég</td>
+<td><code>teszt, alfa</code> – mindkét partner megjelenik</td>
+</tr>
+<tr class="odd">
+<td>Ékezet</td>
+<td>Nem számít</td>
+<td><code>szallito</code> ugyanazt hozza, mint <code>szállító</code></td>
+</tr>
+</tbody>
+</table>
+
+<div class="call tip"><strong>Tipp</strong>
+<p>Ha csak egy konkrét partnert keresel, a partnerkód a leggyorsabb: írd be
+a számot, és azonnal ott van.</p></div>
+
+<h2 id="szures-pillekkel">Szűrés pillekkel</h2>
+
+<p>A kereső alatti sorban találod a pilleket. A mellettük lévő szám mutatja,
+hány partner esik az adott kategóriába.</p>
+
+<table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Pill</strong></th>
+<th><strong>Mit csinál</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Összes</td>
+<td>Nincs típusszűrés.</td>
+</tr>
+<tr class="even">
+<td>Csak vevői</td>
+<td>Csak azok, akiknek kizárólag vevői egyenlegük van.</td>
+</tr>
+<tr class="odd">
+<td>Csak szállítói</td>
+<td>Csak azok, akiknek kizárólag szállítói egyenlegük van.</td>
+</tr>
+<tr class="even">
+<td>Kétoldalú (kompenzálható)</td>
+<td>Akikkel kölcsönösen tartoztok egymásnak. Csak akkor jelenik meg, ha van ilyen partner. Ezeknél a sor bal szélén sárga jelzősáv van.</td>
+</tr>
+<tr class="odd">
+<td>Lejárt</td>
+<td>Akiknél van legalább egy határidőn túli tétel.</td>
+</tr>
+<tr class="even">
+<td>Nem nulla</td>
+<td>Alapból be van kapcsolva. Elrejti azokat a partnereket, akiknek nulla az egyenlegük. A lista alján kiírja, hányat rejtett el.</td>
+</tr>
+</tbody>
+</table>
+
+<p>A típuspillek közül egyszerre egy lehet aktív, a <em>Lejárt</em> és a
+<em>Nem nulla</em> viszont ezektől függetlenül kapcsolható.</p>
+
+<h2 id="egy-partner-megnezese">Egy partner megnézése</h2>
+
+<p>Három különböző mélységben tudsz belenézni egy partnerbe.</p>
+
+<h3 id="sor-kinyitasa">Sor kinyitása – a nyitott számlák</h3>
+
+<ul>
+<li><p>Kattints a partner neve előtti kis nyílra, vagy magára a névre.</p></li>
+<li><p>A sor alatt megjelennek a partner nyitott bizonylatai: bizonylatszám, kelte, fizetési határidő, hány napja lejárt, összeg.</p></li>
+<li><p>A lejárt napok színezve vannak: sárga 30 napig, piros afölött.</p></li>
+</ul>
+
+<p>Több sort is nyitva hagyhatsz egyszerre, és közben a lista is a helyén
+marad.</p>
+
+<p><img src="/media/egyenlegek-03-sor-kinyitva.png" class="shot" loading="lazy" alt="Kinyitott partnersor a nyitott bizonylatokkal"></p>
+
+<h3 id="gyors-nezet">Gyors nézet – a partner adatai</h3>
+
+<ul>
+<li><p>Kattints a sor első, szem alakú gombjára.</p></li>
+<li><p>Jobb oldalt kicsúszik egy panel: partner adatok, e-mail cím, vevői és szállítói egyenleg, és egy színes sáv a korosításról.</p></li>
+<li><p>Az azonosító és az adószám mellett van egy másoló gomb – egy kattintás, és a vágólapon van.</p></li>
+<li><p>Kétoldalú partnernél kiírja, mennyi a kompenzálható összeg.</p></li>
+</ul>
+
+<p><img src="/media/egyenlegek-04-gyors-nezet.png" class="shot" loading="lazy" alt="A partner gyors nézete oldalt"></p>
+
+<h3 id="folyoszamla-kivonat">Folyószámla-kivonat – a teljes forgalom</h3>
+
+<ul>
+<li><p>Kattints a sorban a szem melletti, dokumentum ikonra.</p></li>
+<li><p>Megnyílik a kivonat. Alapból csak a nyitott tételeket mutatja.</p></li>
+<li><p>Ha a <strong>Teljes forgalom</strong> fülre váltasz, a már kiegyenlített tételeket is látod, halványítva, <em>Kiegyenlítve</em> címkével.</p></li>
+<li><p>A tartozik, követel és futó egyenleg oszlopokból tételről tételre levezethető, hogyan jött ki a végösszeg.</p></li>
+<li><p>A <strong>PDF letöltés</strong> gombbal kimented – ezt szokta kérni a partner és a könyvvizsgáló.</p></li>
+</ul>
+
+<p><img src="/media/egyenlegek-05-folyoszamla-kivonat.png" class="shot" loading="lazy" alt="Folyószámla-kivonat teljes forgalom nézetben"></p>
+
+<div class="call tip"><strong>Megjegyzés</strong>
+<p>A kis nyíl és a dokumentum ikon nem ugyanaz. A nyíl csak a nyitott
+tételeket adja, gyorsan, a listán belül. A kivonat a teljes forgalmat adja,
+kiegyenlített tételekkel és futó egyenleggel, PDF-be menthetően.</p></div>
+
+<h2 id="export-excelbe">Export Excelbe</h2>
+
+<p>Az <strong>Export</strong> gomb a kereső mellett van. Fontos: azt
+exportálja, <em>amit épp látsz</em> – a szűrt listát, az aktuális
+nézetmódban és az éppen bekapcsolt oszlopokkal. Nem a teljes táblázatot.</p>
+
+<p>Tehát ha korosítás nézetben, lejárt szűrővel exportálsz, pontosan azt a
+táblát kapod meg Excelben.</p>
+
+<h2 id="gyakori-feladatok">Gyakori feladatok</h2>
+
+<h3 id="kik-tartoznak-90-napon-tul">Kik tartoznak 90 napon túl?</h3>
+
+<ul>
+<li><p>Válts <strong>Korosítás</strong> nézetre.</p></li>
+<li><p>Rendezz a <em>90+ nap</em> oszlopra, csökkenően.</p></li>
+<li><p>A lista tetején vannak a legrégebbi tartozások.</p></li>
+</ul>
+
+<h3 id="kinek-kuldjek-felszolitast">Kinek küldjek felszólítást a héten?</h3>
+
+<ul>
+<li><p>Kapcsold be a <em>Lejárt</em> pillt.</p></li>
+<li><p>Korosítás nézetben nézd meg, kinél mennyi a 31–60 és 61–90 napos sáv.</p></li>
+<li><p>Akinél komoly összeg van, ott nyisd ki a sort, és nézd meg, melyik konkrét számla az.</p></li>
+</ul>
+
+<h3 id="ev-vegi-egyenlegkozlo">Év végi egyenlegközlő minden vevőnek</h3>
+
+<ul>
+<li><p>Állítsd a fordulónapot december 31-re.</p></li>
+<li><p>Kapcsold ki a <em>Nem nulla</em> pillt, ha a nullás partnereknek is kell közlő – auditnál sokszor kell.</p></li>
+<li><p>Válaszd a <em>Csak vevői</em> pillt.</p></li>
+<li><p>Kattints a fejléc <strong>Egyenlegközlő</strong> gombjára, és ellenőrizd a zárójeles darabszámot.</p></li>
+<li><p>Az e-mail sablonnál válaszd az <em>Év végi audit</em> sablont.</p></li>
+<li><p>A küszöbértéket hagyd nullán, hogy senki ne maradjon ki.</p></li>
+</ul>
+
+<h3 id="egy-partner-egyenlege-nem-stimmel">Egy partner egyenlege nem stimmel, mit nézzek meg?</h3>
+
+<ul>
+<li><p>Nyisd meg a folyószámla-kivonatát a dokumentum ikonnal.</p></li>
+<li><p>Váltsd át <strong>Teljes forgalom</strong> nézetre.</p></li>
+<li><p>Menj végig a futó egyenleg oszlopon: ahol megugrik vagy nem csökken, ott van a hiányzó vagy rosszul párosított kiegyenlítés.</p></li>
+<li><p>Ellenőrizd a fordulónapot is – ha múltbeli napra van állítva, a későbbi befizetések még nem látszanak.</p></li>
+</ul>
+
+<h2 id="ha-valami-nem-stimmel">Ha valami nem stimmel</h2>
+
+<table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Amit tapasztalsz</strong></th>
+<th><strong>Mi lehet az oka</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Nem találok egy partnert</td>
+<td>Valószínűleg nulla az egyenlege, és a <em>Nem nulla</em> pill elrejti. Kapcsold ki.</td>
+</tr>
+<tr class="even">
+<td>Az összegek nem azt mutatják, amit várok</td>
+<td>Nézd meg a fordulónapot. Ha nem a mai napon áll, a rendszer arra a napra számol vissza.</td>
+</tr>
+<tr class="odd">
+<td>Az összesítő sor értelmetlen</td>
+<td>Vegyes valutájú a lista. Válts átszámított módra, vagy szűrj egyetlen valutára.</td>
+</tr>
+<tr class="even">
+<td>Nem látom a mérleg ikont egy sorban</td>
+<td>Az csak kétoldalú partnernél jelenik meg, vagy nincs jogosultságod a Kompenzálás modulhoz.</td>
+</tr>
+<tr class="odd">
+<td>Nem látom az <em>Egyenlegközlő</em> gombot</td>
+<td>Az egyenlegek megtekintése és a kiküldés két külön jogosultság. A kiküldéshez külön jog kell, ezt a rendszergazda tudja megadni.</td>
+</tr>
+</tbody>
+</table>

@@ -1,0 +1,502 @@
+<p>A Kintlévőség kezelés egy helyre hozza azt a három dolgot, ami eddig két
+külön menüpontban volt: a <strong>fizetési emlékeztetőt</strong>, a
+<strong>fizetési felszólítást</strong> és a <strong>késedelmi
+kamatbekérőt</strong>. Nem kell többé ugyanazt a lejárt számlalistát több
+helyen megnyitni.</p>
+
+<p>A modul a lejárt számlákból indul, és megmondja, melyik partnernek mi a
+soron következő lépése. Te csak kijelölöd a sorokat és elindítod a
+futtatást, a többit a beállított eljárás intézi.</p>
+
+<p>A modult a <strong>Pénzügy → Kintlévőség kezelés</strong> menüpontban
+találod.</p>
+
+<p><img src="/media/kintlevoseg-01-nyitott-tartozasok.png" class="shot" loading="lazy" alt="A Kintlévőség kezelés képernyő a négy füllel"></p>
+
+<h2 id="mielott-eloszor-elinditod">Mielőtt először elindítod</h2>
+
+<p>Három dolognak rendben kell lennie, különben a kiküldés elakad.
+Mindhármat egyszer kell beállítani.</p>
+
+<table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Mi kell</strong></th>
+<th><strong>Hol állítod be</strong></th>
+<th><strong>Mi történik, ha hiányzik</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Eljárás</td>
+<td><em>Eljárás</em> fül</td>
+<td>Nem tudja a rendszer, mikor mit küldjön</td>
+</tr>
+<tr class="even">
+<td>Levélsablonok</td>
+<td>Sablonkezelő</td>
+<td>A kiküldés blokkolt, mert nincs miből levelet készíteni</td>
+</tr>
+<tr class="odd">
+<td>Késedelmi kamatláb</td>
+<td>Beállítások → Pénzügy → Késedelmi kamat</td>
+<td>Kamatbekérőt nem tudsz készíteni</td>
+</tr>
+</tbody>
+</table>
+
+<p>Ha a kamatláb hiányzik, a <em>Késedelmi kamatbekérők</em> fülön sárga
+sávban jelezzük, és a sávban lévő linkről egyből oda jutsz, ahol be tudod
+állítani.</p>
+
+<h2 id="a-negy-ful">A négy fül</h2>
+
+<table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Fül</strong></th>
+<th><strong>Mire való</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Nyitott tartozások</td>
+<td>A munkalistád. Itt látod a lejárt számlákat, és innen indítod a kiküldést.</td>
+</tr>
+<tr class="even">
+<td>Kiértesítések</td>
+<td>Ami már kiment. Emlékeztetők és felszólítások, e-mail állapottal.</td>
+</tr>
+<tr class="odd">
+<td>Késedelmi kamatbekérők</td>
+<td>A kamatot és a behajtási költségátalányt tartalmazó bizonylatok.</td>
+</tr>
+<tr class="even">
+<td>Eljárás</td>
+<td>A szabályok. Itt állítod be, mikor mi menjen ki, és kire vonatkozik.</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="napi-munka">Napi munka: kiértesítés kiküldése</h2>
+
+<h3 id="mi-esedekes">Nézd meg, mi esedékes</h3>
+
+<p>Nyisd meg a <strong>Nyitott tartozások</strong> fület. Alapból az
+esedékes tételeket mutatja, tehát azokat, ahol most van a dolgod. A fül
+fejlécében lévő piros szám mutatja, hány esedékes lépés vár rád.</p>
+
+<p>A lista partnerenként csoportosít. A partner sorára kattintva kinyílnak
+alatta a számlái. Ha inkább számlánként szeretnél dolgozni, a jobb felső
+sarokban válts <strong>Számlánként</strong> nézetre.</p>
+
+<p>Amit érdemes megnézni minden soron:</p>
+
+<ul>
+<li><p><strong>Késedelem:</strong> hány napja lejárt, színes ponttal jelölve a korosztály</p></li>
+<li><p><strong>Hátralék:</strong> a még ki nem egyenlített összeg, nem a bruttó</p></li>
+<li><p><strong>Elért szint:</strong> hány kiértesítést kapott már ez a számla</p></li>
+<li><p><strong>Következő lépés:</strong> mi jön most, és mikortól esedékes</p></li>
+<li><p><strong>Eljárás:</strong> melyik szabályrendszer vonatkozik erre a partnerre</p></li>
+</ul>
+
+<h3 id="jelold-ki-es-inditsd">Jelöld ki és indítsd</h3>
+
+<ul>
+<li><p>Pipáld ki a sorokat. Ha a partner fejsorát pipálod, az összes számlája bekerül.</p></li>
+<li><p>Kattints a <strong>Következő lépés</strong> gombra. A gomb zárójelben mutatja, hány esedékes sort fog feldolgozni.</p></li>
+<li><p>Megnyílik a javaslat ablak. <em>Ez még nem küld ki semmit.</em></p></li>
+<li><p>Nézd át a javaslatot, vedd ki, amit nem akarsz, majd nyomj a <strong>Levél kiküldése</strong> gombra.</p></li>
+</ul>
+
+<div class="call tip"><strong>Jó tudni</strong>
+<p>A <em>Következő lépés</em> gomb vegyesen is kezeli a sorokat. Ha az egyik
+partnernek emlékeztető jár, a másiknak második felszólítás, egyetlen
+futtatásban mindkettő elkészül, mindenki a saját eljárása szerint.</p></div>
+
+<h3 id="javaslat-ablak">Mit mutat a javaslat ablak</h3>
+
+<p><img src="/media/kintlevoseg-02-javaslat-ablak.png" class="shot" loading="lazy" alt="A javaslat ablak a kiküldés előtt"></p>
+
+<table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Oszlop</strong></th>
+<th><strong>Mit jelent</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Partner</td>
+<td>Kinek megy a levél</td>
+</tr>
+<tr class="even">
+<td>Javasolt szint</td>
+<td>Melyik lépés következik. Legördülőből lejjebb vehető, ha enyhíteni akarsz.</td>
+</tr>
+<tr class="odd">
+<td>Nyelv és sablon</td>
+<td>Milyen nyelven és melyik sablonnal megy ki</td>
+</tr>
+<tr class="even">
+<td>Számlák</td>
+<td>Hány számla kerül a levélre</td>
+</tr>
+<tr class="odd">
+<td>Tartozás</td>
+<td>Mennyiről szól</td>
+</tr>
+</tbody>
+</table>
+
+<p>A <em>Nyelv és sablon</em> oszlop három színt használhat:</p>
+
+<ul>
+<li><p><strong>Zöld:</strong> megvan a sablon a partner nyelvén, minden rendben</p></li>
+<li><p><strong>Sárga:</strong> nincs a partner nyelvén, ezért a tartaléknyelv megy ki helyette</p></li>
+<li><p><strong>Piros:</strong> nincs használható sablon. A kiküldés gomb ilyenkor tiltott.</p></li>
+</ul>
+
+<p>Ha pirosat látsz, vagy válassz sablont az adott lépéshez az <em>Eljárás</em>
+fülön, vagy töltsd fel a hiányzó nyelvi változatot a Sablonkezelőben. Ez
+azért van így, hogy kétszáz levél kiküldése előtt derüljön ki a hiány, ne
+utána.</p>
+
+<h3 id="egy-level-tobb-szamla">Egy levél, több számla</h3>
+
+<p>Ha a partnernek több lejárt számlája van, alapból egy levelet kap, és
+azon szerepel az összes. Ez jogilag is a helyes megoldás, mert a felszólítás
+a tartozásra szól, nem számlánként.</p>
+
+<p>A levél hangvételét a legmagasabb szint adja, de minden számla a saját
+szintjén lép tovább. Tehát ha van egy nagyon régi és három frissebb számla,
+a régi a harmadik lépésre megy, a frissek az elsőre – egyetlen levélben.</p>
+
+<h2 id="elteres-a-szabalytol">Ha el kell térni a szabálytól</h2>
+
+<p>Előfordul, hogy nem a soron következő lépést akarod kiküldeni. Erre való
+a <strong>Kézi lépés</strong> gomb.</p>
+
+<ul>
+<li><p>Jelöld ki a sorokat, majd nyomj a <em>Kézi lépés</em> gombra.</p></li>
+<li><p>Válaszd ki, melyik lépést szeretnéd kiküldeni.</p></li>
+<li><p>Ha átugrasz egy lépést, indoklást kell írnod. Legalább öt karakter.</p></li>
+<li><p>Küldd ki.</p></li>
+</ul>
+
+<p>Az indoklás bekerül a bizonylat naplójába, és a <em>Kiértesítések</em>
+listában látszik, hogy az adott levél kézzel készült, nem az eljárás
+szerint.</p>
+
+<div class="call tip"><strong>Jó tudni</strong>
+<p>A szintátlépést azért kérjük indokolni, mert fizetési meghagyás vagy per
+esetén előny, ha igazolható, hogy fokozatosan jártál el. Ha átugrottad az
+emlékeztetőt, jó, ha tudod, miért.</p></div>
+
+<h2 id="kamatbekero">Kamatbekérő készítése</h2>
+
+<p>A késedelmi kamat a fizetési határidő lejártát követő naptól
+automatikusan jár, felszólítás nélkül is. A bekérő nem keletkezteti a
+követelést, csak összegszerűen közli.</p>
+
+<h3 id="kamatbekero-keszitese">Készítés a lejárt számlákból</h3>
+
+<ul>
+<li><p>A <em>Nyitott tartozások</em> fülön jelöld ki a számlákat.</p></li>
+<li><p>Nyomj a <strong>Kamatbekérő</strong> gombra.</p></li>
+<li><p>A javaslat ablak partneronként és pénznemenként bontva mutatja, mi fog elkészülni. Több partnerre is mehet egyszerre.</p></li>
+<li><p>Egy partner esetén megnyithatod a szerkesztőt is, ha finomhangolni akarsz.</p></li>
+</ul>
+
+<p>A form előtöltve jön: partner, számlák, dátumtól és dátumig, napok száma.
+Soronként ki tudod venni a tételt, és a záró dátumot is módosíthatod.</p>
+
+<p><img src="/media/kintlevoseg-03-kamatbekero.png" class="shot" loading="lazy" alt="Kamatbekérő szerkesztő"></p>
+
+<h3 id="kamat-tudnivalok">Amit érdemes tudni</h3>
+
+<ul>
+<li><p>A kamatláb a jegybanki alapkamat plusz nyolc százalékpont. Szerződéses kamat esetén a szerződésben rögzített érték érvényes.</p></li>
+<li><p>A kamatszámítás alapja 365 vagy 360 nap. Ez egy osztó a napi kamathoz, nem árfolyam.</p></li>
+<li><p>A behajtási költségátalány 40 euró. Forintos bekérőnél átszámítjuk, és a bizonylaton látszik az árfolyam is.</p></li>
+<li><p>Az átalányt számlánként egyszer lehet felszámítani. Ha korábban már ment rá, a rendszer szól.</p></li>
+</ul>
+
+<div class="call warn"><strong>Figyelem</strong>
+<p>Ha egy számla késedelme meghaladja az egy évet, figyelmeztetést kapsz a
+költségátalánynál. A jogszabály erre egyéves, jogvesztő határidőt ír elő. A
+kamat érvényesítését ez nem érinti, csak az átalányt. Nem tiltjuk meg, de
+érdemes átgondolni.</p></div>
+
+<h3 id="sztorno">Sztornó</h3>
+
+<p>A kamatbekérőt <strong>sztornózni lehet, törölni nem</strong>. A sorszám
+megmarad, a bizonylat <em>Sztornózott</em> státuszba kerül, a követelés
+kikerül a nyitottak közül, és az érintett számlák visszakerülnek az
+eljárásban eggyel lejjebb.</p>
+
+<h2 id="kiertesitesi-tilalom">Ha valakit ki kell hagyni</h2>
+
+<p>Ha egy partnerrel vitád van, vagy megállapodtatok részletfizetésben, tedd
+rá a <strong>kiértesítési tilalmat</strong>. A tilalmas partner kimarad
+minden futtatásból, kézi és automatikus egyaránt.</p>
+
+<p>A tilalmat a <em>Nyitott tartozások</em> fülön a sor műveleti gombjai
+közül az áthúzott kör ikonnal kapcsolod be és ki. Indokot kötelező megadni,
+és ez a listában is látszik.</p>
+
+<h2 id="eljaras-beallitasa">Az eljárás beállítása</h2>
+
+<p>Az eljárás a lépéssorozat: hány emlékeztető, hány felszólítás, és melyik
+a lejárat után hányadik napon. Ezt az <strong>Eljárás</strong> fülön
+állítod.</p>
+
+<p><img src="/media/kintlevoseg-04-eljaras.png" class="shot" loading="lazy" alt="Az Eljárás fül a lépésekkel"></p>
+
+<h3 id="tobb-eljaras">Több eljárás, egy alapértelmezett</h3>
+
+<p>Több eljárást is felvihetsz. A csillaggal jelölt az alapértelmezett –
+ezt kapja mindenki, akihez nincs külön eljárás rendelve, és ezt futtatja az
+automatizmus.</p>
+
+<p>A lista soraiban:</p>
+
+<ul>
+<li><p><strong>Csillag:</strong> beállítás alapértelmezettként. Az alapértelmezettet nem lehet törölni vagy inaktívvá tenni.</p></li>
+<li><p><strong>Ceruza:</strong> megnyitja a szerkesztőt. Amíg nem nyomsz rá, a szerkesztő nincs a képernyőn.</p></li>
+<li><p><strong>Két lap ikon:</strong> másolat készítése, ha hasonlót akarsz egy meglévő alapján.</p></li>
+<li><p><strong>Kuka:</strong> törlés.</p></li>
+</ul>
+
+<div class="call warn"><strong>Figyelem</strong>
+<p>Ha alapértelmezettet váltasz, előbb megmutatjuk, kinek mi változik: hány
+számla áll melyik lépésen, mi volt eddig a következő lépésük és mi lesz
+ezután. Ha az új eljárás rövidebb, és lesz olyan számla, aminek nincs
+folytatása, külön tudomásul kell venned.</p></div>
+
+<h3 id="kire-vonatkozzon">Kire vonatkozzon</h3>
+
+<p>A szerkesztőben a <em>Kire vonatkozik</em> blokkban adhatod meg, kire
+érvényes az eljárás. Háromféleképpen:</p>
+
+<ul>
+<li><p><strong>Partner:</strong> egy konkrét cég</p></li>
+<li><p><strong>Partnercsoport:</strong> például a kiemelt vevők</p></li>
+<li><p><strong>Partnerkategória:</strong> például az exportpartnerek</p></li>
+</ul>
+
+<p>A feloldás sorrendje: először partner, aztán csoport, aztán kategória,
+végül az alapértelmezett. Az első találat érvényes.</p>
+
+<p>Ha egy nem alapértelmezett eljáráshoz nem adsz hozzárendelést, az az
+eljárás <strong>soha nem fut le</strong>. Ezt a lista piros jelöléssel
+mutatja.</p>
+
+<h3 id="lepesek-osszeallitasa">A lépések összeállítása</h3>
+
+<p>A leggyorsabb út a <strong>Gyors összeállítás</strong>. Beírod, miből
+hány kell, megadod, hogy az első lépés hány nappal a lejárat után menjen, és
+hogy a lépések között hány nap teljen el, majd nyomsz a
+<strong>Legyártás</strong> gombra.</p>
+
+<p>Utána minden sor külön szerkeszthető. A lépés megnevezését nem kell
+beírnod: a típus és a sorszám adja. Ha beszúrsz egy felszólítást a meglévők
+közé, a többi automatikusan átszámozódik.</p>
+
+<table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Oszlop</strong></th>
+<th><strong>Mit állítasz vele</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Típus</td>
+<td>Emlékeztető, felszólítás, kamatbekérő vagy jogi lépés</td>
+</tr>
+<tr class="even">
+<td>Határidő után</td>
+<td>Hány nappal a fizetési határidő után esedékes ez a lépés</td>
+</tr>
+<tr class="odd">
+<td>Sablon</td>
+<td>Melyik sablon menjen ki. A Sablonkezelőből választasz.</td>
+</tr>
+<tr class="even">
+<td>Fiz. határidő</td>
+<td>Hány napos fizetési határidő legyen a levélen</td>
+</tr>
+<tr class="odd">
+<td>Min. összeg</td>
+<td>Ez alatt a hátralék alatt ez a lépés nem indul. Üresen az eljárás küszöbe él.</td>
+</tr>
+<tr class="even">
+<td>Kamat</td>
+<td>Megjelenjen-e a kamat összege a bizonylaton</td>
+</tr>
+<tr class="odd">
+<td>Könyvel</td>
+<td>Könyvelésre kerüljön-e a kamat</td>
+</tr>
+<tr class="even">
+<td>Átalány</td>
+<td>Felszámoljuk-e a 40 eurós költségátalányt</td>
+</tr>
+<tr class="odd">
+<td>Stop</td>
+<td>Menjen-e szállítási tilalom jelzés</td>
+</tr>
+<tr class="even">
+<td>Összevon</td>
+<td>A partner több számlája egy levélre kerüljön-e</td>
+</tr>
+</tbody>
+</table>
+
+<div class="call tip"><strong>Megjegyzés</strong>
+<p>A <em>Kamat</em> és a <em>Könyvel</em> külön oszlop, és ez szándékos. A
+felszólításon ki lehet írni a felhalmozott kamatot anélkül, hogy
+könyvelnéd. Így nem kell sztornózni, ha a partner erre fizet.</p></div>
+
+<h3 id="globalis-parameterek">Globális paraméterek</h3>
+
+<table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Paraméter</strong></th>
+<th><strong>Mit csinál</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Türelmi idő</td>
+<td>Ennél kisebb késedelmű számla nem kerül be az eljárásba</td>
+</tr>
+<tr class="even">
+<td>Intervallum</td>
+<td>Két levél között ennyi napnak el kell telnie ugyanannál a partnernél</td>
+</tr>
+<tr class="odd">
+<td>Küszöb hátralék</td>
+<td>Ez alatt nem indul kiértesítés</td>
+</tr>
+<tr class="even">
+<td>Levélképzés</td>
+<td>Partnerenként egy levél, vagy számlánként külön</td>
+</tr>
+</tbody>
+</table>
+
+<p>Az intervallum és a lépés napszáma együtt működik. A lépés akkor
+esedékes, ha a késedelem elérte a lépéshez tartozó napszámot,
+<strong>és</strong> az előző levél óta eltelt az intervallum.</p>
+
+<h2 id="automatikus-futtatas">Automatikus futtatás</h2>
+
+<p>Az <em>Eljárás</em> fül tetején kapcsolod be és ki. Bekapcsolva minden
+munkanap a beállított időpontban lefut, és minden partner a hozzá rendelt
+eljárás szerint kapja a leveleket.</p>
+
+<p>Amit beállíthatsz: az időpontot, hogy csak munkanapon fusson, és hogy
+menjen-e azonnal e-mail. Ha az e-mail kiküldést kikapcsolod, a bizonylatok
+elkészülnek, de kiküldés nélkül várakoznak.</p>
+
+<div class="call tip"><strong>Jó tudni</strong>
+<p>Az automatikus futtatás kihagyja azokat a partnereket, akiknél hiányzik a
+sablon a nyelvükön, de a többinél lefut. A futtatás után összefoglalót kapsz
+arról, hány levél ment ki és ki maradt ki, milyen indokkal.</p></div>
+
+<p>Javasoljuk, hogy az első hetekben kikapcsolva hagyd, és kézzel futtass.
+Amikor látod, hogy az eljárás azt csinálja, amit vársz, kapcsold be.</p>
+
+<h2 id="allapotok">Mit jelentenek az állapotok</h2>
+
+<table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Állapot</strong></th>
+<th><strong>Mit jelent</strong></th>
+<th><strong>Mit tegyél</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Esedékes</td>
+<td>Most van a dolgod vele</td>
+<td>Jelöld ki és futtasd</td>
+</tr>
+<tr class="even">
+<td>Várakozik</td>
+<td>Még nem jött el az ideje</td>
+<td>Semmit. A magyarázat a sorra húzva látszik.</td>
+</tr>
+<tr class="odd">
+<td>Blokkolt</td>
+<td>Tilalom van rajta, vagy a küszöb alatt van</td>
+<td>Ha tévedés, oldd fel a tilalmat</td>
+</tr>
+<tr class="even">
+<td>Eljárás vége</td>
+<td>Az eljárás utolsó lépése is lezajlott</td>
+<td>Kézi döntés kell: jogi út, leírás vagy megállapodás</td>
+</tr>
+<tr class="odd">
+<td>Kiegyenlítve</td>
+<td>Megfizették</td>
+<td>Semmit, kiesik a listából</td>
+</tr>
+</tbody>
+</table>
+
+<p>A <em>Várakozik</em> állapotnál mindig kiírjuk az okot is: türelmi idő, a
+lépéshez még hány nap kell, vagy az intervallumból hány nap van hátra.</p>
+
+<h2 id="gyakori-kerdesek">Gyakori kérdések</h2>
+
+<h3 id="miert-nem-kap-felszolitast">Miért nem kap felszólítást ez a partner?</h3>
+
+<p>Nézd meg az <em>Állapot</em> oszlopot, és húzd rá az egeret. A
+leggyakoribb okok: még a türelmi időn belül van, a hátralék a küszöb alatt
+van, az előző levél óta nem telt el az intervallum, vagy tilalom van a
+partneren.</p>
+
+<h3 id="miert-emlekeztetot-kap">Miért emlékeztetőt kap, amikor már felszólítást küldtem?</h3>
+
+<p>Valószínűleg egy másik számlájáról van szó. A szint <strong>számlánként
+külön fut</strong>, nem partnerenként. Kattints a sor előzmény ikonjára, és
+látod a számla saját történetét.</p>
+
+<h3 id="miert-nem-tudom-kikuldeni">Miért nem tudom kiküldeni a levelet?</h3>
+
+<p>Ha a gomb tiltott, nézd meg a javaslat ablakban a <em>Nyelv és sablon</em>
+oszlopot. Piros bejegyzésnél nincs használható sablon, és a hiányt előbb
+pótolni kell.</p>
+
+<h3 id="modosithatom-az-eljarast">Módosíthatom az eljárást, ha már mentek ki levelek?</h3>
+
+<p>Igen, bármikor. A már kiküldött bizonylatok nem változnak, mert mindegyik
+eltárolja, milyen szabály szerint készült. A folyamatban lévő számlák
+viszont innentől az új beállítás szerint lépnek tovább.</p>
+
+<h3 id="mi-tortenik-ha-fizet">Mi történik, ha a partner időközben fizet?</h3>
+
+<p>A számla kiesik a listából, mert a hátraléka nullára áll. A már kiküldött
+leveleket ez nem érinti. Ha csak részben fizet, a hátralék csökken, és a
+kamatszámítás innentől a csökkentett összeggel megy tovább.</p>
+
+<h3 id="a-kamatbekero-szamla">A kamatbekérő számla?</h3>
+
+<p>Nem. A késedelmi kamat és a költségátalány nem szolgáltatás ellenértéke,
+ezért áfa nem terheli, és a NAV felé nem megy adatszolgáltatás. Külön
+bizonylatszám-tartományt használ.</p>
+
+<h2 id="amire-figyelj">Amire figyelj</h2>
+
+<ul>
+<li><p>A <strong>Hátralék</strong> oszlopot nézd, ne a <em>Bruttót</em>. Részfizetés esetén a kettő eltér.</p></li>
+<li><p>Mielőtt nagy kötegben futtatsz, nézd át a javaslat ablakot. Kiküldés után visszavonni csak sztornóval lehet.</p></li>
+<li><p>Ha a sárga sáv jelzi, hogy hiányzik a kamatláb, a bekérő nem készül el. A sávban lévő link odavisz, ahol pótolhatod.</p></li>
+<li><p>Az alapértelmezett eljárás váltása azonnal hat az összes folyamatban lévő számlára. A hatásvizsgálatot olvasd el, ne csak kattints rajta.</p></li>
+<li><p>A tilalomhoz mindig írj érdemi indokot. Fél év múlva neked is segít, nem csak a kollégának.</p></li>
+</ul>

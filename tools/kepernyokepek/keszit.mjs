@@ -34,7 +34,8 @@ const ALAP    = process.env.ERP_URL  || 'https://release.infinityhu.eu';
 const USER    = process.env.ERP_USER || '';
 const PASS    = process.env.ERP_PASS || '';
 const KIMENET = process.env.KIMENET  || '/kimenet';
-const CSAK    = (process.env.CSAK || '').trim();
+// Tobb nev is megadhato vesszovel: CSAK=email-02,email-03
+const CSAK    = (process.env.CSAK || '').split(',').map(x=>x.trim()).filter(Boolean);
 // Mar meglevo kepeket NE gyartsunk ujra: a nevuk a tartalom hash-ebol jon,
 // es a fejezetek mar arra a nevre hivatkoznak. Ujragyartasnal a hash valtozna,
 // es a hivatkozas eltorne. KIVEVE=egyenlegek,kintlevoseg
@@ -101,6 +102,27 @@ async function takarj(page) {
     document.querySelectorAll('td, .mono, code').forEach(el => {
       const t = (el.textContent || '').trim();
       if (KULCSSZERU.test(t) && t.length >= 28) { kitakar(el, t.length); }
+    });
+  }).catch(() => {});
+
+  // Ceglogo semlegesitese: a bal felso sarokban az elofizeto emblemaja all,
+  // ez a sugoban nem jelenhet meg. Semleges "Infinity" feliratra cserelunk.
+  await page.evaluate(() => {
+    const LOGOS = /logo|brand|embl|arculat/i;
+    document.querySelectorAll('img, svg').forEach(el => {
+      const jel = [el.getAttribute('src') || '', el.getAttribute('alt') || '',
+                   el.className && el.className.baseVal !== undefined
+                     ? el.className.baseVal : (el.className || ''),
+                   el.id || '', (el.closest('[class]') || {}).className || ''].join(' ');
+      if (!LOGOS.test(String(jel))) { return; }
+      const m = el.getBoundingClientRect();
+      const sz = document.createElement('span');
+      sz.textContent = 'Infinity';
+      sz.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;'
+        + 'font:600 ' + Math.max(12, Math.min(22, Math.round(m.height * 0.5))) + 'px/1 '
+        + 'system-ui,sans-serif;color:#fff;letter-spacing:.5px;'
+        + 'width:' + Math.round(m.width) + 'px;height:' + Math.round(m.height) + 'px;';
+      el.replaceWith(sz);
     });
   }).catch(() => {});
 
@@ -250,20 +272,36 @@ const KEPEK = [
   { nev:'email-01-lista', mit:'A sablonok listaja kartyas nezetben',
     url:'/core/email-template/index',
     async lepesek(p){ await varjALISTARA(p); } },
+  // A szerkeszto sajat lapon nyilik: /core/email-template/update?id=N - a
+  // kartyakon levo "Szerkesztes" egy sima link, nem gomb.
   { nev:'email-02-szerkeszto', mit:'A sablon szerkesztoje',
-    url:'/core/email-template/index',
-    async lepesek(p){ await varjALISTARA(p);
-      const e=fo(p).getByRole('button',{name:/Szerkeszt/i}).first();
-      if(await e.count()){ await e.click(); await varj(2500); } } },
+    url:'/core/email-template/update?id=10',
+    async lepesek(p){ await varj(5000); } },
 
   // ---------- Jogosultsagkezelo (16.2.2) ----------
-  { nev:'jogosultsag-01-oldal', mit:'A jogosultsagok es kategoriak oldal',
+  { nev:'jogosultsag-01-oldal', mit:'A jogosultsagok oldal kivalasztott kategoriaval',
     url:'/core/action/index',
-    async lepesek(p){ await varjALISTARA(p);
-      // a tabla ures, amig nincs kivalasztva kategoria - valasszuk az elsot
-      const k = fo(p).locator('aside li, .kategoria li, ul li').filter({hasText:/\S/}).first();
-      if (await k.count()) { await k.click().catch(()=>{}); await varj(2000); }
-      await varj(800); } },
+    async lepesek(p){ await varjALISTARA(p); await varj(2500);
+      // A tabla ures, amig nincs kivalasztva kategoria. A bal panelen keressuk
+      // meg az elso olyan sort, ami melett darabszam all - az biztosan kategoria.
+      const k = p.locator('a, li, div').filter({ hasText: /^\s*\S.{2,40}\s+\d+\s*$/ }).first();
+      if (await k.count()) { await k.click().catch(()=>{}); await varj(2500); }
+      await varj(1000); } },
+
+  // ---------- E-mail sablonok reszletek ----------
+  // A szerkesztoben nincs kulon "Trigger" ful - a kivalto esemeny az
+  // Alapadatok "Tipus" mezoje. Helyette az elo elonezetet mutatjuk meg.
+  { nev:'email-03-elonezet', mit:'Az elo elonezet a behelyettesitett valtozokkal',
+    url:'/core/email-template/update?id=10',
+    async lepesek(p){ await varj(5000);
+      const t=p.locator('button.etr-rtab[data-rtab="preview"]').first();
+      if(await t.count()){ await t.click().catch(()=>{}); await varj(2500); } } },
+
+  { nev:'email-04-cimzettek', mit:'A Cimzettek ful',
+    url:'/core/email-template/update?id=10',
+    async lepesek(p){ await varj(5000);
+      const c=p.locator('button.etr-secnav-btn[data-section="recipients"]').first();
+      if(await c.count()){ await c.click().catch(()=>{}); await varj(2500); } } },
 
   // ---------- Szerepkorok (16.2.3) ----------
   { nev:'szerepkor-01-lista', mit:'A szerepkorok listaja',
@@ -369,15 +407,15 @@ const main = async () => {
   await belep(page);
   console.log('Belepve. Kepek keszitese ' + NEZET.width + 'x' + NEZET.height + ', ' + ELESSEG + 'x elesseggel.\n');
 
-  let lista = CSAK ? KEPEK.filter(k => k.nev.includes(CSAK)) : KEPEK;
+  let lista = CSAK.length ? KEPEK.filter(k => CSAK.some(x => k.nev.includes(x))) : KEPEK;
   if (KIVEVE.length) { lista = lista.filter(k => !KIVEVE.some(x => k.nev.includes(x))); }
-  if (CSAK) { console.log('Csak ezek: ' + lista.map(k => k.nev).join(', ') + '\n'); }
+  if (CSAK.length) { console.log('Csak ezek: ' + lista.map(k => k.nev).join(', ') + '\n'); }
 
   let ok = 0, hiba = 0;
   for (const k of lista) {
     const cel = KIMENET + '/' + k.nev + '.png';
     try {
-      await page.goto(ALAP + k.url, { waitUntil: 'domcontentloaded' });
+      await page.goto(ALAP + k.url, { waitUntil: 'domcontentloaded', timeout: 120000 });
       await k.lepesek(page);
       await takarj(page);          // titkok kitakarasa a kep elott
       await varj(300);

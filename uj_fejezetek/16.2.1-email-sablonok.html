@@ -1,0 +1,244 @@
+<p>Az e-mail sablonok határozzák meg, hogyan néznek ki a rendszerből kimenő
+levelek: a fizetési emlékeztetőtől a munkaszerződés-értesítőn át az
+árajánlatig. Egy sablon megmondja, <strong>mikor</strong> menjen ki a levél,
+<strong>kinek</strong>, <strong>milyen szöveggel</strong> és
+<strong>milyen csatolmánnyal</strong> – és mindezt három nyelven.</p>
+
+<p>A funkciót a <strong>Rendszer → Haladó beállítások → E-mail sablon</strong>
+menüpontban találod.</p>
+
+<div class="call warn"><strong>Figyelem</strong>
+<p>Ez rendszergazdai funkció. A sablonok módosítása <strong>minden kimenő
+levélre hatással van</strong>, és azonnal életbe lép: a következő kiküldés már
+az új szöveget használja. Ha nem látod a menüpontot, kérd a rendszergazdát,
+hogy adjon admin szerepkört.</p></div>
+
+<h2 id="a-lista">A sablonok listája</h2>
+
+<p>A képernyő felülről lefelé így épül fel:</p>
+
+<ul>
+<li><p><strong>Statisztika kártyák</strong> – négy szám: összes sablon, aktív, eseményre indított, kategóriák.</p></li>
+<li><p><strong>Szűrősáv</strong> – kereső, kiváltó esemény szerinti szűrők, az inaktívak mutatása, nézetváltó.</p></li>
+<li><p><strong>Kategória oszlop</strong> balra – Mind, hét beépített kategória és a sajátjaid.</p></li>
+<li><p><strong>Fő terület</strong> – a sablonok kártyás vagy listás nézetben.</p></li>
+</ul>
+
+<h3 id="kereses-szures">Keresés és szűrés</h3>
+
+<ul>
+<li><p><strong>Név vagy tárgy szerint:</strong> gépelj a kereső mezőbe – a találatok gépelés közben szűkülnek. Az <em>X</em> ikonnal törlöd a keresést.</p></li>
+<li><p><strong>Kiváltó esemény szerint:</strong> kattints a szűrősáv gombjaira – <em>Eseményre</em>, <em>Időzítve</em>, <em>Manuális</em>, <em>Automatikus</em>. A <em>Mind</em> gomb veszi le a szűrést.</p></li>
+<li><p><strong>Kategória szerint:</strong> a bal oldali oszlopban kattints a kívánt kategóriára.</p></li>
+<li><p><strong>Inaktívak elrejtése:</strong> a szűrősáv jobb szélén kapcsold ki az <em>Inaktív sablonok mutatása</em> kapcsolót.</p></li>
+</ul>
+
+<div class="call tip"><strong>Megjegyzés</strong>
+<p>A kereső a sablon <strong>nevére</strong> és a <strong>magyar nyelvű
+tárgyra</strong> keres. Ha angol vagy német szóra keresel a tárgyban, lehet,
+hogy nem találja meg – ilyenkor a sablon nevével vagy kategória-szűréssel
+próbálkozz.</p></div>
+
+<h3 id="mit-mutat-a-kartya">Mit mutat egy kártya</h3>
+
+<table class="erp-table">
+<thead><tr class="header"><th><strong>Elem</strong></th><th><strong>Mit jelent</strong></th></tr></thead>
+<tbody>
+<tr class="odd"><td>Színes csík a szélén</td><td>A kategória színe.</td></tr>
+<tr class="even"><td>Kategória címke</td><td>Pénzügy, HR, Ajánlat és így tovább.</td></tr>
+<tr class="odd"><td>Aktív/inaktív kapcsoló</td><td>Egy kattintással be- vagy kikapcsolható.</td></tr>
+<tr class="even"><td>Kiváltó jelzés</td><td>Eseményre, Időzítve, Manuális vagy Automatikus.</td></tr>
+<tr class="odd"><td>Nyelvi címkék</td><td>HU, EN, DE – melyik nyelven van kitöltve.</td></tr>
+<tr class="even"><td>Gemkapocs</td><td>Akkor látszik, ha csatolmány is megy a levéllel.</td></tr>
+<tr class="odd"><td>Statisztika</td><td>Hányszor ment ki eddig, és mikor utoljára.</td></tr>
+</tbody>
+</table>
+
+<h2 id="uj-sablon">Új sablon létrehozása</h2>
+
+<p>A legegyszerűbb út a <strong>duplikálás</strong>:</p>
+
+<ul>
+<li><p>Keresd meg azt a sablont, amelyik a legjobban hasonlít arra, amit létre akarsz hozni.</p></li>
+<li><p>Kattints a kártya alján a <strong>Duplikálás</strong> gombra.</p></li>
+<li><p>Létrejön egy másolat <em>(másolat)</em> végződéssel, és rögtön megnyílik a szerkesztőben.</p></li>
+<li><p>Írd át a nevét és a tartalmát, majd mentsd el.</p></li>
+</ul>
+
+<p>Nagyobb mennyiségű sablon betöltéséhez – például egy új modul telepítésekor
+– a rendszergazda tud importálni.</p>
+
+<h2 id="be-es-kikapcsolas">Be- és kikapcsolás</h2>
+
+<p>Ha egy sablont átmenetileg ki akarsz vonni, <strong>nem kell törölni</strong>:
+elég kikapcsolni. A kártya jobb felső sarkában lévő kapcsoló zöld állásban
+aktív, szürkében inaktív. Az inaktív sablont a rendszer <strong>nem küldi
+ki</strong>, akkor sem, ha a kiváltó feltételek teljesülnek.</p>
+
+<div class="call tip"><strong>Jó tudni</strong>
+<p><strong>Kikapcsolás:</strong> a sablon megmarad, bármikor visszakapcsolható,
+és a statisztikája is megmarad. <strong>Törlés:</strong> végleges, nem
+visszavonható – a szerkesztőben nincs is törlés gomb, ehhez rendszergazda
+kell.</p></div>
+
+<h2 id="kategoriak">Kategóriák</h2>
+
+<table class="erp-table">
+<thead><tr class="header"><th><strong>Kategória</strong></th><th><strong>Mire való</strong></th></tr></thead>
+<tbody>
+<tr class="odd"><td>Pénzügy</td><td>Fizetési emlékeztetők, felszólítások, számlakiküldés</td></tr>
+<tr class="even"><td>HR</td><td>Munkavállalói értesítők, szerződés-hosszabbítás, lejáró próbaidő</td></tr>
+<tr class="odd"><td>Ajánlat / Megrendelés</td><td>Árajánlatok, visszaigazolás – itt működnek a visszajelzés gombok</td></tr>
+<tr class="even"><td>Szerviz / Logisztika</td><td>Munkalap kész, teljesítési igazolás, raktári értesítők</td></tr>
+<tr class="odd"><td>Fuvarozás</td><td>Fuvarfeladat értesítő, teljesítés, elszámolás</td></tr>
+<tr class="even"><td>Dokumentumkezelés</td><td>Szerződés-aláírás, iratkérés, hivatalos levelek</td></tr>
+<tr class="odd"><td>CRM</td><td>Partnerkövetés, utánkövető levelek</td></tr>
+</tbody>
+</table>
+
+<p>Saját kategóriát a bal oldali oszlop tetején a <strong>+</strong> gombbal
+veszel fel: adj nevet, válassz színt, és megadhatsz alapértelmezett
+<em>Feladó</em>, <em>CC</em> és <em>BCC</em> címeket is. Meglévő kategória
+alapértelmezéseit a neve mellett megjelenő fogaskerékkel szerkeszted.</p>
+
+<div class="call tip"><strong>Megjegyzés</strong>
+<p>A kategória alapértelmezett címzettjei <strong>az új sablonokba</strong>
+kerülnek át automatikusan. A meglévők nem változnak – ott a szerkesztő
+Címzettek szekciójában sárga sáv jelzi az eltérést, és felkínálja a
+frissítést.</p></div>
+
+<h2 id="a-szerkeszto">A sablon szerkesztése</h2>
+
+<p>A listában kattints egy sablonra vagy a <strong>Szerkesztés</strong>
+gombra. A szerkesztő három részből áll:</p>
+
+<ul>
+<li><p><strong>Fejléc</strong> – vissza gomb, a sablon neve, <em>Mentés</em> és <em>Mégse</em>.</p></li>
+<li><p><strong>Nyelvi fülek</strong> – HU, EN, DE között váltanak.</p></li>
+<li><p><strong>Kétoszlopos tartalom</strong> – balra a beállítások négy szekcióban, jobbra a tartalom vagy az élő előnézet.</p></li>
+</ul>
+
+<h3 id="nyelvi-fulek">Nyelvi fülek</h3>
+
+<p>A nyelvi fül azt mondja meg, <strong>melyik nyelvi változatot szerkeszted
+éppen</strong>. A sablon alapbeállításai – név, kiváltó esemény, címzettek,
+csatolmány – <strong>közösek minden nyelvre</strong>; csak a tartalom, vagyis
+a tárgy és a levélszöveg tér el nyelvenként. Új nyelvet a fülek melletti
+<strong>+</strong> gombbal veszel fel.</p>
+
+<div class="call tip"><strong>Jó tudni</strong>
+<p>A nyelvi fülek közti váltás <strong>nem írja felül</strong> a másik nyelv
+tartalmát. Kiküldéskor a rendszer a partner nyelve szerint választ – ha azon
+a nyelven nincs tartalom, a magyarra esik vissza.</p></div>
+
+<h3 id="alapadatok">Alapadatok</h3>
+
+<p>Itt adod meg a sablon <strong>nevét</strong> (beszédeset érdemes, például
+„Fizetési emlékeztető – 1. szint”), a <strong>kategóriáját</strong>, és itt
+kapcsolod aktívra vagy inaktívra. A kategória befolyásolja a megjelenő színt,
+az alapértelmezett címzetteket, és azt is, hogy megjelennek-e a visszajelzés
+gombok – azok csak az <em>Ajánlat</em> kategóriánál.</p>
+
+<h3 id="trigger">Mikor menjen ki</h3>
+
+<table class="erp-table">
+<thead><tr class="header"><th><strong>Kiváltó</strong></th><th><strong>Mikor küldi a rendszer</strong></th><th><strong>Példa</strong></th></tr></thead>
+<tbody>
+<tr class="odd"><td>Eseményre</td><td>Egy üzleti esemény bekövetkezésekor</td><td>Számla lejárt → emlékeztető</td></tr>
+<tr class="even"><td>Időzítve</td><td>Rendszeresen vagy adott időpontban</td><td>Minden hónap 1-jén reggel 8-kor</td></tr>
+<tr class="odd"><td>Manuális</td><td>A felhasználó rákattint egy gombra</td><td>Munkalapon az „E-mail küldése”</td></tr>
+<tr class="even"><td>Automatikus</td><td>Háttérfolyamat kódba épített logikája szerint</td><td>Új regisztráció után üdvözlő</td></tr>
+</tbody>
+</table>
+
+<p><strong>Eseményre</strong> választás esetén megadod az eseményt, bepipálod
+a feltételeket (<em>minden</em> bepipáltnak teljesülnie kell), és beírod,
+hány nappal az esemény után menjen ki a levél. Több napot is megadhatsz.</p>
+
+<div class="call tip"><strong>Példa</strong>
+<p>Esemény: <em>Számla lejárt</em> · Feltételek: <em>még nincs kifizetve</em>,
+<em>nincs sztornózva</em> · Napok: <em>3, 14, 30</em>.<br>
+Ez azt jelenti: a lejárat után 3, 14 és 30 nappal küld emlékeztetőt, ha a
+számla addig sem lett kifizetve és nincs sztornózva.</p></div>
+
+<p><strong>Időzítve</strong> esetén szövegesen adod meg az időzítést; a
+tényleges futáshoz a rendszergazdának be kell állítania az ütemezett
+feladatot. A <strong>Manuális</strong> és az <strong>Automatikus</strong>
+nem kér további beállítást.</p>
+
+<h3 id="cimzettek">Címzettek</h3>
+
+<p>Minden mezőbe írhatsz konkrét e-mail címet <strong>vagy</strong> változót
+– akár vegyesen. A változót a mező melletti <strong>&lt;&gt;</strong> gombbal
+választod ki.</p>
+
+<ul>
+<li><p><strong>Feladó</strong> – például <code>penzugy@cegnev.hu</code> vagy <code>%%SENDER_EMAIL%%</code>.</p></li>
+<li><p><strong>Címzett</strong> – jellemzően <code>%%PARTNER_EMAIL%%</code>, így mindenki a saját levelét kapja.</p></li>
+<li><p><strong>CC és BCC</strong> – több cím vesszővel elválasztva; a BCC címzettjeit a többiek nem látják. Mindkettő elhagyható.</p></li>
+</ul>
+
+<h3 id="csatolmany">Csatolmány</h3>
+
+<p>Kapcsold be a <em>Csatolmány engedélyezve</em> kapcsolót, majd a
+<strong>+ Hozzáadás</strong> gombbal válassz típust: számla PDF, ajánlat PDF,
+teljesítési igazolás, munkalap és így tovább. Több típus is kiválasztható.</p>
+
+<div class="call tip"><strong>Megjegyzés</strong>
+<p>A PDF <strong>a kiküldés pillanatában keletkezik</strong>, az aktuális
+adatokból – nem kell semmit kézzel feltöltened.</p></div>
+
+<h3 id="tartalom">A levél tartalma</h3>
+
+<p>A jobb oldali oszlopban két fül között váltasz: <strong>Email tartalom</strong>
+(itt írod a tárgyat és a szöveget) és <strong>Élő előnézet</strong> (így fog
+kinézni). A tartalom fül tetején kék sáv jelzi, melyik nyelvi változatot
+szerkeszted éppen – ez segít elkerülni, hogy véletlenül a rossz nyelvet írd
+át.</p>
+
+<p>A levélszöveg mezője formázható szerkesztő: betűméret, félkövér, dőlt,
+aláhúzott, betűszín, kiemelés, felsorolás, formázás törlése – és a
+<strong>&lt;&gt;</strong> gomb, amivel változót szúrsz be.</p>
+
+<h2 id="visszajelzes-gombok">Visszajelzés gombok (ajánlat sablonoknál)</h2>
+
+<p>Ha a sablon kategóriája <strong>Ajánlat / Megrendelés</strong>, a szerkesztő
+bővített nézetet mutat: a tetején négy fül jelenik meg az alap egy helyett. A
+visszajelzés gombokkal a partner <strong>egyetlen kattintással</strong>
+elfogadhatja vagy elutasíthatja az ajánlatot – nem kell visszaírnia vagy
+telefonálnia.</p>
+
+<p>Így működik:</p>
+
+<ul>
+<li><p>A rendszer két egyedi, egyszer használható linket hoz létre – egyet az elfogadáshoz, egyet az elutasításhoz.</p></li>
+<li><p>A levél szövege alá automatikusan beilleszt két nagy gombot, a beállított színnel és felirattal.</p></li>
+<li><p>A partner rákattint, és megnyílik egy weboldal. <strong>Bejelentkezés nem kell.</strong></p></li>
+<li><p>A rendszer rögzíti a választ, az ajánlat állapota magától frissül, az értékesítő pedig értesítést kap.</p></li>
+</ul>
+
+<p>A <em>Visszajelzés gombok</em> fülön állítod a két gomb színét (hét-hét
+árnyalatból), alattuk élő előnézettel, és nyelvenként a feliratokat meg a
+visszajelzés-oldal szövegeit. A másik két fül az e-mail és a visszajelzés-oldal
+előnézetét mutatja.</p>
+
+<div class="call tip"><strong>Miért csak az Ajánlat kategóriánál</strong>
+<p>A visszajelzés gombok az ajánlat életciklusához illeszkednek: a partner
+elfogadja vagy elutasítja. Más kategóriáknál nincs értelmük – egy szerviz
+munkalapot nem kell „elfogadni”, egy számlát pedig nem lehet gombra
+kattintva kifizetni. Ha nem jelenik meg a négy fül, ellenőrizd, hogy a
+kategória tényleg <em>Ajánlat / Megrendelés</em>-re van állítva.</p></div>
+
+<h2 id="ha-valami-nem-stimmel">Ha valami nem stimmel</h2>
+
+<table class="erp-table">
+<thead><tr class="header"><th><strong>Amit tapasztalsz</strong></th><th><strong>Mi lehet az oka</strong></th></tr></thead>
+<tbody>
+<tr class="odd"><td>Nem látom az <em>E-mail sablon</em> menüpontot</td><td>A funkció admin jogot igényel. Kérd a rendszergazdát.</td></tr>
+<tr class="even"><td>A <em>Mind</em> alatt sem látszik az összes sablon</td><td>Valószínűleg él egy szűrő vagy keresőszó. Nézd meg azt is, be van-e kapcsolva az <em>Inaktív sablonok mutatása</em>.</td></tr>
+<tr class="odd"><td>Nem találok egy sablont kereséssel</td><td>A kereső a névre és a magyar tárgyra keres. Próbáld a sablon nevével, vagy szűrj kategóriára.</td></tr>
+<tr class="even"><td>Új kategóriát hoztam létre, de nem látszik</td><td>Töltsd újra az oldalt. Ha így sem, lépj ki és be a menüpontba.</td></tr>
+<tr class="odd"><td>Véletlenül kikapcsoltam egy sablont</td><td>Nincs baj – nem veszett el, csak nem megy ki. A kapcsolóval bármikor visszakapcsolod, a statisztikája megmarad.</td></tr>
+<tr class="even"><td>Egy sablont duplán vittem fel</td><td>A duplumot kapcsold ki, az eredetit hagyd aktívan. Végleges törléshez rendszergazda kell.</td></tr>
+</tbody>
+</table>
