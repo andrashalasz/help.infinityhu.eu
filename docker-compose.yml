@@ -36,12 +36,48 @@ services:
       timeout: 5s
       retries: 30
 
+  # ------------------------------------------------------------------
+  # Sema-migracio MAR LETEZO adatbazishoz.
+  #
+  # A db/ mappa a docker-entrypoint-initdb.d-be van csatolva, azt viszont a
+  # MariaDB CSAK akkor futtatja, amikor ures adatkonyvtarral indul eloszor.
+  # Egy mar feltoltott adatbazis tehat sosem kapna meg az ujabb migraciokat:
+  # a kontener ujraepitese utan a KOD uj lenne, a SEMA regi, es a sugo
+  # elszallna a hianyzo oszlopokon. Ezt zarja ki ez a szolgaltatas.
+  #
+  # A db/migracio/ alatti fajlok TOBBSZOR IS FUTTATHATOK: a sema minden
+  # lepesnel ellenorzi, kell-e meg, a feliratok pedig INSERT IGNORE-ral
+  # mennek be, tehat amit a helyszinen atirtak, azt nem bantja. Ha mar
+  # minden a helyen van, ez a lepes nem csinal semmit.
+  #
+  # A sugo SZOVEGEIHEZ nem nyul.
+  migracio:
+    image: mariadb:11.8.6
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      MARIADB_DATABASE: ${MARIADB_DATABASE:-help_infinityhu}
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:-root}
+    volumes:
+      - ./db/migracio:/migracio:ro
+    command: >
+      sh -c 'set -e;
+             for f in /migracio/*.sql; do
+               echo "--- $$f";
+               mariadb -h db -u root -p"$$MARIADB_ROOT_PASSWORD" "$$MARIADB_DATABASE" < "$$f";
+             done;
+             echo "A migracio lefutott."'
+    restart: "no"
+
   php:
     build: ./docker/php
     restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
+      migracio:
+        condition: service_completed_successfully
     environment:
       HELP_DB_DSN:  "mysql:host=db;port=3306;dbname=${MARIADB_DATABASE:-help_infinityhu};charset=utf8mb4"
       HELP_DB_USER: "${HELP_DB_USER:-help_ro}"
