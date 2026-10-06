@@ -68,6 +68,48 @@ más nem múlik rajta.
 
 ---
 
+## A képek mappája — erre figyelj Docker alatt
+
+A `media/` mappa a gazdagépről van becsatolva a konténerbe (`/srv/media`). A
+`Dockerfile` beállítja a jogosultságát, **de a becsatolt kötet ezt felülírja** —
+ilyenkor a gazdagépi könyvtár tulajdonosa az érvényes.
+
+Ha ez nincs rendben, az adminban a *Képek, videók* lapon ez a figyelmeztetés
+jelenik meg:
+
+> A fájlok mappája nem írható (/srv/media). Feltöltés és Word-import
+> képkibontás nem fog működni.
+
+Ilyenkor **sem képet feltölteni, sem Word-fájlból képet kibontani nem lehet**.
+
+A javítás a gazdagépen:
+
+```bash
+# a konténerben futó PHP felhasználójának azonosítója (jellemzően 33)
+docker compose exec php id -u www-data
+
+# a media mappa kapja meg ezt a tulajdonost
+sudo chown -R 33:33 media
+sudo chmod -R u+rwX media
+```
+
+A `docker-compose.yml`-ben a kötet a **php** szolgáltatásnál írható kell hogy
+legyen, a `web`-nél elég az olvasás:
+
+```yaml
+php:
+  volumes:
+    - ./media:/srv/media        # írható — itt NE legyen :ro
+web:
+  volumes:
+    - ./media:/srv/media:ro     # a kiszolgáláshoz elég
+```
+
+Ellenőrzés: az admin *Képek, videók* lapján a figyelmeztetés eltűnik, és a
+feltöltés után nő a fájlszám.
+
+---
+
 ## Frissítés után: a fejezetszámok helyretétele
 
 Ezt **egyszer** kell lefuttatni, és nem automatikus — mert átírja a
