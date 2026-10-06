@@ -62,8 +62,23 @@ const KIVEVE  = (process.env.KIVEVE || '').split(',').map(x=>x.trim()).filter(Bo
 // Nev-cserek a kepeken: "amit keresunk=amire csereljuk", pontosvesszovel elvalasztva.
 // Pl. CSERE="Anvalor Kft=Minta Kft.;Ignath Gyorgy=Minta Felhasznalo"
 // Ezek VALODI nevek lehetnek a tesztrendszerben - a sugo viszont nyilvanos.
-const CSERE = (process.env.CSERE || '').split(';').map(x => x.split('=')).
-  filter(a => a.length === 2).map(([a, b]) => [a.trim(), b.trim()]);
+//
+// Az ALAP_CSERE mindig lefut, a CSERE kornyezeti valtozoban megadottak
+// pedig hozzaadodnak. Igy a visszateroen elofordulo valodi nevek akkor sem
+// maradnak a kepen, ha valaki elfelejti megadni a CSERE-t.
+const ALAP_CSERE = [
+  ['Anvalor Kft.',  'Minta Kft.'],
+  ['Anvalor Kft',   'Minta Kft.'],
+  ['anvalorerp',    'mintabolt'],
+  ['Anvalor',       'Minta'],
+  ['Ignáth György', 'Minta Felhasználó'],
+  ['András tesztje','Minta sablon'],
+  ['András',        'Minta'],
+];
+
+const CSERE = ALAP_CSERE.concat(
+  (process.env.CSERE || '').split(';').map(x => x.split('=')).
+    filter(a => a.length === 2).map(([a, b]) => [a.trim(), b.trim()]));
 
 // 1440x900 a tipikus laptop-nezet. A deviceScaleFactor 2 azert kell, hogy a
 // kep retina kijelzon se legyen moses - a sugoban felevig elni fog.
@@ -97,6 +112,12 @@ async function varjMODALRA(page, ms = 12000) {
  * zavaro, egy kiszivargott kulcs viszont biztonsagi incidens.
  */
 async function takarj(page) {
+  // Az egeret elvisszuk a tartalom felol, kulonben ott marad az utolso
+  // kattintas helyen, es a csempek hover-ikonjai (mozgatas, bezaras)
+  // rakerulnek a kepre.
+  await page.mouse.move(690, 250).catch(() => {});
+  await varj(400);
+
   await page.evaluate(() => {
     const GYANUS = /(api[\s_-]?key|api[\s_-]?kulcs|kulcs|token|secret|titk|jelsz|password|webhook)/i;
     // hosszu hexa vagy base64-szeru ertek: jellemzoen kulcs
@@ -395,6 +416,47 @@ const KEPEK = [
 
   // A 7.4 "Uj dokumentum iktatasa" fejezethez - a lista "Letrehozas" gombja
   // ablakot nyit, nem kulon lapra visz.
+  // ---------- Szerepkorok reszletei (16.2.3) ----------
+  // A szerepkor-oszlop fejlecenek harom pontja (button.rh-kebab) nyitja a
+  // menut. A "Szerepkor torlese" pontot SOHA nem nyomjuk meg.
+  { nev:'szerepkor-02-menu', mit:'A szerepkor oszlop menuje',
+    url:'/core/role/index',
+    async lepesek(p){ await varjALISTARA(p);
+      const k=p.locator('button.rh-kebab').first();
+      if(await k.count()){ await k.click().catch(()=>{}); await varj(2500); } } },
+
+  { nev:'szerepkor-03-szerkeszto', mit:'A reszletes szerepkor-szerkeszto',
+    url:'/core/role/index',
+    async lepesek(p){ await varjALISTARA(p);
+      const k=p.locator('button.rh-kebab').first();
+      if(await k.count()){ await k.click().catch(()=>{}); await varj(2000); }
+      const e=p.getByText(/Szerepk\u00f6r szerkeszt\u00e9se/).first();
+      if(await e.count()){ await e.click().catch(()=>{}); await varjMODALRA(p); await varj(2500); } } },
+
+  // ---------- Fooldal tovabbi fulei (3.12) ----------
+  { nev:'fooldal-02-dokumentumaim', mit:'A Dokumentumaim ful',
+    url:'/',
+    async lepesek(p){ await varjALISTARA(p);
+      // A fulek a[data-tab] elemek, a szovegukben darabszam-jelveny is van,
+      // ezert pontos egyezesre nem lehet keresni.
+      const f=p.locator('a[data-tab]').filter({hasText:/Dokumentumaim/}).first();
+      if(await f.count()){ await f.click().catch(()=>{}); await varj(4000); } } },
+
+  { nev:'fooldal-03-vezetoi', mit:'A vezetoi attekinto a penzugyi csempekkel',
+    url:'/',
+    async lepesek(p){ await varjALISTARA(p);
+      const f=p.locator('a[data-tab="pageTab-management"]').first();
+      if(await f.count()){ await f.click().catch(()=>{}); await varj(4500); }
+      // A teszt rendszer alappenzneme USD, a sugoban viszont HUF-ot mutatunk:
+      // a csempeken levo HUF kapcsolot mindenhol bekattintjuk.
+      const huf = p.getByRole('button', { name: /^\s*HUF\s*$/ });
+      const db = await huf.count();
+      for (let i = 0; i < db; i++) {
+        await huf.nth(i).click().catch(() => {});
+        await varj(700);
+      }
+      await varj(2500); } },
+
   { nev:'iktatas-02-uj-iktatas', mit:'Az uj dokumentum iktatasa ablak',
     url:'/documents/document/index',
     async lepesek(p){ await varjALISTARA(p);
