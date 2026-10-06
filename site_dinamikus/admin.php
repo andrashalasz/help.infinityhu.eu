@@ -30,6 +30,7 @@ require __DIR__ . '/lib/admin_layout.php';
 require __DIR__ . '/lib/admin_i18n.php';
 require __DIR__ . '/lib/admin_editor.php';
 require __DIR__ . '/lib/admin_releases.php';
+require __DIR__ . '/lib/admin_frissites.php';
 require __DIR__ . '/lib/admin_actions.php';
 require __DIR__ . '/lib/admin_pages.php';
 require __DIR__ . '/lib/admin_pages2.php';
@@ -210,6 +211,9 @@ switch ($page) {
         break;
     case 'uitexts':
         page_uitexts($db, $cfg, $counts);
+        break;
+    case 'frissites':
+        page_frissites($cfg, $counts);
         break;
     default:
         page_dashboard($db, $cfg, $counts);

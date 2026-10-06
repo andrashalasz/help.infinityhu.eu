@@ -1725,6 +1725,44 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             back(['p' => 'settings']);
         }
 
+        // ------------------------------------------------------------------
+        // Frissites keres. EZ NEM FUTTAT SEMMIT: csak leir egy kerelem-fajlt,
+        // amit a gazdagepen futo tools/frissito-figyelo.sh vesz fel. A muvelet
+        // egy ROGZITETT listabol valaszthato - a webrol nem lehet parancsot
+        // atadni. Reszletek: lib/admin_frissites.php fejlece.
+        // ------------------------------------------------------------------
+        case 'frissites.kerelem': {
+            if (!auth_is('admin')) { flash('err', t('Ehhez adminisztrátori jog kell.')); back(['p' => 'frissites']); }
+
+            $muvelet = post('muvelet');
+            if (!in_array($muvelet, ['frissites', 'visszaallitas'], true)) {
+                flash('err', t('Ismeretlen művelet.'));
+                back(['p' => 'frissites']);
+            }
+            // a cel csak commit-azonosito lehet, semmi mas
+            $cel = preg_replace('/[^0-9a-f]/', '', strtolower(post('cel') ?? ''));
+            $cel = substr((string)$cel, 0, 40);
+
+            $dir = frissites_dir($cfg);
+            if (!is_dir($dir) || !is_writable($dir)) {
+                flash('err', t('A frissítő mappája nem írható: ') . $dir);
+                back(['p' => 'frissites']);
+            }
+
+            $kerelem = [
+                'muvelet' => $muvelet,
+                'cel'     => $cel,
+                'ki'      => (string)(auth_user()['username'] ?? '?'),
+                'mikor'   => date('c'),
+            ];
+            file_put_contents($dir . '/kerelem.json', json_encode($kerelem, JSON_UNESCAPED_UNICODE));
+            @chmod($dir . '/kerelem.json', 0664);
+
+            audit_me($db, 'frissites.kerelem', $muvelet, $cel);
+            flash('ok', t('A kérés rögzítve. A frissítés egy percen belül elindul — az oldal magától frissül.'));
+            back(['p' => 'frissites']);
+        }
+
         case 'lang.save': {
             if (!auth_is('admin')) { flash('err', t('flash.lang.save.ehhez-adminisztratori-jog')); back(['p' => 'settings']); }
             $code = strtolower(trim(post('code')));

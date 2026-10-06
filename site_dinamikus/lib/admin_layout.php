@@ -27,6 +27,7 @@ const ADMIN_ICON_PAGES = [
     'uitexts'  => 'A kezelőfelület szövegei',
     'langs'    => 'Nyelvek',
     'releases' => 'Kiadások',
+    'frissites' => 'Frissítés',
 ];
 
 /**

@@ -93,6 +93,10 @@ services:
     volumes:
       - ./site_dinamikus:/var/www/html:ro
       - ./media:/srv/media
+      # A frissito megosztott mappaja: a web ide ir kerelmet, a gazdagepen
+      # futo figyelo szkript innen olvassa. A kontener NEM kap jogot a
+      # gazdagep vezerlesere - csak ezen a mappan keresztul uzen.
+      - ./frissites:/srv/frissites
 
   web:
     image: nginx:1.28.3
