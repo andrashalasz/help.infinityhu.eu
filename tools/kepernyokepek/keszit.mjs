@@ -15,6 +15,24 @@
  *
  * Kornyezeti valtozok:
  *   ERP_URL   - a rendszer cime        (alap: https://release.infinityhu.eu)
+ *
+ * MELYIK RENDSZERROL?
+ *   A release fut az UJ verzion - a sugonak azt kell mutatnia, ezert alapbol
+ *   onnan dolgozunk. A demo es az anvalor a stabil verzio, azok csak ott
+ *   jonnek szoba, ahol a release-en nincs feltoltve adat. 2026-10-06-i
+ *   allapot szerint ez ket kep:
+ *
+ *     jogosultsag-*  az anvalorrol (a release-en ures a kategoriasor)
+ *     unas-*         az anvalorrol (a release-en nincs API kulcs)
+ *
+ *   A tobbi (szerepkor, sablonkezelo, arucikk, partner, iktatas, fooldal,
+ *   email) a release-en is tele van, azok onnan keszulnek.
+ *
+ *   Az anvalorhoz a nevcsere KOTELEZO:
+ *     ERP_URL=https://anvalor.infinityhu.eu ERP_USER=admin ERP_PASS=... \
+ *     CSAK=jogosultsag,unas \
+ *     CSERE="Anvalor Kft=Minta Kft.;anvalorerp=mintabolt;Anvalor=Minta" \
+ *     ./tools/kepernyokepek/futtat.sh
  *   ERP_USER  - felhasznalonev
  *   ERP_PASS  - jelszo
  *   KIMENET   - hova mentse a PNG-ket  (alap: /kimenet)
@@ -362,6 +380,28 @@ const KEPEK = [
   { nev:'fooldal-01-attekintes', mit:'A fooldal a sajat teendokkel',
     url:'/',
     async lepesek(p){ await varjALISTARA(p); } },
+
+  // ---------- Reszletkepek a letrehozo urlapokrol ----------
+  // FONTOS: ezek CSAK megnyitjak az urlapot, semmit nem kuldenek be.
+  // A "Letrehozas"/"Uj ..." gomb megnyomasa onmagaban nem hoz letre adatot.
+
+  { nev:'partner-02-uj', mit:'Az uj partner urlap',
+    url:'/partner/partner/create',
+    async lepesek(p){ await varj(5000); } },
+
+  { nev:'arucikk-02-uj', mit:'Az uj arucikk urlap',
+    url:'/stock/product/quick-create',
+    async lepesek(p){ await varj(5000); } },
+
+  // A 7.4 "Uj dokumentum iktatasa" fejezethez - a lista "Letrehozas" gombja
+  // ablakot nyit, nem kulon lapra visz.
+  { nev:'iktatas-02-uj-iktatas', mit:'Az uj dokumentum iktatasa ablak',
+    url:'/documents/document/index',
+    async lepesek(p){ await varjALISTARA(p);
+      // A "Letrehozas" nevre a datumszuro gombja is illeszkedik - az
+      // a.btn-primary-erp viszont csak a valodi letrehozo.
+      const g=p.locator('a.btn-primary-erp').filter({hasText:/^\s*L\u00e9trehoz\u00e1s\s*$/}).first();
+      if(await g.count()){ await g.click().catch(()=>{}); await varjMODALRA(p); await varj(2500); } } },
 
 ];
 
