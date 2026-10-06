@@ -519,6 +519,11 @@ final class DocxParser
     /** A kepek kiirasa a lemezre. Ami mar ott van ugyanazzal a nevvel, azt nem irjuk felul. */
     private function writeImages(): int
     {
+        // Kep nelkuli dokumentumnal nincs mit kiirni, tehat a mappa allapota
+        // sem szamit. Enelkul egy kep nelkuli import is elhasalt azon, hogy a
+        // media mappa nem irhato - pedig hozza sem kellett volna nyulni.
+        if ($this->images === []) { return 0; }
+
         if (!is_dir($this->mediaDir)) {
             if (!@mkdir($this->mediaDir, 0775, true) && !is_dir($this->mediaDir)) {
                 throw new RuntimeException(t('media.mappa.nincs', ['mappa' => $this->mediaDir]));
