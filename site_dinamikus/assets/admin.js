@@ -866,10 +866,28 @@
       });
     }
 
-    // induláskor a meglévő tartalmat is rendbe tesszük (szám a spanba),
-    // de a számokat nem írjuk át, amíg a szerkesztő hozzá nem nyúl
+    // Induláskor a meglévő tartalmat is rendbe tesszük: a címsor elejére
+    // kézzel írt számot a spanba tesszük.
     adoptInlineNumbers();
     area.querySelectorAll('.hno').forEach(function (n) { n.setAttribute('contenteditable', 'false'); });
+
+    // ...és a számozást is újraszámoljuk. Korábban ezt szándékosan nem tettük
+    // meg ("ne írjunk át magától tartalmat"), de ennek az volt a következménye,
+    // hogy egy ÁTHELYEZETT vagy ÁTSZÁMOZOTT fejezet örökre megtartotta a régi
+    // számokat - a törzsszövegben ugyanis fix szövegként állnak. Egy 5.3-ból
+    // 5.3.2-be mozgatott fejezet belső címsorai így 5.3.1-gyel kezdődtek.
+    //
+    // Most lefut, de NEM ment: csak jelzi, hogy van mit menteni. Így a
+    // szerkesztő látja, mi változott, és ő dönt.
+    if (!autoNum || autoNum.checked) {
+      if (renumber()) {
+        var st0 = $('#ed-state');
+        if (st0) {
+          st0.dataset.dirty = '1';
+          st0.textContent = 'A címsorok számozása a fejezetszámhoz igazodott — mentsd el.';
+        }
+      }
+    }
 
     var numTimer = null;
     area.addEventListener('input', function () {
