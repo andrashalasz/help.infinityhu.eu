@@ -224,6 +224,123 @@ ezt az érintett szakaszok külön jelzik.</p>
 
 <p>A részletes leírás a súgó <strong>Adat export/import</strong> fejezetében található.</p>
 
+<h2 id="tovabbi-muveletek">További műveletek az árucikkekkel</h2>
+
+<p>Az alábbi funkciók az árucikk adatlapjáról, illetve a <strong>Készlet</strong>
+menü további pontjaiból érhetők el.</p>
+
+<h2 id="vonalkod-nyomtatas">Vonalkód nyomtatás</h2>
+<p>Az árucikk adatlapjáról (vagy a listából az ✏ gombbal megnyitva)
+elérhető az Etikett modal, ahol az ártípus és pénznem megadása után
+előnézet látható és a Nyomtatás gombbal a vonalkód kinyomtatható.</p>
+<p>Az Infinityben kétféle vonalkód használható:</p>
+<ul>
+<li><p>Normál, egyáras vonalkód.</p></li>
+<li><p>Kedvezményes vonalkód – áthúzva az eredeti ár, mellette a
+kedvezményes ár.</p></li>
+</ul>
+<p>A telephely vonalkód típusát a telephely beállításánál adhatjuk
+meg.</p>
+
+<div class="call warn">
+<p>A rendszerben a gomb felirata jelenleg <strong>Vonalkód
+nyomtatatás</strong> – elgépelve. A funkció helyesen működik.</p>
+</div>
+
+<h2 id="termek-variansok">Termék variánsok</h2>
+<p>Ha sok lényegében azonos cikkel rendelkezünk – amelyek csak egy-egy
+tulajdonságban térnek el – termékvariánsok létrehozásával csökkenthetjük
+a cikktörzs méretét. A variánsok a főtermék alá rendelődnek.</p>
+<p>A termék variánsok egyedi, konfigurálható cikkszámot kapnak: a
+főtermék cikkszámát kiegészíti a termékvariáns kód. Minden variáns
+örökli a főtermék adatait, de eltérő ára is lehet.</p>
+<p><strong>Bevételezés variánsoknál:</strong></p>
+<ul>
+<li><p>Főcikk bevételezésekor: az összes hozzárendelt variáns egyszerre
+bevételezhető, azonos beszerzési áron, variánsonkénti
+mennyiséggel</p></li>
+<li><p>Variáns szintű bevételezésnél: egyedileg adjuk meg a mennyiséget
+és a beszerzési árat</p></li>
+</ul>
+<p>Értékesíteni csak a termék variánsokat lehet, a főcikket nem.
+Leltározáskor a főterméket leltározhatjuk, vagy variánsonként is
+elvégezhetjük külön.</p>
+<p>Elsőként határozzuk meg a megkülönböztető tulajdonságokat (pl. szín,
+méret) termék jellemzőkként:</p>
+<p><img src="/media/img_83f4b604564f.png" class="shot" loading="lazy" alt="Termékjellemzők megadása"></p>
+<p>Ezután hozzuk létre az egyes termék variánsokat. Pl. különböző színű
+termékekhez: felvesszük az összes lehetséges színt jellemzőként,
+létrehozzuk a főterméket, majd a rendszer variánsonként generálja az új
+cikkszámot.</p>
+<p><img src="/media/img_8b6d216939bd.png" class="shot" loading="lazy" alt="Termékvariánsok létrehozása"></p>
+<p><img src="/media/img_bf744c13fc2f.png" class="shot" loading="lazy" alt="A generált variáns cikkszámok"></p>
+<p><img src="/media/img_7f43ba1ceaed.png" class="shot" loading="lazy" alt="A variánsok a főtermék alatt"></p>
+<p>Mind a termékjellemzők, mind a termék variánsok tetszőlegesen
+bővíthetők. A bevételezéskor az alábbi lehetőségek közül
+választhatunk:</p>
+<ul>
+<li><p>A főcikket vételezzük be (azonos ár, variánsonkénti
+mennyiség)</p></li>
+<li><p>A variánsokat vételezzük be egyenként (egyedi ár és mennyiség
+variánsonként)</p></li>
+</ul>
+<div class="call tip"><strong>Megjegyzés</strong>
+<p>Értékesíteni csak a termék variánsokat lehet, a főcikket
+nem.</p></div>
+
+<h2 id="arucikk-tortenet">Árucikk történet</h2>
+<p>Sorozatszám kezelt árucikkek esetén a sorozatszám megadásával,
+egyébként a cikkszám megadásával listázhatjuk az árucikkhez kapcsolódó
+mozgásokat.</p>
+<p><img src="/media/img_9026ef8e64fd.png" class="shot" loading="lazy" alt="Az árucikkhez kapcsolódó mozgások listája"></p>
+
+<h2 id="tomeges-arazas">Tömeges árazás</h2>
+<p>Ha egyszerre több termék árát kívánjuk változtatni, a Tömeges árazás
+menüpont nyújt segítséget. A menüpont megnyitásakor az összes árucikk
+listázódik – szűrhetjük őket, vagy manuálisan jelöljük ki a
+módosítandókat.</p>
+<p><img src="/media/img_ab8169be069f.png" class="shot" loading="lazy" alt="A tömeges árazás listája"></p>
+<p>A Kiválasztás gombra kattintva megjelenik az ármódosítási felület,
+ahol gyorsan adhatjuk meg az új árakat.</p>
+<p><img src="/media/img_808e77febe75.png" class="shot" loading="lazy" alt="Az ármódosítási felület"></p>
+<p>Ha véletlenül olyan cikket választottunk ki, amelynek mégsem
+módosítjuk az árát, a sor eleji narancssárga kukával törölhetjük a
+listából. Ha a cikkhez minimális vagy maximális árat adtunk meg, azok
+segítségként megjelennek.</p>
+<p>Ha egyszerre több ártípust szeretnénk módosítani (pl. forintos és
+eurós listaár), adjunk hozzá Új ártípust – a rendszer mindkettőt
+egyszerre változtatja. Mentéssel véglegesíthetjük az ármódosítást.</p>
+
+<h2 id="tomeges-arazas-fajlbol">Tömeges árazás fájlból</h2>
+<p>Nagy tömegű ármódosítás esetén Excel-alapú betöltés is
+lehetséges.</p>
+<p><img src="/media/img_28610147260d.png" class="shot" loading="lazy" alt="Tömeges árazás fájlból"></p>
+<p>A mintafájl letöltése után adjuk meg a cikkszámot és az új árat. A
+jobb oldalon lévő Árazás ablakban adjuk meg a devizanemet, az ártípust
+és az érvényességi dátumot.</p>
+<p>A feltöltés gombra kattintva ideiglenesen tölthetjük fel az árakat
+(ez még nem írja felül a meglévőket). Ha elégedettek vagyunk az
+eredménnyel, kattintsunk az Összes változás mentése gombra.</p>
+
+<h2 id="arlista-keszites">Árlista készítés</h2>
+<p>A meglévő termékekből árlistát készíthetünk partnereink számára.
+Válasszuk ki a termékeket, adjuk a listához a Kiválasztás gombbal, majd
+exportáljuk a kívánt devizanemben és ártípusban.</p>
+<p><img src="/media/img_9cee8f937555.png" class="shot" loading="lazy" alt="Árlista készítése"></p>
+
+<h2 id="termekertekesites-engedelyek">Termékértékesítés engedélyek</h2>
+<p>Speciális engedélyeket hozhatunk létre, amelyek alapján csak
+engedéllyel rendelkező partnernek adhatjuk el az adott terméket (pl.
+permetszer értékesítés mezőgazdaságban).</p>
+<p>A folyamat három lépésből áll. Először hozzuk létre az engedélyt:</p>
+<p><img src="/media/img_4d08e44cfa1b.png" class="shot" loading="lazy" alt="Az engedély létrehozása"></p>
+<p>Ezután állítsuk be az engedélyt a terméknél:</p>
+<p><img src="/media/img_304b3ca64b2e.png" class="shot" loading="lazy" alt="Az engedély beállítása a terméknél"></p>
+<p>Végül a partnerlistában válasszuk ki a partnert (csak vevő típusúaknál
+érhető el), kattintsunk a szemgombra, majd a lap alján a
+Termékértékesítés engedélyek fülön adjuk hozzá a szükséges engedélyt.</p>
+<p><img src="/media/img_f86109095cbe.png" class="shot" loading="lazy" alt="Az engedély hozzáadása a partnerhez"></p>
+
 <h2 id="ha-valami-nem-stimmel">Ha valami nem stimmel</h2>
 
 <table class="erp-table">
