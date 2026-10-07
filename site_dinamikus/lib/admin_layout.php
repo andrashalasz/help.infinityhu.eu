@@ -564,9 +564,14 @@ function slug_follow_numbers(PDO $db, array $regiSzamok): int
  * -, a chapter_no es a slug megvaltozik, de ezek a span-ok nem: a 12.11-es
  * fejezet tovabbra is "10.11.1"-et irna ki a cimsoraiban.
  *
- * Ezert minden erintett fejezetben atirjuk a szamok ELSO tagjat a regirol az
- * ujra. Csak az elso tagot: a fejezeten BELULI sorszamozas (11.1, 11.2, ...)
- * valtozatlan marad, hiszen a fejezet tartalma nem rendezodott at.
+ * Ezert minden erintett fejezetben a fejezet SAJAT szamat cserejuk a regirol
+ * az ujra, a szam elejen. Igy mindket eset jo:
+ *
+ *   fofejezet atszamozas   10.11 -> 12.11 :  "10.11.1" -> "12.11.1"
+ *   testver torlese utan   12.13 -> 12.12 :  "12.13.1" -> "12.12.1"
+ *
+ * A fejezeten BELULI sorszamozas (a .1, .2, ... veg) valtozatlan marad,
+ * hiszen a fejezet tartalma nem rendezodott at.
  *
  * A vazlatot (draft_html) is viszi, kulonben a kozzetetel visszahozna a regi
  * szamokat.
@@ -589,20 +594,15 @@ function hno_follow_numbers(PDO $db, array $regiSzamok): int
         $uj   = (string)$r['chapter_no'];
         if ($regi === '' || $uj === '' || $regi === $uj) { continue; }
 
-        // csak a fofejezet-tag erdekel: "10.11" -> "10", "12.11" -> "12"
-        $regiFo = explode('.', $regi)[0];
-        $ujFo   = explode('.', $uj)[0];
-        if ($regiFo === $ujFo || !ctype_digit($regiFo) || !ctype_digit($ujFo)) { continue; }
-
-        $csere = static function (?string $html) use ($regiFo, $ujFo): ?string {
+        $csere = static function (?string $html) use ($regi, $uj): ?string {
             if ($html === null || $html === '') { return $html; }
             return preg_replace_callback(
                 '~<span class="hno">\s*([0-9]+(?:\.[0-9]+)*)\s*</span>~',
-                static function (array $m) use ($regiFo, $ujFo): string {
-                    $tagok = explode('.', $m[1]);
-                    if ($tagok[0] !== $regiFo) { return $m[0]; }
-                    $tagok[0] = $ujFo;
-                    return '<span class="hno">' . implode('.', $tagok) . '</span>';
+                static function (array $m) use ($regi, $uj): string {
+                    $no = $m[1];
+                    // pontosan a fejezet szama, vagy az azzal kezdodo alszam
+                    if ($no !== $regi && !str_starts_with($no, $regi . '.')) { return $m[0]; }
+                    return '<span class="hno">' . $uj . substr($no, strlen($regi)) . '</span>';
                 },
                 $html
             );
