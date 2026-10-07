@@ -1,0 +1,332 @@
+<p>Az árucikktörzs tartalmazza mindazt, amivel a cég kereskedik vagy amit
+raktáron tart: a megnevezést, az azonosítókat, a mértékegységet, az árakat és
+a készletadatokat. Erre épül a készletkezelés, a megrendelés és a
+számlázás.</p>
+
+<p><img src="/media/arucikk-01-lista.png" class="shot" loading="lazy" alt="Az árucikk lista"></p>
+
+<div class="call tip">
+<p>A fejezet nagy része minden felhasználónak szól. Az <em>Egyedi mezők</em>
+kezelése és a <em>Tömeges import</em> rendszergazdai jogosultságot igényel —
+ezt az érintett szakaszok külön jelzik.</p>
+</div>
+
+<h2 id="hol-talalod">Hol találod</h2>
+
+<p><strong>Készlet → Árucikkek.</strong> A bal oldali főmenüben kattints a <strong>Készlet</strong> menüpontra, majd válaszd az <strong>Árucikkek</strong> almenüt.</p>
+
+<h2 id="arucikk-lista">Árucikk lista</h2>
+
+<p>Az Árucikkek oldal megnyitásakor az összes aktív árucikket látod táblázatos nézetben.</p>
+
+<h3 id="kereses-es-szures">Keresés és szűrés</h3>
+
+<p><strong>Keresés:</strong> A lista felett lévő keresőmezőbe gépelj legalább 2 karaktert. A rendszer a cikkszámban, névben, vonalkódban és leírásban is keres.</p>
+
+<ul>
+
+<li><p><strong>Szóköz = ÉS</strong> — pl. kék szék = mindkét szónak szerepelnie kell</p></li>
+
+<li><p><strong>Vessző = VAGY</strong> — pl. szék, asztal = valamelyik szó szerepel</p></li>
+
+<li><p><strong>Ékezetfüggetlen</strong> — arany megtalálja az Arány szót is</p></li>
+
+</ul>
+
+<p><strong>Szűrők:</strong> A lista felett szűrhetsz kategória, státusz (Aktív / Inaktív), raktár és raktárkészlet szerint. Kattints a szűrő ikonra, állítsd be, majd kattints az <strong>Alkalmaz</strong> gombra.</p>
+
+<p><strong>Törlés:</strong> A keresőmező melletti <strong>×</strong> gombra kattintva törlöd a keresési feltételt.</p>
+
+<h3 id="tablazat-oszlopai">Táblázat oszlopai</h3>
+
+<p><strong>(műveleti gombok)</strong></p>
+
+<p>Gyors nézet (szem), szerkesztés (ceruza), másolás, törlés</p>
+
+<p><strong>Cikkszám</strong></p>
+
+<p>A rendszer egyedi azonosítója</p>
+
+<p><strong>Megnevezés</strong></p>
+
+<p>Az árucikk neve</p>
+
+<p><strong>Kategória</strong></p>
+
+<p>Besorolási kategória</p>
+
+<p><strong>Ártípusok</strong></p>
+
+<p>Az árucikkhez rendelt ár(ak)</p>
+
+<p><strong>Egység</strong></p>
+
+<p>Mértékegység (db, kg, m stb.)</p>
+
+<p><strong>Raktárkészlet</strong></p>
+
+<p>Az aktuális készletszint</p>
+
+<p><strong>Státusz</strong></p>
+
+<p>Aktív / Inaktív</p>
+
+<h3 id="rendezes">Rendezés</h3>
+
+<p>Kattints bármelyik oszlopfejlécre — a nyíl jelzi az irányt (<strong>↑</strong> növekvő, <strong>↓</strong> csökkenő). Másodszori kattintás megfordítja a sorrendet.</p>
+
+<h3 id="lapozo">Lapozó</h3>
+
+<p>A lista alján állítsd be hány sort mutasson az oldal (10 / 25 / 50), majd az <strong>&lt; &gt;</strong> gombokkal lapozz.</p>
+
+<h2 id="muveleti-gombok">Műveleti gombok</h2>
+
+<p>Minden sor bal szélén négy kis gomb van:</p>
+
+<p><strong>👁  Gyors nézet</strong></p>
+
+<p>Kattints rá — felugró panel mutatja a főbb adatokat (cikkszám, ár, raktárkészlet, leírás) anélkül, hogy elhagynád a listát. Bezáráshoz kattints a × gombra vagy a háttérre.</p>
+
+<p><strong>✏️  Szerkesztés</strong></p>
+
+<p>Kattints rá — megnyílik a teljes árucikk szerkesztő. Módosítsd az adatokat, majd kattints a zöld Mentés gombra.</p>
+
+<p><strong>📋  Másolás</strong></p>
+
+<p>Kattints rá — a rendszer létrehoz egy másolatot. A másolat neve megkapja a '-MÁSOLAT' utótagot, státusza Inaktív lesz. Keresd meg a listában, majd szerkeszd át.</p>
+
+<p><strong>🗑️  Törlés</strong></p>
+
+<p>Kattints rá — megjelenik a megerősítő ablak. Kattints az OK gombra a végleges törléshez. Figyelem: a törlés nem vonható vissza.</p>
+
+<h2 id="uj-arucikk-letrehozasa">Új árucikk létrehozása</h2>
+
+<p>Kattints a <strong>+ Hozzáadás</strong> kék gombra a lista jobb felső sarkában. Megnyílik az árucikk szerkesztő.</p>
+
+<p><img src="/media/arucikk-02-uj.png" class="shot" loading="lazy" alt="Az új árucikk űrlap"></p>
+
+<h3 id="alapadatok">Alapadatok</h3>
+
+<ul>
+
+<li><p><strong>Add meg a megnevezést</strong> (kötelező mező, piros csillag jelzi).</p></li>
+
+<li><p><strong>Add meg a cikkszámot.</strong> Ha üresen hagyod, a rendszer automatikusan generál egyet mentéskor.</p></li>
+
+<li><p><strong>Válaszd ki a kategóriát</strong> a legördülő listából.</p></li>
+
+<li><p><strong>Válaszd ki a mértékegységet</strong> (db, kg, m, l stb.).</p></li>
+
+<li><p><strong>Állítsd be az ÁFA-kulcsot.</strong></p></li>
+
+<li><p><strong>Írd be a leírást</strong> a szövegmezőbe (opcionális).</p></li>
+
+</ul>
+
+<h3 id="azonositok">Azonosítók</h3>
+
+<ul>
+
+<li><p><strong>Vonalkód:</strong> gépeld be, vagy kattints a <strong>Generálás</strong> gombra.</p></li>
+
+<li><p><strong>VTSZ szám / EAN kód / Gyártói cikkszám:</strong> töltsd ki, ha szükséges.</p></li>
+
+</ul>
+
+<h3 id="artipusok">Ártípusok</h3>
+
+<ul>
+
+<li><p>Kattints az <strong>+ Ártípus hozzáadása</strong> gombra.</p></li>
+
+<li><p>Válaszd ki az ártípust (Listaár, Kedvezményes ár, Partner ár stb.).</p></li>
+
+<li><p>Add meg az árat és a pénznemet.</p></li>
+
+<li><p>Kattints a <strong>Mentés</strong> gombra az ártípus sor végén.</p></li>
+
+<li><p>Ismételd meg, ha több ártípusra is szükség van.</p></li>
+
+</ul>
+
+<h3 id="raktar-es-keszlet">Raktár és készlet</h3>
+
+<ul>
+
+<li><p>Kattints a <strong>Raktár fül</strong> gombra a szerkesztőn belül.</p></li>
+
+<li><p>Válaszd ki a raktárt, add meg a minimális és maximális készletszintet.</p></li>
+
+<li><p>Ha soros/sorozatszámos cikkről van szó, kapcsold be a <strong>Sorozatszám nyilvántartás</strong> kapcsolót.</p></li>
+
+<li><p>Ha tételszámos nyilvántartás szükséges, kapcsold be a <strong>Tételszám nyilvántartás</strong> kapcsolót.</p></li>
+
+</ul>
+
+<h3 id="kepek-es-dokumentumok">Képek és dokumentumok</h3>
+
+<ul>
+
+<li><p>Kattints a <strong>Képek</strong> fülre.</p></li>
+
+<li><p>Húzd rá a képfájlt a feltöltő területre, vagy kattints a <strong>Tallózás</strong> gombra.</p></li>
+
+<li><p>Az első feltöltött kép lesz a borítókép — sorrendet húzd-ejtsd módszerrel változtathatod.</p></li>
+
+<li><p>Dokumentumok (pl. adatlap PDF) ugyanígy tölthetők fel a <strong>Dokumentumok</strong> fülön.</p></li>
+
+</ul>
+
+<h3 id="egyedi-mezok">Egyedi mezők</h3>
+
+<p>Egyedi mezők felviteléhez rendszergazdai jogosultság szükséges. Ha nem látod az Egyedi mezők gombot, kérd meg a rendszergazdát.</p>
+
+<ul>
+
+<li><p>Kattints az <strong>⚙ Egyedi mezők</strong> gombra a lista fejlécében.</p></li>
+
+<li><p>Definiáld a mező nevét, típusát (szöveg, szám, dátum, igen/nem, legördülő).</p></li>
+
+<li><p>Kapcsold be az <strong>Aktív</strong> kapcsolót, hogy megjelenjen a szerkesztőben.</p></li>
+
+<li><p>Mentés után az egyedi mezők megjelennek minden árucikk szerkesztőjének <strong>Egyedi adatok</strong> fülén.</p></li>
+
+</ul>
+
+<h3 id="mentes">Mentés</h3>
+
+<p>Ha minden adatot megadtál, kattints a <strong>💾 Mentés</strong> zöld gombra. Hibás vagy hiányzó kötelező mező esetén a rendszer piros szegéllyel jelzi, mit kell pótolni.</p>
+
+<h2 id="meglevo-arucikk-szerkesztese">Meglévő árucikk szerkesztése</h2>
+
+<ul>
+
+<li><p>Keresd meg az árucikket a listában.</p></li>
+
+<li><p>Kattints a sor elején lévő <strong>✏️ ceruza</strong> ikonra.</p></li>
+
+<li><p>Módosítsd a szükséges adatokat.</p></li>
+
+<li><p>Kattints a <strong>💾 Mentés</strong> gombra.</p></li>
+
+</ul>
+
+<p>Az árucikk cikkszámát csak akkor módosítsd, ha biztosan nem szerepel nyitott rendelésben vagy bizonylatban — a rendszer ezt nem ellenőrzi automatikusan.</p>
+
+<h2 id="arucikk-masolasa">Árucikk másolása</h2>
+
+<p>Ha egy meglévő árucikkhez hasonlót kell felvenni, használd a másolás funkciót.</p>
+
+<ul>
+
+<li><p>Kattints a sor elején lévő <strong>📋 Másolás</strong> ikonra.</p></li>
+
+<li><p>A rendszer létrehozza a másolatot: neve <strong>Eredeti név — MÁSOLAT</strong>, státusza Inaktív.</p></li>
+
+<li><p>Keresd meg az új cikket a lista tetején.</p></li>
+
+<li><p>Kattints a <strong>✏️ ceruza</strong> ikonra, módosítsd a különböző adatokat.</p></li>
+
+<li><p>Aktiváld a cikket: állítsd a státuszt <strong>Aktívra</strong>, majd mentsd el.</p></li>
+
+</ul>
+
+<h2 id="tomeges-import">Tömeges import</h2>
+
+<p>A tömeges importhoz rendszergazdai jogosultság szükséges.</p>
+
+<p>Ha egyszerre sok árucikket kell felvinni, nem kell őket egyesével begépelni — a rendszer CSV és XLSX fájlból is tud importálni.</p>
+
+<ul>
+
+<li><p>Kattints az <strong>Import</strong> gombra a lista fejlécében.</p></li>
+
+<li><p>Töltsd le az üres sablont az Import ablakból a <strong>Sablon letöltése</strong> gombra kattintva.</p></li>
+
+<li><p>Töltsd ki a sablont: minden sor egy árucikket jelent.</p></li>
+
+<li><p>Az egyedi mezők is feltölthetők importtal — az oszlop-hozzárendelő felületen párosítsd a fájl oszlopait a rendszer mezőivel.</p></li>
+
+<li><p>Töltsd vissza a kitöltött fájlt a <strong>Fájl feltöltése</strong> gombbal.</p></li>
+
+<li><p>Ellenőrizd az előnézetet, majd kattints az <strong>Import indítása</strong> gombra.</p></li>
+
+<li><p>A hibás sorok piros jelzéssel jelennek meg — javítsd ki és töltsd fel újra. A sikeres sorok azonnal bekerülnek a rendszerbe.</p></li>
+
+</ul>
+
+<p>A részletes leírás a súgó <strong>Adat export/import</strong> fejezetében található.</p>
+
+<h2 id="ha-valami-nem-stimmel">Ha valami nem stimmel</h2>
+
+<h3 id="nem-jelenik-meg-a-cikk-a-listaban">Nem jelenik meg a cikk a listában</h3>
+
+<p>Ellenőrizd az alábbiakat:</p>
+
+<ul>
+
+<li><p><strong>Aktív-e a szűrő?</strong> A lista feletti szűrő sáv mutatja, ha aktív szűrő van érvényben. Kattints az <strong>Összes szűrő törlése</strong> gombra, és nézd meg újra.</p></li>
+
+<li><p><strong>Inaktív-e a cikk?</strong> Az állapot szűrőt állítsd <strong>Mind</strong>-re — az inaktív cikkek alapból nem látszanak.</p></li>
+
+<li><p><strong>Rossz helyen keresel?</strong> Ellenőrizd, hogy a keresőmező üres-e, vagy nem egy régi keresési feltétel maradt-e benne.</p></li>
+
+</ul>
+
+<h3 id="nem-engedi-menteni">Nem engedi menteni</h3>
+
+<ul>
+
+<li><p><strong>Kötelező mező üres.</strong> A piros szegéllyel jelzett mezők kötelezőek — töltsd ki őket.</p></li>
+
+<li><p><strong>Már létezik ilyen cikkszám.</strong> A cikkszámnak egyedinek kell lennie. Adj meg másik cikkszámot, vagy hagyd üresen és a rendszer generál egyet.</p></li>
+
+<li><p><strong>Nincs jogosultságod.</strong> Bizonyos mezők (pl. egyedi mezők módosítása) rendszergazdai jogot igényelnek. Vedd fel a kapcsolatot a rendszergazdával.</p></li>
+
+</ul>
+
+<h3 id="duplan-vittem-fel-az-arucikket">Duplán vittem fel az árucikket</h3>
+
+<ul>
+
+<li><p>Keresd meg a duplikátumot a listában (cikkszám vagy név alapján).</p></li>
+
+<li><p>Ha az egyiken még nincs tranzakció (bizonylat, rendelés), töröld a <strong>🗑️ kuka</strong> ikonnal.</p></li>
+
+<li><p>Ha már van hozzá tranzakció, ne töröld — inkább állítsd Inaktívra, és a továbbiakban a helyes cikket használd.</p></li>
+
+</ul>
+
+<h3 id="az-importalt-sorok-nem-kerultek-be">Az importált sorok nem kerültek be</h3>
+
+<ul>
+
+<li><p><strong>Hibás formátum.</strong> Csak a sablon szerinti oszloprendben fogadja el a fájlt. Töltsd le az üres sablont az Import ablakból.</p></li>
+
+<li><p><strong>Kötelező mező hiányzik.</strong> A megnevezés mező kötelező — nézd meg, hogy minden sor tartalmaz-e nevet.</p></li>
+
+<li><p><strong>Duplán szerepel a cikkszám.</strong> Egyedi cikkszámokat adj meg, vagy hagyd üresen az oszlopot.</p></li>
+
+</ul>
+
+<h3 id="nem-jelenik-meg-az-artipus">Nem jelenik meg az ártípus</h3>
+
+<ul>
+
+<li><p>Ellenőrizd, hogy az ártípus sor <strong>Mentés</strong> gombját megnyomtad-e (a sor végén, nem az oldal tetején lévő Mentés gomb).</p></li>
+
+<li><p>Ha az ártípus a törzsadatokban nincs felvéve, a legördülőben sem jelenik meg. Kérd meg a rendszergazdát, hogy vegye fel.</p></li>
+
+</ul>
+
+<h3 id="a-kereses-nem-talalja-a-cikket">A keresés nem találja a cikket</h3>
+
+<ul>
+
+<li><p>Legalább 2 karaktert kell beírni a kereséshez.</p></li>
+
+<li><p>Ellenőrizd az ékezetes karaktereket — a kereső ékezetfüggetlen, de ha a cikkszámban speciális karakter van, az pontos egyezést igényel.</p></li>
+
+<li><p>Ha a cikk nemrég lett felvéve, frissítsd az oldalt (F5).</p></li>
+
+</ul>

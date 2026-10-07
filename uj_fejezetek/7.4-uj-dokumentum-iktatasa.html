@@ -1,0 +1,249 @@
+<p>Egy iktatás mindig <strong>egy fájl</strong> és a hozzá tartozó adatok:
+dokumentumtípus, iktatókönyv, sorszám, partner és felelős. Ez a fejezet
+végigvezet az iktatás rögzítésén.</p>
+
+<p>A funkciót az <strong>Iktatás → Dokumentum lista</strong> képernyőn
+találod: a lap tetején, a cím mellett a kék <strong>+ Létrehozás</strong>
+gomb nyitja meg.</p>
+
+<h2 id="az-iktatas-elinditasa">Az iktatás elindítása</h2>
+
+<p>Nyisd meg az <strong>Iktatás → Dokumentum lista</strong> oldalt, és a lap
+tetején, a <em>Dokumentum lista</em> cím mellett kattints a kék
+<strong>+ Létrehozás</strong> gombra. Jobb oldalról becsúszik az
+<strong>Új dokumentum iktatása</strong> ablak, mögötte elhalványul a
+lista.</p>
+
+<p><img src="/media/iktatas-02-uj-iktatas.png" class="shot" loading="lazy" alt="Az Új dokumentum iktatása ablak a három szekcióval"></p>
+
+<p>Az ablak bal oldalán három, sorszámozott szekcióban haladsz végig:
+<strong>1. Iktatás típusa</strong>, <strong>2. Alapadatok</strong> és
+<strong>3. Kapcsolatok</strong>. A jobb oldali <strong>Iktatás
+összegzés</strong> panel közben folyamatosan mutatja, mi lesz a sorszám, az
+iktatószám, az iktatókönyv és a státusz. Alul a zöld <strong>Iktatás
+létrehozása</strong> gomb zárja le a munkát.</p>
+
+<div class="call tip">
+<p>Ha nem látod a <strong>+ Létrehozás</strong> gombot, nincs iktatási
+jogosultságod — fordulj a rendszergazdához.</p>
+</div>
+
+<h2 id="iktatas-tipusa">Iktatás típusa</h2>
+
+<p>Az ablakban legfelül két nagy választókártya található. Válaszd ki, hogy általános vagy lejáró dokumentumot iktatsz. A választás meghatározza, hogy megjelennek-e a lejárati dátum mezők.</p>
+
+<h3 id="altalanos-dokumentum">Általános dokumentum</h3>
+
+<p>Kattints az Általános dokumentum kártyára akkor, ha a dokumentumnak nincs érvényességi határideje. Ide tartoznak a bejövő és kimenő számlák, banki kivonatok, e-mail csatolmányok, projekt dokumentumok, logisztikai munkalapok, HR papírok, sablonok. Ez az alapértelmezett választás, amikor megnyílik az ablak.</p>
+
+<h3 id="lejaro-dokumentum">Lejáró dokumentum</h3>
+
+<p>Kattints a Lejáró dokumentum kártyára akkor, ha a dokumentumnak van érvényességi határideje és előtte emlékeztetőt szeretnél kapni. Ide tartoznak az engedélyek, tanúsítványok, szerződések, igazolványok, bérleti szerződések, biztosítási kötvények, OKJ bizonyítványok, környezetvédelmi és tűzvédelmi engedélyek. A kattintás után a formon megjelennek a lejárati dátum és emlékeztető mezők.</p>
+
+<h2 id="alapadatok">Alapadatok</h2>
+
+<p>Az iktatás típusa alatti Alapadatok szekcióban add meg a dokumentum alapvető adatait. A csillaggal (*) jelölt mezők kötelezőek.</p>
+
+<h3 id="dokumentumtipus">Dokumentumtípus</h3>
+
+<p>Nyisd meg a Dokumentumtípus legördülő listát és válaszd ki a megfelelő típust: Fizetési felszólítás, Bejövő számla, Kimenő számla, Banki kivonat, Email csatolmány, Szerződés, Engedély, Tanúsítvány, Logisztikai munkalap, Eszközátadás, Word sablon, Bizonylat sablon, Jogi irat, Általános. A kiválasztott típus alapján a rendszer automatikusan beállítja a megfelelő iktatókönyvet.</p>
+
+<h3 id="iktatokonyv">Iktatókönyv</h3>
+
+<p>A Dokumentumtípus választás után a rendszer automatikusan beállítja az Iktatókönyv mezőt is. Ha más iktatókönyvet szeretnél használni, nyisd meg a legördülő menüt és válaszd ki a 12 iktatókönyv közül:</p>
+
+<ul>
+
+<li><p>EA — Email csatolmányok</p></li>
+
+<li><p>SZ — Szerződések</p></li>
+
+<li><p>EN — Engedélyek, tanúsítványok</p></li>
+
+<li><p>FF — Fizetési felszólítások</p></li>
+
+<li><p>BK — Banki kivonatok</p></li>
+
+<li><p>LM — Logisztikai munkalapok</p></li>
+
+<li><p>ES — Eszközátadás (HR)</p></li>
+
+<li><p>WS — Word sablonok (HR)</p></li>
+
+<li><p>BS — Bizonylat sablonok</p></li>
+
+<li><p>MG — Management dokumentumok</p></li>
+
+<li><p>JG — Jogi iratok</p></li>
+
+<li><p>ALT — Általános iktatókönyv</p></li>
+
+</ul>
+
+<h3 id="sorszam">Sorszám</h3>
+
+<p>A Sorszám mező automatikusan generálódik a kiválasztott iktatókönyv aktuális számlálója alapján. Formátum: KÖNYV/ÉV/HATJEGYŰ (pl. EA/2026/000243). A mező nem szerkeszthető. Ha váltasz az iktatókönyvön, a sorszám is azonnal frissül az új könyv következő szabad számára.</p>
+
+<h3 id="dokumentum-nev">Dokumentum név</h3>
+
+<p>Írd be a Dokumentum név mezőbe, hogy a listában hogyan jelenjen meg a dokumentum. Legyen beszédes — ne a fájlnevet másold be. Jó példák: 2026 májusi szervizjelentés — Ganz Gépek Kft., ELMU áramszámla 2026 május — Petőfi 15, Bérleti szerződés módosítás 3. — Virág Kft. 2026. Rossz példa: szamla_0015.pdf.</p>
+
+<h3 id="leiras">Leírás</h3>
+
+<p>Opcionális mező. Add meg bővebb magyarázatot, kontextust ha szükséges — pl. Az áprilisi gépkarbantartási szerződés 3. módosítása, az új partnerrel egyeztetve. Később a kereső ebben a mezőben is talál, és a Gyors nézet oldalpanelben is megjelenik.</p>
+
+<h2 id="lejarati-datum-es-emlekezteto">Lejárati dátum és emlékeztető</h2>
+
+<p>Ez a szekció csak akkor jelenik meg, ha az első lépésben Lejáró dokumentum típust választottál. Add meg itt a dokumentum érvényességi határidejét és azt, hogy mikor kapj emlékeztetőt a lejárat előtt.</p>
+
+<h3 id="lejarati-datum">Lejárati dátum</h3>
+
+<p>Írd be a Lejárati dátum mezőbe az érvényesség utolsó napját magyar formátumban: ÉÉÉÉ. HH. NN. (pl. 2026. 12. 31.). A pontok utáni szóköz választható — a rendszer a 2026.12.31 formátumot is felismeri. A mező alatti súgó szöveg mindig mutatja a példát.</p>
+
+<h3 id="emlekezteto">Emlékeztető</h3>
+
+<p>Állítsd be, hány nappal a lejárat előtt szeretnél e-mail értesítést kapni. Az alapérték 30 nap. Írj be egy másik értéket kézzel 0 és 365 között, vagy kattints valamelyik gyors-választó gombra: 5, 15, 30, 60, 90. A kiválasztott preset kék kiemelést kap.</p>
+
+<h3 id="melyik-napot-valaszd">Melyik napot válaszd</h3>
+
+<p>Rövid határidejű dolgokhoz elég az 5-15 nap (pl. parkolóbérlet). Standard szerződésekhez 30 nap megfelelő. Komolyabb szerződésekhez, ahol tárgyalás kell, 60-90 nap ajánlott (bérleti, nagy szállítói keret). Engedélyekhez, ahol hatósági ügyintézés kell, 90-180 nap a biztonságos (környezetvédelmi, tűzvédelmi, építési).</p>
+
+<h2 id="kapcsolodo-adatok">Kapcsolódó adatok</h2>
+
+<p>A Kapcsolatok szekcióban opcionálisan megadhatsz további kontextust. Egyik mező sem kötelező, de javítják a visszakereshetőséget és a kapcsolódó modulokban is láthatóvá teszik a dokumentumot.</p>
+
+<h3 id="partner">Partner</h3>
+
+<p>Kezd el gépelni a partner nevét vagy adószámát a Partner mezőbe — autocomplete lista jelenik meg. Kattints a megfelelő partnerre. A partnerek a CRM modulból jönnek. Egy dokumentum csak egy fő partnerhez köthető. Ha nem akarsz partnert megadni, hagyd üresen vagy válaszd a — Nincs — opciót.</p>
+
+<h3 id="projekt">Projekt</h3>
+
+<p>Nyisd meg a Projekt legördülő menüt és válassz a nyitott projektek listájából. Hasznos, ha a dokumentum egy konkrét projekthez kapcsolódik — így a projekt oldalán is megjelenik a Dokumentumok lapfülön.</p>
+
+<h3 id="koltseghely">Költséghely</h3>
+
+<p>Nyisd meg a Költséghely legördülő menüt és válassz a listából. Pénzügyi tagolás szempontjából hasznos — a költséghely alapú riportok itt is figyelembe veszik a dokumentumot.</p>
+
+<h3 id="irany">Irány</h3>
+
+<p>Kattints az irány megfelelő pill gombjára (ez kötelező mező):</p>
+
+<ul>
+
+<li><p>Bejövő — külső forrásból érkezett, pl. beszállítótól, hatóságtól</p></li>
+
+<li><p>Kimenő — mi küldtük ki, pl. vevőnek, hatóságnak</p></li>
+
+<li><p>Belső — cégen belüli, pl. két részleg közötti dokumentum</p></li>
+
+</ul>
+
+<p>A kiválasztott pill kék színű lesz.</p>
+
+<h3 id="felelos">Felelős</h3>
+
+<p>Nyisd meg a Felelős legördülő menüt és válassz kollégát. Alapértelmezetten te vagy a felelős, de bárkinek kioszthatod. A kiosztott kollégánál a dokumentum automatikusan megjelenik a Saját teendőim listájában a Munkám menü alatt.</p>
+
+<h2 id="fajl-feltoltese">Fájl feltöltése</h2>
+
+<p>Egy iktatáshoz pontosan egy fájl tartozik. Ha több fájlod van ugyanahhoz a dokumentumhoz, csomagold ZIP-be, vagy iktasd őket külön-külön kapcsolt tagekkel.</p>
+
+<h3 id="hogyan-tolts-fel-fajlt">Hogyan tölts fel fájlt</h3>
+
+<p>Két módszer van. Húzd be a fájlt a kijelölt feltöltő területre az ablakban (drag and drop), vagy kattints a feltöltő terület Fájl kiválasztása gombjára és válaszd ki a fájlt a számítógépedről. A kiválasztott fájl neve és mérete azonnal megjelenik a terület alatt.</p>
+
+<h3 id="megengedett-fajltipusok">Megengedett fájltípusok</h3>
+
+<ul>
+
+<li><p>Dokumentum: PDF, DOC, DOCX, ODT</p></li>
+
+<li><p>Táblázat: XLS, XLSX, ODS</p></li>
+
+<li><p>Kép: PNG, JPG, JPEG</p></li>
+
+<li><p>E-mail: EML, MSG</p></li>
+
+<li><p>Tömörített: ZIP</p></li>
+
+</ul>
+
+<h3 id="fajlmeret">Fájlméret</h3>
+
+<p>Egy fájl maximális mérete 50 MB. Ha ennél nagyobb (pl. nagy felbontásban szkennelt PDF), tömörítsd le, vagy kérd a rendszergazdát a korlát emelésére.</p>
+
+<h3 id="fajl-csereje-feltoltes-elott">Fájl cseréje feltöltés előtt</h3>
+
+<p>Ha rossz fájlt választottál, kattints a kijelzett fájlnév mellett megjelenő × ikonra, majd válassz új fájlt.</p>
+
+<h2 id="mentes">Mentés</h2>
+
+<p>Amikor minden kötelező mezőt kitöltöttél, kattints alul a zöld 💾 Iktatás létrehozása gombra. A gomb az ablak jobb alsó sarkában található.</p>
+
+<h3 id="mi-tortenik-a-mentes-soran">Mi történik a mentés során</h3>
+
+<p>A rendszer validálja a mezőket. Ha hiányzik egy kötelező mező, a gomb nem indítja el a mentést, a hibás mező kerete pirosra vált, és egy figyelmeztető szöveg jelenik meg a mező alatt. Javítsd a hibát, majd kattints újra a mentés gombra. Siker esetén a rendszer generál egy egyedi iktatószámot, feltölti és eltárolja a fájlt a megfelelő könyvtárba, hozzárendeli a kiválasztott felelőshöz, megjelenít egy zöld toast értesítést (pl. Iktatás létrehozva, EA/2026/000244), bezárja az ablakot, és a főlista frissül — az új dokumentum a tetején jelenik meg (ha dátum szerint rendezett).</p>
+
+<h3 id="mentes-megszakitasa">Mentés megszakítása</h3>
+
+<p>Ha mégsem akarsz menteni, kattints az ablak jobb felső sarkában lévő × ikonra, vagy nyomd meg az Esc billentyűt. A rendszer figyelmeztet, hogy a kitöltött adatok elvesznek — erősítsd meg a megszakítást.</p>
+
+<h2 id="mi-tortenik-a-mentes-utan">Mi történik a mentés után</h2>
+
+<p>A sikeres mentés után a dokumentum rögtön kereshető a Dokumentumlistán. Ha lejáró típust állítottál be, a rendszer beállítja a lejárati emlékeztetőt is.</p>
+
+<h3 id="a-dokumentum-megjelenik-a-listan">A dokumentum megjelenik a listán</h3>
+
+<p>A Dokumentumlistán az új dokumentum legfelül jelenik meg (ha dátum szerint rendezett a lista). Kattints rajta a ceruza ikonra a megnyitáshoz, vagy a szem ikonra a gyors áttekintéshez.</p>
+
+<h3 id="lejarati-emlekezteto">Lejárati emlékeztető</h3>
+
+<p>Ha lejáró típust és emlékeztetőt állítottál be, a megadott napokkal a lejárat előtt automatikus e-mail értesítést kap a felelős. A dokumentum ekkor bekerül a Hamarosan lejár sárga csempébe is, és megjelenik a felelős Saját teendőim listájában.</p>
+
+<h3 id="engedelyezesi-folyamat">Engedélyezési folyamat</h3>
+
+<p>Ha az iktatókönyvhöz engedélyezési szabály van kötve, a dokumentum státusza automatikusan Folyamatban lesz. Az első engedélyező vagy az összes engedélyező (a szabálytól függően) e-mailes és in-app értesítést kap. Az engedélyezésig a dokumentum az Engedélyezésre vár zöld csempén is látszik.</p>
+
+<h2 id="dokumentum-javitasa-utolag">Dokumentum javítása utólag</h2>
+
+<p>Ha mentés után rájössz, hogy valami hibásan került be, utólag módosítható szinte minden adat — kivéve az iktatószámot.</p>
+
+<h3 id="metaadat-modositasa">Metaadat módosítása</h3>
+
+<p>Nyisd meg a dokumentumot a listáról a ceruza (Megnyitás) ikonnal. A részletes szerkesztő oldalon módosíthatod a dokumentum nevét, leírását, partnert, projektet, költséghelyet, irányt, tageket, lejárati dátumot, emlékeztető napokat, felelőst. Mentsd el a módosításokat a Mentés gombbal.</p>
+
+<h3 id="fajl-csereje">Fájl cseréje</h3>
+
+<p>A részletes oldalon kattints a Fájl csere opcióra. Válassz új fájlt. Az új fájl feltöltése után a régi verzió nem vész el — bekerül a verziótörténetbe, és bármikor visszanézhető.</p>
+
+<h3 id="iktatoszam-nem-modosithato">Iktatószám nem módosítható</h3>
+
+<p>Az iktatószámot semmilyen módon nem lehet megváltoztatni. Ha egy sorszám tévedésből lett kiadva, archiváld a hibás dokumentumot a részletes oldal Archiválás gombjával, majd iktasd be újra a helyes adatokkal — új iktatószámot kap.</p>
+
+<h2 id="ha-valami-nem-stimmel">Ha valami nem stimmel</h2>
+
+<h3 id="nem-jelenik-meg-a-letrehozas-gomb">Nem jelenik meg a + Létrehozás gomb</h3>
+
+<p>Nincs iktatási jogosultságod ehhez a modulhoz. Fordulj a
+rendszergazdához, hogy adja meg a jogot. Az oldal újratöltése nem segít — a
+jogosultság a <strong>Rendszer → Felhasználók</strong> alatt állítható.</p>
+
+<h3 id="nem-engedi-menteni-piros-a-mezo-keret">Nem engedi menteni, piros a mező keret</h3>
+
+<p>Egy vagy több kötelező mező (csillaggal jelölt) üresen maradt vagy hibás formátumú. Nézd át a formot felülről lefelé — minden piros keretű mező a problémás. Tipikusan: Dokumentumtípus, Iktatókönyv, Dokumentum név, Irány. Lejáró típus esetén a Lejárati dátum is kötelező. Töltsd ki őket, majd kattints újra a mentés gombra.</p>
+
+<h3 id="hibat-ad-a-fajl-feltoltesnel">Hibát ad a fájl feltöltésnél</h3>
+
+<p>Három tipikus ok. Ellenőrizd a fájlméretet — 50 MB fölötti fájlt nem fogad el. Ellenőrizd a fájltípust — csak a támogatott kiterjesztések engedélyezettek (PDF, DOC, DOCX, XLS, XLSX, ODT, ODS, PNG, JPG, JPEG, EML, MSG, ZIP). Ellenőrizd a fájlnevet — ne tartalmazzon speciális karaktert (#, @, &amp;, /, \). Ha mindezek rendben vannak és mégis hibát ad, próbáld meg incognito böngészőablakban, vagy fordulj a rendszergazdához.</p>
+
+<h3 id="mar-iktattam-ezt-a-dokumentumot-most-megegyszer-felvettem-va">Már iktattam ezt a dokumentumot, most mégegyszer felvettem — van duplikáció</h3>
+
+<p>A rendszer nem észleli automatikusan a duplikációt (ugyanaz a fájl, ugyanaz a partner). Nyisd meg mindkét iktatást a ceruza ikonnal, és győződj meg melyik tartalmaz hibás adatot (pl. rossz dátum, hiányzó partner). A hibás vagy duplikált példányt archiváld a részletes oldal Archiválás gombjával. A megőrzött példányon javítsd az esetleges hiányzó adatokat. Megelőzésként mentés előtt mindig írj be a Dokumentum név mezőbe egy keresőt a Dokumentumlistán — ha már van ilyen nevű dokumentum, látszik.</p>
+
+<h3 id="rossz-iktatokonyvet-valasztottam-de-mar-mentettem">Rossz iktatókönyvet választottam, de már mentettem</h3>
+
+<p>Az iktatókönyv utólag nem módosítható — mert az iktatószám sorszámát is magában hordozza. Nyisd meg a dokumentumot a ceruza ikonnal, és a részletes oldalon kattints az Archiválás gombra. Majd iktasd be újra a helyes iktatókönyvvel — új iktatószámot kap. Az archivált példány megmarad az előzményben, de nem zavarja az aktív listát.</p>
+
+<h3 id="a-lejarati-datum-mezo-nem-jelenik-meg">A Lejárati dátum mező nem jelenik meg</h3>
+
+<p>A Lejárati dátum és emlékeztető szekció csak akkor látszik, ha az első lépésben a Lejáró dokumentum kártyát választottad. Görgess fel az ablak tetejére és kattints a Lejáró dokumentum kártyára — ekkor megjelennek a szükséges mezők. Ha az Általános kártyát választottad, lejárati dátum nem adható meg.</p>
