@@ -442,6 +442,12 @@ const KEPEK = [
       const f=p.locator('a[data-tab]').filter({hasText:/Dokumentumaim/}).first();
       if(await f.count()){ await f.click().catch(()=>{}); await varj(4000); } } },
 
+  { nev:'hr-dashboard-01', mit:'A HR management ful a fooldalon',
+    url:'/',
+    async lepesek(p){ await varjALISTARA(p);
+      const f=p.locator('a[data-tab="pageTab-hrManagement"]').first();
+      if(await f.count()){ await f.click().catch(()=>{}); await varj(5000); } } },
+
   { nev:'fooldal-03-vezetoi', mit:'A vezetoi attekinto a penzugyi csempekkel',
     url:'/',
     async lepesek(p){ await varjALISTARA(p);
