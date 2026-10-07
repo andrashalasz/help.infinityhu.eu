@@ -1,0 +1,381 @@
+<p>A Beállítások menü tartalmazza a gyártás modul összes törzsadat-kezelőjét. Ezeket az első használatba vétel előtt kell elvégezni, mert a gyártási igények és megbízások ezekre az adatokra támaszkodnak.</p>
+
+<h2 id="munkakozpontok">Munkaközpontok</h2>
+
+<p>Menü: Megrendelések → Gyártás → Beállítások → Munkaközpontok</p>
+
+<p>A munkaközpontok a gyártás fizikai helyszíneit (gépeket, munkacsoportokat) reprezentálják. A listanézetben az összes létrehozott munkaközpont megtekinthető, szerkeszthetsző és törölhető.</p>
+
+<p><img src="/media/img_c2a9d74bc4bc.png" class="shot" loading="lazy" alt="Munkaközpontok"></p>
+
+<p><strong>Munkaközpont létrehozása</strong></p>
+
+<p>Kattints a + Létrehozás gombra. A megjelenő párbeszédablakban töltsd ki az alábbi mezőket:</p>
+
+<p><img src="/media/img_576c2fb1c299.png" class="shot" loading="lazy" alt="Munkaközpontok"></p>
+
+<table class="erp-table">
+<thead><tr class="header">
+<th><strong>Mező</strong></th>
+<th><strong>Kötelező</strong></th>
+<th><strong>Leírás</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><strong>Kód</strong></td>
+<td><strong>igen</strong></td>
+<td>Egyedi azonosító kód a munkaközponthoz (pl. CNC-01)</td>
+</tr>
+<tr class="even">
+<td><strong>Név</strong></td>
+<td><strong>igen</strong></td>
+<td>A munkaközpont teljes neve (pl. Biesse Rover Arany CNC)</td>
+</tr>
+<tr class="odd">
+<td><strong>Típus</strong></td>
+<td><strong>igen</strong></td>
+<td>MACHINE (gép) vagy egyéb kategória kiválasztása</td>
+</tr>
+<tr class="even">
+<td><strong>Státusz</strong></td>
+<td></td>
+<td>Aktív / Inaktív állapot meghatározása</td>
+</tr>
+<tr class="odd">
+<td><strong>Kapacitás</strong></td>
+<td></td>
+<td>Az általános kapacitás mértéke</td>
+</tr>
+<tr class="even">
+<td><strong>Kapacitás/óra</strong></td>
+<td></td>
+<td>Darabszám per óra teljesítmény</td>
+</tr>
+<tr class="odd">
+<td><strong>Elérhető órák/nap</strong></td>
+<td></td>
+<td>Napi rendelkezésre állás órában</td>
+</tr>
+<tr class="even">
+<td><strong>Hatékonyság %</strong></td>
+<td></td>
+<td>A tényleges hatékonyság százalékos értéke</td>
+</tr>
+<tr class="odd">
+<td><strong>Óradíj</strong></td>
+<td></td>
+<td>Az egységnyi munkaidő díja (HUF/óra) – a tervezett költségszámítás alapja</td>
+</tr>
+<tr class="even">
+<td><strong>Beállítási költség</strong></td>
+<td></td>
+<td>Az átállási/beállítási munkára vonatkozó egyszeri költség</td>
+</tr>
+<tr class="odd">
+<td><strong>Telephely</strong></td>
+<td></td>
+<td>Melyik telephelyen található a munkaközpont</td>
+</tr>
+<tr class="even">
+<td><strong>Raktár</strong></td>
+<td></td>
+<td>Hozzárendelt raktár kiválasztása</td>
+</tr>
+<tr class="odd">
+<td><strong>Leírás</strong></td>
+<td></td>
+<td>Szabad szöveges megjegyzés</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="muveletek">Műveletek</h2>
+
+<p>Menü: Megrendelések → Gyártás → Beállítások → Műveletek</p>
+
+<p><img src="/media/img_e1725e217fc2.png" class="shot" loading="lazy" alt="Műveletek"></p>
+
+<p>A műveletek a gyártási folyamat egyes lépéseit írják le — például összerakás, festés, csiszolás. Ezeket előbb kell létrehozni, mint az útvonalakat, mert az útvonal műveleti lépésekből épül fel.</p>
+
+<h2 id="uj-muvelet-letrehozasa">Új művelet létrehozása</h2>
+
+<p><img src="/media/img_323c40bf2e76.png" class="shot" loading="lazy" alt="Új művelet létrehozása"></p>
+
+<p>Kattints a <strong>+ Létrehozás</strong> gombra. A megjelenő párbeszédablakban töltsd ki az alábbi mezőket:</p>
+
+<table class="erp-table">
+<thead><tr class="header">
+<th><strong>Mező</strong></th>
+<th><strong>Kötelező</strong></th>
+<th><strong>Leírás</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><strong>Kód</strong></td>
+<td><strong>igen</strong></td>
+<td>Egyedi azonosító, pl. MUV-001</td>
+</tr>
+<tr class="even">
+<td><strong>Név</strong></td>
+<td><strong>igen</strong></td>
+<td>A művelet megnevezése, pl. Összerakás</td>
+</tr>
+<tr class="odd">
+<td><strong>Munkaközpont</strong></td>
+<td><strong>igen</strong></td>
+<td>Melyik munkaközponton végzik el</td>
+</tr>
+<tr class="even">
+<td><strong>Típus</strong></td>
+<td><strong>igen</strong></td>
+<td>Feldolgozás alatt / Beállítás / stb.</td>
+</tr>
+<tr class="odd">
+<td><strong>Státusz</strong></td>
+<td><strong>igen</strong></td>
+<td>Aktív vagy inaktív</td>
+</tr>
+<tr class="even">
+<td><strong>Telephely</strong></td>
+<td></td>
+<td>Melyik telephelyen érvényes</td>
+</tr>
+<tr class="odd">
+<td><strong>Beállítási idő (perc)</strong></td>
+<td></td>
+<td>Az átálláshoz szükséges idő</td>
+</tr>
+<tr class="even">
+<td><strong>Futási idő (perc)</strong></td>
+<td></td>
+<td>A tényleges végrehajtási idő</td>
+</tr>
+<tr class="odd">
+<td><strong>Lebontási idő (perc)</strong></td>
+<td></td>
+<td>A lezáráshoz szükséges idő</td>
+</tr>
+<tr class="even">
+<td><strong>Várakozási idő (perc)</strong></td>
+<td></td>
+<td>Pl. száradási idő, amit be kell várni</td>
+</tr>
+<tr class="odd">
+<td><strong>Minőségellenőrzési pont</strong></td>
+<td></td>
+<td>Ha be van jelölve, ellenőrzés szükséges</td>
+</tr>
+<tr class="even">
+<td><strong>Leírás</strong></td>
+<td></td>
+<td>Szabad szöveges megjegyzés</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="fontos-tudnivalok">Fontos tudnivalók</h2>
+
+<p><strong>Beállítási idő vs. Futási idő vs. Várakozási idő:</strong></p>
+
+<p><strong>Beállítási idő</strong> — az átállás, előkészítés ideje mielőtt a munka elkezdődik (pl. gép beállítása)</p>
+
+<p><strong>Futási idő</strong> — a tényleges gyártási idő</p>
+
+<p><strong>Lebontási idő</strong> — a lezárás, takarítás ideje</p>
+
+<p><strong>Várakozási idő</strong> — passzív várakozás, pl. száradás, hűlés — ez alatt más munkát lehet végezni</p>
+
+<p><strong>Minőségellenőrzési pont:</strong> ha be van jelölve, a rendszer jelzi hogy ennél a műveletnél ellenőrzés szükséges a továbblépés előtt.</p>
+
+<h2 id="utvonalak">Útvonalak</h2>
+
+<p>Menü: Megrendelések → Gyártás → Beállítások → Útvonalak</p>
+
+<p>Az útvonalak határozzák meg, hogy egy adott termék gyártása során milyen műveleti sorrendet kell követni, és mely munkaközpontokon kell a munkát elvégezni. Ha egy gyártási megbízás kiadásakor nincs aktív útvonal az adott termékhez, a megbízás nem tartalmaz műveleteket – ez megnehezíti a nyomon követést.</p>
+
+<p><img src="/media/img_44990386fec5.png" class="shot" loading="lazy" alt="Útvonalak"></p>
+
+<p><strong>Új útvonal létrehozása</strong></p>
+
+<p>Kattints az + Új útvonal gombra, majd töltsd ki az alábbi adatokat:</p>
+
+<p><img src="/media/img_f0deb74eda6d.png" class="shot" loading="lazy" alt="Útvonalak"></p>
+
+<table class="erp-table">
+<thead><tr class="header">
+<th><strong>Mező</strong></th>
+<th><strong>Kötelező</strong></th>
+<th><strong>Leírás</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><strong>Árucikk</strong></td>
+<td><strong>igen</strong></td>
+<td>Melyik termékhez szól ez az útvonal</td>
+</tr>
+<tr class="even">
+<td><strong>Név</strong></td>
+<td><strong>igen</strong></td>
+<td>Az útvonal megnevezése (pl. Standard asztalos folyamat v1)</td>
+</tr>
+<tr class="odd">
+<td><strong>Alkalmazás verziója</strong></td>
+<td></td>
+<td>Az útvonal verziószáma (alapértelmezett: 1.0)</td>
+</tr>
+<tr class="even">
+<td><strong>Kód</strong></td>
+<td></td>
+<td>Egyedi azonosító kód (pl. RT-TBL-01)</td>
+</tr>
+<tr class="odd">
+<td><strong>Leírás</strong></td>
+<td></td>
+<td>Szabad szöveges megjegyzés az útvonalhoz</td>
+</tr>
+<tr class="even">
+<td><strong>Gyártási megbízás</strong></td>
+<td></td>
+<td>Opcionális: megbízás-specifikus útvonalnál add meg a vonatkozó MO-t. Ha üresen hagyd, termék szintű útvonal lesz.</td>
+</tr>
+<tr class="odd">
+<td><strong>Érvényesség kezdete</strong></td>
+<td><strong>igen</strong></td>
+<td>Mettől érvényes az útvonal</td>
+</tr>
+<tr class="even">
+<td><strong>Érvényesség vége</strong></td>
+<td></td>
+<td>Meddig érvényes az útvonal (opcionális)</td>
+</tr>
+</tbody>
+</table>
+
+<p>Az útvonal listában a státuszok a következők lehetnek:</p>
+
+<p>Tervezet – az útvonal még nem aktív, csak előkészítés alatt van</p>
+
+<p>Aktív – érvényes és aktívan alkalmazható gyártási megbízásokhoz</p>
+
+<h2 id="gyartasi-tetelek">Gyártási tételek</h2>
+
+<p>Menü: Megrendelések → Gyártás → Beállítások → Gyártási tételek</p>
+
+<p><img src="/media/img_c0b16da32b3d.png" class="shot" loading="lazy" alt="Gyártási tételek"></p>
+
+<p>A gyártási tételek a raktáron lévő alapanyagok, félkésztermékek és késztermékek nyilvántartásához szükséges bejegyzések. Kattints a + Létrehozás gombra az új tétel felvételéhez:</p>
+
+<table class="erp-table">
+<thead><tr class="header">
+<th><strong>Mező</strong></th>
+<th><strong>Kötelező</strong></th>
+<th><strong>Leírás</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><strong>Tétel szám</strong></td>
+<td></td>
+<td>Automatikusan generálódik, ha üresen hagyd</td>
+</tr>
+<tr class="even">
+<td><strong>Árucikk</strong></td>
+<td><strong>igen</strong></td>
+<td>Melyik termékhez kapcsolódik a tétel</td>
+</tr>
+<tr class="odd">
+<td><strong>Raktár</strong></td>
+<td><strong>igen</strong></td>
+<td>Melyik raktárban tárolandó</td>
+</tr>
+<tr class="even">
+<td><strong>Státusz</strong></td>
+<td></td>
+<td>Elérhető / Zárolt állapot (alapértelmezett: Elérhető)</td>
+</tr>
+<tr class="odd">
+<td><strong>Kezdeti mennyiség</strong></td>
+<td><strong>igen</strong></td>
+<td>A tételhez rögzített induló darabszám</td>
+</tr>
+<tr class="even">
+<td><strong>Gyártási dátum</strong></td>
+<td></td>
+<td>A tétel gyártásának dátuma</td>
+</tr>
+<tr class="odd">
+<td><strong>Beérkezés dátuma</strong></td>
+<td><strong>igen</strong></td>
+<td>A raktárba érkezés dátuma (alapértelmezett: mai nap)</td>
+</tr>
+<tr class="even">
+<td><strong>Lejárati dátum</strong></td>
+<td></td>
+<td>Ha szükséges, a lejárat dátuma</td>
+</tr>
+<tr class="odd">
+<td><strong>Beszállítói tétel szám</strong></td>
+<td></td>
+<td>A beszállítótól kapott tételazonosító</td>
+</tr>
+<tr class="even">
+<td><strong>Tanúsítvány száma</strong></td>
+<td></td>
+<td>Minőségi tanúsítvány azonosítója</td>
+</tr>
+<tr class="odd">
+<td><strong>Megjegyzések</strong></td>
+<td></td>
+<td>Szabad szöveges megjegyzés</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="gyartas-konfiguracio">Gyártás konfiguráció</h2>
+
+<p>Menü: Megrendelések → Gyártás → Beállítások → Gyártás konfiguráció</p>
+
+<p>A gyártás konfiguráció oldalon a teljes gyártási modulra vonatkozó globális beállítások adhatók meg. A jobb oldalon az Előnézet panel valós időben mutatja a jelenlegi beállítások szerinti rezsiköltség-számítás eredményét egy mintapéldán.</p>
+
+<p><img src="/media/img_ac2d17c4f0a4.png" class="shot" loading="lazy" alt="Gyártás konfiguráció"></p>
+
+<table class="erp-table">
+<thead><tr class="header">
+<th><strong>Mező</strong></th>
+<th><strong>Kötelező</strong></th>
+<th><strong>Leírás</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><strong>Rezsiköltség százalék</strong></td>
+<td><strong>igen</strong></td>
+<td>Az alapköltség hány százalékát adja a rezsi (pl. 20.00 = 20%)</td>
+</tr>
+<tr class="even">
+<td><strong>Rezsiköltség típus</strong></td>
+<td></td>
+<td>Melyik költségelem alapján számítódjon (pl. Munkabér alapú)</td>
+</tr>
+<tr class="odd">
+<td><strong>Minimális rezsiköltség</strong></td>
+<td></td>
+<td>A számítástól függetlenül alkalmazandó minimum összeg (HUF)</td>
+</tr>
+<tr class="even">
+<td><strong>Maximális rezsiköltség</strong></td>
+<td></td>
+<td>A számítástól függetlenül alkalmazandó maximum összeg (HUF)</td>
+</tr>
+<tr class="odd">
+<td><strong>Alapértelmezett óradíj</strong></td>
+<td></td>
+<td>Ha a dolgozónak nincs beállított óradíja, ezt alkalmazza (HUF/óra)</td>
+</tr>
+<tr class="even">
+<td><strong>Aktív</strong></td>
+<td></td>
+<td>Engedélyezve / Letiltva – ha letiltva, nem hozhatók létre gyártandó termékek</td>
+</tr>
+</tbody>
+</table>
+
+<p>Mentés után az Alapértékek visszaállítása gombbal visszaállíthatod a gyárilag beállított értékeket. Példa számítás (20% munkabér alapú rezsivel): Anyagköltség 10 000 Ft + Munkabér 5 000 Ft + Rezsi (20% × 5 000) 1 000 Ft = Összesen 16 000 Ft.</p>

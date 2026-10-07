@@ -1,0 +1,475 @@
+<p>Ez a fejezet egy teljes, valós példán vezeti végig a gyártás modul beállítását és használatát. A példa termék: <strong>Festett fadoboz</strong>.</p>
+
+<h2 id="a-helyes-beallitasi-sorrend">A helyes beállítási sorrend</h2>
+
+<p>Mielőtt gyártási megbízást lehet kiadni, az alábbi törzsadatokat kell felvinni — ebben a sorrendben:</p>
+
+<p>Munkaközpont létrehozása</p>
+
+<p>↓</p>
+
+<p>Műveletek létrehozása</p>
+
+<p>↓</p>
+
+<p>Útvonal létrehozása + műveletek hozzáadása + Jóváhagyás</p>
+
+<p>↓</p>
+
+<p>Árucikkek létrehozása (alapanyagok + késztermék)</p>
+
+<p>↓</p>
+
+<p>Anyagjegyzék (BOM) rögzítése a késztermékhez</p>
+
+<p>↓</p>
+
+<p>Gyártási igény létrehozása</p>
+
+<p>↓</p>
+
+<p>Gyártási megbízás (MO) kiadása</p>
+
+<h2 id="munkakozpont">Munkaközpont</h2>
+
+<p><strong>Elérési út:</strong> Megrendelések → Gyártás → Beállítások → Munkaközpontok → + Létrehozás</p>
+
+<table class="erp-table">
+<thead><tr class="header">
+<th><strong>Mező</strong></th>
+<th><strong>Érték</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Kód</td>
+<td>ASZTAL-01</td>
+</tr>
+<tr class="even">
+<td>Név</td>
+<td>Asztali munkahely</td>
+</tr>
+<tr class="odd">
+<td>Típus</td>
+<td>Gép</td>
+</tr>
+<tr class="even">
+<td>Státusz</td>
+<td>Aktív</td>
+</tr>
+<tr class="odd">
+<td>Kapacitás</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>Kapacitás/óra</td>
+<td>3000</td>
+</tr>
+<tr class="odd">
+<td>Elérhető órák/nap</td>
+<td>8</td>
+</tr>
+<tr class="even">
+<td>Hatékonyság %</td>
+<td>100</td>
+</tr>
+<tr class="odd">
+<td>Óradíj</td>
+<td>3000 Ft</td>
+</tr>
+<tr class="even">
+<td>Beállítási költség</td>
+<td>500 Ft</td>
+</tr>
+<tr class="odd">
+<td>Telephely</td>
+<td>Main</td>
+</tr>
+<tr class="even">
+<td>Raktár</td>
+<td>Bemutató</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="muveletek">Műveletek</h2>
+
+<p><strong>Elérési út:</strong> Megrendelések → Gyártás → Beállítások → Műveletek → + Létrehozás</p>
+
+<p><strong>1. művelet — Összerakás</strong></p>
+
+<table class="erp-table">
+<thead><tr class="header">
+<th><strong>Mező</strong></th>
+<th><strong>Érték</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Kód</td>
+<td>MUV-001</td>
+</tr>
+<tr class="even">
+<td>Név</td>
+<td>Összerakás</td>
+</tr>
+<tr class="odd">
+<td>Munkaközpont</td>
+<td>Asztali munkahely</td>
+</tr>
+<tr class="even">
+<td>Típus</td>
+<td>Feldolgozás alatt</td>
+</tr>
+<tr class="odd">
+<td>Státusz</td>
+<td>Aktív</td>
+</tr>
+<tr class="even">
+<td>Telephely</td>
+<td>Main</td>
+</tr>
+<tr class="odd">
+<td>Beállítási idő</td>
+<td>5 perc</td>
+</tr>
+<tr class="even">
+<td>Futási idő</td>
+<td>20 perc</td>
+</tr>
+<tr class="odd">
+<td>Lebontási idő</td>
+<td>5 perc</td>
+</tr>
+<tr class="even">
+<td>Várakozási idő</td>
+<td>0 perc</td>
+</tr>
+<tr class="odd">
+<td>Minőségellenőrzési pont</td>
+<td>Nem</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>2. művelet — Festés</strong></p>
+
+<table class="erp-table">
+<thead><tr class="header">
+<th><strong>Mező</strong></th>
+<th><strong>Érték</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Kód</td>
+<td>MUV-002</td>
+</tr>
+<tr class="even">
+<td>Név</td>
+<td>Festés</td>
+</tr>
+<tr class="odd">
+<td>Munkaközpont</td>
+<td>Asztali munkahely</td>
+</tr>
+<tr class="even">
+<td>Típus</td>
+<td>Feldolgozás alatt</td>
+</tr>
+<tr class="odd">
+<td>Státusz</td>
+<td>Aktív</td>
+</tr>
+<tr class="even">
+<td>Telephely</td>
+<td>Main</td>
+</tr>
+<tr class="odd">
+<td>Beállítási idő</td>
+<td>5 perc</td>
+</tr>
+<tr class="even">
+<td>Futási idő</td>
+<td>30 perc</td>
+</tr>
+<tr class="odd">
+<td>Lebontási idő</td>
+<td>5 perc</td>
+</tr>
+<tr class="even">
+<td>Várakozási idő</td>
+<td>60 perc (száradás)</td>
+</tr>
+<tr class="odd">
+<td>Minőségellenőrzési pont</td>
+<td>Igen</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="utvonal">Útvonal</h2>
+
+<p><strong>Elérési út:</strong> Megrendelések → Gyártás → Beállítások → Útvonalak → + Új útvonal</p>
+
+<table class="erp-table">
+<thead><tr class="header">
+<th><strong>Mező</strong></th>
+<th><strong>Érték</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Kód</td>
+<td>RT-DOBOZ-01</td>
+</tr>
+<tr class="even">
+<td>Név</td>
+<td>Festett fadoboz folyamat v1</td>
+</tr>
+<tr class="odd">
+<td>Árucikk</td>
+<td>Festett fadoboz</td>
+</tr>
+<tr class="even">
+<td>Alkalmazás verziója</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td>Érvényesség kezdete</td>
+<td>2026-03-26</td>
+</tr>
+<tr class="even">
+<td>Leírás</td>
+<td>Összerakás, majd festés</td>
+</tr>
+</tbody>
+</table>
+
+<p>Mentés után a routing oldalon kattints a <strong>+ Művelet hozzáadása</strong> gombra és add hozzá sorrendben:</p>
+
+<p>MUV-001 Összerakás</p>
+
+<p>MUV-002 Festés</p>
+
+<p>Az összes idő: 10 perc beállítás, 50 perc futás, 60 perc összesen.</p>
+
+<p>Ezután kattints a <strong>Jóváhagyás</strong> gombra — a státusz Tervezetről Aktívra vált. Ez kötelező lépés, enélk</p>
+
+<h2 id="arucikkek-es-anyagjegyzek-bom">Árucikkek és anyagjegyzék (BOM)</h2>
+
+<p><strong>Elérési út:</strong> Megrendelések → Árucikkek</p>
+
+<p>Először hozza létre az alapanyag árucikkeket:</p>
+
+<table class="erp-table">
+<thead><tr class="header">
+<th><strong>Cikkszám</strong></th>
+<th><strong>Név</strong></th>
+<th><strong>Típus</strong></th>
+<th><strong>Mennyiségi egység</strong></th>
+<th><strong>Követési mód</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>FA-001</td>
+<td>Fenyő deszka</td>
+<td>Készlet</td>
+<td>db</td>
+<td>Nincs</td>
+</tr>
+<tr class="even">
+<td>SZEG-001</td>
+<td>Szeg</td>
+<td>Készlet</td>
+<td>db</td>
+<td>Nincs</td>
+</tr>
+<tr class="odd">
+<td>FESTEK-001</td>
+<td>Fehér festék</td>
+<td>Készlet</td>
+<td>ml</td>
+<td>Tétel</td>
+</tr>
+</tbody>
+</table>
+
+<p>Majd hozza létre a késztermék árucikket:</p>
+
+<table class="erp-table">
+<thead><tr class="header">
+<th><strong>Cikkszám</strong></th>
+<th><strong>Név</strong></th>
+<th><strong>Típus</strong></th>
+<th><strong>Mennyiségi egység</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>FFD</td>
+<td>Festett fadoboz</td>
+<td>Gyártandó termék</td>
+<td>db</td>
+</tr>
+</tbody>
+</table>
+
+<p>Ezután a Festett fadoboz árucikknél nyisd meg az <strong>Anyagjegyzék</strong> fület és add hozzá az összetevőket:</p>
+
+<table class="erp-table">
+<thead><tr class="header">
+<th><strong>Komponens</strong></th>
+<th><strong>Cikkszám</strong></th>
+<th><strong>Mennyiség</strong></th>
+<th><strong>Egység</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Fenyő deszka</td>
+<td>FA-001</td>
+<td>6</td>
+<td>db</td>
+</tr>
+<tr class="even">
+<td>Szeg</td>
+<td>SZEG-001</td>
+<td>12</td>
+<td>db</td>
+</tr>
+<tr class="odd">
+<td>Fehér festék</td>
+<td>FESTEK-001</td>
+<td>200</td>
+<td>ml</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="gyartasi-igeny">Gyártási igény</h2>
+
+<p><strong>Elérési út:</strong> Megrendelések → Gyártás → Gyártási igények → + Új gyártási igény</p>
+
+<table class="erp-table">
+<thead><tr class="header">
+<th><strong>Mező</strong></th>
+<th><strong>Érték</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Árucikk</td>
+<td>Festett fadoboz</td>
+</tr>
+<tr class="even">
+<td>Kért mennyiség</td>
+<td>5 db</td>
+</tr>
+<tr class="odd">
+<td>Határidő</td>
+<td>2026-03-26</td>
+</tr>
+<tr class="even">
+<td>Raktár</td>
+<td>Bemutató</td>
+</tr>
+<tr class="odd">
+<td>Telephely</td>
+<td>Main</td>
+</tr>
+<tr class="even">
+<td>Prioritás</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+
+<p>Mentés után a gyártási igény <strong>Jóváhagyott</strong> státuszba kerül és megjelenik a listában.</p>
+
+<h2 id="gyartasi-megbizas-mo">Gyártási megbízás (MO)</h2>
+
+<p><strong>Elérési út:</strong> A gyártási igény sorában kattints a <strong>+ Gyártás létrehozása</strong> gombra.</p>
+
+<table class="erp-table">
+<thead><tr class="header">
+<th><strong>Mező</strong></th>
+<th><strong>Érték</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Tervezett mennyiség</td>
+<td>5 db</td>
+</tr>
+<tr class="even">
+<td>Kezdés tervezett dátuma</td>
+<td>2026-03-26</td>
+</tr>
+</tbody>
+</table>
+
+<p>Mentés után az MO <strong>Tervezett</strong> státuszban jelenik meg. A tervezett összköltség automatikusan kiszámításra kerül a BOM és az útvonal alapján.</p>
+
+<p><strong>Fontos:</strong> Ha az MO-n a Műveletek szekciónál "Nincsenek műveletek" figyelmeztetés jelenik meg, az útvonal még nem volt jóváhagyva a létrehozáskor. Ebben az esetben menjen vissza az útvonalhoz, hagyd jóvá, majd az MO-n kattints a <strong>+ Routing létrehozása ehhez a termékhez</strong> gombra.</p>
+
+<h2 id="gyartas-vegrehajtasa">Gyártás végrehajtása</h2>
+
+<p><strong>1. Rendelés kiadása</strong> → státusz: Felszabadítva</p>
+
+<p><strong>2. Gyártás indítása</strong> → státusz: Folyamatban</p>
+
+<p>A munkaidő mérő elindul</p>
+
+<p>A műveletek megjelennek: Összerakás (Folyamatban), Festés (Nem kezdődött)</p>
+
+<p><strong>3. Anyagfelhasználás rögzítése</strong> — kattints az <strong>+ Anyagfelhasználás rögzítése</strong> linkre:</p>
+
+<table class="erp-table">
+<thead><tr class="header">
+<th><strong>Alapanyag</strong></th>
+<th><strong>Mennyiség</strong></th>
+<th><strong>Tétel</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Fenyő deszka</td>
+<td>30 db</td>
+<td>— (nincs követés)</td>
+</tr>
+<tr class="even">
+<td>Szeg</td>
+<td>60 db</td>
+<td>— (nincs követés)</td>
+</tr>
+<tr class="odd">
+<td>Fehér festék</td>
+<td>1000 ml</td>
+<td>FESTEK-2026-001 (BEM-003 bevételezésből)</td>
+</tr>
+</tbody>
+</table>
+
+<p>A fehér festéknél ki kell választani melyik gyártási tételből (bevételezésből) kerüljön felhasználásra — ez teremti meg a visszakövetési láncot.</p>
+
+<p><strong>4. Összerakás befejezése</strong> → kattints a <strong>Befejezés</strong> gombra az Összerakás műveletnél</p>
+
+<p><strong>5. Festés indítása és befejezése</strong> → Indítás → 60 perc száradás → Befejezés</p>
+
+<p><strong>6. Gyártás befejezése</strong> → kattints a <strong>Gyártás befejezése</strong> gombra</p>
+
+<p>5 db Festett fadoboz felkerül a készletre</p>
+
+<p>Az MO státusza: Teljesített</p>
+
+<h2 id="nyomonkovetesi-lanc-eredmeny">Nyomonkövetési lánc — eredmény</h2>
+
+<p>A gyártás befejezése után a rendszerben az alábbi lánc jön létre:</p>
+
+<p>BEM-003 bevételezés (Fehér festék, 2026-03-26)</p>
+
+<p>↓</p>
+
+<p>FESTEK-2026-001 gyártási tétel</p>
+
+<p>↓</p>
+
+<p>MO-260326-0001 gyártási megbízás</p>
+
+<p>↓</p>
+
+<p>5 db Festett fadoboz (FFD-2026-001 gyártási tétel)</p>
+
+<p>Ha visszahívás szükséges a festék miatt, a rendszer pontosan megmutatja melyik termékek érintettek.</p>

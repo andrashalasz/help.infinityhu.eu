@@ -1,0 +1,144 @@
+<p>Menü: Megrendelések → Gyártás → Gyártás rendelés</p>
+
+<p>A gyártási megbízás (Manufacturing Order – MO) az a végrehajtható utasítás, amelynek alapján a gyártás ténylegesen megvalósul. Azonosítója automatikusan generálódik (pl. MO-260318-0002). Egy gyártási igényhez több MO is tartozhat (pl. részgyártások esetén).</p>
+
+<p><img src="/media/img_08dc48decdb0.png" class="shot" loading="lazy" alt="Gyártás rendelés (Manufacturing Order)"></p>
+
+<h2 id="gyartas-rendeles-lista">Gyártás rendelés lista</h2>
+
+<p>A lista az összes gyártási megbízást tartalmazza. Szűrési lehetőségek: státusz és dátum szerinti szűrés. A lista főbb oszlopai:</p>
+
+<p>MO Szám – automatikusan generált azonosító (pl. MO-260318-0002)</p>
+
+<p>Árucikk – a gyártandó termék neve</p>
+
+<p>Gyártási igény – a kapcsolódó MD azonosítója (kattinthatszó hivatkozás)</p>
+
+<p>Tervezett mennyiség – mennyi terméket kell legyártani</p>
+
+<p>Aktuális mennyiség – eddig legyártott darabszám</p>
+
+<p>Státusz – az MO aktuális állapota</p>
+
+<p>Anyag ellenőrzés – anyagkészlet-státusz jelzés</p>
+
+<p>Tervezett kezdés – mikor kell megkezdeni a gyártást</p>
+
+<p>Helyszín – telephely és raktár</p>
+
+<h2 id="gyartasi-megbizas-allapotok">Gyártási megbízás állapotok</h2>
+
+<table class="erp-table">
+<thead><tr class="header">
+<th><strong>Státusz</strong></th>
+<th><strong>Leírás</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><strong>Tervezett</strong></td>
+<td>Az MO létrehozva, de még nem adták ki – anyag és erőforrás előkészítés fázisa</td>
+</tr>
+<tr class="even">
+<td><strong>Kiadva</strong></td>
+<td>A megbízás ki lett adva a gyártásnak, megkezdhető a munka</td>
+</tr>
+<tr class="odd">
+<td><strong>Folyamatban</strong></td>
+<td>Az aktív gyártás zajlik – munkaidő és anyagfelhasználás rögzíthető</td>
+</tr>
+<tr class="even">
+<td><strong>Befejezett</strong></td>
+<td>A gyártás lezárult, a termékek elkészültek</td>
+</tr>
+<tr class="odd">
+<td><strong>Lezárt</strong></td>
+<td>Az MO véglegesen lezárva, módosítás nem lehetséges</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="gyartasi-megbizas-reszletei">Gyártási megbízás részletei</h2>
+
+<p>Egy MO-ra kattintva (szem ikon) a részletes nézet nyílik meg. Az oldal tetején látható az MO azonosítója és az állapotfolyamat sávja: Tervezett → Kiadva → Folyamatban → Befejezett → Lezárt. A részletek hat lapon érhetők el:</p>
+
+<h2 id="alapadatok-lap">Alapadatok lap</h2>
+
+<p><img src="/media/img_577c57807a02.png" class="shot" loading="lazy" alt="Alapadatok lap"></p>
+
+<p><img src="/media/img_49ff68e95e3a.png" class="shot" loading="lazy" alt="Alapadatok lap"></p>
+
+<p>Az alapadatok lapon az MO legfontosabb adatai találhatók: azonosító, státusz, árucikk neve, kapcsolódó gyártási igény (MD szám, kattinthatszó hivatkozás), raktár, tervezett mennyiség, elindítás dátuma és időpontja.</p>
+
+<p>A lap két fő szekciót tartalmaz:</p>
+
+<p>Munkaidő – munkaidő-bejegyzések rögzítése a Manuális időrögzítés gomb segítségével</p>
+
+<p>Anyagfelhasználás – felhasznált anyagok rögzítése az Anyagfelhasználás rögzítése gombbal</p>
+
+<p>Az oldal alján a Műveletek szekció mutatja az MO-hoz rendelt gyártási lépéseket. Ha nincs útvonal hozzárendelve, figyelmeztető üzenet jelenik meg az alábbi lehetséges okokkal:</p>
+
+<p>Nem volt aktív routing a termékhez a megbízás kiadásakor</p>
+
+<p>A routing-ban nem voltak műveletek definiálva</p>
+
+<p>Technikai hiba történt a routing másolása során</p>
+
+<p>Megoldás: kattints a +Routing létrehozása ehhez a termékhez gombra, hozzon létre aktív útvonalat (lásd 2.2 fejezet). Megjegyzés: az MO továbbléphet műveletek nélkül is, de a műveletkövetés és időkezelés nem lesz elérhető.</p>
+
+<p>Az alapadatok lap alján elérhető műveleti gombok:</p>
+
+<p>Gyártás befejezése – az MO végleges lezárása (zöld gomb)</p>
+
+<p>Részleges teljesítés rögzítése – ha csak részben készült el a termék</p>
+
+<p>Gyártás felfüggesztése – az MO átmeneti leállítása (sárga gomb)</p>
+
+<p>Megrendelés felfüggesztése – a teljes megrendelés felfüggesztése (piros gomb)</p>
+
+<p>Megrendelés nyomtatása – nyomtatási nézet megnyitása</p>
+
+<h2 id="koltseg-osszefoglalo-lap">Költség összefoglaló lap</h2>
+
+<p><img src="/media/img_d1ea3a46f7b9.png" class="shot" loading="lazy" alt="Költség összefoglaló lap"></p>
+
+<p>A Költség összefoglaló lap a tervezett és tényleges költségek összehasonlítását mutatja három összesítő blokk formájában:</p>
+
+<p>Tervezett összesen (kék blokk) – a BOM és útvonal alapján számított tervezett összköltség</p>
+
+<p>Tényleges összesen (lila blokk) – a ténylegesen felmerült és rögzített költség</p>
+
+<p>Eltérés (zöld blokk) – a különbség és százalékos eltérés</p>
+
+<p>A táblázat anyagköltség, munkabér és rezsiköltség bontásban mutatja a tervezett és tényleges értékeket. Ha az eltérés meghaladja a 10%-ot, sárga figyelmeztetés jelenik meg: „Jelentős költségeltérés észlelve!" – vizsgálja meg az okát.</p>
+
+<h2 id="tervezett-koltsegek-osszegzese-lap">Tervezett költségek összegzése lap</h2>
+
+<p><img src="/media/img_0e82246e6de9.png" class="shot" loading="lazy" alt="Tervezett költségek összegzése lap"></p>
+
+<p>Ez a lap részletezi a tervezett egységköltséget és összköltséget négy blokkban: tervezett anyagköltség, tervezett munkaerőköltség, tervezett rezsiköltség és tervezett összes költség. A tervezett mennyiség és egységköltség szintén megjelenik. Az értékek a rendelés létrehozásakor kerülnek kiszámításra a BOM és útvonalzat alapján.</p>
+
+<h2 id="standard-koltsegelemzes-lap">Standard költségelemzés lap</h2>
+
+<p><img src="/media/img_729870202885.png" class="shot" loading="lazy" alt="Standard költségelemzés lap"></p>
+
+<p>A standard egységköltség és standard összes költség jelenik meg ezen a lapon. Ha nincs aktív útvonal hozzárendelve az MO-hoz, mindkét érték 0 HUF lesz.</p>
+
+<h2 id="folyamatban-levo-munkak-ertekelese-wip-lap">Folyamatban lévő munkák értékelése (WIP) lap</h2>
+
+<p>A WIP (Work In Progress) lap a részben elkészült gyártási munka értékét mutatja négy blokkban:</p>
+
+<p>Tényleges összes költség – a tényleges anyag-, munka- és rezsiköltség összege</p>
+
+<p>Teljesített érték – a már késztermékké alakított rész értéke</p>
+
+<p>Selejt költség – a selejtnek minősített termékek értéke</p>
+
+<p>Jelenlegi WIP érték – a folyamatban lévő munka nettó értéke</p>
+
+<p>Számítási képlet: WIP Érték = Tényleges összköltség − Teljesített érték − Selejt költség. Az oldalon látható a Költség előrehaladás is, amely megmutatja, hogy a tényleges költségek a tervezett összeg hány százalékát érik el.</p>
+
+<h2 id="eletciklus-tortenet-lap">Életciklus történet lap</h2>
+
+<p><img src="/media/img_30d36b9787f0.png" class="shot" loading="lazy" alt="Életciklus történet lap"></p>
+
+<p>Az életciklus történet lapon az MO összes állapotváltozása és eseménye kronologikus sorrendben kerül megjelenítésre, felhasználói azonosítóval és pontos időbélyeggel együtt.</p>

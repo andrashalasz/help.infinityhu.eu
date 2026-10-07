@@ -1,0 +1,171 @@
+<p>Menü: Megrendelések → Gyártás → Gyártási igények</p>
+
+<p>A gyártási igény (Manufacturing Demand – MD) az a dokumentum, amellyel jelezheti, hogy egy adott termékből meghatározott mennyiséget kell legyártani egy bizonyos határidőre. Azonosítója automatikusan generálódik (pl. MD-260318-0001).</p>
+
+<p><img src="/media/img_77f20afc929d.png" class="shot" loading="lazy" alt="Gyártási igények"></p>
+
+<h2 id="gyartasi-igeny-lista">Gyártási igény lista</h2>
+
+<p>A lista nézet tartalmazza az összes aktív és lezárt gyártási igényt. Szűrési lehetőségek: Státusz, Árucikk, Telephely, Raktár, Prioritás (1–20), Dátum tartomány. A lista főbb oszlopai:</p>
+
+<table class="erp-table">
+<thead><tr class="header">
+<th><strong>Oszlop</strong></th>
+<th><strong>Tartalom</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><strong>Árucikk</strong></td>
+<td>A legyártandó termék neve és cikkszáma</td>
+</tr>
+<tr class="even">
+<td><strong>Gyártások (db)</strong></td>
+<td>Hány gyártási megbízás tartozik ehhez az igényhez</td>
+</tr>
+<tr class="odd">
+<td><strong>Prioritás</strong></td>
+<td>A sürgősség mértéke (1–20, ahol 1 = legfontosabb)</td>
+</tr>
+<tr class="even">
+<td><strong>Megerősített mennyiség</strong></td>
+<td>Visszaigazolt darabszám</td>
+</tr>
+<tr class="odd">
+<td><strong>Gyártási folyamat</strong></td>
+<td>Progressbar: elkészült / összes mennyiség és százalék</td>
+</tr>
+<tr class="even">
+<td><strong>Helyszín</strong></td>
+<td>Telephely és raktár megjelölése</td>
+</tr>
+<tr class="odd">
+<td><strong>Igény száma</strong></td>
+<td>Automatikusan generált azonosító (pl. MD-260318-0001)</td>
+</tr>
+<tr class="even">
+<td><strong>Státusz</strong></td>
+<td>Az igény aktuális állapota (Jóváhagyott / Részben teljesítve / Teljesített)</td>
+</tr>
+<tr class="odd">
+<td><strong>Határidő</strong></td>
+<td>A teljesítési határnap</td>
+</tr>
+<tr class="even">
+<td><strong>Forrás megrendelés</strong></td>
+<td>Honnan érkezett az igény (Manuális vagy értékesítési megrendelésből)</td>
+</tr>
+</tbody>
+</table>
+
+<p>Egyes igényeknél piros figyelmeztető ikon jelenik meg a hiányzó anyagok jelzésére. A részletes bontásban látható: melyik komponens hiányzik, mennyi kell (Kell), mennyi van raktáron (Van), mennyi van rendelve (Megrendelve), és mennyi még hiányzik (Még hiányzik). A Beszerzés gombbal közvetlenül indítható szállítói megrendelés.</p>
+
+<h2 id="uj-gyartasi-igeny-letrehozasa">Új gyártási igény létrehozása</h2>
+
+<p>Kattints az + Új gyártási igény gombra.</p>
+
+<p><img src="/media/img_cb261ceea18d.png" class="shot" loading="lazy" alt="Új gyártási igény létrehozása"></p>
+
+<p>A megjelenő oldalon két részben kell megadni az adatokat:</p>
+
+<table class="erp-table">
+<thead><tr class="header">
+<th><strong>Mező</strong></th>
+<th><strong>Kötelező</strong></th>
+<th><strong>Leírás</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><strong>Árucikk</strong></td>
+<td><strong>igen</strong></td>
+<td>A legyártandó termék kiválasztása</td>
+</tr>
+<tr class="even">
+<td><strong>Kért mennyiség</strong></td>
+<td><strong>igen</strong></td>
+<td>Hány darabot kell legyártani</td>
+</tr>
+<tr class="odd">
+<td><strong>Határidő</strong></td>
+<td><strong>igen</strong></td>
+<td>A teljesítési határnap megadása</td>
+</tr>
+<tr class="even">
+<td><strong>Raktár</strong></td>
+<td><strong>igen</strong></td>
+<td>Melyik raktárba kerüljön a késztermék</td>
+</tr>
+<tr class="odd">
+<td><strong>Telephely</strong></td>
+<td></td>
+<td>Melyik telephelyen történjen a gyártás</td>
+</tr>
+<tr class="even">
+<td><strong>Tervezett indítás</strong></td>
+<td></td>
+<td>Mikor tervezi megkezdeni a gyártást (opcionális)</td>
+</tr>
+<tr class="odd">
+<td><strong>Prioritás (1–20)</strong></td>
+<td></td>
+<td>Az igény sürgőssége. 1 = legfontosabb, 20 = legalacsonyabb. Érdemes következetesen használni (pl. 1–5: sürgős, 10–20: normál).</td>
+</tr>
+<tr class="even">
+<td><strong>Megjegyzés</strong></td>
+<td></td>
+<td>Szabad szöveges megjegyzés</td>
+</tr>
+<tr class="odd">
+<td><strong>Forrás referencia szám</strong></td>
+<td></td>
+<td>Kapcsolódó értékesítési megrendelés azonosítója (pl. SO-12345)</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="gyartasi-igeny-reszletei">Gyártási igény részletei</h2>
+
+<p>Egy igényen lév szem ikonra kattintva a részletező oldal jelenik meg (pl. MD-260310-0002). Ez négy fő lapból áll:</p>
+
+<p><img src="/media/img_c40bc6528de6.png" class="shot" loading="lazy" alt="Gyártási igény részletei"></p>
+
+<h2 id="alapadatok-lap">Alapadatok lap</h2>
+
+<p>Az alapadatok lapon az igény legfontosabb adatai találhatók:</p>
+
+<p>Igény száma, árucikk, megerősített és gyártott mennyiség, hátralevő mennyiség</p>
+
+<p>Prioritás, igénylés dátuma, határidő, megerősítés időpontja</p>
+
+<p>Raktár, telephely, forrás típusa (Manuális / Megrendelésből)</p>
+
+<p>Gyártási folyamat sáv (pl. 2%-ban kész)</p>
+
+<h2 id="anyagjegyzek-lap">Anyagjegyzék lap</h2>
+
+<p><img src="/media/img_ad7fa9e95a5d.png" class="shot" loading="lazy" alt="Anyagjegyzék lap"></p>
+
+<p>Az anyagjegyzék tartalmazza a termék legyártásához szükséges összes komponenst:</p>
+
+<p>Db/Egység – hány egységnyi komponens kell termékegységenként</p>
+
+<p>Alkatrész neve és cikkszáma</p>
+
+<p>Szükséges (maradék) – a még legyártandó mennyiséghez szükséges komponens</p>
+
+<p>Jelenlegi készlet – raktáron lévő mennyiség</p>
+
+<p>Hiány / Felesleg – automatikusan számított különbözet (piros = hiány, zöld = felesleg)</p>
+
+<p>Státusz (Elérhető / Hiányzik)</p>
+
+<h2 id="kapcsolodo-gyartoi-megrendelesek-lap">Kapcsolódó gyártói megrendelések lap</h2>
+
+<p><img src="/media/img_df9c94655b6b.png" class="shot" loading="lazy" alt="Kapcsolódó gyártói megrendelések lap"></p>
+
+<p>Az igényhez tartozó összes gyártási megbízás (MO) látható itt státuszukkal (Teljesített / Folyamatban), tervezett és tényleges mennyiségekkel, tervezett kezdési időpontokkal és legyártási dátumokkal.</p>
+
+<h2 id="kapcsolodo-beszerzesek-lap">Kapcsolódó beszerzések lap</h2>
+
+<p><img src="/media/img_527bcdeef539.png" class="shot" loading="lazy" alt="Kapcsolódó beszerzések lap"></p>
+
+<p>Ha az igény teljesítéséhez anyagbeszerzés is szükséges volt, a kapcsolódó szállítói megrendelések (PU/...) itt találhatók meg a szállítóval, várható dátummal, beérkezési státusszal és tételes bontással.</p>
