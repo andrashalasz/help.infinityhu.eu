@@ -1,2 +1,6 @@
-kimenet/
 .node_modules/
+
+# A kimenet/ mappa kepei verziokezeltek: innen tolti fel oket a sugo admin,
+# es innen lathato, melyik kep melyik allapotbol keszult. A belepesi hibarol
+# keszult diagnosztikai kep viszont nem kell.
+kimenet/_*.png
