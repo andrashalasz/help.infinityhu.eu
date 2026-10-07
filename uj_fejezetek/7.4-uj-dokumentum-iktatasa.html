@@ -42,55 +42,66 @@ jogosultságod — fordulj a rendszergazdához.</p>
 
 <h2 id="alapadatok">Alapadatok</h2>
 
-<p>Az iktatás típusa alatti Alapadatok szekcióban add meg a dokumentum alapvető adatait. A csillaggal (*) jelölt mezők kötelezőek.</p>
+<p>Az iktatás típusa alatti <strong>Alapadatok</strong> szekcióban add meg a
+dokumentum alapvető adatait. A csillaggal (*) jelölt mezők kötelezőek.</p>
 
-<h3 id="dokumentumtipus">Dokumentumtípus</h3>
+<table class="erp-table">
+<thead><tr class="header">
+<th><strong>Mező</strong></th>
+<th><strong>Mit adj meg</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><strong>Dokumentumtípus</strong> *</td>
+<td>Válaszd ki a legördülő listából (Bejövő számla, Szerződés, Engedély,
+Tanúsítvány és így tovább). A rendszer ez alapján állítja be az
+iktatókönyvet.</td>
+</tr>
+<tr class="even">
+<td><strong>Iktatókönyv</strong> *</td>
+<td>A dokumentumtípus alapján automatikusan kitöltődik. Felülírhatod a
+legördülő menüből — a könyveket lentebb soroljuk fel.</td>
+</tr>
+<tr class="odd">
+<td><strong>Sorszám</strong></td>
+<td>A rendszer adja, nem szerkeszthető. Formátuma
+<span class="mono">KÖNYV/ÉV/HATJEGYŰ</span>, például EA/2026/000243.
+Iktatókönyv-váltáskor azonnal frissül.</td>
+</tr>
+<tr class="even">
+<td><strong>Dokumentum név</strong> *</td>
+<td>Így jelenik meg a listában. Legyen beszédes — ne a fájlnevet másold be.</td>
+</tr>
+<tr class="odd">
+<td><strong>Leírás</strong></td>
+<td>Nem kötelező. Bővebb magyarázat vagy kontextus. A kereső ebben is talál,
+és a gyors nézetben is megjelenik.</td>
+</tr>
+</tbody>
+</table>
 
-<p>Nyisd meg a Dokumentumtípus legördülő listát és válaszd ki a megfelelő típust: Fizetési felszólítás, Bejövő számla, Kimenő számla, Banki kivonat, Email csatolmány, Szerződés, Engedély, Tanúsítvány, Logisztikai munkalap, Eszközátadás, Word sablon, Bizonylat sablon, Jogi irat, Általános. A kiválasztott típus alapján a rendszer automatikusan beállítja a megfelelő iktatókönyvet.</p>
+<div class="call tip">
+<p>Jó dokumentumnév: <em>2026 májusi szervizjelentés — Ganz Gépek Kft.</em>
+vagy <em>Bérleti szerződés módosítás 3. — Virág Kft. 2026</em>.
+Rossz: <em>szamla_0015.pdf</em>.</p>
+</div>
 
-<h3 id="iktatokonyv">Iktatókönyv</h3>
-
-<p>A Dokumentumtípus választás után a rendszer automatikusan beállítja az Iktatókönyv mezőt is. Ha más iktatókönyvet szeretnél használni, nyisd meg a legördülő menüt és válaszd ki a 12 iktatókönyv közül:</p>
+<p>A <strong>12 iktatókönyv</strong>, amiből választhatsz:</p>
 
 <ul>
-
 <li><p>EA — Email csatolmányok</p></li>
-
 <li><p>SZ — Szerződések</p></li>
-
 <li><p>EN — Engedélyek, tanúsítványok</p></li>
-
 <li><p>FF — Fizetési felszólítások</p></li>
-
 <li><p>BK — Banki kivonatok</p></li>
-
 <li><p>LM — Logisztikai munkalapok</p></li>
-
 <li><p>ES — Eszközátadás (HR)</p></li>
-
 <li><p>WS — Word sablonok (HR)</p></li>
-
 <li><p>BS — Bizonylat sablonok</p></li>
-
 <li><p>MG — Management dokumentumok</p></li>
-
 <li><p>JG — Jogi iratok</p></li>
-
 <li><p>ALT — Általános iktatókönyv</p></li>
-
 </ul>
-
-<h3 id="sorszam">Sorszám</h3>
-
-<p>A Sorszám mező automatikusan generálódik a kiválasztott iktatókönyv aktuális számlálója alapján. Formátum: KÖNYV/ÉV/HATJEGYŰ (pl. EA/2026/000243). A mező nem szerkeszthető. Ha váltasz az iktatókönyvön, a sorszám is azonnal frissül az új könyv következő szabad számára.</p>
-
-<h3 id="dokumentum-nev">Dokumentum név</h3>
-
-<p>Írd be a Dokumentum név mezőbe, hogy a listában hogyan jelenjen meg a dokumentum. Legyen beszédes — ne a fájlnevet másold be. Jó példák: 2026 májusi szervizjelentés — Ganz Gépek Kft., ELMU áramszámla 2026 május — Petőfi 15, Bérleti szerződés módosítás 3. — Virág Kft. 2026. Rossz példa: szamla_0015.pdf.</p>
-
-<h3 id="leiras">Leírás</h3>
-
-<p>Opcionális mező. Add meg bővebb magyarázatot, kontextust ha szükséges — pl. Az áprilisi gépkarbantartási szerződés 3. módosítása, az új partnerrel egyeztetve. Később a kereső ebben a mezőben is talál, és a Gyors nézet oldalpanelben is megjelenik.</p>
 
 <h2 id="lejarati-datum-es-emlekezteto">Lejárati dátum és emlékeztető</h2>
 
@@ -110,71 +121,72 @@ jogosultságod — fordulj a rendszergazdához.</p>
 
 <h2 id="kapcsolodo-adatok">Kapcsolódó adatok</h2>
 
-<p>A Kapcsolatok szekcióban opcionálisan megadhatsz további kontextust. Egyik mező sem kötelező, de javítják a visszakereshetőséget és a kapcsolódó modulokban is láthatóvá teszik a dokumentumot.</p>
+<p>A <strong>Kapcsolatok</strong> szekcióban további kontextust adhatsz meg.
+Csak az <em>Irány</em> kötelező; a többi javítja a visszakereshetőséget, és a
+kapcsolódó modulokban is láthatóvá teszi a dokumentumot.</p>
 
-<h3 id="partner">Partner</h3>
-
-<p>Kezd el gépelni a partner nevét vagy adószámát a Partner mezőbe — autocomplete lista jelenik meg. Kattints a megfelelő partnerre. A partnerek a CRM modulból jönnek. Egy dokumentum csak egy fő partnerhez köthető. Ha nem akarsz partnert megadni, hagyd üresen vagy válaszd a — Nincs — opciót.</p>
-
-<h3 id="projekt">Projekt</h3>
-
-<p>Nyisd meg a Projekt legördülő menüt és válassz a nyitott projektek listájából. Hasznos, ha a dokumentum egy konkrét projekthez kapcsolódik — így a projekt oldalán is megjelenik a Dokumentumok lapfülön.</p>
-
-<h3 id="koltseghely">Költséghely</h3>
-
-<p>Nyisd meg a Költséghely legördülő menüt és válassz a listából. Pénzügyi tagolás szempontjából hasznos — a költséghely alapú riportok itt is figyelembe veszik a dokumentumot.</p>
-
-<h3 id="irany">Irány</h3>
-
-<p>Kattints az irány megfelelő pill gombjára (ez kötelező mező):</p>
-
-<ul>
-
-<li><p>Bejövő — külső forrásból érkezett, pl. beszállítótól, hatóságtól</p></li>
-
-<li><p>Kimenő — mi küldtük ki, pl. vevőnek, hatóságnak</p></li>
-
-<li><p>Belső — cégen belüli, pl. két részleg közötti dokumentum</p></li>
-
-</ul>
-
-<p>A kiválasztott pill kék színű lesz.</p>
-
-<h3 id="felelos">Felelős</h3>
-
-<p>Nyisd meg a Felelős legördülő menüt és válassz kollégát. Alapértelmezetten te vagy a felelős, de bárkinek kioszthatod. A kiosztott kollégánál a dokumentum automatikusan megjelenik a Saját teendőim listájában a Munkám menü alatt.</p>
+<table class="erp-table">
+<thead><tr class="header">
+<th><strong>Mező</strong></th>
+<th><strong>Mit adj meg</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><strong>Partner</strong></td>
+<td>Kezdd gépelni a nevet vagy az adószámot — a rendszer ajánl. Egy
+dokumentumhoz egy fő partner tartozhat.</td>
+</tr>
+<tr class="even">
+<td><strong>Projekt</strong></td>
+<td>A nyitott projektek közül választhatsz. A dokumentum ekkor a projekt
+<em>Dokumentumok</em> lapfülén is megjelenik.</td>
+</tr>
+<tr class="odd">
+<td><strong>Költséghely</strong></td>
+<td>Pénzügyi tagoláshoz. A költséghely alapú riportok figyelembe veszik.</td>
+</tr>
+<tr class="even">
+<td><strong>Irány</strong> *</td>
+<td><em>Bejövő</em> (kívülről érkezett), <em>Kimenő</em> (mi küldtük) vagy
+<em>Belső</em> (cégen belüli). A kiválasztott gomb kékre vált.</td>
+</tr>
+<tr class="odd">
+<td><strong>Felelős</strong></td>
+<td>Alapértelmezetten te. A kiosztott kollégánál a dokumentum megjelenik a
+<em>Saját teendőim</em> listában.</td>
+</tr>
+</tbody>
+</table>
 
 <h2 id="fajl-feltoltese">Fájl feltöltése</h2>
 
-<p>Egy iktatáshoz pontosan egy fájl tartozik. Ha több fájlod van ugyanahhoz a dokumentumhoz, csomagold ZIP-be, vagy iktasd őket külön-külön kapcsolt tagekkel.</p>
+<p>Egy iktatáshoz <strong>pontosan egy fájl</strong> tartozik. Ha több fájlod
+van ugyanahhoz a dokumentumhoz, csomagold ZIP-be, vagy iktasd őket
+külön-külön.</p>
 
-<h3 id="hogyan-tolts-fel-fajlt">Hogyan tölts fel fájlt</h3>
+<p>Kétféleképpen tölthetsz fel: húzd a fájlt a kijelölt területre, vagy
+kattints a <strong>Fájl kiválasztása</strong> gombra. A fájl neve és mérete
+azonnal megjelenik alatta. Ha rossz fájlt választottál, a neve melletti
+<strong>×</strong> ikonnal cserélheted.</p>
 
-<p>Két módszer van. Húzd be a fájlt a kijelölt feltöltő területre az ablakban (drag and drop), vagy kattints a feltöltő terület Fájl kiválasztása gombjára és válaszd ki a fájlt a számítógépedről. A kiválasztott fájl neve és mérete azonnal megjelenik a terület alatt.</p>
+<table class="erp-table">
+<thead><tr class="header">
+<th><strong>Mit tölthetsz fel</strong></th>
+<th><strong>Formátum</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd"><td>Dokumentum</td><td>PDF, DOC, DOCX, ODT</td></tr>
+<tr class="even"><td>Táblázat</td><td>XLS, XLSX, ODS</td></tr>
+<tr class="odd"><td>Kép</td><td>PNG, JPG, JPEG</td></tr>
+<tr class="even"><td>E-mail</td><td>EML, MSG</td></tr>
+<tr class="odd"><td>Tömörített</td><td>ZIP</td></tr>
+</tbody>
+</table>
 
-<h3 id="megengedett-fajltipusok">Megengedett fájltípusok</h3>
-
-<ul>
-
-<li><p>Dokumentum: PDF, DOC, DOCX, ODT</p></li>
-
-<li><p>Táblázat: XLS, XLSX, ODS</p></li>
-
-<li><p>Kép: PNG, JPG, JPEG</p></li>
-
-<li><p>E-mail: EML, MSG</p></li>
-
-<li><p>Tömörített: ZIP</p></li>
-
-</ul>
-
-<h3 id="fajlmeret">Fájlméret</h3>
-
-<p>Egy fájl maximális mérete 50 MB. Ha ennél nagyobb (pl. nagy felbontásban szkennelt PDF), tömörítsd le, vagy kérd a rendszergazdát a korlát emelésére.</p>
-
-<h3 id="fajl-csereje-feltoltes-elott">Fájl cseréje feltöltés előtt</h3>
-
-<p>Ha rossz fájlt választottál, kattints a kijelzett fájlnév mellett megjelenő × ikonra, majd válassz új fájlt.</p>
+<div class="call warn">
+<p>Egy fájl legfeljebb <strong>50 MB</strong> lehet. Ha a szkennelt PDF
+ennél nagyobb, tömörítsd, vagy kérd a rendszergazdát a korlát emelésére.</p>
+</div>
 
 <h2 id="mentes">Mentés</h2>
 
@@ -222,28 +234,42 @@ jogosultságod — fordulj a rendszergazdához.</p>
 
 <h2 id="ha-valami-nem-stimmel">Ha valami nem stimmel</h2>
 
-<h3 id="nem-jelenik-meg-a-letrehozas-gomb">Nem jelenik meg a + Létrehozás gomb</h3>
-
-<p>Nincs iktatási jogosultságod ehhez a modulhoz. Fordulj a
-rendszergazdához, hogy adja meg a jogot. Az oldal újratöltése nem segít — a
-jogosultság a <strong>Rendszer → Felhasználók</strong> alatt állítható.</p>
-
-<h3 id="nem-engedi-menteni-piros-a-mezo-keret">Nem engedi menteni, piros a mező keret</h3>
-
-<p>Egy vagy több kötelező mező (csillaggal jelölt) üresen maradt vagy hibás formátumú. Nézd át a formot felülről lefelé — minden piros keretű mező a problémás. Tipikusan: Dokumentumtípus, Iktatókönyv, Dokumentum név, Irány. Lejáró típus esetén a Lejárati dátum is kötelező. Töltsd ki őket, majd kattints újra a mentés gombra.</p>
-
-<h3 id="hibat-ad-a-fajl-feltoltesnel">Hibát ad a fájl feltöltésnél</h3>
-
-<p>Három tipikus ok. Ellenőrizd a fájlméretet — 50 MB fölötti fájlt nem fogad el. Ellenőrizd a fájltípust — csak a támogatott kiterjesztések engedélyezettek (PDF, DOC, DOCX, XLS, XLSX, ODT, ODS, PNG, JPG, JPEG, EML, MSG, ZIP). Ellenőrizd a fájlnevet — ne tartalmazzon speciális karaktert (#, @, &amp;, /, \). Ha mindezek rendben vannak és mégis hibát ad, próbáld meg incognito böngészőablakban, vagy fordulj a rendszergazdához.</p>
-
-<h3 id="mar-iktattam-ezt-a-dokumentumot-most-megegyszer-felvettem-va">Már iktattam ezt a dokumentumot, most mégegyszer felvettem — van duplikáció</h3>
-
-<p>A rendszer nem észleli automatikusan a duplikációt (ugyanaz a fájl, ugyanaz a partner). Nyisd meg mindkét iktatást a ceruza ikonnal, és győződj meg melyik tartalmaz hibás adatot (pl. rossz dátum, hiányzó partner). A hibás vagy duplikált példányt archiváld a részletes oldal Archiválás gombjával. A megőrzött példányon javítsd az esetleges hiányzó adatokat. Megelőzésként mentés előtt mindig írj be a Dokumentum név mezőbe egy keresőt a Dokumentumlistán — ha már van ilyen nevű dokumentum, látszik.</p>
-
-<h3 id="rossz-iktatokonyvet-valasztottam-de-mar-mentettem">Rossz iktatókönyvet választottam, de már mentettem</h3>
-
-<p>Az iktatókönyv utólag nem módosítható — mert az iktatószám sorszámát is magában hordozza. Nyisd meg a dokumentumot a ceruza ikonnal, és a részletes oldalon kattints az Archiválás gombra. Majd iktasd be újra a helyes iktatókönyvvel — új iktatószámot kap. Az archivált példány megmarad az előzményben, de nem zavarja az aktív listát.</p>
-
-<h3 id="a-lejarati-datum-mezo-nem-jelenik-meg">A Lejárati dátum mező nem jelenik meg</h3>
-
-<p>A Lejárati dátum és emlékeztető szekció csak akkor látszik, ha az első lépésben a Lejáró dokumentum kártyát választottad. Görgess fel az ablak tetejére és kattints a Lejáró dokumentum kártyára — ekkor megjelennek a szükséges mezők. Ha az Általános kártyát választottad, lejárati dátum nem adható meg.</p>
+<table class="erp-table">
+<thead><tr class="header">
+<th><strong>Mit tapasztalsz</strong></th>
+<th><strong>Mit tegyél</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Nem jelenik meg a <strong>+ Létrehozás</strong> gomb</td>
+<td>Nincs iktatási jogosultságod. Az oldal újratöltése nem segít — a jogot a
+<strong>Rendszer → Felhasználók</strong> alatt kell megadni.</td>
+</tr>
+<tr class="even">
+<td>Nem engedi menteni, piros a mező kerete</td>
+<td>Kötelező mező maradt üresen vagy hibás. Nézd át a formot felülről
+lefelé; tipikusan a Dokumentumtípus, az Iktatókönyv, a Dokumentum név vagy
+az Irány hiányzik.</td>
+</tr>
+<tr class="odd">
+<td>Hibát ad a fájl feltöltésnél</td>
+<td>Vagy nem megengedett a fájltípus, vagy 50 MB fölötti. Ellenőrizd a fenti
+táblázatot.</td>
+</tr>
+<tr class="even">
+<td>Duplán iktattam ugyanazt</td>
+<td>Archiváld a feleslegeset a részletes oldal <em>Archiválás</em>
+gombjával. Törölni nem kell — az iktatószám így is megmarad a naplóban.</td>
+</tr>
+<tr class="odd">
+<td>Rossz iktatókönyvet választottam, de már mentettem</td>
+<td>Az iktatószám nem módosítható. Archiváld a hibásat, és iktasd be újra a
+helyes könyvvel.</td>
+</tr>
+<tr class="even">
+<td>Nem jelenik meg a Lejárati dátum mező</td>
+<td>Az első lépésben <em>Általános dokumentum</em> van kiválasztva. Válts
+<em>Lejáró dokumentum</em> típusra.</td>
+</tr>
+</tbody>
+</table>

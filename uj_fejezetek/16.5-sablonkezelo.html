@@ -17,35 +17,36 @@ jogosultságod — kérd a rendszergazdát.</p>
 
 <p>A Sablonkezelőben a rendszer által kiadott nyomtatványok (számla, szállítólevél, ajánlat, teljesítési igazolás, fizetési emlékeztető és más dokumentumok) megjelenését szabhatod testre: blokkok elhelyezése, oszlopok, színek, betűméretek, elrendezés. A módosítások rendszerszinten, minden felhasználóra érvényesek, ezért az éles sablonokat csak megfontoltan változtasd.</p>
 
-<p><strong>Figyelem:</strong> a Sablonkezelőben beállított módosítás csak a jövőbeli dokumentumokat befolyásolja. A már kiállított és archivált PDF-ek nem változnak — azok az akkori sablon szerint maradnak. A számlasablonnál NAV-kompatibilitás és az ÁFA tv. 169.§ szerinti tartalmi követelmények kötelezőek: ne hagyj le kötelező mezőt.</p>
+<p><strong>Figyelem:</strong>a Sablonkezelőben beállított módosítás csak a jövőbeli dokumentumokat befolyásolja. A már kiállított és archivált PDF-ek nem változnak — azok az akkori sablon szerint maradnak. A számlasablonnál NAV-kompatibilitás és az ÁFA tv. 169.§ szerinti tartalmi követelmények kötelezőek: ne hagyj le kötelező mezőt.</p>
 
 <h3 id="a-felulet-felepitese">A felület felépítése</h3>
 
 <p>A Sablonkezelő felülete három területből áll:</p>
 
-<p><strong>Terület</strong></p>
-
-<p><strong>Mit tartalmaz</strong></p>
-
-<p><strong>Mire használd</strong></p>
-
-<p>Felső sáv</p>
-
-<p>Sablonválasztó, nyelvválasztó, Mentés, Mentés másként, PDF export, Visszavonás</p>
-
-<p>Fő műveletek és globális beállítások</p>
-
-<p>Középső előnézet</p>
-
-<p>A sablon élő, kattintható megjelenése. A kijelölt blokk kék kerettel látszik</p>
-
-<p>Kattintással választod ki, melyik blokkot szerkeszted</p>
-
-<p>Jobboldali tulajdonságpanel</p>
-
-<p>A kijelölt blokk minden állítható tulajdonsága: méret, szín, oszlopok, igazítás</p>
-
-<p>Itt módosítasz — a hatás azonnal látszik az előnézeten</p>
+<table class="erp-table">
+<thead><tr class="header">
+<th><strong>Terület</strong></th>
+<th><strong>Mit tartalmaz</strong></th>
+<th><strong>Mire használd</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Felső sáv</td>
+<td>Sablonválasztó, nyelvválasztó, Mentés, Mentés másként, PDF export, Visszavonás</td>
+<td>Fő műveletek és globális beállítások</td>
+</tr>
+<tr class="even">
+<td>Középső előnézet</td>
+<td>A sablon élő, kattintható megjelenése. A kijelölt blokk kék kerettel látszik</td>
+<td>Kattintással választod ki, melyik blokkot szerkeszted</td>
+</tr>
+<tr class="odd">
+<td>Jobboldali tulajdonságpanel</td>
+<td>A kijelölt blokk minden állítható tulajdonsága: méret, szín, oszlopok, igazítás</td>
+<td>Itt módosítasz — a hatás azonnal látszik az előnézeten</td>
+</tr>
+</tbody>
+</table>
 
 <p>Minden csúszka, pipa és színválasztó azonnal frissíti az előnézetet. Nincs külön Alkalmaz gomb — az előnézet a tényleges megjelenés.</p>
 
@@ -69,79 +70,84 @@ jogosultságod — kérd a rendszergazdát.</p>
 
 </ul>
 
-<p><strong>Nyelvi előnézet:</strong> a felső nyelvválasztóval (HU / EN / DE) megnézheted, hogy néz ki a sablon az adott nyelven. Ez csak az előnézetet befolyásolja — a sablon mindhárom nyelven egyszerre érvényes. Éles kiállításkor a rendszer a vevő törzsadatában tárolt nyelv alapján választja ki a megjelenítést.</p>
+<p><strong>Nyelvi előnézet:</strong>a felső nyelvválasztóval (HU / EN / DE) megnézheted, hogy néz ki a sablon az adott nyelven. Ez csak az előnézetet befolyásolja — a sablon mindhárom nyelven egyszerre érvényes. Éles kiállításkor a rendszer a vevő törzsadatában tárolt nyelv alapján választja ki a megjelenítést.</p>
 
 <h3 id="sablontipusok">Sablontípusok</h3>
 
 <p>A felső sávban lévő Sablon legördülőben az alábbi dokumentumtípusok közül választhatsz. Minden típusnak saját sablonja van.</p>
 
-<p><strong>Dokumentumtípus</strong></p>
-
-<p><strong>Használat</strong></p>
-
-<p>Számla</p>
-
-<p>Normál kimenő számla ÁFA-összesítővel és tételsorokkal</p>
-
-<p>Előlegszámla</p>
-
-<p>Előleg kiszámlázása szerződéses projekthez</p>
-
-<p>Végszámla</p>
-
-<p>Projekt lezárásakor az előlegek levonása és végszámítás</p>
-
-<p>Jóváírás</p>
-
-<p>Számla korrekciója mínusz értékekkel, pirossal kiemelve</p>
-
-<p>Terhelési értesítés</p>
-
-<p>Pótlólagos tétel kiszámlázása normál színekkel</p>
-
-<p>Szállítólevél</p>
-
-<p>Áru vagy eszköz átadás kísérő bizonylata, alapból ár nélkül</p>
-
-<p>Teljesítési igazolás</p>
-
-<p>Szolgáltatás elvégzésének igazolása számla-szintű oszlopokkal</p>
-
-<p>Ajánlat</p>
-
-<p>Árajánlat képpel, tételenkénti vagy klasszikus elrendezésben</p>
-
-<p>Megrendelés</p>
-
-<p>Beszerzési megrendelés szállító felé</p>
-
-<p>Leltárjelentés</p>
-
-<p>Könyv szerinti vs szemrevételezett mennyiségek különbözettel</p>
-
-<p>Raktári kivét/bevét</p>
-
-<p>Raktárból kiadott vagy bevételezett tételek</p>
-
-<p>Eszközkiadás</p>
-
-<p>Munkavállalónak kiadott eszközök listája</p>
-
-<p>Selejtezési jegyzőkönyv</p>
-
-<p>Használatból kivont eszközök dokumentálása</p>
-
-<p>Fizetési emlékeztető</p>
-
-<p>Lejárt tartozás első jelzése udvarias hangnemben</p>
-
-<p>Fizetési felszólítás</p>
-
-<p>Lejárt tartozás határozott emlékeztetője jogi figyelmeztetéssel</p>
-
-<p>Garancialevél</p>
-
-<p>Termék garanciafeltételei és eljárásrend</p>
+<table class="erp-table">
+<thead><tr class="header">
+<th><strong>Dokumentumtípus</strong></th>
+<th><strong>Használat</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Számla</td>
+<td>Normál kimenő számla ÁFA-összesítővel és tételsorokkal</td>
+</tr>
+<tr class="even">
+<td>Előlegszámla</td>
+<td>Előleg kiszámlázása szerződéses projekthez</td>
+</tr>
+<tr class="odd">
+<td>Végszámla</td>
+<td>Projekt lezárásakor az előlegek levonása és végszámítás</td>
+</tr>
+<tr class="even">
+<td>Jóváírás</td>
+<td>Számla korrekciója mínusz értékekkel, pirossal kiemelve</td>
+</tr>
+<tr class="odd">
+<td>Terhelési értesítés</td>
+<td>Pótlólagos tétel kiszámlázása normál színekkel</td>
+</tr>
+<tr class="even">
+<td>Szállítólevél</td>
+<td>Áru vagy eszköz átadás kísérő bizonylata, alapból ár nélkül</td>
+</tr>
+<tr class="odd">
+<td>Teljesítési igazolás</td>
+<td>Szolgáltatás elvégzésének igazolása számla-szintű oszlopokkal</td>
+</tr>
+<tr class="even">
+<td>Ajánlat</td>
+<td>Árajánlat képpel, tételenkénti vagy klasszikus elrendezésben</td>
+</tr>
+<tr class="odd">
+<td>Megrendelés</td>
+<td>Beszerzési megrendelés szállító felé</td>
+</tr>
+<tr class="even">
+<td>Leltárjelentés</td>
+<td>Könyv szerinti vs szemrevételezett mennyiségek különbözettel</td>
+</tr>
+<tr class="odd">
+<td>Raktári kivét/bevét</td>
+<td>Raktárból kiadott vagy bevételezett tételek</td>
+</tr>
+<tr class="even">
+<td>Eszközkiadás</td>
+<td>Munkavállalónak kiadott eszközök listája</td>
+</tr>
+<tr class="odd">
+<td>Selejtezési jegyzőkönyv</td>
+<td>Használatból kivont eszközök dokumentálása</td>
+</tr>
+<tr class="even">
+<td>Fizetési emlékeztető</td>
+<td>Lejárt tartozás első jelzése udvarias hangnemben</td>
+</tr>
+<tr class="odd">
+<td>Fizetési felszólítás</td>
+<td>Lejárt tartozás határozott emlékeztetője jogi figyelmeztetéssel</td>
+</tr>
+<tr class="even">
+<td>Garancialevél</td>
+<td>Termék garanciafeltételei és eljárásrend</td>
+</tr>
+</tbody>
+</table>
 
 <h3 id="blokkok-a-sablon-epitoelemei">Blokkok — a sablon építőelemei</h3>
 
@@ -159,53 +165,58 @@ jogosultságod — kérd a rendszergazdát.</p>
 
 <p>A leggyakoribb blokkok és tartalmuk:</p>
 
-<p><strong>Blokk</strong></p>
-
-<p><strong>Tartalma</strong></p>
-
-<p>Logó (h-logo)</p>
-
-<p>Cég logó kép, méret és pozíció</p>
-
-<p>Cégadatok (h-seller)</p>
-
-<p>Eladó cég neve, címe, adószáma, bankszámla, elérhetőségek</p>
-
-<p>Vevő adatai (h-partner)</p>
-
-<p>Vevő vagy partner neve, címe, adószáma</p>
-
-<p>Dokumentum fejléc (h-doc)</p>
-
-<p>Sorszám, kelte, teljesítés dátuma, fizetési határidő, fizetési mód</p>
-
-<p>Tételtáblázat (b-items...)</p>
-
-<p>A dokumentum fő táblája tételekkel</p>
-
-<p>ÁFA-összesítő (b-vat)</p>
-
-<p>ÁFA-kulcsok szerinti bontás: adóalap, ÁFA összeg</p>
-
-<p>Végösszeg (b-total)</p>
-
-<p>Nettó, ÁFA, bruttó összesen, fizetendő</p>
-
-<p>Pénznem-info (b-currency)</p>
-
-<p>MNB árfolyam és devizaösszegek deviza számlánál</p>
-
-<p>Megjegyzés (b-notes)</p>
-
-<p>Szabad szöveges mező</p>
-
-<p>Jogi szöveg (f-legal)</p>
-
-<p>ÁFA tv. hivatkozás, Infinity program jelölés</p>
-
-<p>Aláírás (f-signature)</p>
-
-<p>Aláírás helye, név, dátum</p>
+<table class="erp-table">
+<thead><tr class="header">
+<th><strong>Blokk</strong></th>
+<th><strong>Tartalma</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Logó (h-logo)</td>
+<td>Cég logó kép, méret és pozíció</td>
+</tr>
+<tr class="even">
+<td>Cégadatok (h-seller)</td>
+<td>Eladó cég neve, címe, adószáma, bankszámla, elérhetőségek</td>
+</tr>
+<tr class="odd">
+<td>Vevő adatai (h-partner)</td>
+<td>Vevő vagy partner neve, címe, adószáma</td>
+</tr>
+<tr class="even">
+<td>Dokumentum fejléc (h-doc)</td>
+<td>Sorszám, kelte, teljesítés dátuma, fizetési határidő, fizetési mód</td>
+</tr>
+<tr class="odd">
+<td>Tételtáblázat (b-items...)</td>
+<td>A dokumentum fő táblája tételekkel</td>
+</tr>
+<tr class="even">
+<td>ÁFA-összesítő (b-vat)</td>
+<td>ÁFA-kulcsok szerinti bontás: adóalap, ÁFA összeg</td>
+</tr>
+<tr class="odd">
+<td>Végösszeg (b-total)</td>
+<td>Nettó, ÁFA, bruttó összesen, fizetendő</td>
+</tr>
+<tr class="even">
+<td>Pénznem-info (b-currency)</td>
+<td>MNB árfolyam és devizaösszegek deviza számlánál</td>
+</tr>
+<tr class="odd">
+<td>Megjegyzés (b-notes)</td>
+<td>Szabad szöveges mező</td>
+</tr>
+<tr class="even">
+<td>Jogi szöveg (f-legal)</td>
+<td>ÁFA tv. hivatkozás, Infinity program jelölés</td>
+</tr>
+<tr class="odd">
+<td>Aláírás (f-signature)</td>
+<td>Aláírás helye, név, dátum</td>
+</tr>
+</tbody>
+</table>
 
 <h4 id="blokk-kijelolese">Blokk kijelölése</h4>
 
@@ -235,7 +246,7 @@ jogosultságod — kérd a rendszergazdát.</p>
 
 <p>Betűméretek pixelben, mellettük színválasztó, és B / I / U gombok (félkövér, dőlt, aláhúzott).</p>
 
-<p><strong>Fontos:</strong> minden Fnt (betűméret) mező MIND a méretet, MIND a színt tartalmazza. Ha emellett van külön Clr (szín) mező is, az egy másik tulajdonságra vonatkozik (például külön szöveg szín és külön keret szín).</p>
+<p><strong>Fontos:</strong>minden Fnt (betűméret) mező MIND a méretet, MIND a színt tartalmazza. Ha emellett van külön Clr (szín) mező is, az egy másik tulajdonságra vonatkozik (például külön szöveg szín és külön keret szín).</p>
 
 <h4 id="igazitas">Igazítás</h4>
 
@@ -347,62 +358,6 @@ jogosultságod — kérd a rendszergazdát.</p>
 
 </ul>
 
-<h4 id="infinity-szinpaletta-alap-ertekek">Infinity színpaletta — alap értékek</h4>
-
-<p><strong>Szerep</strong></p>
-
-<p><strong>Hex érték</strong></p>
-
-<p><strong>Hol használatos</strong></p>
-
-<p>Elsődleges kék</p>
-
-<p>#2563EB</p>
-
-<p>Elsődleges akciók, linkek, kiemelések</p>
-
-<p>Zöld (siker)</p>
-
-<p>#16A34A</p>
-
-<p>Mentés, jóváhagyás, pozitív jelzés</p>
-
-<p>Piros (veszély)</p>
-
-<p>#DC2626</p>
-
-<p>Törlés, veszély, tartozás, mínusz érték</p>
-
-<p>Sárga (figyelem)</p>
-
-<p>#F59E0B</p>
-
-<p>Figyelmeztetés, függőben</p>
-
-<p>Alap szövegszín</p>
-
-<p>#3A4254</p>
-
-<p>Szöveg</p>
-
-<p>Segédszöveg</p>
-
-<p>#6B7280</p>
-
-<p>Placeholder, hint, másodlagos szöveg</p>
-
-<p>Oldal háttér</p>
-
-<p>#F5F4F1</p>
-
-<p>Fő háttér</p>
-
-<p>Belső keret</p>
-
-<p>#E8E7E3</p>
-
-<p>Elválasztók</p>
-
 <h4 id="szoveg-igazitas-allitasa">Szöveg igazítás állítása</h4>
 
 <ul>
@@ -425,9 +380,9 @@ jogosultságod — kérd a rendszergazdát.</p>
 
 <ul>
 
-<li><p><strong>Több számla megjelenítése bekapcsolva:</strong> minden lejárt számla egy-egy sorban, táblázatban. Alul a Tartozás összesen sor.</p></li>
+<li><p><strong>Több számla megjelenítése bekapcsolva:</strong>minden lejárt számla egy-egy sorban, táblázatban. Alul a Tartozás összesen sor.</p></li>
 
-<li><p><strong>Több számla megjelenítése kikapcsolva:</strong> egyetlen számla részletei label:érték párokként, öt sorban (Számla sorszáma, Kelte, Lejárat, Túllépés napokban, Tartozás).</p></li>
+<li><p><strong>Több számla megjelenítése kikapcsolva:</strong>egyetlen számla részletei label:érték párokként, öt sorban (Számla sorszáma, Kelte, Lejárat, Túllépés napokban, Tartozás).</p></li>
 
 </ul>
 
@@ -445,45 +400,50 @@ jogosultságod — kérd a rendszergazdát.</p>
 
 <h4 id="szamlalista-blokk-beallitasai">Számlalista blokk beállításai</h4>
 
-<p><strong>Beállítás</strong></p>
-
-<p><strong>Hatás</strong></p>
-
-<p>Háttér szín</p>
-
-<p>A dobozkeret háttere (alap: világossárga)</p>
-
-<p>Keret szín</p>
-
-<p>Doboz kerete és elválasztó vonalak (alap: sárgásbarna)</p>
-
-<p>Fejléc betűméret</p>
-
-<p>A táblázat fejlécének mérete multi módban</p>
-
-<p>Adatok betűméret és szín</p>
-
-<p>A sorokban lévő adatok mérete és színe</p>
-
-<p>Késedelem szín</p>
-
-<p>A "Túllépés napokban" oszlop értékének színe (alap: piros)</p>
-
-<p>Tartozás összege szín</p>
-
-<p>A tartozás-érték színe a táblasorokban (alap: piros)</p>
-
-<p>Tartozás összesen méret</p>
-
-<p>A Tartozás összesen sor betűmérete</p>
-
-<p>Tartozás összesen szín</p>
-
-<p>A Tartozás összesen sor összegének színe. Ha nincs külön beállítva, a Tartozás összege szín érvényesül</p>
-
-<p>Tartozás összesen vastagon</p>
-
-<p>A Tartozás összesen sor félkövér-e</p>
+<table class="erp-table">
+<thead><tr class="header">
+<th><strong>Beállítás</strong></th>
+<th><strong>Hatás</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Háttér szín</td>
+<td>A dobozkeret háttere (alap: világossárga)</td>
+</tr>
+<tr class="even">
+<td>Keret szín</td>
+<td>Doboz kerete és elválasztó vonalak (alap: sárgásbarna)</td>
+</tr>
+<tr class="odd">
+<td>Fejléc betűméret</td>
+<td>A táblázat fejlécének mérete multi módban</td>
+</tr>
+<tr class="even">
+<td>Adatok betűméret és szín</td>
+<td>A sorokban lévő adatok mérete és színe</td>
+</tr>
+<tr class="odd">
+<td>Késedelem szín</td>
+<td>A "Túllépés napokban" oszlop értékének színe (alap: piros)</td>
+</tr>
+<tr class="even">
+<td>Tartozás összege szín</td>
+<td>A tartozás-érték színe a táblasorokban (alap: piros)</td>
+</tr>
+<tr class="odd">
+<td>Tartozás összesen méret</td>
+<td>A Tartozás összesen sor betűmérete</td>
+</tr>
+<tr class="even">
+<td>Tartozás összesen szín</td>
+<td>A Tartozás összesen sor összegének színe. Ha nincs külön beállítva, a Tartozás összege szín érvényesül</td>
+</tr>
+<tr class="odd">
+<td>Tartozás összesen vastagon</td>
+<td>A Tartozás összesen sor félkövér-e</td>
+</tr>
+</tbody>
+</table>
 
 <h4 id="jogi-figyelmeztetes-b-payment-warning-blokk">Jogi figyelmeztetés — b-payment-warning blokk</h4>
 
