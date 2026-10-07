@@ -29,20 +29,46 @@ declare(strict_types=1);
 
 final class Translator
 {
-    /** A hasznalt Claude modell. Arak (2026): 5 USD / 1M bemeneti, 25 USD / 1M kimeneti token. */
-    private const CLAUDE_MODEL = 'claude-opus-5';
+    /**
+     * A valaszthato Claude modellek, es amit tudni erdemes roluk.
+     *
+     * Forditasra a Sonnet eleg: a sugo szakszotara (mt_glossary) amugy is
+     * megadja a kotott kifejezeseket, ezert a modelltol nem kell szakmai
+     * dontes. Az Opus nagysagrenddel dragabb - egy teljes sugo-ujraforditas
+     * (114 fejezet, ket nyelv) vele ~40 USD, Sonnettel ennek toredeke.
+     *
+     * ar = USD / 1M token (bemenet / kimenet), 2026-os listaar
+     */
+    public const MODELLEK = [
+        'claude-sonnet-5-5' => ['nev' => 'Sonnet 5.5 — ajánlott fordításra', 'ar' => '3 / 15'],
+        'claude-opus-5-5'   => ['nev' => 'Opus 5.5 — a legpontosabb, drága',  'ar' => '5 / 25'],
+        'claude-haiku-4-5-20251001' => ['nev' => 'Haiku 4.5 — a leggyorsabb és legolcsóbb', 'ar' => '1 / 5'],
+    ];
+
+    /** Ha nincs beallitva semmi, ezzel forditunk. */
+    public const ALAP_MODELL = 'claude-sonnet-5-5';
 
     public string $provider;
     private string $endpoint;
     private string $key;
     private string $glossary = '';
+    private string $model    = self::ALAP_MODELL;
 
-    public function __construct(string $provider, string $endpoint, string $key)
+    public function __construct(string $provider, string $endpoint, string $key, string $model = '')
     {
         $this->provider = $provider !== '' ? $provider : 'none';
         $this->endpoint = rtrim($endpoint, '/');
         $this->key      = $key;
+        $this->setModel($model);
     }
+
+    /** Ismeretlen vagy ures modellnev eseten az alapertelmezett marad. */
+    public function setModel(string $model): void
+    {
+        $this->model = isset(self::MODELLEK[$model]) ? $model : self::ALAP_MODELL;
+    }
+
+    public function model(): string { return $this->model; }
 
     /** A config es az adatbazis-beallitasok osszefesulese (a kornyezeti valtozo eros). */
     public static function fromConfig(array $cfg, ?PDO $db = null): self
@@ -50,23 +76,25 @@ final class Translator
         $provider = $cfg['mt_provider'] ?? '';
         $endpoint = $cfg['mt_endpoint'] ?? '';
         $key      = $cfg['mt_key'] ?? '';
+        $model    = $cfg['mt_model'] ?? '';
 
         $glossary = '';
         if ($db !== null) {
             try {
                 $rows = $db->query("SELECT `key`, value FROM help_setting
-                                     WHERE `key` IN ('mt_provider','mt_endpoint','mt_key','mt_glossary')")->fetchAll();
+                                     WHERE `key` IN ('mt_provider','mt_endpoint','mt_key','mt_glossary','mt_model')")->fetchAll();
                 $s = [];
                 foreach ($rows as $r) { $s[$r['key']] = (string)$r['value']; }
                 if ($provider === '') { $provider = $s['mt_provider'] ?? 'none'; }
                 if ($endpoint === '') { $endpoint = $s['mt_endpoint'] ?? ''; }
                 if ($key === '')      { $key      = $s['mt_key'] ?? ''; }
                 $glossary = $s['mt_glossary'] ?? '';
+                if ($model === '') { $model = $s['mt_model'] ?? ''; }
             } catch (Throwable $e) {
                 // beallitas-tabla nelkul is mukodjon
             }
         }
-        $t = new self($provider ?: 'none', $endpoint, $key);
+        $t = new self($provider ?: 'none', $endpoint, $key, $model);
         $t->setGlossary($glossary);
         return $t;
     }
@@ -166,7 +194,7 @@ final class Translator
 
         $base = $this->endpoint !== '' ? $this->endpoint : 'https://api.anthropic.com';
         $res = $this->post($base . '/v1/messages', [
-            'model'         => self::CLAUDE_MODEL,
+            'model'         => $this->model,
             'max_tokens'    => 32000,
             'output_config' => ['effort' => 'medium'],
             'system'        => $system,
@@ -249,7 +277,7 @@ final class Translator
         $base = $this->endpoint !== '' ? $this->endpoint : 'https://api.anthropic.com';
 
         $res = $this->post($base . '/v1/messages', [
-            'model'      => self::CLAUDE_MODEL,
+            'model'      => $this->model,
             'max_tokens' => 32000,
             // A forditas szoveg-atalakitas, nem gondolkodtato feladat: kozepes
             // rafordital jo minoseget ad, es toredeke a koltsege a magasnak.

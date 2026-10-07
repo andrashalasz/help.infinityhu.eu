@@ -977,6 +977,14 @@ function page_mt(PDO $db, array $cfg, array $counts): void
                 <option value="<?= h($k) ?>" <?= admin_setting($db, 'mt_provider', 'none') === $k ? 'selected' : '' ?>><?= h($v) ?></option>
               <?php endforeach; ?>
             </select></div>
+          <div class="field" style="flex:0 1 260px"><label><?= h(t('Modell')) ?></label>
+            <select class="sel" name="mt_model">
+              <?php $mtModell = admin_setting($db, 'mt_model', Translator::ALAP_MODELL); ?>
+              <?php foreach (Translator::MODELLEK as $mk => $mv): ?>
+                <option value="<?= h($mk) ?>" <?= $mtModell === $mk ? 'selected' : '' ?>><?= h(t($mv['nev'])) ?></option>
+              <?php endforeach; ?>
+            </select>
+            <div class="hint"><?= h(t('Csak a Claude szolgáltatónál számít. Fordításra a Sonnet elég — a szakszótár amúgy is megadja a kötött kifejezéseket. Az Opus nagyságrenddel drágább: egy teljes újrafordítás vele több tízezer forint.')) ?></div></div>
           <div class="field"><label><?= h(t('Végpont (LibreTranslate-nél kötelező)')) ?></label>
             <input class="inp mono" name="mt_endpoint" value="<?= h(admin_setting($db, 'mt_endpoint')) ?>" placeholder="https://libretranslate.example.com"></div>
           <div class="field"><label><?= h(t('API-kulcs')) ?></label>

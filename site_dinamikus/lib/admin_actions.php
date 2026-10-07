@@ -1569,7 +1569,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
         case 'setting.save': {
             if (!auth_is('admin')) { flash('err', t('flash.setting.save.ehhez-adminisztratori-jog')); back(['p' => 'settings']); }
             $keys = ['site_title_hu', 'site_title_en', 'site_title_de',
-                     'mt_provider', 'mt_endpoint', 'mt_key', 'mt_auto', 'mt_glossary',
+                     'mt_provider', 'mt_endpoint', 'mt_key', 'mt_auto', 'mt_glossary', 'mt_model',
                      'highlight_days', 'export_company', 'export_footer'];
             // a kipipalatlan jelolonegyzet nem kerul be a POST-ba
             if (isset($_POST['mt_provider'])) { $_POST['mt_auto'] = isset($_POST['mt_auto']) ? '1' : '0'; }
