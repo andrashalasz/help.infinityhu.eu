@@ -10,7 +10,7 @@ Hasznalat:  python3 tools/egyszerusit.py <fajl> [--max-hossz N] [--proba]
 """
 import sys, re, io
 
-FEJ = re.compile(r'<h([23])[^>]*>(.*?)</h\1>', re.S)
+FEJ = re.compile(r'<h([234])[^>]*>(.*?)</h\1>', re.S)
 
 def szakaszok(s):
     """A h2/h3 cimsorok mellett a hozzajuk tartozo torzs."""
@@ -58,11 +58,12 @@ def alakit(s, max_hossz=400, min_db=3):
     cserek = []          # (eleje, vege, uj_szoveg)
     i = 0
     while i < len(sz):
-        if sz[i]['szint'] != 3:
+        if sz[i]['szint'] not in (3, 4):
             i += 1; continue
+        szint = sz[i]['szint']
         futam = []
         j = i
-        while j < len(sz) and sz[j]['szint'] == 3:
+        while j < len(sz) and sz[j]['szint'] == szint:
             r = rovid(sz[j]['torzs'], max_hossz)
             if r is None: break
             futam.append((sz[j]['cim'], r)); j += 1
@@ -81,10 +82,13 @@ if __name__ == '__main__':
     if '--max-hossz' in sys.argv:
         max_hossz = int(sys.argv[sys.argv.index('--max-hossz')+1])
     s = io.open(fajl, encoding='utf-8').read()
-    elotte = {h: len(re.findall(r'<%s[ >]' % h, s)) for h in ('h2','h3')}
+    elotte = {h: len(re.findall(r'<%s[ >]' % h, s)) for h in ('h2','h3','h4')}
     uj, db, _ = alakit(s, max_hossz)
-    utana = {h: len(re.findall(r'<%s[ >]' % h, uj)) for h in ('h2','h3')}
+    # ami h4 megis maradt, egy szinttel feljebb kerul - harom szint eleg
+    uj = uj.replace('<h4 id=', '<h3 id=').replace('</h4>', '</h3>')
+    utana = {h: len(re.findall(r'<%s[ >]' % h, uj)) for h in ('h2','h3','h4')}
     if '--proba' not in sys.argv:
         io.open(fajl, 'w', encoding='utf-8').write(uj)
-    print('  %-40s h3: %d -> %d   (%d tablazat keszult)'
-          % (fajl.split('/')[-1], elotte['h3'], utana['h3'], db))
+    print('  %-36s h3: %d -> %d | h4: %d -> %d   (%d tabla)'
+          % (fajl.split('/')[-1], elotte['h3'], utana['h3'],
+             elotte['h4'], utana['h4'], db))
