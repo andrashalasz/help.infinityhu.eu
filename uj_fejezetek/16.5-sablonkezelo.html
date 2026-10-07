@@ -1,5 +1,3 @@
-<h2 id="sablonkezelo">Sablonkezelő</h2>
-
 <p>A Sablonkezelő a pénzügyi, kereskedelmi és raktári bizonylatok
 sablonjait kezeli: a számláét, az árajánlatét, a megrendelését, a fizetési
 felszólításét. A sablonok a bizonylat létrehozásakor automatikusan
@@ -19,7 +17,7 @@ jogosultságod — kérd a rendszergazdát.</p>
 
 <p><strong>Figyelem:</strong>a Sablonkezelőben beállított módosítás csak a jövőbeli dokumentumokat befolyásolja. A már kiállított és archivált PDF-ek nem változnak — azok az akkori sablon szerint maradnak. A számlasablonnál NAV-kompatibilitás és az ÁFA tv. 169.§ szerinti tartalmi követelmények kötelezőek: ne hagyj le kötelező mezőt.</p>
 
-<h3 id="a-felulet-felepitese">A felület felépítése</h3>
+<h2 id="a-felulet-felepitese">A felület felépítése</h2>
 
 <p>A Sablonkezelő felülete három területből áll:</p>
 
@@ -50,13 +48,13 @@ jogosultságod — kérd a rendszergazdát.</p>
 
 <p>Minden csúszka, pipa és színválasztó azonnal frissíti az előnézetet. Nincs külön Alkalmaz gomb — az előnézet a tényleges megjelenés.</p>
 
-<h3 id="az-elso-sablonmegnyitas">Az első sablonmegnyitás</h3>
+<h2 id="az-elso-sablonmegnyitas">Az első sablonmegnyitás</h2>
 
 <p>Nézzük végig, hogyan nyitsz meg egy sablont és csinálsz egy egyszerű módosítást.</p>
 
 <ul>
 
-<li><p>Nyisd meg a Rendszer menü → Nyomtatási sablonok menüpontot.</p></li>
+<li><p>Nyisd meg a Rendszer → Sablonkezelő menüpontot.</p></li>
 
 <li><p>Válaszd ki a felső sávban lévő Sablon legördülőből azt a dokumentumtípust, amin dolgozni szeretnél (például Számla).</p></li>
 
@@ -72,7 +70,7 @@ jogosultságod — kérd a rendszergazdát.</p>
 
 <p><strong>Nyelvi előnézet:</strong>a felső nyelvválasztóval (HU / EN / DE) megnézheted, hogy néz ki a sablon az adott nyelven. Ez csak az előnézetet befolyásolja — a sablon mindhárom nyelven egyszerre érvényes. Éles kiállításkor a rendszer a vevő törzsadatában tárolt nyelv alapján választja ki a megjelenítést.</p>
 
-<h3 id="sablontipusok">Sablontípusok</h3>
+<h2 id="sablontipusok">Sablontípusok</h2>
 
 <p>A felső sávban lévő Sablon legördülőben az alábbi dokumentumtípusok közül választhatsz. Minden típusnak saját sablonja van.</p>
 
@@ -149,7 +147,7 @@ jogosultságod — kérd a rendszergazdát.</p>
 </tbody>
 </table>
 
-<h3 id="blokkok-a-sablon-epitoelemei">Blokkok — a sablon építőelemei</h3>
+<h2 id="blokkok-a-sablon-epitoelemei">Blokkok — a sablon építőelemei</h2>
 
 <p>Egy sablon kisebb, önálló részekből (blokkokból) áll. Minden blokk külön kijelölhető és külön szerkeszthető. A blokkok típusa a kódelőtagjukból látszik:</p>
 
@@ -218,7 +216,7 @@ jogosultságod — kérd a rendszergazdát.</p>
 </tbody>
 </table>
 
-<h4 id="blokk-kijelolese">Blokk kijelölése</h4>
+<h3 id="blokk-kijelolese">Blokk kijelölése</h3>
 
 <ul>
 
@@ -230,37 +228,34 @@ jogosultságod — kérd a rendszergazdát.</p>
 
 </ul>
 
-<h3 id="a-tulajdonsagpanel">A tulajdonságpanel</h3>
+<h2 id="a-tulajdonsagpanel">A tulajdonságpanel</h2>
 
-<p>A kijelölt blokk tulajdonságai szekciókba vannak csoportosítva. A szekciók blokkonként eltérnek — nem minden blokknak van mindegyik szekciója.</p>
+<p>Ha kijelölsz egy blokkot, a jobb oldali panelen megjelennek a
+beállításai. A panel szekciói mindig ugyanazok — csak az aktuális blokknál
+értelmes szekciók aktívak.</p>
 
-<h4 id="elrendezes">Elrendezés</h4>
+<table class="erp-table">
+<thead><tr class="header">
+<th><strong>Szekció</strong></th>
+<th><strong>Mit állítasz vele</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd"><td><strong>Elrendezés</strong></td>
+<td>A blokk helye és szélessége a lapon.</td></tr>
+<tr class="even"><td><strong>Oszlopok</strong></td>
+<td>Tételtáblánál: melyik oszlop látszik és milyen sorrendben.</td></tr>
+<tr class="odd"><td><strong>Méret és szín</strong></td>
+<td>Betűméret, betűszín, valamint a félkövér, dőlt és aláhúzott formázás.</td></tr>
+<tr class="even"><td><strong>Igazítás</strong></td>
+<td>Balra, középre, jobbra.</td></tr>
+<tr class="odd"><td><strong>Megjelenítés</strong></td>
+<td>A blokk látszik-e egyáltalán a kész bizonylaton.</td></tr>
+<tr class="even"><td><strong>Keret és háttér</strong></td>
+<td>Keretvonal és háttérszín.</td></tr>
+</tbody>
+</table>
 
-<p>A tételtáblázat blokkoknál (b-items...) itt válthatsz Klasszikus és Tételenkénti nézet között, és állíthatod az első oszlop (tétel megnevezés) szélességét csúszkával.</p>
-
-<h4 id="oszlopok">Oszlopok</h4>
-
-<p>A tételtáblázat blokkoknál itt kapcsolhatod be vagy ki az egyes oszlopokat, és itt rendezheted őket drag-and-dropppal. Minden oszlop egy húzható sor: balra a fogantyú ikon, jobbra a be/ki kapcsoló.</p>
-
-<h4 id="meret-es-szin">Méret és szín</h4>
-
-<p>Betűméretek pixelben, mellettük színválasztó, és B / I / U gombok (félkövér, dőlt, aláhúzott).</p>
-
-<p><strong>Fontos:</strong>minden Fnt (betűméret) mező MIND a méretet, MIND a színt tartalmazza. Ha emellett van külön Clr (szín) mező is, az egy másik tulajdonságra vonatkozik (például külön szöveg szín és külön keret szín).</p>
-
-<h4 id="igazitas">Igazítás</h4>
-
-<p>A legtöbb blokknál beállítható a Szöveg igazítás bal / közép / jobb értékekre. Ez a blokkon belüli tartalom helyét befolyásolja, nem a blokk oldalon belüli pozícióját.</p>
-
-<h4 id="megjelenites">Megjelenítés</h4>
-
-<p>Blokkra jellemző kapcsolók: EU-számla jelölés, Számlakép megjelenítése, Dokumentummásolat jelölés, Szállítási cím és hasonlók.</p>
-
-<h4 id="keret-es-hatter">Keret és háttér</h4>
-
-<p>Keretes blokkoknál (például fizetési emlékeztető figyelmeztetés doboza vagy tartozás-összesítő) itt állíthatod a háttér és keret színét.</p>
-
-<h3 id="oszlopkezeles-a-teteltablakban">Oszlopkezelés a tételtáblákban</h3>
+<h2 id="oszlopkezeles-a-teteltablakban">Oszlopkezelés a tételtáblákban</h2>
 
 <p>A tételtáblázat (b-items...) blokkokban az oszlopokat drag-and-droppal rendezheted, és egyenként kapcsolhatod ki vagy be. Ez az összes alábbi blokkra érvényes:</p>
 
@@ -288,7 +283,7 @@ jogosultságod — kérd a rendszergazdát.</p>
 
 </ul>
 
-<h4 id="oszlop-be-vagy-kikapcsolasa">Oszlop be- vagy kikapcsolása</h4>
+<h3 id="oszlop-be-vagy-kikapcsolasa">Oszlop be- vagy kikapcsolása</h3>
 
 <ul>
 
@@ -300,7 +295,7 @@ jogosultságod — kérd a rendszergazdát.</p>
 
 </ul>
 
-<h4 id="oszlopok-sorrendjenek-modositasa">Oszlopok sorrendjének módosítása</h4>
+<h3 id="oszlopok-sorrendjenek-modositasa">Oszlopok sorrendjének módosítása</h3>
 
 <p>A sor bal oldalán található fogantyú ikonra kattints, és tartsd lenyomva. Húzd a sort fel vagy le a kívánt pozícióba. Az előnézeten azonnal átrendeződnek az oszlopok.</p>
 
@@ -316,19 +311,19 @@ jogosultságod — kérd a rendszergazdát.</p>
 
 </ul>
 
-<h3 id="elrendezes-klasszikus-vagy-tetelenkenti">Elrendezés — Klasszikus vagy Tételenkénti</h3>
+<h2 id="elrendezes-klasszikus-vagy-tetelenkenti">Elrendezés — Klasszikus vagy Tételenkénti</h2>
 
 <p>Minden tételtáblázat kétféle elrendezésben jeleníthető meg.</p>
 
-<h4 id="klasszikus">Klasszikus</h4>
+<h3 id="klasszikus">Klasszikus</h3>
 
 <p>Hagyományos táblázat: minden tétel egy sorban, az oszlopok egymás mellett. Ha sok oszlopot kapcsolsz be (mennyiség + egységár + nettó + ÁFA% + ÁFA összeg + bruttó), a tétel neve mellé kevés hely marad. Rövid tételek esetén jó.</p>
 
-<h4 id="tetelenkenti-stacked">Tételenkénti (stacked)</h4>
+<h3 id="tetelenkenti-stacked">Tételenkénti (stacked)</h3>
 
 <p>Minden tétel két sorban: felül a megnevezés teljes szélességben, félkövéren, enyhén színes háttéren; alatta az ÁFA és ár adatok. Hosszú tételneveknél és részletes leírásoknál áttekinthetőbb.</p>
 
-<h4 id="valtas-a-ket-elrendezes-kozott">Váltás a két elrendezés között</h4>
+<h3 id="valtas-a-ket-elrendezes-kozott">Váltás a két elrendezés között</h3>
 
 <ul>
 
@@ -342,9 +337,9 @@ jogosultságod — kérd a rendszergazdát.</p>
 
 <p>Ajánlás: ajánlatokhoz és teljesítési igazolásokhoz a Tételenkénti nézet elegánsabb. Számlákhoz a Klasszikus a megszokott. Szállítólevélhez és leltárjelentéshez a Klasszikus általában elegendő.</p>
 
-<h3 id="szinek-meretek-igazitas">Színek, méretek, igazítás</h3>
+<h2 id="szinek-meretek-igazitas">Színek, méretek, igazítás</h2>
 
-<h4 id="betumeret-es-szin-allitasa">Betűméret és szín állítása</h4>
+<h3 id="betumeret-es-szin-allitasa">Betűméret és szín állítása</h3>
 
 <ul>
 
@@ -358,7 +353,7 @@ jogosultságod — kérd a rendszergazdát.</p>
 
 </ul>
 
-<h4 id="szoveg-igazitas-allitasa">Szöveg igazítás állítása</h4>
+<h3 id="szoveg-igazitas-allitasa">Szöveg igazítás állítása</h3>
 
 <ul>
 
@@ -370,11 +365,11 @@ jogosultságod — kérd a rendszergazdát.</p>
 
 </ul>
 
-<h3 id="fizetesi-emlekezteto-es-felszolitas-kulonlegessegei">Fizetési emlékeztető és felszólítás különlegességei</h3>
+<h2 id="fizetesi-emlekezteto-es-felszolitas-kulonlegessegei">Fizetési emlékeztető és felszólítás különlegességei</h2>
 
 <p>A fizetési emlékeztető (udvarias hangnem) és fizetési felszólítás (határozott hangnem) sablonok több egyedi blokkot használnak. Ezek beállításai eltérnek a számlasablontól.</p>
 
-<h4 id="szamlalista-b-payment-debt-blokk">Számlalista — b-payment-debt blokk</h4>
+<h3 id="szamlalista-b-payment-debt-blokk">Számlalista — b-payment-debt blokk</h3>
 
 <p>A tartozó számla vagy számlák adatait megjelenítő, sárga keretes blokk. Kétféle módban működhet.</p>
 
@@ -386,7 +381,7 @@ jogosultságod — kérd a rendszergazdát.</p>
 
 </ul>
 
-<h4 id="mod-valtasa">Mód váltása</h4>
+<h3 id="mod-valtasa">Mód váltása</h3>
 
 <ul>
 
@@ -398,7 +393,7 @@ jogosultságod — kérd a rendszergazdát.</p>
 
 </ul>
 
-<h4 id="szamlalista-blokk-beallitasai">Számlalista blokk beállításai</h4>
+<h3 id="szamlalista-blokk-beallitasai">Számlalista blokk beállításai</h3>
 
 <table class="erp-table">
 <thead><tr class="header">
@@ -445,11 +440,11 @@ jogosultságod — kérd a rendszergazdát.</p>
 </tbody>
 </table>
 
-<h4 id="jogi-figyelmeztetes-b-payment-warning-blokk">Jogi figyelmeztetés — b-payment-warning blokk</h4>
+<h3 id="jogi-figyelmeztetes-b-payment-warning-blokk">Jogi figyelmeztetés — b-payment-warning blokk</h3>
 
 <p>Piros keretes doboz, benne figyelmeztető cím és a jogi szöveg. Jellemzően a felszólítás sablonban jelenik meg. A szöveg szabadon átírható — jogi hitelessége miatt javasolt szakemberrel egyeztetni.</p>
 
-<h4 id="jogi-szoveg-modositasa">Jogi szöveg módosítása</h4>
+<h3 id="jogi-szoveg-modositasa">Jogi szöveg módosítása</h3>
 
 <ul>
 
@@ -467,11 +462,11 @@ jogosultságod — kérd a rendszergazdát.</p>
 
 </ul>
 
-<h3 id="elonezet-es-pdf-export">Előnézet és PDF export</h3>
+<h2 id="elonezet-es-pdf-export">Előnézet és PDF export</h2>
 
 <p>Az előnézet pontosan ugyanazt mutatja, mint a tényleges PDF-export. Ha az előnézeten jól néz ki, a PDF-ben is jól lesz.</p>
 
-<h4 id="pdf-teszt-export-keszitese">PDF teszt-export készítése</h4>
+<h3 id="pdf-teszt-export-keszitese">PDF teszt-export készítése</h3>
 
 <ul>
 
@@ -485,9 +480,9 @@ jogosultságod — kérd a rendszergazdát.</p>
 
 <p>Ha az előnézet és a PDF eltér egymástól, az hiba (bug). Jelezd a fejlesztőknek a sablontípus és a konkrét eltérés megjelölésével.</p>
 
-<h3 id="mentes-verziozas-visszaallas">Mentés, verziózás, visszaállás</h3>
+<h2 id="mentes-verziozas-visszaallas">Mentés, verziózás, visszaállás</h2>
 
-<h4 id="modositasok-mentese">Módosítások mentése</h4>
+<h3 id="modositasok-mentese">Módosítások mentése</h3>
 
 <ul>
 
@@ -499,7 +494,7 @@ jogosultságod — kérd a rendszergazdát.</p>
 
 </ul>
 
-<h4 id="uj-verzio-keszitese-mentes-maskent">Új verzió készítése (Mentés másként)</h4>
+<h3 id="uj-verzio-keszitese-mentes-maskent">Új verzió készítése (Mentés másként)</h3>
 
 <ul>
 
@@ -513,15 +508,15 @@ jogosultságod — kérd a rendszergazdát.</p>
 
 <p>Használd ezt a funkciót nagyobb átszabás előtt: így a jelenlegi állapotból biztonsági mentés lesz, és ha bármit elrontasz, a kimentett verzióból visszatölthetsz.</p>
 
-<h4 id="visszavonas-es-ujra">Visszavonás és újra</h4>
+<h3 id="visszavonas-es-ujra">Visszavonás és újra</h3>
 
 <p>A felső sáv nyíl gombjaival (balra: visszavonás, jobbra: újra) lépésenként visszavonhatod vagy visszaállíthatod a módosításokat. A visszavonás csak mentés előtt működik — mentés után az előző állapotra csak egy korábban elmentett verzióból tudsz visszatérni.</p>
 
-<h3 id="nyelvi-beallitasok">Nyelvi beállítások</h3>
+<h2 id="nyelvi-beallitasok">Nyelvi beállítások</h2>
 
 <p>Az Infinity ERP háromnyelvű rendszer: magyar, angol és német kimenő dokumentumokat egyaránt támogat. A sablonokban minden feliratnak van mindhárom nyelven változata.</p>
 
-<h4 id="nyelvi-elonezet">Nyelvi előnézet</h4>
+<h3 id="nyelvi-elonezet">Nyelvi előnézet</h3>
 
 <ul>
 
@@ -535,208 +530,99 @@ jogosultságod — kérd a rendszergazdát.</p>
 
 <p>Éles dokumentum-kiállításkor a rendszer a partner (vevő) törzsadatában tárolt nyelv alapján választja ki, melyik nyelven jelenjen meg a felirat. A sablonbeállítások (betűméret, szín, elrendezés) nyelvtől függetlenül érvényesek.</p>
 
-<h4 id="ketnyelvu-oszlopfejlecek">Kétnyelvű oszlopfejlécek</h4>
+<h3 id="ketnyelvu-oszlopfejlecek">Kétnyelvű oszlopfejlécek</h3>
 
 <p>Néhány blokkban (ÁFA-összesítő, pénznem-info) a fejlécek kétnyelvűek: a magyar felirat alatt angolul is megjelenik, például "ÁFA kód / VAT code". Ez automatikus az exportsablonoknál.</p>
 
-<h3 id="gyakori-feladatok">Gyakori feladatok</h3>
-
-<h4 id="ceg-logo-csereje-a-szamlasablonon">Cég logó cseréje a számlasablonon</h4>
-
-<ul>
-
-<li><p>Nyisd meg a Rendszer menü → Nyomtatási sablonok menüpontot.</p></li>
-
-<li><p>Válaszd a Számla sablont a felső sáv legördülőjéből.</p></li>
-
-<li><p>Kattints a Logó blokkra az előnézeten (jellemzően bal felső sarok).</p></li>
-
-<li><p>A jobboldali panelen keresd a Logó feltöltése vagy Logó URL mezőt.</p></li>
-
-<li><p>Töltsd fel az új képet (PNG vagy SVG ajánlott, maximum 500 × 200 px).</p></li>
-
-<li><p>Állítsd be a megjelenítendő méretet a csúszkával.</p></li>
-
-<li><p>Nyomd meg a Mentés gombot.</p></li>
-
-</ul>
-
-<h4 id="afa-osszesito-betumeretenek-modositasa">ÁFA-összesítő betűméretének módosítása</h4>
-
-<ul>
-
-<li><p>Nyisd meg a Számla sablont.</p></li>
-
-<li><p>Kattints az ÁFA-összesítő blokkra (b-vat).</p></li>
-
-<li><p>A jobboldali panelen keresd a Méret és szín szekciót.</p></li>
-
-<li><p>Állítsd be a Fejléc méret értéket (jellemző: 10 px).</p></li>
-
-<li><p>Állítsd be az Adatok méret értéket (jellemző: 8 px).</p></li>
-
-<li><p>Nyomd meg a Mentés gombot.</p></li>
-
-</ul>
-
-<h4 id="szallitolevelhez-ar-oszlopok-hozzaadasa">Szállítólevélhez ár-oszlopok hozzáadása</h4>
-
-<ul>
-
-<li><p>Nyisd meg a Szállítólevél sablont.</p></li>
-
-<li><p>Kattints a tételtáblára (b-items-szl).</p></li>
-
-<li><p>A jobboldali panelen keresd az Oszlopok szekciót.</p></li>
-
-<li><p>Kapcsold be az Egységár, Nettó érték, ÁFA%, ÁFA összeg, Bruttó kapcsolókat egyenként.</p></li>
-
-<li><p>Ha szükséges, húzd át az oszlopok sorrendjét drag-and-droppal.</p></li>
-
-<li><p>Nyomd meg a Mentés gombot.</p></li>
-
-</ul>
-
-<h4 id="ajanlat-kepenek-pozicioja">Ajánlat képének pozíciója</h4>
-
-<ul>
-
-<li><p>Nyisd meg az Ajánlat sablont.</p></li>
-
-<li><p>Kattints a tételtáblára (b-items-offer).</p></li>
-
-<li><p>A jobboldali panelen keresd a Kép szekciót.</p></li>
-
-<li><p>Válassz a 3 pozíció közül: Bal, Közép vagy Jobb.</p></li>
-
-<li><p>Állítsd be a kép szélességét csúszkával (80–280 px között).</p></li>
-
-<li><p>Nyomd meg a Mentés gombot.</p></li>
-
-</ul>
-
-<h4 id="teljesitesi-igazolashoz-afa-oszlopok-kikapcsolasa">Teljesítési igazoláshoz ÁFA oszlopok kikapcsolása</h4>
-
-<ul>
-
-<li><p>Nyisd meg a Teljesítési igazolás sablont.</p></li>
-
-<li><p>Kattints a tételtáblára (b-items-teljesit).</p></li>
-
-<li><p>A jobboldali panelen keresd az Oszlopok szekciót.</p></li>
-
-<li><p>Kapcsold ki az ÁFA összeg, Bruttó és ÁFA% kapcsolókat külön-külön.</p></li>
-
-<li><p>Nyomd meg a Mentés gombot. Látható marad: Mennyiség, Egységár, Nettó érték.</p></li>
-
-</ul>
-
-<h4 id="leltarjelentes-osszesitojenek-testreszabasa">Leltárjelentés összesítőjének testreszabása</h4>
-
-<ul>
-
-<li><p>Nyisd meg a Leltárjelentés sablont.</p></li>
-
-<li><p>Kattints a Leltár összesítő blokkra (b-leltar-summary).</p></li>
-
-<li><p>A jobboldali panelen keresd a Megjelenített összegek szekciót.</p></li>
-
-<li><p>Kapcsold be vagy ki a Könyv szerinti összesen, Szemrevételezett összesen, Különbözet összesen kapcsolókat egyenként.</p></li>
-
-<li><p>Nyomd meg a Mentés gombot.</p></li>
-
-</ul>
-
-<h4 id="jovairas-tetelsorainak-piros-szinezese">Jóváírás tételsorainak piros színezése</h4>
-
-<ul>
-
-<li><p>Nyisd meg a Jóváírás sablont.</p></li>
-
-<li><p>Kattints a tételtáblára (b-items-cn).</p></li>
-
-<li><p>A jobboldali panelen keresd a Méret és szín szekciót.</p></li>
-
-<li><p>Az Adatok színválasztóra kattints és válaszd a #DC2626 pirosat (vagy írd be hex kódként).</p></li>
-
-<li><p>Nyomd meg a Mentés gombot.</p></li>
-
-</ul>
-
-<h3 id="ha-valami-nem-stimmel">Ha valami nem stimmel</h3>
-
-<h4 id="nem-jelennek-meg-a-modositasaim">Nem jelennek meg a módosításaim</h4>
-
-<ul>
-
-<li><p>Ellenőrizd, hogy nyomtál-e Mentés gombot — mentés nélkül a módosítások nem élnek.</p></li>
-
-<li><p>Frissítsd a böngészőt a Ctrl+Shift+R billentyűkkel — a cache néha régi sablont tárol.</p></li>
-
-<li><p>Ellenőrizd a felső sávban, hogy a megfelelő sablontípust szerkeszted-e. A Számla, Előlegszámla és Jóváírás külön sablonok.</p></li>
-
-<li><p>Nyiss egy új dokumentumot a rendszerben, és ellenőrizd, az új sablon szerint készül-e. A már kiállított PDF-ek nem változnak visszamenőleg.</p></li>
-
-</ul>
-
-<h4 id="a-tulajdonsagpanel-ures">A tulajdonságpanel üres</h4>
-
-<ul>
-
-<li><p>Kattints egyszer egy blokkra az előnézeten. A tulajdonságpanel csak akkor mutat beállításokat, ha egy blokk ki van jelölve.</p></li>
-
-<li><p>Ellenőrizd, hogy a blokk kékkel keretezve van-e. Ha nem, nem az adott blokk van kijelölve.</p></li>
-
-<li><p>Ha ez sem segít, frissítsd a böngészőt a Ctrl+Shift+R billentyűkkel.</p></li>
-
-</ul>
-
-<h4 id="nem-engedi-menteni">Nem engedi menteni</h4>
-
-<ul>
-
-<li><p>Ellenőrizd a jobb felső sarokban megjelenő hibaüzenetet. Ez tartalmazza a konkrét okot.</p></li>
-
-<li><p>Ha a sablon kötelező mezőt nem tartalmaz (például cégnév vagy ÁFA-összesítő), a mentés nem engedélyezett. Ellenőrizd, hogy minden blokk a helyén van-e.</p></li>
-
-<li><p>Ha jogosultsági hibát kapsz, kérd a rendszergazdát. A Sablonkezelő rendszergazdai jogot igényel.</p></li>
-
-<li><p>Ha hálózati hibát jelez, ellenőrizd az internetkapcsolatot, és próbáld újra.</p></li>
-
-</ul>
-
-<h4 id="a-drag-and-drop-nem-mukodik">A drag-and-drop nem működik</h4>
-
-<ul>
-
-<li><p>Ellenőrizd, hogy a fogantyú ikonra kattintasz-e, nem a kapcsolóra. A fogantyú a sor bal oldalán található.</p></li>
-
-<li><p>Fogd meg az egérgombot és tartsd lenyomva, húzd a célpozícióba, csak ott engedd el. Ha korán elengeded, a sor nem mozdul.</p></li>
-
-<li><p>Használj naprakész Chrome, Edge vagy Firefox böngészőt. Régebbi böngészőkben a drag-and-drop nem minden esetben működik.</p></li>
-
-</ul>
-
-<h4 id="a-pdf-export-ures-vagy-hibas">A PDF export üres vagy hibás</h4>
-
-<ul>
-
-<li><p>Ellenőrizd az előnézetet. Ha az előnézeten jól néz ki, a PDF-nek is jónak kell lennie.</p></li>
-
-<li><p>Nagy sablonoknál (sok tételsor) a PDF generálás eltarthat néhány másodpercig. Várj.</p></li>
-
-<li><p>Ha az előnézet jó, de a PDF rossz, az hiba (bug). Jelezd a fejlesztőknek a sablontípus és a konkrét eltérés megjelölésével.</p></li>
-
-</ul>
-
-<h4 id="a-szinvaltas-vagy-meretvaltas-nem-ervenyesul">A színváltás vagy méretváltás nem érvényesül</h4>
-
-<ul>
-
-<li><p>Ellenőrizd, hogy a megfelelő mezőt módosítottad-e. A Méret és szín szekcióban a Fnt mezők beépített színválasztóval rendelkeznek. Ezen felül lehet külön Clr mező is más tulajdonsághoz.</p></li>
-
-<li><p>Egyes blokkoknál a szín örökölhető tulajdonság. Például a Tartozás összesen szín alapból a Tartozás összege színt veszi fel, ha nincs külön beállítva.</p></li>
-
-<li><p>Ellenőrizd, hogy mentetted-e a módosítást. A felső sáv Mentés gombját meg kell nyomni.</p></li>
-
-</ul>
+<h2 id="gyakori-feladatok">Gyakori feladatok</h2>
+
+<p>A legtöbb feladat <strong>ugyanazt a négy lépést</strong> követi: nyisd
+meg a sablont a felső sáv legördülőjéből, kattints a módosítandó blokkra az
+előnézeten, állítsd be az értéket a jobb oldali panelen, majd
+<strong>Mentés</strong>. Az alábbi táblázat csak azt mondja meg, hol keresd
+a dolgokat.</p>
+
+<table class="erp-table">
+<thead><tr class="header">
+<th><strong>Mit akarsz csinálni</strong></th>
+<th><strong>Sablon és blokk</strong></th>
+<th><strong>Hol állítod</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Cég logó cseréje</td>
+<td>Számla → <em>Logó</em> blokk (bal felső sarok)</td>
+<td><em>Logó feltöltése</em> mező. PNG vagy SVG ajánlott, legfeljebb
+500 × 200 px. A méretet csúszkával állítod.</td>
+</tr>
+<tr class="even">
+<td>ÁFA-összesítő betűmérete</td>
+<td>Számla → <em>ÁFA-összesítő</em> blokk</td>
+<td><em>Méret és szín</em> szekció. Jellemző érték: fejléc 10 px, adatok
+8 px.</td>
+</tr>
+<tr class="odd">
+<td>Ár-oszlopok a szállítólevélre</td>
+<td>Szállítólevél → tételtábla</td>
+<td><em>Oszlopok</em> szekció: kapcsold be az Egységár, Nettó érték, ÁFA%,
+ÁFA összeg és Bruttó oszlopot.</td>
+</tr>
+<tr class="even">
+<td>Ajánlat képének pozíciója</td>
+<td>Ajánlat → tételtábla</td>
+<td><em>Kép</em> szekció: bal, közép vagy jobb, a szélesség 80–280 px
+között.</td>
+</tr>
+<tr class="odd">
+<td>ÁFA-oszlopok levétele a teljesítési igazolásról</td>
+<td>Teljesítési igazolás → tételtábla</td>
+<td><em>Oszlopok</em> szekció: kapcsold ki az ÁFA összeg, Bruttó és ÁFA%
+oszlopot. Marad a Mennyiség, Egységár és Nettó érték.</td>
+</tr>
+<tr class="even">
+<td>Leltárjelentés összesítője</td>
+<td>Leltárjelentés → összesítő blokk</td>
+<td><em>Oszlopok</em> és <em>Méret és szín</em> szekció.</td>
+</tr>
+<tr class="odd">
+<td>Jóváírás tételsorai pirossal</td>
+<td>Jóváírás → tételtábla</td>
+<td><em>Méret és szín</em> szekció: állítsd a betűszínt pirosra.</td>
+</tr>
+</tbody>
+</table>
+
+<div class="call warn">
+<p>A számlasablonnál a NAV-kompatibilitás és az áfatörvény szerinti kötelező
+tartalmi elemek nem hagyhatók el. Oszlopot vagy blokkot csak akkor kapcsolj
+ki, ha biztos vagy benne, hogy nem kötelező.</p>
+</div>
+
+<h2 id="ha-valami-nem-stimmel">Ha valami nem stimmel</h2>
+
+<table class="erp-table">
+<thead><tr class="header">
+<th><strong>Mit tapasztalsz</strong></th>
+<th><strong>Mit tegyél</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd"><td>Nem jelennek meg a módosításaim</td>
+<td>A már kiállított bizonylatok nem változnak — a sablon csak a
+jövőbeliekre hat. Készíts új teszt-bizonylatot.</td></tr>
+<tr class="even"><td>A tulajdonságpanel üres</td>
+<td>Nincs kijelölt blokk. Kattints egy blokkra a sablonon.</td></tr>
+<tr class="odd"><td>Nem engedi menteni</td>
+<td>Kötelező mező hiányzik a sablonból, vagy nincs jogosultságod. A
+számlasablonnál a kötelező tartalmi elemek nem hagyhatók el.</td></tr>
+<tr class="even"><td>A drag-and-drop nem működik</td>
+<td>Zárolt a blokk, vagy a böngésző nagyítása nem 100%. Állítsd vissza a
+nagyítást, és töltsd újra az oldalt.</td></tr>
+<tr class="odd"><td>A PDF export üres vagy hibás</td>
+<td>Olyan blokk van a sablonban, amihez nincs adat a teszt-bizonylaton.
+Próbáld másik bizonylattal.</td></tr>
+<tr class="even"><td>A színváltás vagy méretváltás nem érvényesül</td>
+<td>Nem a megfelelő blokk van kijelölve, vagy a beállítás egy fölérendelt
+blokktól öröklődik. Jelöld ki pontosan azt az elemet, amin változtatni
+akarsz.</td></tr>
+</tbody>
+</table>
