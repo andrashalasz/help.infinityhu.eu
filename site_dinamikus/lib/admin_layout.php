@@ -556,6 +556,69 @@ function slug_follow_numbers(PDO $db, array $regiSzamok): int
 }
 
 /**
+ * A SZOVEGBE AGYAZOTT cimsorszamok kovessek az uj fejezetszamot.
+ *
+ * A cimsorok elejen a szam egy <span class="hno"> elemben el, a body_html-ben
+ * leirva (lasd docx.php es az admin.js szamozoja). Ha egy fejezet uj szamot
+ * kap - mert a fofejezetet atszamoztuk vagy torolt fofejezet utan felzarkozik
+ * -, a chapter_no es a slug megvaltozik, de ezek a span-ok nem: a 12.11-es
+ * fejezet tovabbra is "10.11.1"-et irna ki a cimsoraiban.
+ *
+ * Ezert minden erintett fejezetben atirjuk a szamok ELSO tagjat a regirol az
+ * ujra. Csak az elso tagot: a fejezeten BELULI sorszamozas (11.1, 11.2, ...)
+ * valtozatlan marad, hiszen a fejezet tartalma nem rendezodott at.
+ *
+ * A vazlatot (draft_html) is viszi, kulonben a kozzetetel visszahozna a regi
+ * szamokat.
+ *
+ * @param array $regiSzamok  fejezet id => a REGI chapter_no
+ * @return int ahany sort atirt
+ */
+function hno_follow_numbers(PDO $db, array $regiSzamok): int
+{
+    if (!$regiSzamok) { return 0; }
+    $in   = implode(',', array_map('intval', array_keys($regiSzamok)));
+    $rows = $db->query("SELECT id, chapter_no, body_html, draft_html
+                          FROM help_article WHERE id IN ($in)")->fetchAll();
+
+    $upd = $db->prepare('UPDATE help_article SET body_html = ?, draft_html = ? WHERE id = ?');
+    $n = 0;
+    foreach ($rows as $r) {
+        $id   = (int)$r['id'];
+        $regi = (string)($regiSzamok[$id] ?? '');
+        $uj   = (string)$r['chapter_no'];
+        if ($regi === '' || $uj === '' || $regi === $uj) { continue; }
+
+        // csak a fofejezet-tag erdekel: "10.11" -> "10", "12.11" -> "12"
+        $regiFo = explode('.', $regi)[0];
+        $ujFo   = explode('.', $uj)[0];
+        if ($regiFo === $ujFo || !ctype_digit($regiFo) || !ctype_digit($ujFo)) { continue; }
+
+        $csere = static function (?string $html) use ($regiFo, $ujFo): ?string {
+            if ($html === null || $html === '') { return $html; }
+            return preg_replace_callback(
+                '~<span class="hno">\s*([0-9]+(?:\.[0-9]+)*)\s*</span>~',
+                static function (array $m) use ($regiFo, $ujFo): string {
+                    $tagok = explode('.', $m[1]);
+                    if ($tagok[0] !== $regiFo) { return $m[0]; }
+                    $tagok[0] = $ujFo;
+                    return '<span class="hno">' . implode('.', $tagok) . '</span>';
+                },
+                $html
+            );
+        };
+
+        $ujBody  = $csere((string)$r['body_html']);
+        $ujDraft = $csere($r['draft_html'] === null ? null : (string)$r['draft_html']);
+        if ($ujBody === (string)$r['body_html'] && $ujDraft === $r['draft_html']) { continue; }
+
+        $upd->execute([$ujBody, $ujDraft, $id]);
+        $n++;
+    }
+    return $n;
+}
+
+/**
  * A FOFEJEZETEK szamozasanak hezagmentesitese.
  *
  * Ha kitorolsz egy fofejezetet (pl. a 14-est), a tobbi szama zarkozzon fel:
@@ -627,6 +690,7 @@ function renumber_modules(PDO $db): int
         }
     }
     slug_follow_numbers($db, $erintett);
+    hno_follow_numbers($db, $erintett);
 
     return $n;
 }
@@ -743,6 +807,7 @@ function renumber_module(PDO $db, int $moduleId, string $lang): int
         foreach ($q->fetchAll(PDO::FETCH_COLUMN) as $aid) { $erintett[(int)$aid] = $lepes['old']; }
     }
     slug_follow_numbers($db, $erintett);
+    hno_follow_numbers($db, $erintett);
 
     return $changed;
 }
