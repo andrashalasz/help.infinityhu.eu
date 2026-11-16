@@ -448,6 +448,18 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
             }
             if ($slug === '') { $slug = help_slug($chapter, $title); }
 
+            // A fofejezet (module_id) sincs ezen az urlapon. Ha nem erkezik,
+            // a meglevo marad - kulonben minden "Adatok mentese" NULL-ra
+            // allitotta, es a fejezet kiesett a fofejezete alol a navigacioban.
+            // Csak akkor irjuk at, ha a mezot kifejezetten elkuldik.
+            if (array_key_exists('module_id', $_POST)) {
+                $moduleId = (int)post('module_id') ?: null;
+            } else {
+                $q = $db->prepare('SELECT module_id FROM help_article WHERE id = ?');
+                $q->execute([$id]);
+                $moduleId = ($m = $q->fetchColumn()) === false || $m === null ? null : (int)$m;
+            }
+
             // Ha ez a fejezet a FOFEJEZET LEIRASA, akkor a szama egyben a
             // fofejezet szama is. Ilyenkor az atirasa a fofejezetet es az
             // osszes alatta levo fejezetet is atszamozza, minden nyelven.
@@ -468,7 +480,7 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
                                WHERE id = ?')
                    ->execute([
                        mb_substr($chapter, 0, 16), mb_substr($title, 0, 255),
-                       (int)post('module_id') ?: null,
+                       $moduleId,
                        $id,
                    ]);
             } catch (PDOException $e) {
