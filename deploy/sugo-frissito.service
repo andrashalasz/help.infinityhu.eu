@@ -1,0 +1,32 @@
+# Infinity Súgó – frissítő szolgáltatás (systemd).
+# Telepítés: docs/FRISSITO.md
+#
+#   sudo install -m 0755 deploy/sugo-frissito.py /usr/local/bin/sugo-frissito
+#   sudo install -m 0644 deploy/sugo-frissito.service /etc/systemd/system/
+#   sudo install -m 0640 deploy/sugo-frissito.env.example /etc/sugo-frissito.env   # majd kitölteni
+#   sudo systemctl daemon-reload && sudo systemctl enable --now sugo-frissito
+
+[Unit]
+Description=Infinity Súgó – frissítő szolgáltatás (admin felületről kért telepítés)
+After=docker.service network-online.target
+Wants=network-online.target
+Requires=docker.service
+
+[Service]
+Type=simple
+# AZ A FELHASZNÁLÓ, akié a kicsomagolt tároló, és aki a `docker compose`-t
+# eddig is futtatta. Legyen a `docker` csoport tagja.
+User=sugo
+EnvironmentFile=/etc/sugo-frissito.env
+ExecStart=/usr/bin/python3 /usr/local/bin/sugo-frissito run
+Restart=always
+RestartSec=10
+
+# LEÁLLÍTÁS TELEPÍTÉS KÖZBEN: a szolgáltatás a jelzésre nem szakítja félbe a
+# futó telepítést, hanem befejezi, és utána áll le. A `mixed` miatt a jelzést
+# csak a főfolyamat kapja meg – az építés és a migráció nem.
+KillMode=mixed
+TimeoutStopSec=3600
+
+[Install]
+WantedBy=multi-user.target

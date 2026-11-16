@@ -98,11 +98,7 @@ function auth_login(PDO $db, string $username, string $password): array
     }
 
     if (!password_verify($password, $u['password_hash'])) {
-        $fails = (int)$u['failed_logins'] + 1;
-        $lock  = $fails >= 5 ? "now() + interval '10 minutes'" : 'NULL';
-        $db->prepare("UPDATE help_user SET failed_logins = ?, locked_until = {$lock} WHERE id = ?")
-           ->execute([$fails, $u['id']]);
-        audit($db, null, $username, 'login.fail', 'user:' . $username, "sikertelen probalkozas #{$fails}");
+        auth_register_failure($db, $u, 'login.fail');
         return ['ok' => false, 'error' => t('auth.rossz-jelszo')];
     }
 
@@ -128,6 +124,47 @@ function auth_login(PDO $db, string $username, string $password): array
     ];
     audit($db, (int)$u['id'], $u['username'], 'login', 'user:' . $u['username'], null);
     return ['ok' => true, 'error' => null];
+}
+
+/**
+ * Sikertelen jelszo: szamlalo, otodik utan 10 perc zarolas.
+ * (Korabban itt PostgreSQL-szintaxisu intervallum allt, ami MariaDB
+ * alatt az otodik rossz jelszonal SQL-hibaval elszallt, zarolas nelkul.)
+ */
+function auth_register_failure(PDO $db, array $u, string $auditAction): void
+{
+    $fails = (int)$u['failed_logins'] + 1;
+    $lock  = $fails >= 5 ? 'now() + INTERVAL 10 MINUTE' : 'NULL';
+    $db->prepare("UPDATE help_user SET failed_logins = ?, locked_until = {$lock} WHERE id = ?")
+       ->execute([$fails, $u['id']]);
+    audit($db, null, (string)$u['username'], $auditAction, 'user:' . $u['username'], "sikertelen probalkozas #{$fails}");
+}
+
+/**
+ * A bejelentkezett felhasznalo jelszavanak UJBOLI ellenorzese (eles frissites elott).
+ * Ugyanazt a zarolast hasznalja, mint a belepes: a rossz jelszo itt is szamit.
+ * A felhasznalot a munkamenetbol vesszuk, soha nem a kerelembol.
+ *
+ * @return array{ok:bool,error:?string,locked:bool}
+ */
+function auth_reauth(PDO $db, string $password, string $auditAction = 'frissites.reauth_fail'): array
+{
+    $me = auth_user();
+    if ($me === null) { return ['ok' => false, 'error' => t('auth.rossz-jelszo'), 'locked' => false]; }
+    $st = $db->prepare('SELECT * FROM help_user WHERE id = ? LIMIT 1');
+    $st->execute([$me['id']]);
+    $u = $st->fetch();
+    if (!$u || !$u['is_active']) { return ['ok' => false, 'error' => t('auth.inaktiv'), 'locked' => false]; }
+    if ($u['locked_until'] !== null && strtotime((string)$u['locked_until']) > time()) {
+        $mins = max(1, (int)ceil((strtotime((string)$u['locked_until']) - time()) / 60));
+        return ['ok' => false, 'error' => t('auth.zarolva', ['perc' => $mins]), 'locked' => true];
+    }
+    if (!password_verify($password, $u['password_hash'])) {
+        auth_register_failure($db, $u, $auditAction);
+        return ['ok' => false, 'error' => 'A jelszó nem megfelelő.', 'locked' => false];
+    }
+    $db->prepare('UPDATE help_user SET failed_logins = 0 WHERE id = ?')->execute([$u['id']]);
+    return ['ok' => true, 'error' => null, 'locked' => false];
 }
 
 function auth_logout(): void

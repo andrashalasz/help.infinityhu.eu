@@ -1732,35 +1732,69 @@ function admin_handle_action(string $action, PDO $db, array $cfg): void
         // atadni. Reszletek: lib/admin_frissites.php fejlece.
         // ------------------------------------------------------------------
         case 'frissites.kerelem': {
-            if (!auth_is('admin')) { flash('err', t('Ehhez adminisztrátori jog kell.')); back(['p' => 'frissites']); }
-
-            $muvelet = post('muvelet');
-            if (!in_array($muvelet, ['frissites', 'visszaallitas'], true)) {
-                flash('err', t('Ismeretlen művelet.'));
-                back(['p' => 'frissites']);
+            // ELES FRISSITES KERESE. A web itt sem futtat semmit: egyetlen keresfajlt ir a
+            // csatornaba, a munkat a gazdagepen futo deploy/sugo-frissito.py vegzi.
+            // Sorrend (V40 Vital mintajara): jog -> adatok -> probalkozasi korlat ->
+            // jelszo -> zarolt dontes es kiiras.
+            $vissza = ['p' => 'frissites'];
+            if (!fr_may_request_update(auth_user()['role'] ?? null)) {
+                flash('err', t('Ehhez adminisztrátori jog kell.'));
+                back($vissza);
             }
-            // a cel csak commit-azonosito lehet, semmi mas
-            $cel = preg_replace('/[^0-9a-f]/', '', strtolower(post('cel') ?? ''));
-            $cel = substr((string)$cel, 0, 40);
+            $body = fr_parse_update_body($_POST);
+            if (!$body['ok']) { flash('err', $body['message']); back($vissza); }
 
-            $dir = frissites_dir($cfg);
-            if (!is_dir($dir) || !is_writable($dir)) {
-                flash('err', t('A frissítő mappája nem írható: ') . $dir);
-                back(['p' => 'frissites']);
+            // Legfeljebb 5 kiserlet 15 percenkent - felhasznalonkent ES IP-cimenkent.
+            $me = auth_user();
+            $ip = (string)($_SERVER['REMOTE_ADDR'] ?? '');
+            $q = $db->prepare("SELECT COUNT(*) FROM help_audit
+                                WHERE action = 'frissites.kiserlet' AND created_at > now() - INTERVAL 15 MINUTE
+                                  AND (user_id = ? OR ip = ?)");
+            $q->execute([$me['id'], $ip]);
+            if ((int)$q->fetchColumn() >= 5) {
+                flash('err', 'Túl sok telepítési kísérlet. Próbáld újra 15 perc múlva.');
+                back($vissza);
             }
+            audit_me($db, 'frissites.kiserlet', null, fr_short($body['commit']));
 
-            $kerelem = [
-                'muvelet' => $muvelet,
-                'cel'     => $cel,
-                'ki'      => (string)(auth_user()['username'] ?? '?'),
-                'mikor'   => date('c'),
-            ];
-            file_put_contents($dir . '/kerelem.json', json_encode($kerelem, JSON_UNESCAPED_UNICODE));
-            @chmod($dir . '/kerelem.json', 0664);
+            $re = auth_reauth($db, $body['password']);
+            if (!$re['ok']) { flash('err', (string)$re['error']); back($vissza); }
 
-            audit_me($db, 'frissites.kerelem', $muvelet, $cel);
-            flash('ok', t('A kérés rögzítve. A frissítés egy percen belül elindul — az oldal magától frissül.'));
-            back(['p' => 'frissites']);
+            $eredmeny = frc_with_lock($cfg, static function () use ($cfg, $body, $me): array {
+                $view = frc_view($cfg, time());
+                $status = frc_read_status($cfg);
+                $request = frc_read_request($cfg);
+                $history = frc_read_history($cfg);
+                $pending = fr_request_pending($request, ($status['status']['run'] ?? null), $history['items']);
+                $d = fr_decide_update_request([
+                    'channel' => $view['channel'], 'status' => $status, 'pendingRequest' => $pending,
+                    'confirmedCommit' => $body['commit'], 'now' => time(),
+                ]);
+                if (!$d['ok']) { return ['ok' => false, 'reason' => $d['reason'], 'message' => $d['message']]; }
+                // A telepitendo verzio az ALLAPOTFAJLBOL jon (amit a frissito latott), nem a kerelembol.
+                $w = frc_write_request($cfg, $d['commit'], (int)$me['id'], $request['state'] !== 'NONE');
+                if (!$w['ok']) {
+                    return $w['error'] === 'EXISTS'
+                        ? ['ok' => false, 'reason' => 'REQUEST_PENDING', 'message' => FR_REFUSAL_TEXT['REQUEST_PENDING']]
+                        : ['ok' => false, 'reason' => 'WRITE_FAILED', 'detail' => $w['error'],
+                           'message' => 'A telepítési kérést nem sikerült kiírni a megosztott mappába. A szervercsapat teendője.'];
+                }
+                return ['ok' => true, 'decision' => $d, 'request' => $w];
+            });
+
+            if (!$eredmeny['ok']) {
+                audit_me($db, 'frissites.elutasitva', $eredmeny['reason'],
+                         fr_short($body['commit']) . (isset($eredmeny['detail']) ? ' ' . $eredmeny['detail'] : ''));
+                flash('err', $eredmeny['message']);
+                back($vissza);
+            }
+            $d = $eredmeny['decision'];
+            audit_me($db, 'frissites.kerve', 'keres:' . $eredmeny['request']['id'], json_encode([
+                'commit' => $d['commit'], 'fromCommit' => $d['fromCommit'],
+                'count' => $d['count'], 'hasMigrations' => $d['hasMigrations'],
+            ]));
+            flash('ok', 'A telepítési kérés elküldve. A frissítő néhány másodpercen belül elkezdi – ez az oldal magától frissül.');
+            back($vissza);
         }
 
         case 'lang.save': {

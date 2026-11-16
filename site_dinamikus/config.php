@@ -30,8 +30,9 @@ return [
     // --- kepek a lemezen (ide kerulnek a Word-bol kibontott kepernyokepek) ---
     'media_dir' => getenv('HELP_MEDIA_DIR') ?: '/srv/media',
 
-    // A frissito megosztott mappaja. A web ide ir kerelmet, a gazdagepen futo
-    // tools/frissito-figyelo.sh innen olvassa, es ide irja a naplot.
+    // Az eles frissito megosztott mappaja ("csatorna"). A web ide ir egyetlen
+    // keresfajlt; a gazdagepen futo deploy/sugo-frissito.py innen veszi fel, es
+    // ide irja az allapotot, az elozmenyeket es a naplot. Lasd docs/FRISSITO.md.
     'update_dir' => getenv('HELP_UPDATE_DIR') ?: '/srv/frissites',
 
     // --- gepi fordito (opcionalis) ---

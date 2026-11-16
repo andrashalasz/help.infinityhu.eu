@@ -11,3 +11,7 @@ media/vid_b7bacd88293c.mov
 
 # a kicsomagolt frissitocsomag es a keszre csomagolt tarball nem tartozik a repoba
 infinity-sugo-frissites-*/
+
+# az eles frissito sajat allapota es mentesei (deploy/sugo-frissito.py)
+.frissito/
+frissito-mentesek/
