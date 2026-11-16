@@ -1,0 +1,293 @@
+<!--
+  13.7 Teljesítési igazolások – a release-rendszeren 2026-11-16-án
+  végigkattintott működés alapján. A régi 13.7 (korábban 12.7) szövegét váltja
+  (az még egy „Lezárás" gombot írt le, ami már nincs).
+  Élesben közzétéve 2026-11-16, 9 képpel (HU, EN, DE).
+  A nyitott fejlesztési hibák listája a fejezet végén, megjegyzésben.
+-->
+
+<p>A teljesítési igazolás azt igazolja, hogy egy munka elkészült. A
+bizonylatot mi állítjuk ki, a másik fél jóváhagyja és aláírja, az aláírt
+példányt visszatöltjük a rendszerbe, és ehhez kapcsolódik végül a
+számla.</p>
+
+<p>Két fajtája van, ugyanazon a képernyőn:</p>
+
+<table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Típus</strong></th>
+<th><strong>Kinek a teljesítését igazolja</strong></th>
+<th><strong>Milyen számla tartozik hozzá</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>↗ Vevői</td>
+<td>A mi teljesítésünket, a vevő felé</td>
+<td>Kimenő számla (mi számlázunk a vevőnek)</td>
+</tr>
+<tr class="even">
+<td>↘ Alvállalkozói</td>
+<td>Az alvállalkozónk teljesítését</td>
+<td>Bejövő számla (az alvállalkozó számláz nekünk)</td>
+</tr>
+</tbody>
+</table>
+
+<p>A modult a <strong>Számlázás → Teljesítési igazolások</strong>
+menüpontban találod.</p>
+
+<h2 id="a-lista">A lista</h2>
+
+<p>A lista tetején a <strong>Mind</strong>, <strong>Vevői</strong> és
+<strong>Alvállalkozói</strong> fülekkel típus szerint szűrhetsz. Alattuk
+dátumtartományt adhatsz meg, és a <strong>Keresés</strong> gombbal
+szűrheted a listát. A <em>Partner</em> és a <em>Sorszám</em> oszlop
+fölötti mezőbe gépelve, a <em>Státusz</em> oszlopnál pedig a
+legördülőből választva oszloponként is szűrhetsz.</p>
+
+<p><img src="/media/img_c1d0c0f8410f.jpg" class="shot" loading="lazy" alt="A Teljesítési igazolások lista"></p>
+
+<table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Oszlop</strong></th>
+<th><strong>Mit mutat</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd"><td>Partner</td><td>A vevő, illetve az alvállalkozó</td></tr>
+<tr class="even"><td>Sorszám</td><td>A bizonylat száma, például <code>CC/2026/000003</code></td></tr>
+<tr class="odd"><td>Teljesítés, Határidő</td><td>A teljesítés napja és a határidő</td></tr>
+<tr class="even"><td>Szerződések, Ajánlatok, Megrendelések</td><td>A bizonylathoz kapcsolt dokumentumok</td></tr>
+<tr class="odd"><td>Típus</td><td>↗ Vevői vagy ↘ Alvállalkozói</td></tr>
+<tr class="even"><td>Státusz</td><td>Hol tart a bizonylat a folyamatban (lásd lentebb)</td></tr>
+<tr class="odd"><td>Email küldések</td><td>Hányszor ment ki e-mailben</td></tr>
+</tbody>
+</table>
+
+<p>A sor elején lévő ikonokkal megnyithatod szerkesztésre (ceruza),
+megnézheted a bizonylat képét (szem), újraküldheted e-mailben (boríték)
+vagy törölheted (kuka). A lista alján lévő <strong>Export</strong>
+gombbal Excelbe mentheted a listát.</p>
+
+<h2 id="uj-igazolas">Új teljesítési igazolás</h2>
+
+<p><img src="/media/img_cfd6b233ae46.jpg" class="shot" loading="lazy" alt="A Létrehozás gomb típusválasztója"></p>
+
+<ol>
+<li><p>Kattints a cím melletti <strong>+ Létrehozás</strong> gombra, és
+válaszd ki a típust: <strong>Vevői teljesítésigazolás</strong> vagy
+<strong>Alvállalkozói teljesítésigazolás</strong>.</p></li>
+<li><p>A <em>Partner azonosító vagy név</em> mezőbe kezdd el beírni a
+partner nevét, és válaszd ki a listából. A rendszer ekkor
+<strong>azonnal elmenti</strong> a bizonylatot Tervezet állapotban, és
+kitölti a sablont (Vevőinél <em>Vállalkozói teljesítésigazolás</em>,
+Alvállalkozóinál <em>Megrendelői teljesítésigazolás</em>).</p></li>
+<li><p>Ha kell, kapcsold hozzá a szerződést, ajánlatot vagy
+megrendelést a <em>Szerződések</em>, <em>Ajánlatok</em> és
+<em>Megrendelések</em> mezőben.</p></li>
+<li><p>Ellenőrizd a jobb oldalon a <em>Teljesítés</em> dátumát (alapból
+a mai nap) és a <em>Határidőt</em>.</p></li>
+<li><p>Vedd fel a tételeket (lásd alább), majd kattints a
+<strong>Mentés</strong> gombra.</p></li>
+</ol>
+
+<p><img src="/media/img_4c02d6e68f55.jpg" class="shot" loading="lazy" alt="Egy tervezet állapotú teljesítési igazolás"></p>
+
+<h3 id="tetelek">Tételek felvétele</h3>
+
+<p>Az <strong>Új tétel</strong> gomb megnyitja a termékválasztót.
+Keress rá a cikkszámra vagy a névre, és kattints a sor elején lévő
+<strong>+</strong> jelre. Ezután a tétel adatlapja jelenik meg:</p>
+
+<table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Mező</strong></th>
+<th><strong>Mit adj meg</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd"><td>Mennyiség</td><td>A teljesített mennyiség (kötelező)</td></tr>
+<tr class="even"><td>Egységár</td><td>A nettó egységár (kötelező)</td></tr>
+<tr class="odd"><td>Áfa százalék</td><td>27%, 19% vagy 0%. A cikk beállításából érkezik, de átírható.</td></tr>
+<tr class="even"><td>Áfa, Nettó, Bruttó</td><td>Magától kiszámolódik a mennyiségből, az egységárból és az áfakulcsból</td></tr>
+<tr class="odd"><td>Megjegyzés</td><td>Szabad szöveg a tételhez</td></tr>
+</tbody>
+</table>
+
+<p><img src="/media/img_a35d80a0e541.jpg" class="shot" loading="lazy" alt="A tétel adatlapja kiszámolt áfával és bruttóval"></p>
+
+<p>A <strong>Mentés</strong> után visszakerülsz a bizonylatra, ahol a
+jobb oldali <em>Összegzés</em> a nettó, áfa és bruttó végösszeget
+mutatja. Ha a termék még nincs a törzsben, az <strong>Új árucikk</strong>
+gombbal felveheted. A kijelölt tételeket a <strong>Tételek
+eltávolítása</strong> gomb törli.</p>
+
+<p><img src="/media/img_08b197403b57.jpg" class="shot" loading="lazy" alt="A tételek, a csatolmányok és a gombsor"></p>
+
+<div class="call tip">
+<p>A <em>Csatolmányok</em> részben feltöltött fájlok a teljesítési
+igazolással együtt mennek ki. Ide például a munkalapot vagy a
+fotódokumentációt teheted.</p>
+</div>
+
+<h2 id="folyamat">A folyamat</h2>
+
+<p>Minden teljesítési igazolás ugyanazokon az állapotokon megy végig. A
+jobb oldali <em>Folyamat</em> doboz mutatja, hol tart, a <em>Következő
+lépések</em> doboz pedig megmondja, mi a teendő.</p>
+
+<table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Státusz</strong></th>
+<th><strong>Mit jelent</strong></th>
+<th><strong>Mit tehetsz</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd"><td>Tervezet</td><td>Még szerkeszthető</td><td>Mentés, Jóváhagyásra küld</td></tr>
+<tr class="even"><td>Jóváhagyás alatt</td><td>A jóváhagyóra vár, a tartalma már nem módosítható</td><td>Jóváhagyás, Visszadobás piszkozatba, Elutasítás</td></tr>
+<tr class="odd"><td>Jóváhagyott</td><td>Jóváhagyva, az aláírt példányra vár</td><td>Leigazolás, Küldése e-mailben, Visszanyitás piszkozatba</td></tr>
+<tr class="even"><td>Leigazolva</td><td>Az aláírt dokumentum feltöltve</td><td>Számla párosítása, Leigazolás visszavonása</td></tr>
+<tr class="odd"><td>Lezárt</td><td>Számla párosítva, a folyamat véget ért</td><td>Nyomtatás, Számla leválasztása</td></tr>
+<tr class="even"><td>Elutasítva</td><td>A jóváhagyó nem fogadta el</td><td>Visszanyitás piszkozatba</td></tr>
+</tbody>
+</table>
+
+<h3 id="jovahagyasra-kuldes">Jóváhagyásra küldés</h3>
+
+<p>Ha a bizonylat kész, kattints a <strong>Jóváhagyásra küld</strong>
+gombra. Az állapot <em>Jóváhagyás alatt</em> lesz, a tartalma zárolódik.
+Küldés előtt az <strong>Előnézet</strong> gombbal megnézheted, hogyan fog
+kinézni a nyomtatott bizonylat.</p>
+
+<h3 id="jovahagyas">Jóváhagyás, visszadobás, elutasítás</h3>
+
+<p>A <em>Jóváhagyás alatt</em> álló bizonylat jobb oldalán a jóváhagyó
+panel látszik, a fizetendő bruttó összeggel és egy <em>Jóváhagyási
+megjegyzés</em> mezővel.</p>
+
+<p><img src="/media/img_9ddfb7eea102.jpg" class="shot" loading="lazy" alt="A jóváhagyó panel Jóváhagyás alatt állapotban"></p>
+
+<table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Gomb</strong></th>
+<th><strong>Mi történik</strong></th>
+<th><strong>Kell megjegyzés?</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd"><td>Jóváhagyás</td><td>A bizonylat <em>Jóváhagyott</em> lesz</td><td>Nem kötelező</td></tr>
+<tr class="even"><td>Visszadobás piszkozatba</td><td>Visszakerül <em>Tervezet</em> állapotba javításra</td><td>Igen, a <em>Jóváhagyási megjegyzés</em> mezőben</td></tr>
+<tr class="odd"><td>Elutasítás</td><td>A bizonylat <em>Elutasítva</em> lesz</td><td>Igen, a felugró ablakban</td></tr>
+</tbody>
+</table>
+
+<p><img src="/media/img_36b6bed0cfb6.jpg" class="shot" loading="lazy" alt="Az elutasítás indokát kérő ablak"></p>
+
+<p>Az elutasítás okát a bizonylat jobb oldalán, az <em>Elutasítás
+oka</em> dobozban látod. Az elutasított bizonylatot a
+<strong>Visszanyitás piszkozatba</strong> gombbal javíthatod, és utána
+újra jóváhagyásra küldheted.</p>
+
+<h3 id="leigazolas">Leigazolás az aláírt dokumentummal</h3>
+
+<p>Amikor a partner aláírva visszaküldte a teljesítési igazolást, nyisd
+meg a <em>Jóváhagyott</em> bizonylatot, és görgess le a
+<strong>Leigazolás</strong> részhez.</p>
+
+<p><img src="/media/img_0772f8ae4c68.jpg" class="shot" loading="lazy" alt="A Leigazolás rész az aláírt dokumentum feltöltésével"></p>
+
+<ol>
+<li><p>Az <em>Aláírt dokumentum</em> mezőben töltsd fel a visszakapott
+példányt (PDF, kép, Word vagy Excel fájl).</p></li>
+<li><p>Állítsd be a <em>Leigazolás dátumát</em>, ha nem a mai nap volt.</p></li>
+<li><p>Ellenőrizd a <em>Leigazoló</em> nevét.</p></li>
+<li><p>Kattints a <strong>Leigazolás</strong> gombra.</p></li>
+</ol>
+
+<div class="call warn">
+<p>Feltöltött dokumentum nélkül a leigazolás nem menthető. Az aláírt
+példány a számla mögötti bizonyíték, ezért mindig a valóban aláírt
+változatot töltsd fel.</p>
+</div>
+
+<p>Ha tévesen igazoltad le, a <strong>Leigazolás visszavonása</strong>
+gomb visszaállítja <em>Jóváhagyott</em> állapotba.</p>
+
+<h3 id="szamla-parositas">Számla párosítása</h3>
+
+<p>A leigazolt Alvállalkozói igazolás jobb oldalán, a <em>Számla
+kapcsolat</em> dobozban jelenik meg a <em>Várható bejövő számla
+fedezete</em>. Ez az összeg a pénzügyi modulban is látszik, amíg a
+számla meg nem érkezik.</p>
+
+<p>Amikor az alvállalkozó számlája beérkezett és rögzítve van, válaszd
+ki a <em>Válasszon számlát</em> listából, majd kattints a <strong>Számla
+párosítása</strong> gombra. A bizonylat ezzel <em>Lezárt</em> állapotba
+kerül, a dobozban pedig a párosított számla száma és összege látszik.</p>
+
+<p><img src="/media/img_a8fe82d2d450.jpg" class="shot" loading="lazy" alt="Lezárt teljesítési igazolás párosított számlával"></p>
+
+<div class="call tip">
+<p>A listában a partner rögzített bejövő számlái jelennek meg, a
+számlaszámmal és az összeggel. Párosítás előtt nézd meg, hogy az összeg
+egyezik-e a teljesítési igazolás bruttó összegével.</p>
+</div>
+
+<p>Ha rossz számlát párosítottál, a <strong>Számla leválasztása</strong>
+gombbal bonthatod a kapcsolatot.</p>
+
+<h2 id="tovabbi-muveletek">További műveletek</h2>
+
+<table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Gomb</strong></th>
+<th><strong>Mire való</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd"><td>Előnézet / Nyomtatás</td><td>A bizonylat nyomtatható képe, PDF-ként le is tölthető</td></tr>
+<tr class="even"><td>Küldése e-mailben</td><td>A bizonylat elküldése a partnernek (jóváhagyás után érhető el)</td></tr>
+<tr class="odd"><td>Másolás</td><td>Új tervezet ugyanezekkel az adatokkal, például ismétlődő munkához</td></tr>
+<tr class="even"><td>Visszanyitás piszkozatba</td><td>Jóváhagyott vagy elutasított bizonylat visszaállítása szerkeszthetőre, megerősítés után</td></tr>
+</tbody>
+</table>
+
+<h2 id="hibaelharitas">Ha valami nem úgy megy</h2>
+
+<table class="erp-table">
+<thead>
+<tr class="header">
+<th><strong>Tünet</strong></th>
+<th><strong>Mit tegyél</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd"><td>Nem tudom módosítani a tételeket</td><td>A bizonylat már nem Tervezet. Kérd vissza piszkozatba (jóváhagyó: <em>Visszadobás piszkozatba</em>; jóváhagyott vagy elutasított bizonylatnál: <em>Visszanyitás piszkozatba</em>).</td></tr>
+<tr class="even"><td>„Az elutasítás indoka kötelező."</td><td>Írd be a felugró ablakba, miért utasítod el.</td></tr>
+<tr class="odd"><td>„Jóváhagyási megjegyzés kötelező a piszkozatba visszadobáskor."</td><td>Írd be a <em>Jóváhagyási megjegyzés</em> mezőbe, mit kell javítani, és nyomd meg újra a gombot.</td></tr>
+<tr class="even"><td>A Leigazolás gomb fájlt kér</td><td>Előbb töltsd fel az aláírt dokumentumot.</td></tr>
+<tr class="odd"><td>Nincs párosítható számla</td><td>A partner bejövő számlája még nincs rögzítve. Rögzítsd, és utána párosítsd.</td></tr>
+</tbody>
+</table>
+
+<!--
+  NYITOTT FEJLESZTÉSI HIBÁK (2026-11-16, release) – amíg ezek élnek, a
+  fejezet szándékosan nem ír róluk szabályként:
+  - Vevői igazolásnál is a bejövő számlás (alvállalkozói) szöveg és
+    párosítás jelenik meg; kimenő számla létrehozása/párosítása nincs.
+    Emiatt a fejezet csak az Alvállalkozói párosítást írja le.
+  - A feltöltött aláírt dokumentum a Szerződések mezőbe/oszlopba kerül.
+  - A Jóváhagyás gomb fehér oldalra visz (/approve), a művelet lefut.
+  - Lezárt és Leigazolva bizonylat is törölhető a listából.
+  - Közös CC/ sorszám-széria a két típusra; leigazolás utáni
+    visszanyitáskor nem kap új sorszámot.
+  Ha javítják, a „Számla párosítása" szakaszt a Vevői ággal ki kell egészíteni.
+-->

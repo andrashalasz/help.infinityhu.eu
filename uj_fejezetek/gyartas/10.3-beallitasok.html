@@ -2,7 +2,7 @@
 
 <h2 id="munkakozpontok">Munkaközpontok</h2>
 
-<p>Menü: Megrendelések → Gyártás → Beállítások → Munkaközpontok</p>
+<p>Menü: Gyártás → Beállítások → Munkaközpontok</p>
 
 <p>A munkaközpontok a gyártás fizikai helyszíneit (gépeket, munkacsoportokat) reprezentálják. A listanézetben az összes létrehozott munkaközpont megtekinthető, szerkeszthetsző és törölhető.</p>
 
@@ -91,7 +91,7 @@
 
 <h2 id="muveletek">Műveletek</h2>
 
-<p>Menü: Megrendelések → Gyártás → Beállítások → Műveletek</p>
+<p>Menü: Gyártás → Beállítások → Műveletek</p>
 
 <p><img src="/media/img_e1725e217fc2.png" class="shot" loading="lazy" alt="Műveletek"></p>
 
@@ -189,7 +189,7 @@
 
 <h2 id="utvonalak">Útvonalak</h2>
 
-<p>Menü: Megrendelések → Gyártás → Beállítások → Útvonalak</p>
+<p>Menü: Gyártás → Beállítások → Útvonalak</p>
 
 <p>Az útvonalak határozzák meg, hogy egy adott termék gyártása során milyen műveleti sorrendet kell követni, és mely munkaközpontokon kell a munkát elvégezni. Ha egy gyártási megbízás kiadásakor nincs aktív útvonal az adott termékhez, a megbízás nem tartalmaz műveleteket – ez megnehezíti a nyomon követést.</p>
 
@@ -259,80 +259,164 @@
 
 <h2 id="gyartasi-tetelek">Gyártási tételek</h2>
 
-<p>Menü: Megrendelések → Gyártás → Beállítások → Gyártási tételek</p>
+<p>Menü: Gyártás → Beállítások → Gyártási tételek</p>
 
-<p><img src="/media/img_c0b16da32b3d.png" class="shot" loading="lazy" alt="Gyártási tételek"></p>
+<p><img src="/media/img_cfd7e178ef3d.jpg" class="shot" loading="lazy" alt="A Gyártási tételek lista"></p>
 
-<p>A gyártási tételek a raktáron lévő alapanyagok, félkésztermékek és késztermékek nyilvántartásához szükséges bejegyzések. Kattints a + Létrehozás gombra az új tétel felvételéhez:</p>
+<p>A gyártási tétel (lot) egy konkrét beérkezett vagy legyártott mennyiség
+egy árucikkből: például egy szállítmány festék, vagy egy legyártott sorozat
+doboz. A tétel számán keresztül követhető vissza, hogy melyik alapanyagból
+mi készült, és hiba esetén mely termékeket érinti.</p>
+
+<h3 id="gyartasi-tetelek-lista">A lista</h3>
+
+<p>A lista oszlopai: <em>Tétel szám</em>, <em>Árucikk</em>, <em>Raktár</em>,
+<em>Mennyiség</em>, <em>Lejárati dátum</em> és <em>Státusz</em>. Az
+oszlopok fölötti mezőkbe gépelve szűrhetsz, a státuszt legördülőből
+választod.</p>
+
+<p>A <em>Mennyiség</em> oszlop az aktuális és a kezdeti mennyiséget mutatja
+(például <code>30.00 / 50.00</code>), mellette egy százalékkal: ennyi van
+még meg a tételből. A <em>Lejárati dátum</em> mellett piros
+<em>Lejárt</em> címke jelzi, ha a dátum elmúlt.</p>
+
+<p>A sor elején lévő ikonok: <strong>Módosítás</strong> (ceruza),
+<strong>Törlés</strong> (kuka), <strong>Származás</strong> (fa) és
+<strong>Visszahívás szimuláció</strong> (figyelmeztető háromszög). A
+tétel számára kattintva a tétel adatlapja nyílik meg.</p>
+
+<h3 id="uj-gyartasi-tetel">Új tétel felvétele</h3>
+
+<p>Kattints a <strong>+ Létrehozás</strong> gombra, töltsd ki az ablakot,
+majd kattints a <strong>Mentés</strong> gombra.</p>
+
+<p><img src="/media/img_bd80374268b3.jpg" class="shot" loading="lazy" alt="Az új tétel felvétele ablak"></p>
 
 <table class="erp-table">
 <thead><tr class="header">
 <th><strong>Mező</strong></th>
 <th><strong>Kötelező</strong></th>
-<th><strong>Leírás</strong></th>
+<th><strong>Mit adj meg</strong></th>
 </tr></thead>
 <tbody>
-<tr class="odd">
-<td><strong>Tétel szám</strong></td>
-<td></td>
-<td>Automatikusan generálódik, ha üresen hagyd</td>
-</tr>
-<tr class="even">
-<td><strong>Árucikk</strong></td>
-<td><strong>igen</strong></td>
-<td>Melyik termékhez kapcsolódik a tétel</td>
-</tr>
-<tr class="odd">
-<td><strong>Raktár</strong></td>
-<td><strong>igen</strong></td>
-<td>Melyik raktárban tárolandó</td>
-</tr>
-<tr class="even">
-<td><strong>Státusz</strong></td>
-<td></td>
-<td>Elérhető / Zárolt állapot (alapértelmezett: Elérhető)</td>
-</tr>
-<tr class="odd">
-<td><strong>Kezdeti mennyiség</strong></td>
-<td><strong>igen</strong></td>
-<td>A tételhez rögzített induló darabszám</td>
-</tr>
-<tr class="even">
-<td><strong>Gyártási dátum</strong></td>
-<td></td>
-<td>A tétel gyártásának dátuma</td>
-</tr>
-<tr class="odd">
-<td><strong>Beérkezés dátuma</strong></td>
-<td><strong>igen</strong></td>
-<td>A raktárba érkezés dátuma (alapértelmezett: mai nap)</td>
-</tr>
-<tr class="even">
-<td><strong>Lejárati dátum</strong></td>
-<td></td>
-<td>Ha szükséges, a lejárat dátuma</td>
-</tr>
-<tr class="odd">
-<td><strong>Beszállítói tétel szám</strong></td>
-<td></td>
-<td>A beszállítótól kapott tételazonosító</td>
-</tr>
-<tr class="even">
-<td><strong>Tanúsítvány száma</strong></td>
-<td></td>
-<td>Minőségi tanúsítvány azonosítója</td>
-</tr>
-<tr class="odd">
-<td><strong>Megjegyzések</strong></td>
-<td></td>
-<td>Szabad szöveges megjegyzés</td>
-</tr>
+<tr class="odd"><td><strong>Tétel szám</strong></td><td></td><td>Hagyd üresen: a rendszer generálja, <code>LOT-cikkszám-dátum-sorszám</code> formában (például <code>LOT-FESTEK-001-20261116-001</code>)</td></tr>
+<tr class="even"><td><strong>Árucikk</strong></td><td><strong>igen</strong></td><td>Melyik termékből van a tétel</td></tr>
+<tr class="odd"><td><strong>Raktár</strong></td><td><strong>igen</strong></td><td>Hol tárolod</td></tr>
+<tr class="even"><td><strong>Státusz</strong></td><td></td><td>Alapból <em>Elérhető</em> (a többi állapotot lásd lentebb)</td></tr>
+<tr class="odd"><td><strong>Kezdeti mennyiség</strong></td><td><strong>igen</strong></td><td>A beérkezett vagy legyártott mennyiség. Negatív nem lehet.</td></tr>
+<tr class="even"><td><strong>Gyártási dátum</strong></td><td></td><td>Mikor gyártották</td></tr>
+<tr class="odd"><td><strong>Beérkezés dátuma</strong></td><td><strong>igen</strong></td><td>Mikor érkezett a raktárba (alapból a mai nap)</td></tr>
+<tr class="even"><td><strong>Lejárati dátum</strong></td><td></td><td>Szavatossági idő, ha van</td></tr>
+<tr class="odd"><td><strong>Beszállítói tétel szám</strong></td><td></td><td>A beszállító saját sarzsszáma, a csomagolásról</td></tr>
+<tr class="even"><td><strong>Tanúsítvány száma</strong></td><td></td><td>A minőségi tanúsítvány (például CoA) azonosítója</td></tr>
+<tr class="odd"><td><strong>Megjegyzések</strong></td><td></td><td>Szabad szöveg, például a szállítmány adatai</td></tr>
 </tbody>
 </table>
 
+<p>Ha egy kötelező mező üres, a rendszer piros szöveggel jelzi alatta, és
+nem ment.</p>
+
+<h3 id="gyartasi-tetel-modositasa">Tétel módosítása</h3>
+
+<p>A ceruza ikonnal ugyanez az ablak nyílik meg, kiegészítve az
+<strong>Aktuális mennyiség</strong> mezővel. Ez nem lehet több a kezdeti
+mennyiségnél. Itt állíthatod át a tétel <strong>Státuszát</strong> is.</p>
+
+<table class="erp-table">
+<thead><tr class="header">
+<th><strong>Státusz</strong></th>
+<th><strong>Mikor használd</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd"><td>Elérhető</td><td>A tétel felhasználható a gyártásban</td></tr>
+<tr class="even"><td>Karantén</td><td>Minőségi kérdés miatt félretetted, amíg kivizsgálod</td></tr>
+<tr class="odd"><td>Felszabadítva</td><td>A karanténból kiengedted</td></tr>
+<tr class="even"><td>Elutasítva</td><td>A vizsgálat után nem használható fel</td></tr>
+<tr class="odd"><td>Lejárt</td><td>Lejárt a szavatossága</td></tr>
+<tr class="even"><td>Kimerült</td><td>Elfogyott</td></tr>
+</tbody>
+</table>
+
+<h3 id="gyartasi-tetel-adatlap">A tétel adatlapja</h3>
+
+<p>A tétel számára kattintva megnyílik az adatlap. Felül négy kártya
+mutatja a <em>Státuszt</em>, az elérhető mennyiséget (aktuális / kezdeti,
+sávval), a <em>Lejáratot</em> és a <em>Nyomon követés</em> gombot. Alattuk
+az alapadatok, köztük a tételt előállító <em>Gyártás rendelés</em>
+(kattintható), a mennyiségi és dátumadatok, valamint a beszállítói és
+tanúsítványadatok láthatók.</p>
+
+<p><img src="/media/img_1037c8129b36.jpg" class="shot" loading="lazy" alt="Egy gyártási tétel adatlapja"></p>
+
+<p>Az oldal tetején lévő ceruza a módosító ablakot nyitja meg, a lista ikon
+visszavisz a listához.</p>
+
+<h3 id="szarmazasi-fa">Származási fa</h3>
+
+<p>Az adatlap <strong>Fa megtekintése</strong> gombja, vagy a lista
+<strong>Származás</strong> ikonja megnyitja a nyomonkövetési fát. Középen az
+aktuális tétel áll (zöld), fölötte a gyártásához felhasznált anyagok
+(narancs), alatta a belőle előállított termékek (kék).</p>
+
+<p><img src="/media/img_48e4e686f6f3.jpg" class="shot" loading="lazy" alt="A származási fa"></p>
+
+<p>Alatta két táblázat sorolja fel ugyanezt:</p>
+
+<ul>
+<li><p><strong>Felhasznált anyagok (visszafelé nyomonkövetés):</strong>
+miből készült ez a tétel. Ha üres, a tétel alapanyag vagy kezdeti
+készlet.</p></li>
+<li><p><strong>Előállított termékek (előre nyomonkövetés):</strong> mely
+tételek gyártásához használták fel, és mennyit.</p></li>
+</ul>
+
+<p>A sorokban lévő szem ikon a kapcsolódó tétel adatlapját, a fa ikon annak
+saját fáját nyitja meg, így a lánc tetszőleges irányban bejárható.</p>
+
+<h3 id="visszahivas-szimulacio">Visszahívás szimuláció</h3>
+
+<p>Ha egy tételről kiderül, hogy hibás, a <strong>Visszahívás
+szimuláció</strong> megmutatja, mire van hatással. A szimuláció
+<strong>semmit nem módosít</strong>, csak kimutatást készít.</p>
+
+<p><img src="/media/img_b0a44e0ff786.jpg" class="shot" loading="lazy" alt="A visszahívás szimuláció eredménye"></p>
+
+<table class="erp-table">
+<thead><tr class="header">
+<th><strong>Rész</strong></th>
+<th><strong>Mit mutat</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd"><td>Visszahívott tétel információi</td><td>A vizsgált tétel száma, árucikke, raktára, mennyisége és státusza</td></tr>
+<tr class="even"><td>Hatáselemzés – Érintett termékek</td><td>Az összes tétel, amelynek gyártásához ezt felhasználták. Ezeket kell visszahívni vagy karanténba tenni.</td></tr>
+<tr class="odd"><td>Kiváltó ok elemzés – Felhasznált anyagok</td><td>Az anyagok, amelyekből ez a tétel készült. Itt keresheted a hiba forrását.</td></tr>
+</tbody>
+</table>
+
+<div class="call tip">
+<p>Az érintett tételeket egyenként nyisd meg, és a módosító ablakban
+állítsd a státuszukat <em>Karantén</em>-ra. Így a gyártás nem használja
+fel őket, amíg a vizsgálat tart.</p>
+</div>
+
+<!--
+  Gyártási tételek – NYITOTT HIBÁK (release, 2026-11-16); a fenti szöveg
+  szándékosan nem ír róluk:
+  - Az adatlap Karantén / Feloldás / Elutasítás gombja 405-öt ad
+    (change-status GET-tel, a végpont csak POST-ot fogad) -> a szöveg a
+    Státusz mezőt ajánlja.
+  - A lista Törlés gombja 404 (delete?id=…) -> a törlés nincs leírva.
+  - Jövőbeli lejárati dátum esetén a teljes lista TypeError-ral elszáll
+    (views/lot/index.php 125. sor, Yii::t 4. paraméter) -> a Lejárati
+    dátum mező leírása emiatt rövid.
+  - A „Felhasználás" sáv a megmaradt %-ot mutatja, nem a felhasználtat.
+  - Az adatlap alján a „Lezárás" gomb valójában bezárás (closePopup).
+  Ha javítják: a három státuszgombot és a törlést be kell írni.
+-->
+
 <h2 id="gyartas-konfiguracio">Gyártás konfiguráció</h2>
 
-<p>Menü: Megrendelések → Gyártás → Beállítások → Gyártás konfiguráció</p>
+<p>Menü: Gyártás → Beállítások → Gyártás konfiguráció</p>
 
 <p>A gyártás konfiguráció oldalon a teljes gyártási modulra vonatkozó globális beállítások adhatók meg. A jobb oldalon az Előnézet panel valós időben mutatja a jelenlegi beállítások szerinti rezsiköltség-számítás eredményét egy mintapéldán.</p>
 

@@ -36,6 +36,11 @@ megtartja, a Heading3/4/5-ből h2/h3/h4 lesz horgonnyal).
 | `16.2.1-email-sablonok.html` | 4 | |
 | `16.2.3-szerepkorok.html` | 3 | |
 | `16.5-sablonkezelo.html` | 1 | |
+| `13.7-teljesitesi-igazolasok.html` | 9 | élesben 2026-11-16 (HU, EN, DE) |
+| `gyartas/10.1`…`10.4` | 22+5 | élesben; 2026-11-16: menüút „Gyártás → …", a 10.3 Gyártási tételek szakasza újraírva 5 képpel |
+
+A 2026-11-16-i képek (`img_*.jpg`) a `media/` mappában vannak, a súgóból
+visszatöltve, tehát bájtra azonosak az élővel.
 
 Minden képhivatkozáshoz **létezik a fájl** a `tools/kepernyokepek/kimenet/`
 mappában, a végleges néven. A HTML épsége és a házi konvenciók gépileg
@@ -54,6 +59,8 @@ Ezek a rendszer és a dokumentáció közti eltérések – a fejlesztőknek is
 | 16.2.1 | külön „Mikor menjen ki" beállítás | nincs: a kiváltót a **Típus** mező adja, nem szerkeszthető |
 | 16.2.1 | „Időzítve" kiváltó | sehol nem jelenik meg |
 | 16.2.1 | „+" gomb új nyelvhez | nincs ilyen gomb |
+| 10.x | „Megrendelések → Gyártás → …" | a **Gyártás** külön főmenü |
+| 13.7 | „Lezárás gomb véglegesíti és elküldi" | nincs ilyen gomb: Jóváhagyásra küld → Jóváhagyás → Leigazolás → Számla párosítás |
 
 A Word-fájlok címlapi maradéka („Infinity ERP", „Felhasználói útmutató",
 cégnév, verziószám) mindenhonnan kiszedve.
