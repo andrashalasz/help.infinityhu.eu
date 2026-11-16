@@ -308,6 +308,10 @@ function page_frissites(PDO $db, array $cfg, array $counts): void
     <p><b>A szerver most nem válaszol.</b> Telepítés közben ez rendben van: a súgó épp átvált az új verzióra.
        Az oldal magától próbálkozik tovább.</p>
   </div>
+  <div class="msg msg--warn" id="fr-kilepve" hidden>
+    <p><b>A munkamenet lejárt.</b> Lépj be újra, hogy lásd a telepítés állapotát.
+       <button type="button" class="btn" onclick="location.reload()">Újratöltés</button></p>
+  </div>
   <div class="msg msg--info" id="fr-ujverzio" hidden>
     <p><b>Új verzió fut a szerveren.</b> Töltsd újra az oldalt, hogy a felület is az új legyen.
        <button type="button" class="btn" onclick="location.reload()">Oldal újratöltése</button></p>
@@ -373,6 +377,14 @@ function page_frissites(PDO $db, array $cfg, array $counts): void
       .then(function (r) { if (!r.ok) { throw new Error(r.status); } return r.text(); })
       .then(function (t) {
         document.getElementById('fr-offline').hidden = true;
+        // Ha nem a lap resze jott vissza (pl. lejart a munkamenet, es a belepo lap
+        // jott), nem tesszuk a lapra - helyette szolunk.
+        if (t.indexOf('id="fr-allapot"') === -1) {
+          document.getElementById('fr-kilepve').hidden = false;
+          idozit(true);
+          return;
+        }
+        document.getElementById('fr-kilepve').hidden = true;
         if (modal.hidden) { tarto.innerHTML = t; bekot(); }
         var a = document.getElementById('fr-allapot');
         if (a && kezdoVerzio && a.dataset.running && a.dataset.running !== kezdoVerzio) {

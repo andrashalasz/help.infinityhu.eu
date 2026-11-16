@@ -65,7 +65,7 @@ benne van. Az erre a verzióra való frissítés még kézzel megy:
 ```bash
 cd /var/www/help.infinityhu.eu          # a kicsomagolt tároló
 git pull --ff-only
-docker compose up -d --build
+docker compose up -d --build --force-recreate php web
 ```
 
 A régi, percenként futó `tools/frissito-figyelo.sh` sort **ki kell venni a

@@ -29,7 +29,7 @@ lent.
 1. Erre a verzióra még kézzel frissítsetek:
    ```bash
    git pull --ff-only
-   docker compose up -d --build
+   docker compose up -d --build --force-recreate php web
    ```
 2. A régi cron-sort vegyétek ki (`crontab -e`):
    `*/1 * * * * …/tools/frissito-figyelo.sh` – a szkript már nincs a tárolóban.

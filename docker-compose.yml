@@ -97,6 +97,8 @@ services:
       # futo figyelo szkript innen olvassa. A kontener NEM kap jogot a
       # gazdagep vezerlesere - csak ezen a mappan keresztul uzen.
       - ./frissites:/srv/frissites
+      # A munkamenetek - egy frissites ne jelentkeztessen ki senkit.
+      - help_sessions:/srv/munkamenet
 
   web:
     image: nginx:1.28.3
@@ -148,4 +150,5 @@ services:
 
 volumes:
   help_dbdata:
+  help_sessions:
   help_mt_models:

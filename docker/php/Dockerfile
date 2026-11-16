@@ -33,6 +33,11 @@ RUN { \
 
 RUN mkdir -p /srv/media && chown www-data:www-data /srv/media
 
+# A munkamenetek KULON KOTETBEN: igy egy frissites (a kontener ujraindulasa) nem
+# jelentkezteti ki a szerkesztoket, es nem vesz el a felbehagyott munkajuk.
+RUN mkdir -p /srv/munkamenet && chown www-data:www-data /srv/munkamenet && chmod 1733 /srv/munkamenet \
+    && echo 'session.save_path = "/srv/munkamenet"' > /usr/local/etc/php/conf.d/munkamenet.ini
+
 # A kornyezeti valtozok (HELP_DB_*, APP_COMMIT) eljussanak a PHP-hoz.
 RUN printf '[www]\nclear_env = no\n' > /usr/local/etc/php-fpm.d/zz-env.conf
 

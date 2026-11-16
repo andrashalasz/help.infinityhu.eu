@@ -352,6 +352,18 @@ class Updater:
                 return v if COMMIT_RE.match(v) else None
         return None
 
+    def running_image_exists(self) -> bool:
+        """A futó PHP-konténer képfájlja még megvan-e (csak akkor lehet visszaút-címkét adni rá)."""
+        cid = self.app_container()
+        if not cid:
+            return False
+        try:
+            image_id = self.out(["docker", "inspect", "--format", "{{.Image}}", cid])
+            self.out(["docker", "image", "inspect", "--format", "{{.Id}}", image_id])
+            return True
+        except Exception:
+            return False
+
     def modified_files(self):
         """A követett fájlok, amelyek a szerveren eltérnek a kicsomagolt verziótól (munkafa és index)."""
         c = self.cfg
@@ -561,6 +573,11 @@ class Updater:
         if not self.app_container():
             raise StepError("A súgó PHP-konténere nem fut. Az első telepítést kézzel kell elvégezni "
                             "(docs/FRISSITO.md), a frissítő csak futó rendszert frissít.")
+        if not self.running_image_exists():
+            raise StepError("A futó PHP-konténer képfájlja már nem létezik (valaki újraépítette, de a konténert "
+                            "nem indította újra), így nem lenne mire visszaállni. A szervercsapat teendője: "
+                            "`docker compose up -d --force-recreate php web`, utána újra indítható. "
+                            "A futó rendszerhez nem nyúltam.")
         free = shutil.disk_usage(c.repo).free / (1024 ** 3)
         if free < c.min_free_gb:
             raise StepError("Kevés a szabad hely a szerveren (%.1f GB, legalább %.0f GB kell). "
@@ -1075,6 +1092,8 @@ def check(cfg: Config) -> int:
                  "a compose-fájlban kell a `./frissites:%s` kötet" % cfg.channel_mount)
         except Exception:
             line(False, "a konténer kötetei lekérdezhetők")
+        line(u.running_image_exists(), "a futó PHP-konténer képfájlja megvan (erre lehet visszaállni)",
+             "a konténer egy már törölt képfájlon fut: `docker compose up -d --force-recreate php web`")
         if u.running_commit() is None:
             print("  [ megj. ] a futó PHP-képfájlban még nincs verzióazonosító (APP_COMMIT) – az első frissítés után lesz")
     try:
