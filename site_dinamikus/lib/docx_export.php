@@ -948,11 +948,9 @@ function export_pdf(PDO $db, array $cfg, string $lang, bool $onlyPublished = tru
 
     $html = export_print_html($db, $cfg, $lang, $onlyPublished, false, true);
 
-    // A kepek /media/... alakban hivatkozottak; a PDF-motor a lemezrol olvassa oket.
-    $dir = rtrim($cfg['media_dir'], '/');
-    $html = str_replace(['src="/media/', "src='/media/"],
-                        ['src="file://' . $dir . '/', "src='file://" . $dir . '/'],
-                        $html);
+    // A PDF-motor a HTML minden src-jet maga tolti be, ezert csak a /media/ alatti,
+    // a media.php altal nevezett fajlok es a beagyazott logo mehet at (lasd util.php).
+    $html = help_pdf_sources($html, (string)$cfg['media_dir']);
 
     $out = tempnam(sys_get_temp_dir(), 'helppdf') . '.pdf';
     $cmd = escapeshellarg($bin) . ' --encoding utf-8 - ' . escapeshellarg($out) . ' 2>&1';

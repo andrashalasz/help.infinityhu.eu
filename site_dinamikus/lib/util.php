@@ -633,3 +633,42 @@ function help_search_sql(string $q): array
         ],
     ];
 }
+
+/**
+ * A PDF-motornak atadott HTML kepforrasainak szurese.
+ *
+ * A PDF-et a weasyprint a kiszolgalo gepen keszíti, es a HTML-ben talalt
+ * minden src-t maga tolt be: file://-t a lemezrol, http(s)-t a halozatrol.
+ * Ket baj lehetne belole:
+ *   - egy "/media/../../etc/..." hivatkozas a media mappabol kilepne;
+ *   - egy "http://belso-gep/..." kep miatt a szerver tolne le belso cimet.
+ *
+ * Ezert csak ket forras mehet at:
+ *   - "data:image/..."            (a naplóba agyazott logo)
+ *   - "/media/img_<12 hex>.<kit>" (vagy vid_...), amit a media.php maga nevez el
+ * minden mas src KIURUL. A media-hivatkozas file://<mappa>/<fajl> lesz.
+ */
+function help_pdf_sources(string $html, string $mediaDir): string
+{
+    $mediaDir = rtrim($mediaDir, '/');
+    // idezojelesen es idezojel nelkul is: src="..." | src='...' | src=ertek
+    $ki = preg_replace_callback(
+        '~(?<![\w-])src\s*=\s*(?:(["\'])(.*?)\1|([^\s>]+))~is',
+        static function (array $m) use ($mediaDir): string {
+            $nyers = ($m[1] ?? '') !== '' ? ($m[2] ?? '') : ($m[3] ?? '');
+            $v = trim(html_entity_decode($nyers, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+            if (stripos($v, 'data:image/') === 0) {
+                return $m[0];
+            }
+            if (preg_match('~^/media/((?:img|vid)_[0-9a-f]{12}\.[a-z0-9]{2,5})$~', $v, $f)) {
+                return 'src="file://' . $mediaDir . '/' . $f[1] . '"';
+            }
+            return 'src=""';
+        },
+        $html
+    );
+    if ($ki === null) {
+        throw new RuntimeException('A PDF kepforrasainak szurese nem sikerult.');
+    }
+    return $ki;
+}

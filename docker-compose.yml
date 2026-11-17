@@ -29,7 +29,9 @@ services:
       - ./db:/docker-entrypoint-initdb.d:ro
     ports:
       # 3307 a hoston, hogy ne utkozzon egy esetleg mar futo helyi MariaDB-vel
-      - "${DB_PORT:-3307}:3306"
+      # Alapbol csak a gepen belulrol erheto el. Ha kivulrol is kell (nem ajanlott):
+      # DB_BIND=0.0.0.0 a .env-ben - es akkor erositsd meg a jelszavakat is.
+      - "${DB_BIND:-127.0.0.1}:${DB_PORT:-3307}:3306"
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 5s
@@ -146,7 +148,8 @@ services:
     volumes:
       - help_mt_models:/home/libretranslate/.local/share/argos-translate
     ports:
-      - "${MT_PORT:-5050}:5000"
+      # A fordito hitelesites nelkuli, ezert csak helyben hasznalhato.
+      - "${MT_BIND:-127.0.0.1}:${MT_PORT:-5050}:5000"
 
 volumes:
   help_dbdata:
