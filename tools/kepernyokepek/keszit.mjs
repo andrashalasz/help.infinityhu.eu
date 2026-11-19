@@ -74,6 +74,7 @@ const ALAP_CSERE = [
   ['Ignáth György', 'Minta Felhasználó'],
   ['András tesztje','Minta sablon'],
   ['András',        'Minta'],
+  ['Andras',        'Minta'],
 ];
 
 const CSERE = ALAP_CSERE.concat(
@@ -193,6 +194,17 @@ async function takarj(page) {
       });
     }, CSERE).catch(() => {});
   }
+  // Hosszu, egybefuggo szamsor (bankszamlaszam, egyeb azonosito) ne latsszon a
+  // kepen. A tesztadatban is lehet valodinak tuno szam, a sugo viszont nyilvanos.
+  await page.evaluate(() => {
+    const bejaro = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    const csomopontok = [];
+    while (bejaro.nextNode()) { csomopontok.push(bejaro.currentNode); }
+    csomopontok.forEach(n => {
+      const v = n.nodeValue.replace(/\d{10,}/g, m => '\u2022'.repeat(m.length));
+      if (v !== n.nodeValue) { n.nodeValue = v; }
+    });
+  }).catch(() => {});
 }
 
 /** A lista betoltodeset nem elegszik meg a networkidle - a tablazat utolag rajzol. */
@@ -201,6 +213,46 @@ async function varjALISTARA(page) {
   await page.waitForSelector('table', { timeout: 15000 }).catch(() => {});
   await varj(900);
 }
+
+/**
+ * Egy tabla adott fejlecu oszlopanak minden cellaja helyere mintaszoveg kerul.
+ *
+ * Szerkezeti alapon dolgozik, NEM nevlistaval: a nevlista (ALAP_CSERE) a nyilvanos
+ * repoban van, es ha oda valodinak tuno nevet irnank, azzal kiadnank. A {n} a
+ * sorszam helyere kerul.
+ */
+async function nevOszlopTakaras(p, fejlec, minta) {
+  await p.evaluate(({ fejlec, minta }) => {
+    document.querySelectorAll('table').forEach(t => {
+      const fejek = [...t.querySelectorAll('tr th')];
+      const idx = fejek.findIndex(h => (h.textContent || '').trim().toLowerCase() === fejlec.toLowerCase());
+      if (idx < 0) { return; }
+      let n = 0;
+      t.querySelectorAll('tbody tr').forEach(tr => {
+        const td = tr.children[idx];
+        if (!td || td.querySelector('input, select')) { return; }
+        if (!(td.textContent || '').trim()) { return; }
+        n++;
+        const bejaro = document.createTreeWalker(td, NodeFilter.SHOW_TEXT);
+        const csomopontok = [];
+        while (bejaro.nextNode()) { csomopontok.push(bejaro.currentNode); }
+        csomopontok.filter(c => c.nodeValue.trim())
+          .forEach((c, i) => { c.nodeValue = i === 0 ? minta.replace('{n}', String(n)) : ''; });
+      });
+    });
+  }, { fejlec, minta }).catch(() => {});
+}
+
+/** A fooldal egy fulenek kepe: megnyitja a fulet, es var, amig kirajzolodik. */
+const fulKepe = (nev, mit, tab, ms = 5000, utana = null) => ({
+  nev, mit, url: '/',
+  async lepesek(p) {
+    await varjALISTARA(p);
+    const f = p.locator(`a[data-tab="pageTab-${tab}"]`).first();
+    if (await f.count()) { await f.click({ force: true }).catch(() => {}); await varj(ms); }
+    if (utana) { await utana(p); }
+  }
+});
 
 const KEPEK = [
   // ---------- Vevoi / Szallitoi egyenlegek ----------
@@ -447,6 +499,34 @@ const KEPEK = [
     async lepesek(p){ await varjALISTARA(p);
       const f=p.locator('a[data-tab="pageTab-hrManagement"]').first();
       if(await f.count()){ await f.click().catch(()=>{}); await varj(5000); } } },
+
+  // ---------- A fooldal tobbi fule (3.12) ----------
+  // Az "Ugyintezes" a Sajat teendoim jobb paneljenek "Adminisztracio" pill-je:
+  // jogosultsag alapu csapatfeladatok, amit ha valaki elvegez, mindenkinel eltunik.
+  { nev:'fooldal-04-adminisztracio', mit:'Az Adminisztracio pill a Sajat teendoim jobb paneljen',
+    url:'/',
+    async lepesek(p){ await varjALISTARA(p);
+      const k = p.locator('text=Adminisztráció').filter({hasNotText:'Rendszer'}).last();
+      if (await k.count()) { await k.click({ force:true }).catch(()=>{}); await varj(3500); }
+      // Ezen a nezeten a sor .number eleme a dolgozo neve (a tobbi nezeten
+      // dokumentumszam), ezert csak itt, csak a lathato soroknal cserelunk.
+      await p.evaluate(() => {
+        let n = 0;
+        document.querySelectorAll('.involvementsItem .number').forEach(e => {
+          if (e.offsetParent === null) { return; }
+          n++; e.textContent = 'Minta Dolgozó ' + n;
+        });
+      }).catch(()=>{}); } },
+  fulKepe('fooldal-05-sajat-hr',          'A Sajat HR adataim ful',                 'employed'),
+  fulKepe('fooldal-06-kapcsolatok',       'A Kapcsolatok & Leadek ful',             'crmmanagement'),
+  // A kontaktlistaban valodinak tuno nev-cegparok vannak - a kepen nem maradhatnak.
+  fulKepe('fooldal-07-projektek',         'A Projektek ful',                        'crmtask', 5000,
+          p => nevOszlopTakaras(p, 'Név', 'Minta Kapcsolat {n} (Minta Kft.)')),
+  fulKepe('fooldal-08-projektmenedzsment','A Project management ful',              'projectTask'),
+  fulKepe('fooldal-09-eladasok',          'Az Eladasok ful',                        'sales',     6000),
+  fulKepe('fooldal-10-raktar',            'A Raktar & Beszerzes ful',               'inventory', 6000),
+  fulKepe('fooldal-11-gyartas',           'A Gyartas ful',                          'manufacturing'),
+  fulKepe('fooldal-12-dokumentum-feltoltes','A Dokumentum feltoltes ful',           'docUpload'),
 
   { nev:'fooldal-03-vezetoi', mit:'A vezetoi attekinto a penzugyi csempekkel',
     url:'/',
