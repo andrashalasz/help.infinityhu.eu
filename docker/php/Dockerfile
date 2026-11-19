@@ -41,6 +41,10 @@ RUN mkdir -p /srv/munkamenet && chown www-data:www-data /srv/munkamenet && chmod
 # A kornyezeti valtozok (HELP_DB_*, APP_COMMIT) eljussanak a PHP-hoz.
 RUN printf '[www]\nclear_env = no\n' > /usr/local/etc/php-fpm.d/zz-env.conf
 
+# Tobb worker, mint a kep alapertelmezett 5-je: a gepi forditas percekig foglal egyet,
+# es enelkul az egesz oldal sorba all. Indoklas a fajl elejen.
+COPY zz-pool.conf /usr/local/etc/php-fpm.d/zz-pool.conf
+
 # A VERZIO, amit ez a kepfajl kiszolgal. Az eles frissito (deploy/sugo-frissito.py)
 # tolti ki; a Frissites lap es az ellenorzes ebbol tudja, mi fut. Szandekosan az
 # utolso reteg: igy a valtozasa nem epiti ujra a fenti, lassu retegeket.
